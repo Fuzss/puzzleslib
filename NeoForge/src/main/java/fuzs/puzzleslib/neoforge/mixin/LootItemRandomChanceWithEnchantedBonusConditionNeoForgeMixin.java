@@ -15,12 +15,14 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 abstract class LootItemRandomChanceWithEnchantedBonusConditionNeoForgeMixin {
     @Shadow
     @Final
-    public Holder<Enchantment> enchantment;
+    private Holder<Enchantment> enchantment;
 
-    @ModifyVariable(method = "test", at = @At("STORE"), ordinal = 0)
+    @ModifyVariable(method = "test(Lnet/minecraft/world/level/storage/loot/LootContext;)Z",
+            at = @At("STORE"),
+            ordinal = 0)
     public int test(int enchantmentLevel, LootContext lootContext) {
-        return ComputeEnchantedLootBonusEvent.onComputeEnchantedLootBonus(this.enchantment, enchantmentLevel,
-                lootContext
-        );
+        return ComputeEnchantedLootBonusEvent.onComputeEnchantedLootBonus(this.enchantment,
+                enchantmentLevel,
+                lootContext);
     }
 }

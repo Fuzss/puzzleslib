@@ -9,6 +9,7 @@ import net.minecraft.world.item.CreativeModeTab;
 /**
  * Add items to a creative tab.
  */
+@Deprecated
 public interface BuildCreativeModeTabContentsContext {
 
     /**

@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.FireBlock;
 
 import java.util.Objects;
 
+@Deprecated
 public final class FlammableBlocksContextNeoForgeImpl implements FlammableBlocksContext {
 
     @Override

@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.api.shape.v1;
 
-import com.google.common.collect.Maps;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -12,6 +11,7 @@ import java.util.Map;
 /**
  * A simple helper class for {@link VoxelShape}, mainly used for applying rotations.
  */
+@Deprecated
 public final class ShapesHelper {
 
     private ShapesHelper() {
@@ -28,11 +28,7 @@ public final class ShapesHelper {
      * @return the rotated shapes
      */
     public static Map<Direction, VoxelShape> rotate(VoxelShape voxelShape) {
-        Map<Direction, VoxelShape> shapes = Maps.newEnumMap(Direction.class);
-        for (Direction direction : Direction.values()) {
-            shapes.put(direction, rotate(direction.getRotation(), voxelShape));
-        }
-        return Maps.immutableEnumMap(shapes);
+        return fuzs.puzzleslib.api.util.v1.ShapesHelper.rotate(voxelShape);
     }
 
     /**
@@ -45,12 +41,7 @@ public final class ShapesHelper {
      * @return the rotated shapes
      */
     public static Map<Direction, VoxelShape> rotateHorizontally(VoxelShape voxelShape) {
-        Map<Direction, VoxelShape> shapes = Maps.newEnumMap(Direction.class);
-        for (Direction direction : Direction.Plane.HORIZONTAL) {
-            Quaternionf rotation = getHorizontalRotation(direction);
-            shapes.put(direction, rotate(rotation, voxelShape));
-        }
-        return Maps.immutableEnumMap(shapes);
+        return fuzs.puzzleslib.api.util.v1.ShapesHelper.rotateHorizontally(voxelShape);
     }
 
     /**
@@ -62,7 +53,7 @@ public final class ShapesHelper {
      * @return the quaternion
      */
     public static Quaternionf getHorizontalRotation(Direction direction) {
-        return new Quaternionf().rotationY((float) Math.atan2(direction.getStepX(), direction.getStepZ()));
+        return fuzs.puzzleslib.api.util.v1.ShapesHelper.getHorizontalRotation(direction);
     }
 
     @Deprecated(forRemoval = true)
@@ -86,7 +77,7 @@ public final class ShapesHelper {
      * @return the rotated shape
      */
     public static VoxelShape rotate(Quaternionf rotation, VoxelShape voxelShape) {
-        return rotate(rotation, voxelShape, new Vector3d(0.5, 0.5, 0.5));
+        return fuzs.puzzleslib.api.util.v1.ShapesHelper.rotate(rotation, voxelShape);
     }
 
     /**
@@ -101,13 +92,7 @@ public final class ShapesHelper {
      * @return the rotated shape
      */
     public static VoxelShape rotate(Quaternionf rotation, VoxelShape voxelShape, Vector3d originOffset) {
-        VoxelShape[] joinedVoxelShape = new VoxelShape[]{Shapes.empty()};
-        voxelShape.forAllBoxes((minX, minY, minZ, maxX, maxY, maxZ) -> {
-            Vector3d start = rotation.transform(new Vector3d(minX, minY, minZ).sub(originOffset)).add(originOffset);
-            Vector3d end = rotation.transform(new Vector3d(maxX, maxY, maxZ).sub(originOffset)).add(originOffset);
-            joinedVoxelShape[0] = Shapes.or(joinedVoxelShape[0], box(start.x, start.y, start.z, end.x, end.y, end.z));
-        });
-        return joinedVoxelShape[0];
+        return fuzs.puzzleslib.api.util.v1.ShapesHelper.rotate(rotation, voxelShape, originOffset);
     }
 
     /**
@@ -126,8 +111,6 @@ public final class ShapesHelper {
      * @return the new shape
      */
     public static VoxelShape box(double startX, double startY, double startZ, double endX, double endY, double endZ) {
-        return Shapes.box(Math.min(startX, endX), Math.min(startY, endY), Math.min(startZ, endZ),
-                Math.max(startX, endX), Math.max(startY, endY), Math.max(startZ, endZ)
-        );
+        return fuzs.puzzleslib.api.util.v1.ShapesHelper.box(startX, startY, startZ, endX, endY, endZ);
     }
 }

@@ -2,7 +2,7 @@ package fuzs.puzzleslib.api.data.v2.tags;
 
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
-import fuzs.puzzleslib.impl.core.CommonFactories;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.data.PackOutput;
@@ -31,8 +31,8 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
         super(packOutput, registryKey, registries);
         this.modId = modId;
         this.registry = RegistryHelper.findNullableBuiltInRegistry(registryKey);
-        this.keyExtractor = this.registry != null ? (T t) -> RegistryHelper.getResourceKeyOrThrow(this.registry, t) :
-                null;
+        this.keyExtractor =
+                this.registry != null ? (T t) -> RegistryHelper.getResourceKeyOrThrow(this.registry, t) : null;
     }
 
     @Override
@@ -55,7 +55,7 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     }
 
     public AbstractTagAppender<T> add(TagKey<T> tagKey) {
-        return CommonFactories.INSTANCE.getTagAppender(this.getOrCreateRawBuilder(tagKey), this.keyExtractor);
+        return ProxyImpl.get().getTagAppender(this.getOrCreateRawBuilder(tagKey), this.keyExtractor);
     }
 
     protected Registry<T> registry() {

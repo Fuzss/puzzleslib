@@ -65,6 +65,32 @@ public interface ModLoaderEnvironment {
     boolean isDataGeneration();
 
     /**
+     * @param modId the mod id
+     * @return is this running in a development environment with the system property
+     *         {@code ${modId}.isDevelopmentEnvironment=true} set
+     */
+    default boolean isDevelopmentEnvironmentWithoutDataGeneration(String modId) {
+        if (this.isDataGeneration()) {
+            return false;
+        } else {
+            return this.isDevelopmentEnvironment(modId);
+        }
+    }
+
+    /**
+     * @param modId the mod id
+     * @return is this running in a development environment with the system property
+     *         {@code ${modId}.isDevelopmentEnvironment=true} set
+     */
+    default boolean isDevelopmentEnvironment(String modId) {
+        if (!this.isDevelopmentEnvironment()) {
+            return false;
+        } else {
+            return Boolean.getBoolean(modId + ".isDevelopmentEnvironment");
+        }
+    }
+
+    /**
      * @return a wrapped mod list
      */
     Map<String, ModContainer> getModList();
@@ -86,9 +112,8 @@ public interface ModLoaderEnvironment {
     }
 
     /**
-     * A simple check for any mod constructed using Puzzles Lib to find if the mod is installed on the server.
-     * <p>
-     * Useful for altering client behavior depending on the server mod state.
+     * A simple check for any mod constructed using Puzzles Lib to find if the mod is installed on the server; useful
+     * for altering behaviour depending on the mod state.
      * <p>
      * This method <b>CANNOT</b> be used for checking the state of any arbitrary mod, only Puzzles Lib mods are
      * supported.
@@ -97,6 +122,8 @@ public interface ModLoaderEnvironment {
      * @return is the mod installed on the server
      */
     default boolean isModPresentServerside(String modId) {
-        return ModContext.isPresentServerside(modId);
+        return ModContext.getModContexts().containsKey(modId) && ModContext.getModContexts()
+                .get(modId)
+                .isPresentServerside();
     }
 }

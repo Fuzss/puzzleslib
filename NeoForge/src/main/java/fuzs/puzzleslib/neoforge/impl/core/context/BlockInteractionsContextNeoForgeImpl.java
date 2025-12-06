@@ -23,6 +23,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+@Deprecated
 public final class BlockInteractionsContextNeoForgeImpl implements BlockInteractionsContext {
     private final Map<ItemAbility, Map<Block, BlockInteraction>> abilities = new IdentityHashMap<>();
 

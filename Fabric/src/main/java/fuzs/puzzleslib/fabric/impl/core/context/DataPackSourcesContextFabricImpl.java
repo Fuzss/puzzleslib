@@ -23,14 +23,14 @@ public final class DataPackSourcesContextFabricImpl implements PackRepositorySou
     }
 
     @Override
-    public void registerBuiltInPack(ResourceLocation resourceLocation, Component displayName, boolean isRequired) {
+    public void registerBuiltInPack(ResourceLocation resourceLocation, Component displayName, boolean shouldAddAutomatically) {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(displayName, "display name is null");
-        registerBuiltInPack(resourceLocation, displayName, isRequired, PackType.SERVER_DATA);
+        registerBuiltInPack(resourceLocation, displayName, shouldAddAutomatically, PackType.SERVER_DATA);
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    public static void registerBuiltInPack(ResourceLocation resourceLocation, Component displayName, boolean isRequired, PackType packType) {
+    public static void registerBuiltInPack(ResourceLocation resourceLocation, Component displayName, boolean shouldAddAutomatically, PackType packType) {
         ModContainer modContainer = FabricLoader.getInstance()
                 .getModContainer(resourceLocation.getNamespace())
                 .orElseThrow();
@@ -38,6 +38,7 @@ public final class DataPackSourcesContextFabricImpl implements PackRepositorySou
                 PackResourcesHelper.getBuiltInPack(resourceLocation, packType).getPath(),
                 modContainer,
                 displayName,
-                isRequired ? ResourcePackActivationType.ALWAYS_ENABLED : ResourcePackActivationType.NORMAL);
+                shouldAddAutomatically ? ResourcePackActivationType.DEFAULT_ENABLED :
+                        ResourcePackActivationType.NORMAL);
     }
 }

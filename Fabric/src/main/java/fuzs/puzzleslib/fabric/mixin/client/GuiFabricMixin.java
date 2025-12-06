@@ -27,7 +27,7 @@ import java.util.Optional;
 abstract class GuiFabricMixin {
     @Shadow
     @Final
-    private Minecraft minecraft;
+    public Minecraft minecraft;
 
     @Inject(
             method = "render", at = @At(

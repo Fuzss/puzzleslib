@@ -14,6 +14,7 @@ import net.minecraft.world.item.crafting.*;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
+@Deprecated
 public interface CopyComponentsRecipe {
     /**
      * The shaped recipe serializer id that is used during registration.

@@ -25,6 +25,7 @@ import java.util.function.UnaryOperator;
  * Allows for skipping a screen that's just been opened by automatically triggering the press action of a button on that
  * screen.
  */
+@Deprecated
 public final class ScreenSkipper {
     public static final Codec<ScreenSkipper> CODEC = RecordCodecBuilder.create(instance -> instance.group(Codec.STRING.optionalFieldOf(
                     "screen_title_translation_key").forGetter(config -> getOptionalComponent(config.titleComponent)),

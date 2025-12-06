@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.impl.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
 import fuzs.puzzleslib.api.client.event.v1.gui.AddToastCallback;
@@ -14,7 +13,6 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.config.ConfigTranslationsManager;
-import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -46,12 +44,11 @@ public class PuzzlesLibClient implements ClientModConstructor {
     }
 
     private static void registerEventHandlers() {
-        AddResourcePackReloadListenersCallback.EVENT.register(
-                ConfigTranslationsManager::onAddResourcePackReloadListeners);
+        AddResourcePackReloadListenersCallback.EVENT.register(ConfigTranslationsManager::onAddResourcePackReloadListeners);
     }
 
     private static void setupDevelopmentEnvironment() {
-        if (!PuzzlesLib.isDevelopmentEnvironmentWithoutDataGeneration()) return;
+        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironmentWithoutDataGeneration(PuzzlesLib.MOD_ID)) return;
         if (ModLoaderEnvironment.INSTANCE.getModLoader().isForgeLike()) {
             setupGameOptions();
         }
@@ -64,16 +61,16 @@ public class PuzzlesLibClient implements ClientModConstructor {
             }
             return EventResult.PASS;
         });
-        ScreenEvents.beforeInit(TitleScreen.class).register(
-                (Minecraft minecraft, TitleScreen screen, int screenWidth, int screenHeight, List<AbstractWidget> widgets) -> {
-                    if (minecraft.getOverlay() instanceof LoadingOverlay loadingOverlay &&
-                            loadingOverlay.fadeOutStart != 0L) {
+        ScreenEvents.beforeInit(TitleScreen.class)
+                .register((Minecraft minecraft, TitleScreen screen, int screenWidth, int screenHeight, List<AbstractWidget> widgets) -> {
+                    if (minecraft.getOverlay() instanceof LoadingOverlay loadingOverlay
+                            && loadingOverlay.fadeOutStart != 0L) {
                         loadingOverlay.fadeOutStart = 0L;
                     }
                 });
         AddToastCallback.EVENT.register((ToastComponent toastManager, Toast toast) -> {
-            if (toast instanceof SystemToast systemToast &&
-                    systemToast.getToken() == SystemToast.SystemToastId.UNSECURE_SERVER_WARNING) {
+            if (toast instanceof SystemToast systemToast
+                    && systemToast.getToken() == SystemToast.SystemToastId.UNSECURE_SERVER_WARNING) {
                 // block the annoying unsecure server warning when joining a multiplayer server in offline mode
                 return EventResult.INTERRUPT;
             } else if (toastManager.freeSlots() == 0) {
@@ -84,10 +81,14 @@ public class PuzzlesLibClient implements ClientModConstructor {
             }
         });
         // skip experimental settings warning
-        ScreenSkipper.create().setTitleComponent("selectWorld.backupQuestion.experimental").setButtonComponent(
-                "selectWorld.backupJoinSkipButton").build();
-        ScreenSkipper.create().setTitleComponent("selectWorld.warning.experimental.title").setButtonComponent(
-                CommonComponents.GUI_YES).build();
+        ScreenSkipper.create()
+                .setTitleComponent("selectWorld.backupQuestion.experimental")
+                .setButtonComponent("selectWorld.backupJoinSkipButton")
+                .build();
+        ScreenSkipper.create()
+                .setTitleComponent("selectWorld.warning.experimental.title")
+                .setButtonComponent(CommonComponents.GUI_YES)
+                .build();
         // launch directly into the key binds screen from the controls button
         ScreenSkipper.create()
                 .setTitleComponent("controls.title")
@@ -95,12 +96,12 @@ public class PuzzlesLibClient implements ClientModConstructor {
                 .setLastTitleComponent("options.title")
                 .build();
         // required for EditBox mixin to work properly on all screens like ChatScreen
-        ScreenMouseEvents.beforeMouseClick(Screen.class).register(
-                (Screen screen, double mouseX, double mouseY, int button) -> {
+        ScreenMouseEvents.beforeMouseClick(Screen.class)
+                .register((Screen screen, double mouseX, double mouseY, int button) -> {
                     for (GuiEventListener guiEventListener : screen.children()) {
-                        if (guiEventListener instanceof EditBox && guiEventListener.mouseClicked(mouseX, mouseY,
-                                button
-                        )) {
+                        if (guiEventListener instanceof EditBox && guiEventListener.mouseClicked(mouseX,
+                                mouseY,
+                                button)) {
                             screen.setFocused(guiEventListener);
                             if (button == InputConstants.MOUSE_BUTTON_LEFT) {
                                 screen.setDragging(true);
@@ -110,20 +111,22 @@ public class PuzzlesLibClient implements ClientModConstructor {
                     }
                     return EventResult.PASS;
                 });
-        ScreenMouseEvents.beforeMouseRelease(Screen.class).register(
-                (Screen screen, double mouseX, double mouseY, int button) -> {
+        ScreenMouseEvents.beforeMouseRelease(Screen.class)
+                .register((Screen screen, double mouseX, double mouseY, int button) -> {
                     screen.setDragging(false);
-                    return screen.getChildAt(mouseX, mouseY).filter(EditBox.class::isInstance).filter(
-                            (GuiEventListener guiEventListener) -> {
+                    return screen.getChildAt(mouseX, mouseY)
+                            .filter(EditBox.class::isInstance)
+                            .filter((GuiEventListener guiEventListener) -> {
                                 return guiEventListener.mouseReleased(mouseX, mouseY, button);
-                            }).isPresent() ? EventResult.INTERRUPT : EventResult.PASS;
+                            })
+                            .isPresent() ? EventResult.INTERRUPT : EventResult.PASS;
                 });
-        ScreenMouseEvents.beforeMouseDrag(Screen.class).register(
-                (Screen screen, double mouseX, double mouseY, int button, double dragX, double dragY) -> {
-                    return screen.getFocused() instanceof EditBox && screen.isDragging() &&
-                            button == InputConstants.MOUSE_BUTTON_LEFT && screen.getFocused().mouseDragged(mouseX,
-                            mouseY, button, dragX, dragY
-                    ) ? EventResult.INTERRUPT : EventResult.PASS;
+        ScreenMouseEvents.beforeMouseDrag(Screen.class)
+                .register((Screen screen, double mouseX, double mouseY, int button, double dragX, double dragY) -> {
+                    return screen.getFocused() instanceof EditBox && screen.isDragging()
+                            && button == InputConstants.MOUSE_BUTTON_LEFT && screen.getFocused()
+                            .mouseDragged(mouseX, mouseY, button, dragX, dragY) ? EventResult.INTERRUPT :
+                            EventResult.PASS;
                 });
     }
 
@@ -158,10 +161,8 @@ public class PuzzlesLibClient implements ClientModConstructor {
 
     @Override
     public void onClientSetup() {
-        EventHandlerProvider.tryRegister(ClientAbstractions.INSTANCE);
-        if (PuzzlesLib.isDevelopmentEnvironmentWithoutDataGeneration()) {
-            CreativeModeInventoryScreen.selectedTab = BuiltInRegistries.CREATIVE_MODE_TAB.getOrThrow(
-                    CreativeModeTabs.SEARCH);
+        if (ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironmentWithoutDataGeneration(PuzzlesLib.MOD_ID)) {
+            CreativeModeInventoryScreen.selectedTab = BuiltInRegistries.CREATIVE_MODE_TAB.getOrThrow(CreativeModeTabs.SEARCH);
         }
     }
 }

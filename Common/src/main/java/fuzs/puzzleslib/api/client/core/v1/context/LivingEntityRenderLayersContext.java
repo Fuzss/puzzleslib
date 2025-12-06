@@ -15,6 +15,7 @@ import java.util.function.Predicate;
 /**
  * Register additional {@link RenderLayer RenderLayer} for any living entity, including players.
  */
+@Deprecated
 @FunctionalInterface
 public interface LivingEntityRenderLayersContext {
 

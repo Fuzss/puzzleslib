@@ -5,6 +5,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
 import net.minecraft.world.entity.LivingEntity;
 
+@Deprecated(forRemoval = true)
 public final class LivingBreathEvents {
     public static final EventInvoker<Breathe> BREATHE = EventInvoker.lookup(Breathe.class);
     public static final EventInvoker<Drown> DROWN = EventInvoker.lookup(Drown.class);

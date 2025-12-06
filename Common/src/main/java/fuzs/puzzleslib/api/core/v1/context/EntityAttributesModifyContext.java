@@ -8,7 +8,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 /**
  * Registers modifications to attributes of already existing entities.
  */
-@FunctionalInterface
+@Deprecated
 public interface EntityAttributesModifyContext {
 
     /**

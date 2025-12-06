@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.fabric.mixin;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
@@ -40,9 +41,8 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
     @Nullable
     private Collection<ItemEntity> puzzleslib$capturedDrops;
 
-    @WrapWithCondition(
-            method = "rideTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V")
-    )
+    @WrapWithCondition(method = "rideTick",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V"))
     public boolean rideTick(Entity entity, @Share("isEntityTickCancelled") LocalBooleanRef isEntityTickCancelled) {
         // avoid using @WrapOperation, so we are not blamed for any overhead from running the entity tick
         EventResult result = FabricEntityEvents.ENTITY_TICK_START.invoker().onStartEntityTick(entity);
@@ -50,10 +50,8 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
         return result.isPass();
     }
 
-    @Inject(
-            method = "rideTick",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V", shift = At.Shift.AFTER)
-    )
+    @Inject(method = "rideTick",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V", shift = At.Shift.AFTER))
     public void rideTick(CallbackInfo callback, @Share("isEntityTickCancelled") LocalBooleanRef isEntityTickCancelled) {
         if (!isEntityTickCancelled.get()) {
             FabricEntityEvents.ENTITY_TICK_END.invoker().onEndEntityTick(Entity.class.cast(this));
@@ -72,50 +70,41 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
         return this.puzzleslib$capturedDrops;
     }
 
-    @WrapWithCondition(
-            method = "spawnAtLocation(Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"
-            )
-    )
-    public boolean spawnAtLocation(Level level, Entity entity) {
+    @Inject(method = "spawnAtLocation(Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"),
+            cancellable = true)
+    public void spawnAtLocation(CallbackInfoReturnable<ItemEntity> callback, @Local ItemEntity itemEntity) {
         Collection<ItemEntity> capturedDrops = this.puzzleslib$getCapturedDrops();
         if (capturedDrops != null) {
-            capturedDrops.add((ItemEntity) entity);
-            return false;
-        } else {
-            return true;
+            capturedDrops.add(itemEntity);
+            callback.setReturnValue(itemEntity);
         }
     }
 
-    @Inject(
-            method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z", at = @At(
-            value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isPassenger()Z", shift = At.Shift.BEFORE
-    ), cancellable = true
-    )
+    @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isPassenger()Z"),
+            cancellable = true)
     public void startRiding(Entity vehicle, boolean force, CallbackInfoReturnable<Boolean> callback) {
         // runs a little later than Forge when it is actually guaranteed for the rider to start riding
-        EventResult result = FabricEntityEvents.ENTITY_START_RIDING.invoker().onStartRiding(this.level,
-                Entity.class.cast(this), vehicle
-        );
+        EventResult result = FabricEntityEvents.ENTITY_START_RIDING.invoker()
+                .onStartRiding(this.level, Entity.class.cast(this), vehicle);
         if (result.isInterrupt()) callback.setReturnValue(false);
     }
 
     @Inject(method = "removeVehicle", at = @At("HEAD"), cancellable = true)
     public void removeVehicle(CallbackInfo callback) {
         if (this.vehicle != null) {
-            EventResult result = FabricEntityEvents.ENTITY_STOP_RIDING.invoker().onStopRiding(this.level,
-                    Entity.class.cast(this), this.vehicle
-            );
+            EventResult result = FabricEntityEvents.ENTITY_STOP_RIDING.invoker()
+                    .onStopRiding(this.level, Entity.class.cast(this), this.vehicle);
             if (result.isInterrupt()) callback.cancel();
         }
     }
 
     @Inject(method = "<init>", at = @At("TAIL"))
     public void init(EntityType<?> entityType, Level level, CallbackInfo callback) {
-        EventResultHolder<EntityDimensions> result = FabricEntityEvents.CHANGE_ENTITY_SIZE.invoker().onChangeEntitySize(
-                Entity.class.cast(this), Pose.STANDING, entityType.getDimensions());
+        EventResultHolder<EntityDimensions> result = FabricEntityEvents.REFRESH_ENTITY_DIMENSIONS.invoker()
+                .onRefreshEntityDimensions(Entity.class.cast(this), Pose.STANDING, entityType.getDimensions());
         result.ifInterrupt((EntityDimensions entityDimensions) -> {
             this.dimensions = entityDimensions;
             this.eyeHeight = entityDimensions.eyeHeight();
@@ -124,8 +113,8 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
 
     @ModifyVariable(method = "refreshDimensions", at = @At("STORE"), ordinal = 1)
     public EntityDimensions refreshDimensions(EntityDimensions entityDimensions) {
-        EventResultHolder<EntityDimensions> result = FabricEntityEvents.CHANGE_ENTITY_SIZE.invoker().onChangeEntitySize(
-                Entity.class.cast(this), this.getPose(), entityDimensions);
+        EventResultHolder<EntityDimensions> result = FabricEntityEvents.REFRESH_ENTITY_DIMENSIONS.invoker()
+                .onRefreshEntityDimensions(Entity.class.cast(this), this.getPose(), entityDimensions);
         return result.getInterrupt().orElse(entityDimensions);
     }
 

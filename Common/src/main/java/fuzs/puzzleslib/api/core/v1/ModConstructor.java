@@ -1,13 +1,11 @@
 package fuzs.puzzleslib.api.core.v1;
 
 import fuzs.puzzleslib.api.core.v1.context.*;
-import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.core.CommonFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
+import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.resources.ResourceLocation;
-import org.apache.logging.log4j.util.Strings;
 
-import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -17,24 +15,26 @@ import java.util.function.Supplier;
 public interface ModConstructor extends BaseModConstructor {
 
     /**
-     * Construct the main {@link ModConstructor} instance provided as <code>supplier</code> to begin initialization of a
-     * mod.
+     * Construct the {@link ModConstructor} instance to begin initialization of a mod.
      *
-     * @param modId          the mod id for registering events on Forge to the correct mod event bus
-     * @param modConstructor the main mod instance for mod setup
+     * @param modId                  the mod id
+     * @param modConstructorSupplier the mod instance for the setup
      */
-    static void construct(String modId, Supplier<ModConstructor> modConstructor) {
-        if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id is empty");
-        // build first to force class being loaded for executing buildables
-        ModConstructor instance = modConstructor.get();
-        ResourceLocation identifier = ModContext.getPairingIdentifier(modId, instance);
-        PuzzlesLib.LOGGER.info("Constructing common components for {}", identifier);
-        ModContext modContext = ModContext.get(modId);
-        Set<ContentRegistrationFlags> availableFlags = Set.of(instance.getContentRegistrationFlags());
-        Set<ContentRegistrationFlags> flagsToHandle = modContext.getFlagsToHandle(availableFlags);
-        modContext.beforeModConstruction();
-        CommonFactories.INSTANCE.constructMod(modId, instance, availableFlags, flagsToHandle);
-        modContext.afterModConstruction(identifier);
+    static void construct(String modId, Supplier<ModConstructor> modConstructorSupplier) {
+        construct(ResourceLocation.fromNamespaceAndPath(modId, "common"), modConstructorSupplier);
+    }
+
+    /**
+     * Construct the {@link ModConstructor} instance to begin initialization of a mod.
+     *
+     * @param resourceLocation       the identifier for the provided mod instance
+     * @param modConstructorSupplier the mod instance for the setup
+     */
+    static void construct(ResourceLocation resourceLocation, Supplier<ModConstructor> modConstructorSupplier) {
+        ModConstructorImpl.construct(resourceLocation,
+                modConstructorSupplier,
+                ProxyImpl.get()::getModConstructorImpl,
+                ModContext::runBeforeConstruction);
     }
 
     /**
@@ -56,6 +56,13 @@ public interface ModConstructor extends BaseModConstructor {
     }
 
     /**
+     * @param context register attributes for entities
+     */
+    default void onRegisterEntityAttributes(EntityAttributesContext context) {
+        // NO-OP
+    }
+
+    /**
      * @param context add to entity spawn placement register
      */
     default void onRegisterSpawnPlacements(final SpawnPlacementsContext context) {
@@ -65,6 +72,7 @@ public interface ModConstructor extends BaseModConstructor {
     /**
      * @param context add default attributes for our own entities to entity attribute map
      */
+    @Deprecated
     default void onEntityAttributeCreation(final EntityAttributesCreateContext context) {
         // NO-OP
     }
@@ -72,6 +80,7 @@ public interface ModConstructor extends BaseModConstructor {
     /**
      * @param context replace or add attribute in entity attribute map
      */
+    @Deprecated
     default void onEntityAttributeModification(final EntityAttributesModifyContext context) {
         // NO-OP
     }
@@ -134,6 +143,7 @@ public interface ModConstructor extends BaseModConstructor {
     /**
      * @param context add items to a creative tab
      */
+    @Deprecated
     default void onBuildCreativeModeTabContents(final BuildCreativeModeTabContentsContext context) {
         // NO-OP
     }
@@ -142,6 +152,27 @@ public interface ModConstructor extends BaseModConstructor {
      * @param context register additional data pack sources
      */
     default void onAddDataPackFinders(final PackRepositorySourcesContext context) {
+        // NO-OP
+    }
+
+    /**
+     * @param context register built-in static registries
+     */
+    default void onRegisterGameRegistries(GameRegistriesContext context) {
+        // NO-OP
+    }
+
+    /**
+     * @param context register data pack-driven dynamic registries
+     */
+    default void onRegisterDataPackRegistries(DataPackRegistriesContext context) {
+        // NO-OP
+    }
+
+    /**
+     * @param context register new villager trades
+     */
+    default void onRegisterVillagerTrades(VillagerTradesContext context) {
         // NO-OP
     }
 }

@@ -4,7 +4,7 @@ import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
 import fuzs.puzzleslib.impl.config.serialization.EnumProvider;
 import fuzs.puzzleslib.impl.config.serialization.RegistryProvider;
-import fuzs.puzzleslib.impl.core.CommonFactories;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -82,9 +82,9 @@ public interface KeyedValueProvider<T> {
      */
     static <T> AbstractTagAppender<T> tagAppender(ResourceKey<? extends Registry<? super T>> registryKey) {
         Registry<T> registry = RegistryHelper.findNullableBuiltInRegistry(registryKey);
-        Function<T, ResourceKey<T>> keyExtractor = registry != null ? (T t) -> RegistryHelper.getResourceKeyOrThrow(
-                registry, t) : null;
-        return CommonFactories.INSTANCE.getTagAppender(new TagBuilder(), keyExtractor);
+        Function<T, ResourceKey<T>> keyExtractor =
+                registry != null ? (T t) -> RegistryHelper.getResourceKeyOrThrow(registry, t) : null;
+        return ProxyImpl.get().getTagAppender(new TagBuilder(), keyExtractor);
     }
 
     /**
@@ -124,8 +124,12 @@ public interface KeyedValueProvider<T> {
      */
     @SafeVarargs
     static <T> List<String> toString(KeyedValueProvider<T> valueProvider, T... entries) {
-        return Stream.of(entries).peek(Objects::requireNonNull).map(valueProvider::getKey).filter(Objects::nonNull).map(
-                ResourceLocation::toString).collect(Collectors.toList());
+        return Stream.of(entries)
+                .peek(Objects::requireNonNull)
+                .map(valueProvider::getKey)
+                .filter(Objects::nonNull)
+                .map(ResourceLocation::toString)
+                .collect(Collectors.toList());
     }
 
     /**

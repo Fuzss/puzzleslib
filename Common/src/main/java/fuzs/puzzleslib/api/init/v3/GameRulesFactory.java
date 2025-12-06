@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.init.v3;
 
-import fuzs.puzzleslib.impl.core.CommonFactories;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
@@ -9,13 +9,14 @@ import java.util.function.BiConsumer;
 
 /**
  * Helper class for registering custom game rules.
- * <p>Fabric has many custom options for game rules (mainly double and enum rules), but since they don't exist on Forge we don't support them.
+ * <p>Fabric has many custom options for game rules (mainly double and enum rules), but since they don't exist on Forge
+ * we don't support them.
  */
 public interface GameRulesFactory {
     /**
      * the instance
      */
-    GameRulesFactory INSTANCE = CommonFactories.INSTANCE.getGameRulesFactory();
+    GameRulesFactory INSTANCE = ProxyImpl.get().getGameRulesFactory();
 
     /**
      * Register a new boolean game rule.
@@ -85,7 +86,8 @@ public interface GameRulesFactory {
 
     /**
      * Create a new {@link net.minecraft.world.level.GameRules.IntegerValue}.
-     * <p>Note that any bounds are not supported on Forge and are therefore simply ignored when creating the new game rule.
+     * <p>Note that any bounds are not supported on Forge and are therefore simply ignored when creating the new game
+     * rule.
      *
      * @param defaultValue the default value for the game rule
      * @param minimumValue the minimum value for this rule, usually {@link Integer#MIN_VALUE}
@@ -97,7 +99,8 @@ public interface GameRulesFactory {
 
     /**
      * Create a new {@link net.minecraft.world.level.GameRules.IntegerValue}.
-     * <p>Note that any bounds are not supported on Forge and are therefore simply ignored when creating the new game rule.
+     * <p>Note that any bounds are not supported on Forge and are therefore simply ignored when creating the new game
+     * rule.
      *
      * @param defaultValue the default value for the game rule
      * @param minimumValue the minimum value for this rule, usually {@link Integer#MIN_VALUE}
@@ -105,9 +108,12 @@ public interface GameRulesFactory {
      * @return the game rule
      */
     default GameRules.Type<GameRules.IntegerValue> createIntRule(int defaultValue, int minimumValue, int maximumValue) {
-        return this.createIntRule(defaultValue, minimumValue, maximumValue, (MinecraftServer server, GameRules.IntegerValue integerValue) -> {
-            // NO-OP
-        });
+        return this.createIntRule(defaultValue,
+                minimumValue,
+                maximumValue,
+                (MinecraftServer server, GameRules.IntegerValue integerValue) -> {
+                    // NO-OP
+                });
     }
 
     /**
@@ -123,7 +129,8 @@ public interface GameRulesFactory {
 
     /**
      * Create a new {@link net.minecraft.world.level.GameRules.IntegerValue}.
-     * <p>Note that any bounds are not supported on Forge and are therefore simply ignored when creating the new game rule.
+     * <p>Note that any bounds are not supported on Forge and are therefore simply ignored when creating the new game
+     * rule.
      *
      * @param defaultValue the default value for the game rule
      * @param minimumValue the minimum value for this rule, usually {@link Integer#MIN_VALUE}
@@ -136,7 +143,8 @@ public interface GameRulesFactory {
 
     /**
      * Create a new {@link net.minecraft.world.level.GameRules.IntegerValue}.
-     * <p>Note that any bounds are not supported on Forge and are therefore simply ignored when creating the new game rule.
+     * <p>Note that any bounds are not supported on Forge and are therefore simply ignored when creating the new game
+     * rule.
      *
      * @param defaultValue the default value for the game rule
      * @param minimumValue the minimum value for this rule, usually {@link Integer#MIN_VALUE}

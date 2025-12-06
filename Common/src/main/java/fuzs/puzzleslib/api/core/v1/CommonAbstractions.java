@@ -1,6 +1,8 @@
 package fuzs.puzzleslib.api.core.v1;
 
 import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
+import fuzs.puzzleslib.api.init.v3.tags.TagFactory;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -8,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
@@ -34,15 +37,20 @@ import java.util.function.BiConsumer;
 /**
  * Useful methods for gameplay related things that require mod loader specific abstractions.
  */
+@Deprecated
 public interface CommonAbstractions {
-    CommonAbstractions INSTANCE = ServiceProviderHelper.load(CommonAbstractions.class);
+    CommonAbstractions INSTANCE = new CommonAbstractions() {
+        // NO-OP
+    };
 
     /**
      * Get the current game server which is captured to allow retrieval from anywhere.
      *
      * @return current game server, null when not in a world
      */
-    MinecraftServer getMinecraftServer();
+    default MinecraftServer getMinecraftServer() {
+        return ProxyImpl.get().getMinecraftServer();
+    }
 
     /**
      * Checks if the connected client declared the ability to receive a specific type of packet.
@@ -51,16 +59,20 @@ public interface CommonAbstractions {
      * @param type         the packet type
      * @return if the connected client has declared the ability to receive a specific type of packet
      */
-    boolean hasChannel(ServerPlayer serverPlayer, CustomPacketPayload.Type<?> type);
+    default boolean hasChannel(ServerPlayer serverPlayer, CustomPacketPayload.Type<?> type) {
+        return ProxyImpl.get().hasChannel(serverPlayer.connection, type);
+    }
 
     /**
      * Opens a menu on both client and server while also providing additional data.
      *
-     * @param player       player to open menu for
+     * @param serverPlayer player to open menu for
      * @param menuProvider menu factory
      * @param dataWriter   additional data added via {@link RegistryFriendlyByteBuf}
      */
-    void openMenu(ServerPlayer player, MenuProvider menuProvider, BiConsumer<ServerPlayer, RegistryFriendlyByteBuf> dataWriter);
+    default void openMenu(ServerPlayer serverPlayer, MenuProvider menuProvider, BiConsumer<ServerPlayer, RegistryFriendlyByteBuf> dataWriter) {
+        ProxyImpl.get().openMenu(serverPlayer, menuProvider, dataWriter);
+    }
 
     /**
      * Get the parent mob from a possible mob part entity, like
@@ -71,7 +83,9 @@ public interface CommonAbstractions {
      * @param entity the mob, possibly a mob part
      * @return the parent mob for the part, otherwise the original entity
      */
-    Entity getPartEntityParent(Entity entity);
+    default Entity getPartEntityParent(Entity entity) {
+        return ProxyImpl.get().getPartEntityParent(entity);
+    }
 
     /**
      * Is the entity type considered a boss mob like {@link EntityType#ENDER_DRAGON} and {@link EntityType#WITHER} in
@@ -83,7 +97,9 @@ public interface CommonAbstractions {
      * @param type the entity type
      * @return is it a boss mob
      */
-    boolean isBossMob(EntityType<?> type);
+    default boolean isBossMob(EntityType<?> type) {
+        return type.is(TagFactory.COMMON.registerEntityTypeTag("bosses"));
+    }
 
     /**
      * Returns the enchanting power provided by a block. An enchanting power of 15 is required for level 30 enchants,
@@ -94,7 +110,9 @@ public interface CommonAbstractions {
      * @param pos   the block position in the level
      * @return enchanting power, usually zero for blocks other than bookshelves
      */
-    float getEnchantPowerBonus(BlockState state, Level level, BlockPos pos);
+    default float getEnchantPowerBonus(BlockState state, Level level, BlockPos pos) {
+        return ProxyImpl.get().getEnchantPowerBonus(state, level, pos);
+    }
 
     /**
      * Returns if an entity can equip some form of item in a certain slot.
@@ -104,7 +122,9 @@ public interface CommonAbstractions {
      * @param entity the entity trying to equip
      * @return is equipping this <code>stack</code> to <code>slot</code> allowed for <code>entity</code>
      */
-    boolean canEquip(ItemStack stack, EquipmentSlot slot, LivingEntity entity);
+    default boolean canEquip(ItemStack stack, EquipmentSlot slot, LivingEntity entity) {
+        return ProxyImpl.get().canEquip(stack, slot, entity);
+    }
 
     /**
      * Called before an entity drops loot for determining the level of
@@ -133,7 +153,9 @@ public interface CommonAbstractions {
      * @param entity the entity responsible for triggering the game rule check
      * @return is mob griefing allows to happen
      */
-    boolean getMobGriefingRule(Level level, @Nullable Entity entity);
+    default boolean getMobGriefingRule(Level level, @Nullable Entity entity) {
+        return level instanceof ServerLevel serverLevel && ProxyImpl.get().isMobGriefingAllowed(serverLevel, entity);
+    }
 
     /**
      * A trigger for running a Forge event for destroying an item.
@@ -142,7 +164,9 @@ public interface CommonAbstractions {
      * @param originalItemStack the item stack before being destroyed
      * @param interactionHand   the hand holding the destroyed stack
      */
-    void onPlayerDestroyItem(Player player, ItemStack originalItemStack, @Nullable InteractionHand interactionHand);
+    default void onPlayerDestroyItem(Player player, ItemStack originalItemStack, @Nullable InteractionHand interactionHand) {
+        ProxyImpl.get().onPlayerDestroyItem(player, originalItemStack, interactionHand);
+    }
 
     /**
      * Retrieves a {@link MobSpawnType} from a {@link Mob} if it has been set during
@@ -152,8 +176,9 @@ public interface CommonAbstractions {
      * @param mob the mob
      * @return the spawn type or null if none has been set
      */
-    @Nullable
-    MobSpawnType getMobSpawnType(Mob mob);
+    default @Nullable MobSpawnType getMobSpawnType(Mob mob) {
+        return ProxyImpl.get().getMobSpawnReason(mob);
+    }
 
     /**
      * Creates a new {@link Pack.Metadata} instance with additional parameters only supported on NeoForge.
@@ -167,7 +192,9 @@ public interface CommonAbstractions {
      *                          data pack selection screens
      * @return the created pack info instance
      */
-    Pack.Metadata createPackInfo(ResourceLocation id, Component description, PackCompatibility packCompatibility, FeatureFlagSet features, boolean hidden);
+    default Pack.Metadata createPackInfo(ResourceLocation id, Component description, PackCompatibility packCompatibility, FeatureFlagSet features, boolean hidden) {
+        return ProxyImpl.get().createPackInfo(id, description, packCompatibility, features, hidden);
+    }
 
     /**
      * Can the given enchanted be applied to an item stack via enchanting (in an enchanting table).
@@ -176,7 +203,9 @@ public interface CommonAbstractions {
      * @param itemStack   the item stack trying to receive the enchantment
      * @return is the application allowed
      */
-    boolean canApplyAtEnchantingTable(Holder<Enchantment> enchantment, ItemStack itemStack);
+    default boolean canApplyAtEnchantingTable(Holder<Enchantment> enchantment, ItemStack itemStack) {
+        return ProxyImpl.get().canApplyAtEnchantingTable(enchantment, itemStack);
+    }
 
     /**
      * Can the given enchantment be applied to enchanted books.
@@ -195,7 +224,9 @@ public interface CommonAbstractions {
      * @param bookStack  the book stack to enchant the item with
      * @return is combining both stacks allowed
      */
-    boolean isBookEnchantable(ItemStack inputStack, ItemStack bookStack);
+    default boolean isBookEnchantable(ItemStack inputStack, ItemStack bookStack) {
+        return true;
+    }
 
     /**
      * Called just before an {@link Explosion} is about to be executed for a level.
@@ -204,5 +235,7 @@ public interface CommonAbstractions {
      * @param explosion the explosion that is about to start
      * @return <code>true</code> to mark the explosion as handled, {@link Explosion#explode()} is not called
      */
-    boolean onExplosionStart(Level level, Explosion explosion);
+    default boolean onExplosionStart(Level level, Explosion explosion) {
+        return ProxyImpl.get().onExplosionStart(level, explosion);
+    }
 }

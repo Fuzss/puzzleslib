@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
+import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import net.minecraft.world.damagesource.DamageSource;
@@ -12,6 +13,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -47,13 +50,12 @@ abstract class PlayerFabricMixin extends LivingEntity {
         if (result.isInterrupt()) callback.setReturnValue(false);
     }
 
-    @ModifyReturnValue(
-            method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;",
-            at = @At("TAIL")
-    )
+    @ModifyReturnValue(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;",
+            at = @At("TAIL"))
     public ItemEntity drop(@Nullable ItemEntity itemEntity) {
-        if (itemEntity != null &&
-                FabricPlayerEvents.ITEM_TOSS.invoker().onItemToss(Player.class.cast(this), itemEntity).isInterrupt()) {
+        if (itemEntity != null && FabricPlayerEvents.ITEM_TOSS.invoker()
+                .onItemToss(Player.class.cast(this), itemEntity)
+                .isInterrupt()) {
             return null;
         } else {
             return itemEntity;
@@ -72,11 +74,7 @@ abstract class PlayerFabricMixin extends LivingEntity {
         return defaultedFloat.getAsOptionalFloat().orElse(destroySpeed);
     }
 
-    @Inject(
-            method = "die", at = @At(
-            "HEAD"
-    ), cancellable = true
-    )
+    @Inject(method = "die", at = @At("HEAD"), cancellable = true)
     public void die(DamageSource damageSource, CallbackInfo callback) {
         // this will fire twice for players, since the die method calls super on LivingEntity, where this is hooked in again
         // Forge has it implemented like this, so let's leave it for now for parity
@@ -87,8 +85,7 @@ abstract class PlayerFabricMixin extends LivingEntity {
 
     @Inject(method = "actuallyHurt", at = @At("HEAD"), cancellable = true)
     protected void actuallyHurt(DamageSource damageSource, float damageAmount, CallbackInfo callback, @Share(
-            "damageAmount"
-    ) LocalRef<DefaultedFloat> damageAmountRef) {
+            "damageAmount") LocalRef<DefaultedFloat> damageAmountRef) {
         if (!this.isInvulnerableTo(damageSource)) {
             damageAmountRef.set(DefaultedFloat.fromValue(damageAmount));
             if (FabricLivingEvents.LIVING_HURT.invoker()
@@ -106,5 +103,17 @@ abstract class PlayerFabricMixin extends LivingEntity {
             damageAmount = damageAmountRef.get().getAsOptionalFloat().orElse(damageAmount);
         }
         return damageAmount;
+    }
+
+    @ModifyReturnValue(method = "getProjectile", at = @At("RETURN"))
+    public ItemStack getProjectile(ItemStack projectileItemStack, ItemStack weaponItemStack) {
+        if (weaponItemStack.getItem() instanceof ProjectileWeaponItem) {
+            DefaultedValue<ItemStack> projectileItemStackValue = DefaultedValue.fromValue(projectileItemStack);
+            FabricLivingEvents.PICK_PROJECTILE.invoker()
+                    .onPickProjectile(this, weaponItemStack, projectileItemStackValue);
+            return projectileItemStackValue.getAsOptional().orElse(projectileItemStack);
+        } else {
+            return projectileItemStack;
+        }
     }
 }

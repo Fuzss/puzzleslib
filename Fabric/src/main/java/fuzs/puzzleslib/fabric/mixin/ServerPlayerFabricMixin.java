@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.authlib.GameProfile;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
@@ -11,7 +11,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -33,14 +32,15 @@ abstract class ServerPlayerFabricMixin extends Player implements CapturedDropsEn
         super(level, pos, yRot, gameProfile);
     }
 
-    @WrapWithCondition(method = "drop", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
-    public boolean drop(Level level, Entity entity) {
+    @Inject(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"),
+            cancellable = true)
+    public void drop(CallbackInfoReturnable<ItemEntity> callback, @Local ItemEntity itemEntity) {
         Collection<ItemEntity> capturedDrops = this.puzzleslib$getCapturedDrops();
         if (capturedDrops != null) {
-            capturedDrops.add((ItemEntity) entity);
-            return false;
-        } else {
-            return true;
+            capturedDrops.add(itemEntity);
+            callback.setReturnValue(itemEntity);
         }
     }
 
@@ -60,13 +60,10 @@ abstract class ServerPlayerFabricMixin extends Player implements CapturedDropsEn
         FabricPlayerEvents.CONTAINER_OPEN.invoker().onContainerOpen(ServerPlayer.class.cast(this), this.containerMenu);
     }
 
-    @Inject(
-            method = "doCloseContainer", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/world/inventory/InventoryMenu;transferState(Lnet/minecraft/world/inventory/AbstractContainerMenu;)V",
-            shift = At.Shift.AFTER
-    )
-    )
+    @Inject(method = "doCloseContainer",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/inventory/InventoryMenu;transferState(Lnet/minecraft/world/inventory/AbstractContainerMenu;)V",
+                    shift = At.Shift.AFTER))
     public void doCloseContainer(CallbackInfo callback) {
         FabricPlayerEvents.CONTAINER_CLOSE.invoker()
                 .onContainerClose(ServerPlayer.class.cast(this), this.containerMenu);

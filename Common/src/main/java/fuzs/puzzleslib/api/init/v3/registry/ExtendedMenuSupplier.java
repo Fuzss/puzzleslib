@@ -10,6 +10,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
  *
  * @param <T> type of menu
  */
+@Deprecated
 @FunctionalInterface
 public interface ExtendedMenuSupplier<T extends AbstractContainerMenu> {
 

@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
+@Deprecated
 public final class LivingEntityRenderLayersContextFabricImpl implements LivingEntityRenderLayersContext {
 
     @SuppressWarnings("unchecked")

@@ -1,8 +1,7 @@
 package fuzs.puzzleslib.api.entity.v1;
 
-import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
+import fuzs.puzzleslib.api.util.v1.DamageHelper;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
@@ -14,10 +13,11 @@ import org.jetbrains.annotations.Nullable;
  * A small helper class for creating new {@link DamageSource} instances, as vanilla's
  * {@link net.minecraft.world.damagesource.DamageSources} does not allow for creating custom damage types.
  */
+@Deprecated
 public final class DamageSourcesHelper {
 
     private DamageSourcesHelper() {
-
+        // NO-OP
     }
 
     /**
@@ -28,7 +28,7 @@ public final class DamageSourcesHelper {
      * @return new {@link DamageSource} instance
      */
     public static DamageSource source(LevelReader level, ResourceKey<DamageType> damageType) {
-        return source(level, damageType, null, null);
+        return DamageHelper.damageSource(level, damageType);
     }
 
     /**
@@ -41,7 +41,7 @@ public final class DamageSourcesHelper {
      * @return new {@link DamageSource} instance
      */
     public static DamageSource source(LevelReader level, ResourceKey<DamageType> damageType, @Nullable Entity directEntity) {
-        return source(level, damageType, directEntity, directEntity);
+        return DamageHelper.damageSource(level, damageType, directEntity);
     }
 
     /**
@@ -56,7 +56,7 @@ public final class DamageSourcesHelper {
      * @return new {@link DamageSource} instance
      */
     public static DamageSource source(LevelReader level, ResourceKey<DamageType> damageType, @Nullable Entity directEntity, @Nullable Entity causingEntity) {
-        return source(level.registryAccess(), damageType, directEntity, causingEntity);
+        return DamageHelper.damageSource(level, damageType, directEntity, causingEntity);
     }
 
     /**
@@ -71,9 +71,6 @@ public final class DamageSourcesHelper {
      * @return new {@link DamageSource} instance
      */
     public static DamageSource source(RegistryAccess registryAccess, ResourceKey<DamageType> damageType, @Nullable Entity directEntity, @Nullable Entity causingEntity) {
-        return new DamageSource(LookupHelper.lookup(registryAccess, Registries.DAMAGE_TYPE, damageType),
-                directEntity,
-                causingEntity
-        );
+        return DamageHelper.damageSource(registryAccess, damageType, directEntity, causingEntity);
     }
 }

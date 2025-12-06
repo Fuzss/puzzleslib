@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
  * mods that interfere with tooltip rendering (such as Adaptive Tooltips and ToolTipFix), since they otherwise cause an
  * implementation such as this one without a proper valid screen to fail or even crash.
  */
+@Deprecated
 public final class TooltipRenderHelper {
 
     private TooltipRenderHelper() {

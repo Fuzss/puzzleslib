@@ -7,6 +7,7 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -19,7 +20,11 @@ abstract class AbstractHorseFabricMixin extends Animal {
         super(entityType, level);
     }
 
-    @Inject(method = "executeRidersJump", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/animal/horse/AbstractHorse;hasImpulse:Z", shift = At.Shift.AFTER))
+    @Inject(method = "executeRidersJump",
+            at = @At(value = "FIELD",
+                    target = "Lnet/minecraft/world/entity/animal/horse/AbstractHorse;hasImpulse:Z",
+                    shift = At.Shift.AFTER,
+                    opcode = Opcodes.PUTFIELD))
     public void executeRidersJump(float playerJumpPendingScale, Vec3 travelVector, CallbackInfo callback) {
         EventImplHelper.onLivingJump(FabricLivingEvents.LIVING_JUMP.invoker(), this);
     }

@@ -29,8 +29,7 @@ public final class FabricLivingEvents {
      * <p>Can also be used to modify the distance the entity has fallen used for damage calculation, as well as the
      * damage multiplier defined by the block the entity is falling on to.
      */
-    public static final Event<LivingFallCallback> LIVING_FALL = FabricEventFactory.createResult(
-            LivingFallCallback.class);
+    public static final Event<LivingFallCallback> LIVING_FALL = FabricEventFactory.createResult(LivingFallCallback.class);
     /**
      * Called just before a {@link LivingEntity} drops all its loot for determining the level of a bonus enchantment
      * such as {@link net.minecraft.world.item.enchantment.Enchantments#LOOTING} that should be applied to the drops.
@@ -41,49 +40,41 @@ public final class FabricLivingEvents {
      * Called right before drops from a killed entity are spawned in the world.
      * <p>This event is fired whenever an Entity dies and drops items in {@link LivingEntity#die(DamageSource)}.
      */
-    public static final Event<LivingDropsCallback> LIVING_DROPS = FabricEventFactory.createResult(
-            LivingDropsCallback.class);
+    public static final Event<LivingDropsCallback> LIVING_DROPS = FabricEventFactory.createResult(LivingDropsCallback.class);
     /**
      * Called right before any reduction on damage due to e.g. armor are done, cancelling prevents any damage / armor
      * durability being taken.
      */
-    public static final Event<LivingHurtCallback> LIVING_HURT = FabricEventFactory.createResult(
-            LivingHurtCallback.class);
+    public static final Event<LivingHurtCallback> LIVING_HURT = FabricEventFactory.createResult(LivingHurtCallback.class);
     /**
      * Fired when an item starts being used in {@link LivingEntity#startUsingItem(InteractionHand)}.
      */
-    public static final Event<UseItemEvents.Start> USE_ITEM_START = FabricEventFactory.createResult(
-            UseItemEvents.Start.class);
+    public static final Event<UseItemEvents.Start> USE_ITEM_START = FabricEventFactory.createResult(UseItemEvents.Start.class);
     /**
      * Fired every tick an entity is using an item.
      */
-    public static final Event<UseItemEvents.Tick> USE_ITEM_TICK = FabricEventFactory.createResult(
-            UseItemEvents.Tick.class);
+    public static final Event<UseItemEvents.Tick> USE_ITEM_TICK = FabricEventFactory.createResult(UseItemEvents.Tick.class);
     /**
      * Fired when an item is stopped being used without being finished, meaning
      * {@link net.minecraft.world.item.Item#getUseDuration(ItemStack, LivingEntity)} has not been reached.
      */
-    public static final Event<UseItemEvents.Stop> USE_ITEM_STOP = FabricEventFactory.createResult(
-            UseItemEvents.Stop.class);
+    public static final Event<UseItemEvents.Stop> USE_ITEM_STOP = FabricEventFactory.createResult(UseItemEvents.Stop.class);
     /**
      * Fired when an item is finished being used, meaning
      * {@link net.minecraft.world.item.Item#getUseDuration(ItemStack, LivingEntity)} has run out.
      */
-    public static final Event<UseItemEvents.Finish> USE_ITEM_FINISH = FabricEventFactory.create(
-            UseItemEvents.Finish.class);
+    public static final Event<UseItemEvents.Finish> USE_ITEM_FINISH = FabricEventFactory.create(UseItemEvents.Finish.class);
     /**
      * Called right before damage from an incoming attack is negated via blocking using a shield.
      */
-    public static final Event<ShieldBlockCallback> SHIELD_BLOCK = FabricEventFactory.createResult(
-            ShieldBlockCallback.class);
+    public static final Event<ShieldBlockCallback> SHIELD_BLOCK = FabricEventFactory.createResult(ShieldBlockCallback.class);
     /**
      * Fires whenever a living entity dies, allows for preventing the death.
      * <p>
      * Fabric Api also has {@link net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents#ALLOW_DEATH}, but it
      * only runs server-side.
      */
-    public static final Event<LivingDeathCallback> LIVING_DEATH = FabricEventFactory.createResult(
-            LivingDeathCallback.class);
+    public static final Event<LivingDeathCallback> LIVING_DEATH = FabricEventFactory.createResult(LivingDeathCallback.class);
     /**
      * Called when a child is created from breeding two parents, allows for replacing the child or for preventing any
      * offspring from being spawned.
@@ -93,13 +84,11 @@ public final class FabricLivingEvents {
     /**
      * Called when a player is about to tame an animal, allows for preventing taming.
      */
-    public static final Event<AnimalTameCallback> ANIMAL_TAME = FabricEventFactory.createResult(
-            AnimalTameCallback.class);
+    public static final Event<AnimalTameCallback> ANIMAL_TAME = FabricEventFactory.createResult(AnimalTameCallback.class);
     /**
      * Fires when a {@link LivingEntity} is attacked, allows for cancelling that attack.
      */
-    public static final Event<LivingAttackCallback> LIVING_ATTACK = FabricEventFactory.createResult(
-            LivingAttackCallback.class);
+    public static final Event<LivingAttackCallback> LIVING_ATTACK = FabricEventFactory.createResult(LivingAttackCallback.class);
     /**
      * Called before an entity is knocked-back in {@link LivingEntity#knockback(double, double, double)}, allows for
      * preventing the knock-back.
@@ -116,8 +105,7 @@ public final class FabricLivingEvents {
      * Called when a new {@link MobEffectInstance} is added to a {@link LivingEntity} in
      * {@link LivingEntity#addEffect(MobEffectInstance, Entity)}.
      */
-    public static final Event<MobEffectEvents.Apply> MOB_EFFECT_APPLY = FabricEventFactory.create(
-            MobEffectEvents.Apply.class);
+    public static final Event<MobEffectEvents.Apply> MOB_EFFECT_APPLY = FabricEventFactory.create(MobEffectEvents.Apply.class);
     /**
      * Called when a {@link MobEffectInstance} is removed from a {@link LivingEntity} in
      * {@link LivingEntity#removeEffect(Holder)}.
@@ -128,19 +116,17 @@ public final class FabricLivingEvents {
      * Called when a {@link MobEffectInstance} is removed from a {@link LivingEntity} in
      * <code>net.minecraft.world.entity.LivingEntity#tickEffects</code> due to the instance duration having run out.
      */
-    public static final Event<MobEffectEvents.Expire> MOB_EFFECT_EXPIRE = FabricEventFactory.create(
-            MobEffectEvents.Expire.class);
+    public static final Event<MobEffectEvents.Expire> MOB_EFFECT_EXPIRE = FabricEventFactory.create(MobEffectEvents.Expire.class);
     /**
      * Called when an entity is jumping, allows for modifying the jump height as well as preventing the jump.
      */
-    public static final Event<LivingJumpCallback> LIVING_JUMP = FabricEventFactory.createResult(
-            LivingJumpCallback.class);
+    public static final Event<LivingJumpCallback> LIVING_JUMP = FabricEventFactory.createResult(LivingJumpCallback.class);
     /**
      * Called in {@link LivingEntity#getVisibilityPercent(Entity)} when an entity is trying to be targeted by another
      * entity for applying a given percentage to the looking entity's original visibility range.
      */
-    public static final Event<LivingVisibilityCallback> LIVING_VISIBILITY = FabricEventFactory.create(
-            LivingVisibilityCallback.class);
+    public static final Event<CalculateLivingVisibilityCallback> CALCULATE_LIVING_VISIBILITY = FabricEventFactory.create(
+            CalculateLivingVisibilityCallback.class);
     /**
      * Called when a {@link Mob} sets a new target.
      */
@@ -166,6 +152,10 @@ public final class FabricLivingEvents {
      */
     public static final Event<LookingAtEndermanCallback> LOOKING_AT_ENDERMAN = FabricEventFactory.createResult(
             LookingAtEndermanCallback.class);
+    /**
+     * Fired when an entity attempts to find a valid projectile via {@link LivingEntity#getProjectile(ItemStack)}.
+     */
+    public static final Event<PickProjectileCallback> PICK_PROJECTILE = FabricEventFactory.create(PickProjectileCallback.class);
 
     private FabricLivingEvents() {
         // NO-OP

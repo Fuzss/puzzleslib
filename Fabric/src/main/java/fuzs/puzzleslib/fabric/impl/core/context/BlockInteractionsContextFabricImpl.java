@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+@Deprecated
 public final class BlockInteractionsContextFabricImpl implements BlockInteractionsContext {
 
     @Override

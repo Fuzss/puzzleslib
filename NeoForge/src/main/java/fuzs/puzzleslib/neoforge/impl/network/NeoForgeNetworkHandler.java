@@ -19,7 +19,6 @@ import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.ClientCommonPacketListener;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -30,59 +29,62 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 
-public class NeoForgeNetworkHandler extends NetworkHandlerRegistryImpl {
+public final class NeoForgeNetworkHandler extends NetworkHandlerRegistryImpl {
     @Nullable
     private PayloadRegistrar channel;
 
-    public NeoForgeNetworkHandler(ResourceLocation channelName) {
-        super(channelName);
+    public NeoForgeNetworkHandler(String modId) {
+        super(modId);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Record & ClientboundMessage<T>> void registerClientbound$Internal(Class<?> clazz) {
-        this.register((Class<T>) clazz, PacketFlow.CLIENTBOUND,
+        this.register((Class<T>) clazz,
+                PacketFlow.CLIENTBOUND,
                 (CustomPacketPayloadAdapter<T> payload, IPayloadContext context) -> {
                     return ((NeoForgeProxy) Proxy.INSTANCE).registerClientReceiver(payload, context, MessageV3::unwrap);
-                }
-        );
+                });
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Record & ServerboundMessage<T>> void registerServerbound$Internal(Class<?> clazz) {
-        this.register((Class<T>) clazz, PacketFlow.SERVERBOUND,
+        this.register((Class<T>) clazz,
+                PacketFlow.SERVERBOUND,
                 (CustomPacketPayloadAdapter<T> payload, IPayloadContext context) -> {
                     return ((NeoForgeProxy) Proxy.INSTANCE).registerServerReceiver(payload, context, MessageV3::unwrap);
-                }
-        );
+                });
     }
 
     @SuppressWarnings("unchecked")
     @Override
     protected <T extends MessageV2<T>> void registerLegacyClientbound$Internal(Class<?> clazz, StreamDecoder<FriendlyByteBuf, ?> factory) {
-        this.registerLegacy((Class<T>) clazz, (StreamDecoder<FriendlyByteBuf, T>) factory, PacketFlow.CLIENTBOUND,
+        this.registerLegacy((Class<T>) clazz,
+                (StreamDecoder<FriendlyByteBuf, T>) factory,
+                PacketFlow.CLIENTBOUND,
                 (CustomPacketPayloadAdapter<T> payload, IPayloadContext context) -> {
-                    return ((NeoForgeProxy) Proxy.INSTANCE).registerClientReceiver(payload, context,
-                            MessageV2::toClientboundMessage
-                    );
-                }
-        );
+                    return ((NeoForgeProxy) Proxy.INSTANCE).registerClientReceiver(payload,
+                            context,
+                            MessageV2::toClientboundMessage);
+                });
     }
 
     @SuppressWarnings("unchecked")
     @Override
     protected <T extends MessageV2<T>> void registerLegacyServerbound$Internal(Class<?> clazz, StreamDecoder<FriendlyByteBuf, ?> factory) {
-        this.registerLegacy((Class<T>) clazz, (StreamDecoder<FriendlyByteBuf, T>) factory, PacketFlow.SERVERBOUND,
+        this.registerLegacy((Class<T>) clazz,
+                (StreamDecoder<FriendlyByteBuf, T>) factory,
+                PacketFlow.SERVERBOUND,
                 (CustomPacketPayloadAdapter<T> payload, IPayloadContext context) -> {
-                    return ((NeoForgeProxy) Proxy.INSTANCE).registerServerReceiver(payload, context,
-                            MessageV2::toServerboundMessage
-                    );
-                }
-        );
+                    return ((NeoForgeProxy) Proxy.INSTANCE).registerServerReceiver(payload,
+                            context,
+                            MessageV2::toServerboundMessage);
+                });
     }
 
     private <T extends MessageV2<T>> void registerLegacy(Class<T> clazz, StreamDecoder<FriendlyByteBuf, T> decoder, PacketFlow packetFlow, BiFunction<CustomPacketPayloadAdapter<T>, IPayloadContext, CompletableFuture<Void>> receiverRegistrar) {
+        this.isFrozenOrThrow();
         this.registerSerializer(clazz, (FriendlyByteBuf buf, T message) -> {
             message.write(buf);
         }, decoder);
@@ -90,11 +92,14 @@ public class NeoForgeNetworkHandler extends NetworkHandlerRegistryImpl {
     }
 
     private <T> void register(Class<T> clazz, PacketFlow packetFlow, BiFunction<CustomPacketPayloadAdapter<T>, IPayloadContext, CompletableFuture<Void>> receiverRegistrar) {
+        this.isFrozenOrThrow();
         Objects.requireNonNull(this.channel, "channel is null");
         CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type = this.registerMessageType(clazz);
         StreamCodec<? super RegistryFriendlyByteBuf, CustomPacketPayloadAdapter<T>> streamCodec = CustomPacketPayloadAdapter.streamCodec(
-                type, StreamCodecRegistryImpl.fromType(clazz));
-        this.channel.playBidirectional(type, streamCodec,
+                type,
+                StreamCodecRegistryImpl.fromType(clazz));
+        this.channel.playBidirectional(type,
+                streamCodec,
                 (CustomPacketPayloadAdapter<T> payload, IPayloadContext context) -> {
                     if (context.flow() == packetFlow) {
                         receiverRegistrar.apply(payload, context).exceptionally((Throwable throwable) -> {
@@ -106,8 +111,7 @@ public class NeoForgeNetworkHandler extends NetworkHandlerRegistryImpl {
                             this.disconnectWrongSide(clazz).accept(context::disconnect);
                         });
                     }
-                }
-        );
+                });
     }
 
     @Override
@@ -123,17 +127,19 @@ public class NeoForgeNetworkHandler extends NetworkHandlerRegistryImpl {
     }
 
     @Override
-    public void build() {
-        NeoForgeModContainerHelper.getOptionalModEventBus(this.channelName.getNamespace()).ifPresent(
-                (IEventBus eventBus) -> {
+    public void freeze() {
+        this.isWritableOrThrow();
+        this.isFrozen = true;
+        NeoForgeModContainerHelper.getOptionalModEventBus(this.channelName.getNamespace())
+                .ifPresent((IEventBus eventBus) -> {
                     eventBus.addListener((final RegisterPayloadHandlersEvent evt) -> {
-                        if (this.channel != null) throw new IllegalStateException("channel is already built");
+                        this.isFrozenOrThrow();
                         this.channel = evt.registrar(this.channelName.toLanguageKey());
                         if (this.optional) {
                             this.channel = this.channel.optional();
                         }
-                        super.build();
-                        this.channel = null;
+
+                        super.freeze();
                     });
                 });
     }

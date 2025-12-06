@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.Block;
 
 import java.util.Objects;
 
+@Deprecated
 public final class FlammableBlocksContextFabricImpl implements FlammableBlocksContext {
 
     @Override

@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.api.config.v3;
 
-import fuzs.puzzleslib.api.core.v1.utility.Buildable;
 import fuzs.puzzleslib.impl.config.ConfigHolderRegistry;
 import fuzs.puzzleslib.impl.core.ModContext;
 
@@ -69,7 +68,7 @@ public interface ConfigHolder {
      * builder interface for registering configs, not needed anymore after initial registration is complete, but no new
      * instance is created, so we only store the super type {@link ConfigHolder}
      */
-    interface Builder extends ConfigHolderRegistry, Buildable {
+    interface Builder extends ConfigHolderRegistry {
 
         /**
          * register a new client config to the holder/builder

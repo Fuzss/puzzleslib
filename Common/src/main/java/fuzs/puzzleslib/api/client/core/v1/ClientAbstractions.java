@@ -1,7 +1,9 @@
 package fuzs.puzzleslib.api.client.core.v1;
 
 import fuzs.puzzleslib.api.client.core.v1.context.ClientTooltipComponentsContext;
-import fuzs.puzzleslib.api.core.v1.ServiceProviderHelper;
+import fuzs.puzzleslib.api.client.gui.v2.ScreenHelper;
+import fuzs.puzzleslib.api.client.renderer.v1.RenderTypeHelper;
+import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -26,8 +28,11 @@ import java.util.List;
 /**
  * Useful methods for client related things that require mod loader specific abstractions.
  */
+@Deprecated
 public interface ClientAbstractions {
-    ClientAbstractions INSTANCE = ServiceProviderHelper.load(ClientAbstractions.class);
+    ClientAbstractions INSTANCE = new ClientAbstractions() {
+        // NO-OP
+    };
 
     /**
      * Checks if the connected server declared the ability to receive a specific type of packet.
@@ -36,7 +41,9 @@ public interface ClientAbstractions {
      * @param type                 the packet type
      * @return if the connected server has declared the ability to receive a specific type of packet
      */
-    boolean hasChannel(ClientPacketListener clientPacketListener, CustomPacketPayload.Type<?> type);
+    default boolean hasChannel(ClientPacketListener clientPacketListener, CustomPacketPayload.Type<?> type) {
+        return ClientProxyImpl.get().hasChannel(clientPacketListener, type);
+    }
 
     /**
      * Checks if a key mapping is pressed.
@@ -49,7 +56,9 @@ public interface ClientAbstractions {
      * @param scanCode   the key scan code
      * @return is the key mapping pressed
      */
-    boolean isKeyActiveAndMatches(KeyMapping keyMapping, int keyCode, int scanCode);
+    default boolean isKeyActiveAndMatches(KeyMapping keyMapping, int keyCode, int scanCode) {
+        return ClientProxyImpl.get().isKeyActiveAndMatches(keyMapping, keyCode, scanCode);
+    }
 
     /**
      * Converts an image {@link TooltipComponent} into the appropriate client-side component.
@@ -64,7 +73,9 @@ public interface ClientAbstractions {
      * @param imageComponent the un-sided {@link TooltipComponent} to convert
      * @return the client tooltip components representation
      */
-    ClientTooltipComponent createImageComponent(TooltipComponent imageComponent);
+    default ClientTooltipComponent createImageComponent(TooltipComponent imageComponent) {
+        return ClientProxyImpl.get().createImageComponent(imageComponent);
+    }
 
     /**
      * Retrieves a model from the {@link ModelManager}, allows for using {@link ResourceLocation} instead of
@@ -88,7 +99,9 @@ public interface ClientAbstractions {
      * @param resourceLocation the model resource location
      * @return the model, or the missing model if not found
      */
-    BakedModel getBakedModel(ModelManager modelManager, ResourceLocation resourceLocation);
+    default BakedModel getBakedModel(ModelManager modelManager, ResourceLocation resourceLocation) {
+        return ClientProxyImpl.get().getBakedModel(modelManager, resourceLocation);
+    }
 
     /**
      * Allows for retrieving the {@link RenderType} that has been registered for a block.
@@ -98,7 +111,9 @@ public interface ClientAbstractions {
      * @param block the block to get the render type for
      * @return the render type
      */
-    RenderType getRenderType(Block block);
+    default RenderType getRenderType(Block block) {
+        return RenderTypeHelper.getRenderType(block);
+    }
 
     /**
      * Allows for retrieving the {@link RenderType} that has been registered for a fluid.
@@ -120,7 +135,9 @@ public interface ClientAbstractions {
      * @param block      the block to register the render type for
      * @param renderType the render type
      */
-    void registerRenderType(Block block, RenderType renderType);
+    default void registerRenderType(Block block, RenderType renderType) {
+        ClientProxyImpl.get().registerRenderType(block, renderType);
+    }
 
     /**
      * Allows for registering a {@link RenderType} for a fluid.
@@ -130,7 +147,9 @@ public interface ClientAbstractions {
      * @param fluid      the fluid to register the render type for
      * @param renderType the render type
      */
-    void registerRenderType(Fluid fluid, RenderType renderType);
+    default void registerRenderType(Fluid fluid, RenderType renderType) {
+        ClientProxyImpl.get().registerRenderType(fluid, renderType);
+    }
 
     /**
      * Get the current partial tick time while taking into account whether the game is paused.
@@ -138,7 +157,7 @@ public interface ClientAbstractions {
      * @return current partial tick time
      */
     default float getPartialTick() {
-        return Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
+        return ScreenHelper.getPartialTick();
     }
 
     /**
@@ -152,7 +171,9 @@ public interface ClientAbstractions {
      * @param positioner  positioner for placing the tooltip in relation to provided mouse coordinates
      * @return <code>true</code> to prevent the tooltip from rendering, allows for fully taking over rendering
      */
-    boolean onRenderTooltip(GuiGraphics guiGraphics, Font font, int mouseX, int mouseY, List<ClientTooltipComponent> components, ClientTooltipPositioner positioner);
+    default boolean onRenderTooltip(GuiGraphics guiGraphics, Font font, int mouseX, int mouseY, List<ClientTooltipComponent> components, ClientTooltipPositioner positioner) {
+        return ClientProxyImpl.get().onRenderTooltip(guiGraphics, font, mouseX, mouseY, components, positioner);
+    }
 
     /**
      * Returns the current render height for hotbar decorations on the left side.
@@ -162,7 +183,9 @@ public interface ClientAbstractions {
      * @param gui the gui instance
      * @return the hotbar decorations render height
      */
-    int getGuiLeftHeight(Gui gui);
+    default int getGuiLeftHeight(Gui gui) {
+        return ClientProxyImpl.get().getGuiLeftHeight(gui);
+    }
 
     /**
      * Returns the current render height for hotbar decorations on the right side.
@@ -172,7 +195,9 @@ public interface ClientAbstractions {
      * @param gui the gui instance
      * @return the hotbar decorations render height
      */
-    int getGuiRightHeight(Gui gui);
+    default int getGuiRightHeight(Gui gui) {
+        return ClientProxyImpl.get().getGuiRightHeight(gui);
+    }
 
     /**
      * Add to the current render height for hotbar decorations on the left side.
@@ -180,7 +205,9 @@ public interface ClientAbstractions {
      * @param gui        the gui instance
      * @param leftHeight the additional hotbar decorations render height
      */
-    void addGuiLeftHeight(Gui gui, int leftHeight);
+    default void addGuiLeftHeight(Gui gui, int leftHeight) {
+        ClientProxyImpl.get().addGuiLeftHeight(gui, leftHeight);
+    }
 
     /**
      * Add to the current render height for hotbar decorations on the right side.
@@ -188,5 +215,7 @@ public interface ClientAbstractions {
      * @param gui         the gui instance
      * @param rightHeight the additional hotbar decorations render height
      */
-    void addGuiRightHeight(Gui gui, int rightHeight);
+    default void addGuiRightHeight(Gui gui, int rightHeight) {
+        ClientProxyImpl.get().addGuiRightHeight(gui, rightHeight);
+    }
 }

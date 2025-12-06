@@ -10,6 +10,7 @@ import net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent;
 
 import java.util.Objects;
 
+@Deprecated
 public final class FuelBurnTimesContextNeoForgeImpl implements FuelBurnTimesContext {
     private final Object2IntOpenHashMap<Item> fuelBurnTimes = new Object2IntOpenHashMap<>();
 

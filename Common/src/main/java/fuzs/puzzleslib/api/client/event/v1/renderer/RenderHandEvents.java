@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.client.event.v1.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
+import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
@@ -13,6 +14,10 @@ import net.minecraft.world.item.ItemStack;
 public final class RenderHandEvents {
     public static final EventInvoker<MainHand> MAIN_HAND = EventInvoker.lookup(MainHand.class);
     public static final EventInvoker<OffHand> OFF_HAND = EventInvoker.lookup(OffHand.class);
+    public static final EventInvoker<MainHand> BOTH = (EventPhase phase, MainHand callback) -> {
+        MAIN_HAND.register(phase, callback);
+        OFF_HAND.register(phase, callback::onRenderMainHand);
+    };
 
     private RenderHandEvents() {
         // NO-OP

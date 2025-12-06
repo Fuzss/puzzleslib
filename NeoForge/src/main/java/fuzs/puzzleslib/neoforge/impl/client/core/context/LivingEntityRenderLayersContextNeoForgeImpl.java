@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
+@Deprecated
 public record LivingEntityRenderLayersContextNeoForgeImpl(EntityRenderersEvent.AddLayers evt) implements LivingEntityRenderLayersContext {
 
     @Override

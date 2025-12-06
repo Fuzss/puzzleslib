@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl.event;
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedDouble;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingJumpCallback;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -13,6 +14,7 @@ import net.minecraft.world.inventory.GrindstoneMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.OptionalDouble;
@@ -37,6 +39,26 @@ public final class EventImplHelper {
         }
     }
 
+    @Nullable
+    public static Player getPlayerFromContainerMenu(AbstractContainerMenu abstractContainerMenu) {
+        for (Slot slot : abstractContainerMenu.slots) {
+            if (slot.container instanceof Inventory inventory) {
+                return inventory.player;
+            }
+        }
+
+        MinecraftServer minecraftServer = ProxyImpl.get().getMinecraftServer();
+        if (minecraftServer != null) {
+            for (ServerPlayer serverPlayer : minecraftServer.getPlayerList().getPlayers()) {
+                if (serverPlayer.containerMenu == abstractContainerMenu) {
+                    return serverPlayer;
+                }
+            }
+        }
+
+        return null;
+    }
+
     public static Optional<Player> getGrindstoneUsingPlayer(ItemStack topInput, ItemStack bottomInput) {
         MinecraftServer minecraftServer = CommonAbstractions.INSTANCE.getMinecraftServer();
         Optional<Player> optional = Optional.empty();
@@ -49,20 +71,5 @@ public final class EventImplHelper {
             }
         }
         return optional;
-    }
-
-    public static Optional<Player> getPlayerFromContainerMenu(AbstractContainerMenu menu) {
-        for (Slot slot : menu.slots) {
-            if (slot.container instanceof Inventory inventory) {
-                return Optional.of(inventory.player);
-            }
-        }
-        MinecraftServer minecraftServer = CommonAbstractions.INSTANCE.getMinecraftServer();
-        for (ServerPlayer player : minecraftServer.getPlayerList().getPlayers()) {
-            if (player.containerMenu == menu) {
-                return Optional.of(player);
-            }
-        }
-        return Optional.empty();
     }
 }

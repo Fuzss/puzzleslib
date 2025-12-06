@@ -30,7 +30,9 @@
     "LivingEntityFabricMixin",
     "LootItemRandomChanceWithEnchantedBonusConditionFabricMixin",
     "MagmaCubeFabricMixin",
+    "MenuProviderWithDataFabricMixin",
     "MobFabricMixin",
+    "MonsterFabricMixin",
     "NaturalSpawnerFabricMixin",
     "OcelotFabricMixin",
     "PackRepositoryFabricMixin",
@@ -44,6 +46,7 @@
     "ServerLevelFabricMixin",
     "ServerPlayerFabricMixin",
     "StartAttackingFabricMixin",
+    "ThrownEnderpearlFabricMixin",
     "WolfFabricMixin",
     "accessor.GrindstoneMenuFabricAccessor",
     "accessor.PackRepositoryFabricAccessor"
@@ -84,7 +87,7 @@
     "client.accessor.MultiPlayerGameModeFabricAccessor"
   ],
   "server": [
-    "server.MainFabricMixin"
+    "server.MainServerFabricMixin"
   ],
   "injectors": {
     "defaultRequire": 1

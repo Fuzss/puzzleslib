@@ -8,6 +8,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.CreativeModeTab;
 
+@Deprecated
 public final class CreativeModeTabContextFabricImpl implements CreativeModeTabContext {
 
     @Override

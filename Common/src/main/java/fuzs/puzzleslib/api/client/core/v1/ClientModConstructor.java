@@ -2,11 +2,9 @@ package fuzs.puzzleslib.api.client.core.v1;
 
 import fuzs.puzzleslib.api.client.core.v1.context.*;
 import fuzs.puzzleslib.api.core.v1.BaseModConstructor;
-import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
-import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.client.core.ClientFactories;
-import fuzs.puzzleslib.impl.core.ModContext;
+import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
+import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
@@ -17,9 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
-import org.apache.logging.log4j.util.Strings;
 
-import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -29,24 +25,25 @@ import java.util.function.Supplier;
 public interface ClientModConstructor extends BaseModConstructor {
 
     /**
-     * Construct the {@link ClientModConstructor} instance provided as <code>supplier</code> to begin client-side
-     * initialization of a mod.
+     * Construct the {@link ClientModConstructor} instance to begin client-side initialization of a mod.
      *
-     * @param modId          the mod id for registering events on Forge to the correct mod event bus
-     * @param modConstructor the main mod instance for mod setup
+     * @param modId                  the mod id
+     * @param modConstructorSupplier the mod instance for the setup
      */
-    static void construct(String modId, Supplier<ClientModConstructor> modConstructor) {
-        if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id is empty");
-        ClientModConstructor instance = modConstructor.get();
-        ModContext modContext = ModContext.get(modId);
-        ResourceLocation identifier = ModContext.getPairingIdentifier(modId, instance);
-        // not an issue on Fabric, but Forge might call client construction before common
-        modContext.scheduleClientModConstruction(identifier, () -> {
-            PuzzlesLib.LOGGER.info("Constructing client components for {}", identifier);
-            Set<ContentRegistrationFlags> availableFlags = Set.of(instance.getContentRegistrationFlags());
-            Set<ContentRegistrationFlags> flagsToHandle = modContext.getFlagsToHandle(availableFlags);
-            ClientFactories.INSTANCE.constructClientMod(modId, instance, availableFlags, flagsToHandle);
-        });
+    static void construct(String modId, Supplier<ClientModConstructor> modConstructorSupplier) {
+        construct(ResourceLocation.fromNamespaceAndPath(modId, "client"), modConstructorSupplier);
+    }
+
+    /**
+     * Construct the {@link ClientModConstructor} instance to begin client-side initialization of a mod.
+     *
+     * @param resourceLocation       the identifier for the provided mod instance
+     * @param modConstructorSupplier the mod instance for the setup
+     */
+    static void construct(ResourceLocation resourceLocation, Supplier<ClientModConstructor> modConstructorSupplier) {
+        ModConstructorImpl.construct(resourceLocation,
+                modConstructorSupplier,
+                ClientProxyImpl.get()::getClientModConstructorImpl);
     }
 
     /**
@@ -154,6 +151,7 @@ public interface ClientModConstructor extends BaseModConstructor {
     /**
      * @param context register additional {@link RenderLayer}s for a living entity
      */
+    @Deprecated
     default void onRegisterLivingEntityRenderLayers(final LivingEntityRenderLayersContext context) {
         // NO-OP
     }

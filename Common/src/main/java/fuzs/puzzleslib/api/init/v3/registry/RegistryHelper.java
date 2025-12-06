@@ -20,6 +20,7 @@ import java.util.Optional;
 /**
  * A helper class for Minecraft's registries.
  */
+@Deprecated
 public final class RegistryHelper {
 
     private RegistryHelper() {

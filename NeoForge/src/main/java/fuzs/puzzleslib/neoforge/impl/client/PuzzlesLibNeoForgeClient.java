@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.client;
 
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.PuzzlesLibClient;
 import fuzs.puzzleslib.neoforge.impl.client.commands.NeoForgeConfigCommand;
@@ -21,7 +22,7 @@ public class PuzzlesLibNeoForgeClient {
     }
 
     private static void setupDevelopmentEnvironment() {
-        if (!PuzzlesLib.isDevelopmentEnvironmentWithoutDataGeneration()) return;
+        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironmentWithoutDataGeneration(PuzzlesLib.MOD_ID)) return;
         registerEventHandlers(NeoForge.EVENT_BUS);
     }
 

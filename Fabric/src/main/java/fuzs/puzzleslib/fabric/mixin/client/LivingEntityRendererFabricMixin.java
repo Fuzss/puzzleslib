@@ -21,14 +21,29 @@ abstract class LivingEntityRendererFabricMixin<T extends LivingEntity, M extends
         super(context);
     }
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
+            at = @At("HEAD"),
+            cancellable = true)
     public void render$0(T entity, float entityYaw, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int packedLight, CallbackInfo callback) {
-        EventResult result = FabricRendererEvents.BEFORE_RENDER_LIVING.invoker().onBeforeRenderEntity(entity, LivingEntityRenderer.class.cast(this), partialTicks, matrixStack, buffer, packedLight);
+        EventResult result = FabricRendererEvents.BEFORE_RENDER_LIVING.invoker()
+                .onBeforeRenderEntity(entity,
+                        LivingEntityRenderer.class.cast(this),
+                        partialTicks,
+                        matrixStack,
+                        buffer,
+                        packedLight);
         if (result.isInterrupt()) callback.cancel();
     }
 
-    @Inject(method = "render", at = @At("TAIL"))
+    @Inject(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
+            at = @At("TAIL"))
     public void render$1(T entity, float entityYaw, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int packedLight, CallbackInfo callback) {
-        FabricRendererEvents.AFTER_RENDER_LIVING.invoker().onAfterRenderEntity(entity, LivingEntityRenderer.class.cast(this), partialTicks, matrixStack, buffer, packedLight);
+        FabricRendererEvents.AFTER_RENDER_LIVING.invoker()
+                .onAfterRenderEntity(entity,
+                        LivingEntityRenderer.class.cast(this),
+                        partialTicks,
+                        matrixStack,
+                        buffer,
+                        packedLight);
     }
 }

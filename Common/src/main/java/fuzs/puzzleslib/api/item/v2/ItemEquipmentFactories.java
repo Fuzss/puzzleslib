@@ -18,6 +18,7 @@ import java.util.function.Supplier;
 /**
  * A class containing factory methods for default {@link Tier} and {@link ArmorMaterial} implementations.
  */
+@Deprecated
 public final class ItemEquipmentFactories {
     private static final ArmorItem.Type[] ARMOR_TYPES = {
             ArmorItem.Type.BOOTS,

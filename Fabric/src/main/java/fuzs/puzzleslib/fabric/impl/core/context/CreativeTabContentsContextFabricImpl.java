@@ -7,6 +7,7 @@ import net.minecraft.world.item.CreativeModeTab;
 
 import java.util.Objects;
 
+@Deprecated
 public final class CreativeTabContentsContextFabricImpl implements BuildCreativeModeTabContentsContext {
 
     @Override

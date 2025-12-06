@@ -4,6 +4,7 @@ import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.fabric.impl.core.context.*;
+import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.impl.item.CopyComponentsRecipe;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -12,39 +13,35 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public final class FabricModConstructor {
+public final class FabricModConstructor implements ModConstructorImpl<ModConstructor> {
 
-    private FabricModConstructor() {
-        // NO-OP
-    }
-
-    public static void construct(ModConstructor constructor, String modId, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
-        registerContent(modId, flagsToHandle);
-        registerLoadingHandlers(constructor, modId, availableFlags);
-    }
-
-    private static void registerContent(String modId, Set<ContentRegistrationFlags> flagsToHandle) {
-        if (flagsToHandle.contains(ContentRegistrationFlags.COPY_RECIPES)) {
-            CopyComponentsRecipe.registerSerializers((String s, Supplier<RecipeSerializer<?>> supplier) -> {
-                Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, ResourceLocationHelper.fromNamespaceAndPath(modId, s), supplier.get());
+    @Override
+    public void construct(String modId, ModConstructor modConstructor, Set<ContentRegistrationFlags> contentRegistrationFlags) {
+        modConstructor.onConstructMod();
+        modConstructor.onRegisterCreativeModeTabs(new CreativeModeTabContextFabricImpl());
+        modConstructor.onBuildCreativeModeTabContents(new CreativeTabContentsContextFabricImpl());
+        if (contentRegistrationFlags.contains(ContentRegistrationFlags.COPY_RECIPES)) {
+            CopyComponentsRecipe.registerSerializers((String path, Supplier<RecipeSerializer<?>> supplier) -> {
+                Registry.register(BuiltInRegistries.RECIPE_SERIALIZER,
+                        ResourceLocationHelper.fromNamespaceAndPath(modId, path),
+                        supplier.get());
             });
         }
-    }
 
-    private static void registerLoadingHandlers(ModConstructor constructor, String modId, Set<ContentRegistrationFlags> availableFlags) {
-        constructor.onConstructMod();
-        constructor.onRegisterCreativeModeTabs(new CreativeModeTabContextFabricImpl());
-        constructor.onBuildCreativeModeTabContents(new CreativeTabContentsContextFabricImpl());
-        constructor.onCommonSetup();
-        constructor.onEntityAttributeCreation(new EntityAttributesCreateContextFabricImpl());
-        constructor.onEntityAttributeModification(new EntityAttributesModifyContextFabricImpl());
-        constructor.onRegisterSpawnPlacements(new SpawnPlacementsContextFabricImpl());
-        constructor.onRegisterGameplayContent(new GameplayContentContextFabricImpl());
-        constructor.onRegisterFuelBurnTimes(new FuelBurnTimesContextFabricImpl());
-        constructor.onRegisterFlammableBlocks(new FlammableBlocksContextFabricImpl());
-        constructor.onRegisterCompostableBlocks(new CompostableBlocksContextFabricImpl());
-        constructor.onRegisterBlockInteractions(new BlockInteractionsContextFabricImpl());
-        constructor.onRegisterBiomeModifications(new BiomeModificationsContextFabricImpl(modId, availableFlags));
-        constructor.onAddDataPackFinders(new DataPackSourcesContextFabricImpl());
+        modConstructor.onCommonSetup();
+        modConstructor.onRegisterEntityAttributes(new EntityAttributesContextFabricImpl());
+        modConstructor.onEntityAttributeCreation(new EntityAttributesCreateContextFabricImpl());
+        modConstructor.onEntityAttributeModification(new EntityAttributesModifyContextFabricImpl());
+        modConstructor.onRegisterSpawnPlacements(new SpawnPlacementsContextFabricImpl());
+        modConstructor.onRegisterGameplayContent(new GameplayContentContextFabricImpl());
+        modConstructor.onRegisterFuelBurnTimes(new FuelBurnTimesContextFabricImpl());
+        modConstructor.onRegisterFlammableBlocks(new FlammableBlocksContextFabricImpl());
+        modConstructor.onRegisterCompostableBlocks(new CompostableBlocksContextFabricImpl());
+        modConstructor.onRegisterBlockInteractions(new BlockInteractionsContextFabricImpl());
+        modConstructor.onRegisterBiomeModifications(new BiomeModificationsContextFabricImpl(modId));
+        modConstructor.onAddDataPackFinders(new DataPackSourcesContextFabricImpl());
+        modConstructor.onRegisterGameRegistries(new GameRegistriesContextFabricImpl());
+        modConstructor.onRegisterDataPackRegistries(new DataPackRegistriesContextFabricImpl());
+        modConstructor.onRegisterVillagerTrades(new VillagerTradesContextFabricImpl());
     }
 }

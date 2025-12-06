@@ -10,6 +10,7 @@ public enum ContentRegistrationFlags {
     /**
      * Registers a biome modifier, and it's codec on Forge to allow the custom biome modification system to work.
      */
+    @Deprecated
     BIOME_MODIFICATIONS,
     /**
      * Register a client-side resource reload listener that reloads built-in item model renderers.
@@ -21,6 +22,7 @@ public enum ContentRegistrationFlags {
      * <p>
      * Intended to be used for upgrading items to a higher tier, similar to the smithing table.
      */
+    @Deprecated
     COPY_RECIPES;
 
     @ApiStatus.Internal

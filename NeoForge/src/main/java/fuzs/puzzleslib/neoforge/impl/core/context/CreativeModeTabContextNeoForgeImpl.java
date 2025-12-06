@@ -11,6 +11,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
 public record CreativeModeTabContextNeoForgeImpl(IEventBus modEventBus) implements CreativeModeTabContext {
 
     @Override

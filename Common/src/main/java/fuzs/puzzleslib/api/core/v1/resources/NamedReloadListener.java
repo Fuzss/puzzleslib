@@ -6,6 +6,7 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 /**
  * Allows for providing an identifier for a reload listener by wrapping it in an effort to help with debugging.
  */
+@Deprecated
 public interface NamedReloadListener extends PreparableReloadListener {
 
     /**

@@ -5,6 +5,8 @@ import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.api.config.v3.ConfigDataHolder;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.impl.core.Freezable;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
@@ -14,7 +16,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
+public abstract class ConfigHolderImpl implements ConfigHolder.Builder, Freezable {
     private final String modId;
     private Map<Class<?>, ConfigDataHolderImpl<?>> configsByClass = new IdentityHashMap<>();
 
@@ -82,19 +84,24 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
     }
 
     @Override
-    public final void build() {
+    public final void freeze() {
+        this.isWritableOrThrow();
         this.configsByClass = ImmutableMap.copyOf(this.configsByClass);
         // register events before registering configs
         for (ConfigDataHolderImpl<?> holder : this.configsByClass.values()) {
             // this is the wrong physical side for this config, it hasn't been loaded and doesn't need any processing
-            if (holder.config != null) this.bake(holder, this.modId);
+            if (holder.config != null) {
+                this.bake(holder, this.modId);
+            }
         }
-        if (ModLoaderEnvironment.INSTANCE.isClient()) {
-            this.registerConfigurationScreen(this.modId);
-        }
+
+        ProxyImpl.get().registerConfigurationScreen(this.modId);
+    }
+
+    @Override
+    public final boolean isFrozen() {
+        return this.configsByClass instanceof ImmutableMap<Class<?>, ConfigDataHolderImpl<?>>;
     }
 
     protected abstract void bake(ConfigDataHolderImpl<?> holder, String modId);
-
-    protected abstract void registerConfigurationScreen(String modId);
 }

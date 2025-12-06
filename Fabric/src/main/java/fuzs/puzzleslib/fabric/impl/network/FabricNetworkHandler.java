@@ -21,70 +21,69 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientCommonPacketListener;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class FabricNetworkHandler extends NetworkHandlerRegistryImpl {
-    private boolean building = true;
+public final class FabricNetworkHandler extends NetworkHandlerRegistryImpl {
 
-    public FabricNetworkHandler(ResourceLocation channelName) {
-        super(channelName);
+    public FabricNetworkHandler(String modId) {
+        super(modId);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Record & ClientboundMessage<T>> void registerClientbound$Internal(Class<?> clazz) {
-        this.register((Class<T>) clazz, PayloadTypeRegistry.playS2C(),
+        this.register((Class<T>) clazz,
+                PayloadTypeRegistry.playS2C(),
                 (CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type, BiConsumer<Throwable, Consumer<Component>> disconnectExceptionally) -> {
-                    ((FabricProxy) Proxy.INSTANCE).registerClientReceiver(type, disconnectExceptionally,
-                            MessageV3::unwrap
-                    );
-                }
-        );
+                    ((FabricProxy) Proxy.INSTANCE).registerClientReceiver(type,
+                            disconnectExceptionally,
+                            MessageV3::unwrap);
+                });
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Record & ServerboundMessage<T>> void registerServerbound$Internal(Class<?> clazz) {
-        this.register((Class<T>) clazz, PayloadTypeRegistry.playC2S(),
+        this.register((Class<T>) clazz,
+                PayloadTypeRegistry.playC2S(),
                 (CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type, BiConsumer<Throwable, Consumer<Component>> disconnectExceptionally) -> {
-                    ((FabricProxy) Proxy.INSTANCE).registerServerReceiver(type, disconnectExceptionally,
-                            MessageV3::unwrap
-                    );
-                }
-        );
+                    ((FabricProxy) Proxy.INSTANCE).registerServerReceiver(type,
+                            disconnectExceptionally,
+                            MessageV3::unwrap);
+                });
     }
 
     @SuppressWarnings("unchecked")
     @Override
     protected <T extends MessageV2<T>> void registerLegacyClientbound$Internal(Class<?> clazz, StreamDecoder<FriendlyByteBuf, ?> factory) {
-        this.registerLegacy((Class<T>) clazz, (StreamDecoder<FriendlyByteBuf, T>) factory,
+        this.registerLegacy((Class<T>) clazz,
+                (StreamDecoder<FriendlyByteBuf, T>) factory,
                 PayloadTypeRegistry.playS2C(),
                 (CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type, BiConsumer<Throwable, Consumer<Component>> disconnectExceptionally) -> {
-                    ((FabricProxy) Proxy.INSTANCE).registerClientReceiver(type, disconnectExceptionally,
-                            MessageV2::toClientboundMessage
-                    );
-                }
-        );
+                    ((FabricProxy) Proxy.INSTANCE).registerClientReceiver(type,
+                            disconnectExceptionally,
+                            MessageV2::toClientboundMessage);
+                });
     }
 
     @SuppressWarnings("unchecked")
     @Override
     protected <T extends MessageV2<T>> void registerLegacyServerbound$Internal(Class<?> clazz, StreamDecoder<FriendlyByteBuf, ?> factory) {
-        this.registerLegacy((Class<T>) clazz, (StreamDecoder<FriendlyByteBuf, T>) factory,
+        this.registerLegacy((Class<T>) clazz,
+                (StreamDecoder<FriendlyByteBuf, T>) factory,
                 PayloadTypeRegistry.playC2S(),
                 (CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type, BiConsumer<Throwable, Consumer<Component>> disconnectExceptionally) -> {
-                    ((FabricProxy) Proxy.INSTANCE).registerServerReceiver(type, disconnectExceptionally,
-                            MessageV2::toServerboundMessage
-                    );
-                }
-        );
+                    ((FabricProxy) Proxy.INSTANCE).registerServerReceiver(type,
+                            disconnectExceptionally,
+                            MessageV2::toServerboundMessage);
+                });
     }
 
     private <T extends MessageV2<T>> void registerLegacy(Class<T> clazz, StreamDecoder<FriendlyByteBuf, T> factory, PayloadTypeRegistry<RegistryFriendlyByteBuf> registry, BiConsumer<CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>>, BiConsumer<Throwable, Consumer<Component>>> receiverRegistrar) {
+        this.isFrozenOrThrow();
         this.registerSerializer(clazz, (FriendlyByteBuf buf, T message) -> {
             message.write(buf);
         }, factory);
@@ -92,31 +91,31 @@ public class FabricNetworkHandler extends NetworkHandlerRegistryImpl {
     }
 
     private <T> void register(Class<T> clazz, PayloadTypeRegistry<RegistryFriendlyByteBuf> registry, BiConsumer<CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>>, BiConsumer<Throwable, Consumer<Component>>> receiverRegistrar) {
-        if (this.building) throw new IllegalStateException("channel is null");
+        this.isFrozenOrThrow();
         CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type = this.registerMessageType(clazz);
         StreamCodec<? super RegistryFriendlyByteBuf, CustomPacketPayloadAdapter<T>> streamCodec = CustomPacketPayloadAdapter.streamCodec(
-                type, StreamCodecRegistryImpl.fromType(clazz));
+                type,
+                StreamCodecRegistryImpl.fromType(clazz));
         registry.register(type, streamCodec);
         receiverRegistrar.accept(type, this.disconnectExceptionally(clazz));
     }
 
     @Override
     public <T> Packet<ClientCommonPacketListener> toClientboundPacket(ClientboundMessage<T> message) {
-        if (this.building) throw new IllegalStateException("channel is null");
         Objects.requireNonNull(message, "message is null");
         return this.toPacket(ServerPlayNetworking::createS2CPacket, message);
     }
 
     @Override
     public <T> Packet<ServerCommonPacketListener> toServerboundPacket(ServerboundMessage<T> message) {
-        if (this.building) throw new IllegalStateException("channel is null");
         Objects.requireNonNull(message, "message is null");
         return this.toPacket(ClientPlayNetworking::createC2SPacket, message);
     }
 
     @Override
-    public void build() {
-        this.building = false;
-        super.build();
+    public void freeze() {
+        this.isWritableOrThrow();
+        this.isFrozen = true;
+        super.freeze();
     }
 }
