@@ -8,16 +8,23 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 
+@Deprecated
 public class CopyComponentsShapedRecipe extends ShapedRecipe implements CopyComponentsRecipe {
     private final RecipeSerializer<?> recipeSerializer;
     private final Ingredient copyFrom;
 
     public CopyComponentsShapedRecipe(String modId, ShapedRecipe shapedRecipe, Ingredient copyFrom) {
-        this(CopyComponentsRecipe.getModSerializer(modId, CopyComponentsRecipe.SHAPED_RECIPE_SERIALIZER_ID), shapedRecipe, copyFrom);
+        this(CopyComponentsRecipe.getModSerializer(modId, CopyComponentsRecipe.SHAPED_RECIPE_SERIALIZER_ID),
+                shapedRecipe,
+                copyFrom);
     }
 
     public CopyComponentsShapedRecipe(RecipeSerializer<?> recipeSerializer, ShapedRecipe shapedRecipe, Ingredient copyFrom) {
-        super(shapedRecipe.getGroup(), shapedRecipe.category(), shapedRecipe.pattern, shapedRecipe.getResultItem(RegistryAccess.EMPTY), shapedRecipe.showNotification());
+        super(shapedRecipe.getGroup(),
+                shapedRecipe.category(),
+                shapedRecipe.pattern,
+                shapedRecipe.getResultItem(RegistryAccess.EMPTY),
+                shapedRecipe.showNotification());
         this.recipeSerializer = recipeSerializer;
         this.copyFrom = copyFrom;
     }

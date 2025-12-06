@@ -26,6 +26,7 @@ public interface ParticleProvidersContext {
      * @param particleProvider particle factory
      * @param <T>              type of particle
      */
+    @Deprecated
     <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> particleType, ParticleProvider.Sprite<T> particleProvider);
 
     /**

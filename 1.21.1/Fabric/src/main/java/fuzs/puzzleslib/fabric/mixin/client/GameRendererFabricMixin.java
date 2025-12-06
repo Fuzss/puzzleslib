@@ -23,8 +23,7 @@ abstract class GameRendererFabricMixin {
     @Final
     private Camera mainCamera;
     @Shadow
-    @Nullable
-    private PostChain postEffect;
+    @Nullable PostChain postEffect;
 
     @Inject(method = "checkEntityPostEffect", at = @At("TAIL"))
     public void checkEntityPostEffect(@Nullable Entity entity, CallbackInfo callback) {
@@ -41,7 +40,8 @@ abstract class GameRendererFabricMixin {
     @ModifyReturnValue(method = "getFov", at = @At("TAIL"))
     private double getFov(double fieldOfViewValue, Camera camera, float partialTicks, boolean useFOVSetting) {
         DefaultedDouble fieldOfView = DefaultedDouble.fromValue(fieldOfViewValue);
-        FabricRendererEvents.COMPUTE_FIELD_OF_VIEW.invoker().onComputeFieldOfView(GameRenderer.class.cast(this), this.mainCamera, partialTicks, fieldOfView);
+        FabricRendererEvents.COMPUTE_FIELD_OF_VIEW.invoker()
+                .onComputeFieldOfView(GameRenderer.class.cast(this), this.mainCamera, partialTicks, fieldOfView);
         return fieldOfView.getAsOptionalDouble().orElse(fieldOfViewValue);
     }
 }

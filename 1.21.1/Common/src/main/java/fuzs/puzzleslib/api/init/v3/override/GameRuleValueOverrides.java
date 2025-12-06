@@ -9,6 +9,7 @@ import java.util.function.Function;
  * Allows for setting new default values to game rules in a development environment.
  * <p>Will not apply any changes in a production environment.
  */
+@Deprecated
 public final class GameRuleValueOverrides {
 
     private GameRuleValueOverrides() {

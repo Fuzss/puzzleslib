@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
-import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
-import fuzs.puzzleslib.fabric.impl.core.FabricAbstractions;
+import fuzs.puzzleslib.fabric.impl.core.FabricProxy;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.packs.PackSelectionModel;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
@@ -21,6 +20,6 @@ abstract class PackSelectionScreenFabricMixin extends Screen {
 
     @ModifyVariable(method = "updateList", at = @At("LOAD"), argsOnly = true)
     private Stream<PackSelectionModel.Entry> updateList(Stream<PackSelectionModel.Entry> models) {
-        return models.filter(entry -> ((FabricAbstractions) CommonAbstractions.INSTANCE).notHidden(entry.getId()));
+        return models.filter((PackSelectionModel.Entry entry) -> FabricProxy.get().notHidden(entry.getId()));
     }
 }

@@ -1,130 +1,121 @@
 package fuzs.puzzleslib.impl.core;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Queues;
-import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.capability.v3.CapabilityController;
-import fuzs.puzzleslib.api.client.event.v1.entity.player.ClientPlayerNetworkEvents;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
-import fuzs.puzzleslib.api.core.v1.BaseModConstructor;
-import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.api.core.v1.utility.Buildable;
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
-import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
-import fuzs.puzzleslib.api.event.v1.entity.player.PlayerNetworkEvents;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
 import fuzs.puzzleslib.api.network.v3.NetworkHandler;
-import fuzs.puzzleslib.api.network.v3.PlayerSet;
-import fuzs.puzzleslib.impl.PuzzlesLibMod;
-import net.minecraft.client.multiplayer.MultiPlayerGameMode;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.Connection;
+import fuzs.puzzleslib.impl.config.ConfigHolderImpl;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
+import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
+import fuzs.puzzleslib.impl.network.NetworkHandlerRegistryImpl;
+import net.minecraft.network.protocol.common.custom.BrandPayload;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
+import java.util.Collections;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public abstract class ModContext {
     private static final Map<String, ModContext> MOD_CONTEXTS = Maps.newConcurrentMap();
 
-    protected final String modId;
-    private final Queue<Buildable> buildables = Queues.newConcurrentLinkedQueue();
-    private final Map<ResourceLocation, Runnable> clientModConstructors = Maps.newConcurrentMap();
-    private final Set<ResourceLocation> constructedPairings = Sets.newConcurrentHashSet();
-    private final Set<ContentRegistrationFlags> handledFlags = EnumSet.noneOf(ContentRegistrationFlags.class);
-    @Nullable protected RegistryManager registryManager;
-    @Nullable protected CapabilityController capabilityController;
-    // true by default for dedicated servers, is reset on client when joining new world
-    private boolean presentServerside = true;
+    private final String modId;
+    protected final CustomPacketPayload.Type<BrandPayload> payloadType;
+    @Nullable
+    private NetworkHandlerRegistryImpl networkHandler;
+    @Nullable
+    private ConfigHolderImpl configHolder;
+    @Nullable
+    private RegistryManagerImpl registryManager;
+    @Nullable
+    protected CapabilityController capabilityController;
 
     protected ModContext(String modId) {
         this.modId = modId;
+        this.payloadType = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(modId, "handshake"));
     }
 
-    public static void registerEventHandlers() {
-        LoadCompleteCallback.EVENT.register(() -> {
-            for (ModContext context : MOD_CONTEXTS.values()) {
-                if (!context.buildables.isEmpty()) {
-                    throw new IllegalStateException("Mod context for %s has %s remaining buildable(s)".formatted(context.modId, context.buildables.size()));
-                }
-                if (!context.clientModConstructors.isEmpty()) {
-                    throw new IllegalStateException("Mod context for %s has remaining client mod constructor(s): %s".formatted(context.modId, context.clientModConstructors.keySet()));
-                }
-            }
-        });
-        PlayerNetworkEvents.LOGGED_IN.register((ServerPlayer serverPlayer) -> {
-            PuzzlesLibMod.NETWORK.sendMessage(PlayerSet.ofPlayer(serverPlayer), new ClientboundModListMessage(MOD_CONTEXTS.keySet()));
-        });
-        if (ModLoaderEnvironment.INSTANCE.isClient()) {
-            ClientPlayerNetworkEvents.LOGGED_IN.register((LocalPlayer player, MultiPlayerGameMode multiPlayerGameMode, Connection connection) -> {
-                for (ModContext context : MOD_CONTEXTS.values()) {
-                    context.presentServerside = false;
-                }
-            });
-        }
+    public static void forEach(Consumer<ModContext> modContextConsumer) {
+        MOD_CONTEXTS.values().forEach(modContextConsumer);
+    }
+
+    public static Map<String, ModContext> getModContexts() {
+        return Collections.unmodifiableMap(MOD_CONTEXTS);
     }
 
     public static ModContext get(String modId) {
-        return MOD_CONTEXTS.computeIfAbsent(modId, CommonFactories.INSTANCE::getModContext);
+        return MOD_CONTEXTS.computeIfAbsent(modId, ProxyImpl.get()::getModContext);
     }
 
-    public static Stream<CapabilityController> getCapabilityControllers() {
-        return MOD_CONTEXTS.values().stream().map(context -> context.capabilityController).filter(Objects::nonNull);
-    }
+    public abstract boolean isPresentServerside();
 
-    public static ResourceLocation getPairingIdentifier(String modId, BaseModConstructor modConstructor) {
-        ResourceLocation identifier = modConstructor.getPairingIdentifier();
-        return identifier != null ? identifier : ResourceLocationHelper.fromNamespaceAndPath(modId, "main");
-    }
+    public abstract boolean isPresentClientside(ServerPlayer serverPlayer);
 
-    public static void acceptServersideMods(Collection<String> modList) {
-        modList.stream().map(MOD_CONTEXTS::get).filter(Objects::nonNull).forEach(context -> context.presentServerside = true);
-    }
-
-    public static boolean isPresentServerside(String modId) {
-        return MOD_CONTEXTS.containsKey(modId) && MOD_CONTEXTS.get(modId).presentServerside;
-    }
-
-    public abstract NetworkHandler.Builder getNetworkHandler(ResourceLocation channelName);
-
-    public abstract ConfigHolder.Builder getConfigHolder();
-
-    public abstract RegistryManager getRegistryManager();
-
-    public abstract CapabilityController getCapabilityController();
-
-    protected <T extends Buildable> T addBuildable(T buildable) {
-        Objects.requireNonNull(buildable, "buildable is null");
-        this.buildables.offer(buildable);
-        return buildable;
-    }
-
-    public final void scheduleClientModConstruction(ResourceLocation identifier, Runnable runnable) {
-        if (this.constructedPairings.contains(identifier)) {
-            runnable.run();
+    public final NetworkHandler.Builder getNetworkHandler() {
+        if (this.networkHandler == null) {
+            return this.networkHandler = this.createNetworkHandler(this.modId);
         } else {
-            this.clientModConstructors.put(identifier, runnable);
+            return this.networkHandler;
         }
     }
 
-    public final void beforeModConstruction() {
-        while (!this.buildables.isEmpty()) {
-            this.buildables.poll().build();
+    protected abstract NetworkHandlerRegistryImpl createNetworkHandler(String modId);
+
+    public final ConfigHolder.Builder getConfigHolder() {
+        if (this.configHolder == null) {
+            return this.configHolder = this.createConfigHolder(this.modId);
+        } else {
+            return this.configHolder;
         }
     }
 
-    public final void afterModConstruction(ResourceLocation identifier) {
-        this.constructedPairings.add(identifier);
-        Runnable runnable = this.clientModConstructors.remove(identifier);
-        if (runnable != null) runnable.run();
+    protected abstract ConfigHolderImpl createConfigHolder(String modId);
+
+    public final RegistryManager getRegistryManager() {
+        if (this.registryManager == null) {
+            return this.registryManager = this.createRegistryManager(this.modId);
+        } else {
+            return this.registryManager;
+        }
     }
 
-    public final Set<ContentRegistrationFlags> getFlagsToHandle(Set<ContentRegistrationFlags> availableFlags) {
-        return availableFlags.stream().filter(Predicate.not(this.handledFlags::contains)).peek(this.handledFlags::add).collect(ImmutableSet.toImmutableSet());
+    protected abstract RegistryManagerImpl createRegistryManager(String modId);
+
+    public final CapabilityController getCapabilityController() {
+        if (this.capabilityController == null) {
+            return this.capabilityController = this.createCapabilityController(this.modId);
+        } else {
+            return this.capabilityController;
+        }
+    }
+
+    protected abstract CapabilityController createCapabilityController(String modId);
+
+    public final void runBeforeConstruction() {
+        if (this.networkHandler != null) {
+            this.networkHandler.freeze();
+        }
+
+        if (this.configHolder != null) {
+            this.configHolder.freeze();
+        }
+    }
+
+    public final void runAfterConstruction() {
+        if (this.networkHandler != null) {
+//            this.networkHandler.isFrozenOrThrow();
+        }
+
+        if (this.configHolder != null) {
+            this.configHolder.isFrozenOrThrow();
+        }
+
+        if (this.registryManager != null) {
+            this.registryManager.freeze();
+            this.registryManager.isFrozenOrThrow();
+        }
     }
 }

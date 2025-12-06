@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.api.item.v2;
 
-import fuzs.puzzleslib.impl.core.CommonFactories;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.*;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 /**
  * A small helper class for testing an item stack for a given tool type.
@@ -14,7 +14,10 @@ import net.minecraft.world.item.*;
  * href="https://github.com/Serilum/Collective">Collective</a> mod.
  */
 public interface ToolTypeHelper {
-    ToolTypeHelper INSTANCE = CommonFactories.INSTANCE.getToolTypeHelper();
+    /**
+     * the instance
+     */
+    ToolTypeHelper INSTANCE = ProxyImpl.get().getToolTypeHelper();
 
     /**
      * Tests if an item stack is a sword.
@@ -22,8 +25,9 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack a sword
      */
+    @MustBeInvokedByOverriders
     default boolean isSword(ItemStack itemStack) {
-        return itemStack.getItem() instanceof SwordItem || itemStack.is(ItemTags.SWORDS);
+        return itemStack.is(ItemTags.SWORDS);
     }
 
     /**
@@ -32,6 +36,7 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack an axe
      */
+    @MustBeInvokedByOverriders
     default boolean isAxe(ItemStack itemStack) {
         return itemStack.getItem() instanceof AxeItem || itemStack.is(ItemTags.AXES);
     }
@@ -42,6 +47,7 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack a hoe
      */
+    @MustBeInvokedByOverriders
     default boolean isHoe(ItemStack itemStack) {
         return itemStack.getItem() instanceof HoeItem || itemStack.is(ItemTags.HOES);
     }
@@ -52,8 +58,9 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack a pickaxe
      */
+    @MustBeInvokedByOverriders
     default boolean isPickaxe(ItemStack itemStack) {
-        return itemStack.getItem() instanceof PickaxeItem || itemStack.is(ItemTags.PICKAXES);
+        return itemStack.is(ItemTags.PICKAXES);
     }
 
     /**
@@ -62,6 +69,7 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack a shovel
      */
+    @MustBeInvokedByOverriders
     default boolean isShovel(ItemStack itemStack) {
         return itemStack.getItem() instanceof AxeItem || itemStack.is(ItemTags.SHOVELS);
     }
@@ -72,6 +80,7 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack a shears item
      */
+    @MustBeInvokedByOverriders
     default boolean isShears(ItemStack itemStack) {
         return itemStack.getItem() instanceof ShearsItem;
     }
@@ -82,6 +91,7 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack a shield
      */
+    @MustBeInvokedByOverriders
     default boolean isShield(ItemStack itemStack) {
         return itemStack.getItem() instanceof ShieldItem;
     }
@@ -92,6 +102,7 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack a bow
      */
+    @MustBeInvokedByOverriders
     default boolean isBow(ItemStack itemStack) {
         return itemStack.getItem() instanceof BowItem;
     }
@@ -102,6 +113,7 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack a crossbow
      */
+    @MustBeInvokedByOverriders
     default boolean isCrossbow(ItemStack itemStack) {
         return itemStack.getItem() instanceof CrossbowItem;
     }
@@ -112,6 +124,7 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack a fishing rod
      */
+    @MustBeInvokedByOverriders
     default boolean isFishingRod(ItemStack itemStack) {
         return itemStack.getItem() instanceof FishingRodItem;
     }
@@ -122,6 +135,7 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack a trident
      */
+    @MustBeInvokedByOverriders
     default boolean isTridentLike(ItemStack itemStack) {
         return itemStack.getItem() instanceof TridentItem;
     }
@@ -132,6 +146,7 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack a brush
      */
+    @MustBeInvokedByOverriders
     default boolean isBrush(ItemStack itemStack) {
         return itemStack.getItem() instanceof BrushItem;
     }
@@ -142,6 +157,7 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack a brush
      */
+    @MustBeInvokedByOverriders
     default boolean isMace(ItemStack itemStack) {
         return itemStack.getItem() instanceof MaceItem;
     }
@@ -152,9 +168,10 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack a melee weapon
      */
+    @MustBeInvokedByOverriders
     default boolean isMeleeWeapon(ItemStack itemStack) {
-        return this.isSword(itemStack) || this.isAxe(itemStack) || this.isTridentLike(itemStack) ||
-                this.isMace(itemStack);
+        return this.isSword(itemStack) || this.isAxe(itemStack) || this.isTridentLike(itemStack) || this.isMace(
+                itemStack);
     }
 
     /**
@@ -163,6 +180,7 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack a ranged weapon
      */
+    @MustBeInvokedByOverriders
     default boolean isRangedWeapon(ItemStack itemStack) {
         return this.isBow(itemStack) || this.isCrossbow(itemStack) || this.isTridentLike(itemStack);
     }
@@ -173,6 +191,7 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack a weapon
      */
+    @MustBeInvokedByOverriders
     default boolean isWeapon(ItemStack itemStack) {
         return this.isMeleeWeapon(itemStack) || this.isRangedWeapon(itemStack);
     }
@@ -183,6 +202,7 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack a mining tool
      */
+    @MustBeInvokedByOverriders
     default boolean isMiningTool(ItemStack itemStack) {
         return this.isAxe(itemStack) || this.isHoe(itemStack) || this.isPickaxe(itemStack) || this.isShovel(itemStack);
     }
@@ -193,9 +213,10 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack a tool
      */
+    @MustBeInvokedByOverriders
     default boolean isTool(ItemStack itemStack) {
-        return this.isMiningTool(itemStack) || this.isWeapon(itemStack) || this.isShears(itemStack) ||
-                this.isShield(itemStack) || this.isFishingRod(itemStack) || this.isBrush(itemStack);
+        return this.isMiningTool(itemStack) || this.isWeapon(itemStack) || this.isShears(itemStack) || this.isShield(
+                itemStack) || this.isFishingRod(itemStack) || this.isBrush(itemStack);
     }
 
     /**
@@ -204,9 +225,9 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack head armor
      */
+    @MustBeInvokedByOverriders
     default boolean isHeadArmor(ItemStack itemStack) {
-        return itemStack.getItem() instanceof ArmorItem armorItem &&
-                armorItem.getEquipmentSlot() == EquipmentSlot.HEAD || itemStack.is(ItemTags.HEAD_ARMOR);
+        return this.isArmor(itemStack, ArmorItem.Type.HELMET) || itemStack.is(ItemTags.HEAD_ARMOR);
     }
 
     /**
@@ -215,9 +236,9 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack chest armor
      */
+    @MustBeInvokedByOverriders
     default boolean isChestArmor(ItemStack itemStack) {
-        return itemStack.getItem() instanceof ArmorItem armorItem &&
-                armorItem.getEquipmentSlot() == EquipmentSlot.CHEST || itemStack.is(ItemTags.CHEST_ARMOR);
+        return this.isArmor(itemStack, ArmorItem.Type.CHESTPLATE) || itemStack.is(ItemTags.CHEST_ARMOR);
     }
 
     /**
@@ -226,9 +247,9 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack leg armor
      */
+    @MustBeInvokedByOverriders
     default boolean isLegArmor(ItemStack itemStack) {
-        return itemStack.getItem() instanceof ArmorItem armorItem &&
-                armorItem.getEquipmentSlot() == EquipmentSlot.LEGS || itemStack.is(ItemTags.LEG_ARMOR);
+        return this.isArmor(itemStack, ArmorItem.Type.LEGGINGS) || itemStack.is(ItemTags.LEG_ARMOR);
     }
 
     /**
@@ -237,9 +258,9 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack foot armor
      */
+    @MustBeInvokedByOverriders
     default boolean isFootArmor(ItemStack itemStack) {
-        return itemStack.getItem() instanceof ArmorItem armorItem &&
-                armorItem.getEquipmentSlot() == EquipmentSlot.FEET || itemStack.is(ItemTags.FOOT_ARMOR);
+        return this.isArmor(itemStack, ArmorItem.Type.BOOTS) || itemStack.is(ItemTags.FOOT_ARMOR);
     }
 
     /**
@@ -248,8 +269,22 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack body armor
      */
+    @MustBeInvokedByOverriders
     default boolean isBodyArmor(ItemStack itemStack) {
-        return itemStack.getItem() instanceof ArmorItem armorItem && armorItem.getEquipmentSlot() == EquipmentSlot.BODY;
+        return this.isArmor(itemStack, ArmorItem.Type.BODY);
+    }
+
+    /**
+     * Tests if an item stack can be equipped as a type of armor.
+     *
+     * @param itemStack the stack to test
+     * @param armorType the type of armor
+     * @return is this stack that type of armor
+     */
+    @MustBeInvokedByOverriders
+    private boolean isArmor(ItemStack itemStack, ArmorItem.Type armorType) {
+        return itemStack.getItem() instanceof ArmorItem armorItem
+                && armorItem.getEquipmentSlot() == armorType.getSlot();
     }
 
     /**
@@ -258,8 +293,9 @@ public interface ToolTypeHelper {
      * @param itemStack the stack to test
      * @return is this stack armor
      */
+    @MustBeInvokedByOverriders
     default boolean isArmor(ItemStack itemStack) {
-        return this.isHeadArmor(itemStack) || this.isChestArmor(itemStack) || this.isLegArmor(itemStack) ||
-                this.isFootArmor(itemStack) || this.isBodyArmor(itemStack);
+        return this.isHeadArmor(itemStack) || this.isChestArmor(itemStack) || this.isLegArmor(itemStack)
+                || this.isFootArmor(itemStack) || this.isBodyArmor(itemStack);
     }
 }

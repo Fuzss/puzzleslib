@@ -24,6 +24,7 @@ import java.util.function.UnaryOperator;
  * Allows for registering commands that run when a world or a player are first created in a development environment.
  * <p>Will not apply any changes in a production environment.
  */
+@Deprecated
 public final class CommandOverrides {
     private static final String KEY_PLAYER_SEEN_WORLD = PuzzlesLibMod.id("has_seen_world").toLanguageKey();
     private static final Map<CommandEnvironment, Collection<String>> COMMAND_OVERRIDES = Maps.newEnumMap(

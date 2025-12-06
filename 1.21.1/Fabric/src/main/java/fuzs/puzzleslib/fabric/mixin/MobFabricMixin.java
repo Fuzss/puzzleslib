@@ -50,22 +50,27 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
         this.puzzleslib$spawnType = mobSpawnType;
     }
 
-    @ModifyVariable(method = "setTarget", at = @At("HEAD"), ordinal = 0)
+    @ModifyVariable(method = "setTarget", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     public LivingEntity setTarget(@Nullable LivingEntity entity) {
         DefaultedValue<LivingEntity> target = DefaultedValue.fromValue(entity);
         EventResult result = FabricLivingEvents.LIVING_CHANGE_TARGET.invoker().onLivingChangeTarget(this, target);
         return result.isInterrupt() ? this.target : target.getAsOptional().orElse(entity);
     }
 
-    @Inject(method = "checkDespawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getNearestPlayer(Lnet/minecraft/world/entity/Entity;D)Lnet/minecraft/world/entity/player/Player;"), cancellable = true)
+    @Inject(method = "checkDespawn",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/Level;getNearestPlayer(Lnet/minecraft/world/entity/Entity;D)Lnet/minecraft/world/entity/player/Player;"),
+            cancellable = true)
     public void checkDespawn(CallbackInfo callback) {
-        EventResult result = FabricLivingEvents.CHECK_MOB_DESPAWN.invoker().onCheckMobDespawn(Mob.class.cast(this), (ServerLevel) this.level());
+        EventResult result = FabricLivingEvents.CHECK_MOB_DESPAWN.invoker()
+                .onCheckMobDespawn(Mob.class.cast(this), (ServerLevel) this.level());
         if (result.isInterrupt()) {
             if (result.getAsBoolean()) {
                 this.discard();
             } else {
                 this.noActionTime = 0;
             }
+
             callback.cancel();
         }
     }

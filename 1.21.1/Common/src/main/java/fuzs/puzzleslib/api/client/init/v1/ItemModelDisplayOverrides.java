@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.client.init.v1;
 
-import fuzs.puzzleslib.impl.client.core.ClientFactories;
+import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -14,7 +14,7 @@ import net.minecraft.world.item.ItemDisplayContext;
  * </ul>
  */
 public interface ItemModelDisplayOverrides {
-    ItemModelDisplayOverrides INSTANCE = ClientFactories.INSTANCE.getItemModelDisplayOverrides();
+    ItemModelDisplayOverrides INSTANCE = ClientProxyImpl.get().getItemModelDisplayOverrides();
 
     /**
      * Register vanilla item model overrides for an item.

@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
-import fuzs.puzzleslib.fabric.mixin.accessor.GrindstoneMenuFabricAccessor;
+import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import fuzs.puzzleslib.fabric.impl.event.GrindstoneExperienceHolder;
+import fuzs.puzzleslib.fabric.mixin.accessor.GrindstoneMenuFabricAccessor;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.GrindstoneMenu;
@@ -27,7 +27,7 @@ import java.util.Optional;
 abstract class GrindstoneMenu$ResultSlotFabricMixin extends Slot {
     @Shadow
     @Final
-    private GrindstoneMenu this$0;
+    GrindstoneMenu this$0;
     @Nullable
     @Unique
     private DefaultedValue<ItemStack> puzzleslib$topInput;
@@ -39,15 +39,20 @@ abstract class GrindstoneMenu$ResultSlotFabricMixin extends Slot {
         super(container, slot, x, y);
     }
 
-    @Inject(method = "onTake", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "onTake", at = @At("HEAD"))
     public void onTake$0(Player player, ItemStack stack, CallbackInfo callback) {
         Container repairSlots = ((GrindstoneMenuFabricAccessor) this.this$0).puzzleslib$getRepairSlots();
         DefaultedValue<ItemStack> topInput = this.puzzleslib$topInput = DefaultedValue.fromValue(repairSlots.getItem(0));
-        DefaultedValue<ItemStack> bottomInput = this.puzzleslib$bottomInput = DefaultedValue.fromValue(repairSlots.getItem(1));
+        DefaultedValue<ItemStack> bottomInput = this.puzzleslib$bottomInput = DefaultedValue.fromValue(repairSlots.getItem(
+                1));
         FabricPlayerEvents.GRINDSTONE_USE.invoker().onGrindstoneUse(topInput, bottomInput, player);
     }
 
-    @Inject(method = "onTake", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/ContainerLevelAccess;execute(Ljava/util/function/BiConsumer;)V", shift = At.Shift.AFTER), cancellable = true)
+    @Inject(method = "onTake",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/inventory/ContainerLevelAccess;execute(Ljava/util/function/BiConsumer;)V",
+                    shift = At.Shift.AFTER),
+            cancellable = true)
     public void onTake$1(Player player, ItemStack stack, CallbackInfo callback) {
         Objects.requireNonNull(this.puzzleslib$topInput, "top input is null");
         Objects.requireNonNull(this.puzzleslib$bottomInput, "bottom input is null");

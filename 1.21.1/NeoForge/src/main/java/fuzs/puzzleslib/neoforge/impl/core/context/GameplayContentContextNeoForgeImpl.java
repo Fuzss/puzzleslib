@@ -5,10 +5,11 @@ import com.google.common.base.Predicates;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import fuzs.puzzleslib.api.core.v1.context.GameplayContentContext;
-import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.api.data.v2.core.DataProviderHelper;
 import fuzs.puzzleslib.neoforge.api.data.v2.core.NeoForgeDataProviderContext;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.context.UseOnContext;
@@ -16,6 +17,7 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FireBlock;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
@@ -43,20 +45,20 @@ public final class GameplayContentContextNeoForgeImpl implements GameplayContent
             HoeItem::onlyIfAirAbove);
     private final DataMapBuilder<Holder<Block>, Holder<Block>> oxidizables;
     private final DataMapBuilder<Holder<Block>, Holder<Block>> waxables;
-    private final String modId;
+    private final IEventBus eventBus;
 
-    public GameplayContentContextNeoForgeImpl(String modId) {
-        this.modId = modId;
+    public GameplayContentContextNeoForgeImpl(String modId, IEventBus eventBus) {
+        this.eventBus = eventBus;
         this.furnaceFuels = new DataMapBuilder<>(modId,
                 NeoForgeDataMaps.FURNACE_FUELS,
-                (Holder<? extends ItemLike> holder) -> holder.value().asItem().builtInRegistryHolder(),
+                (Holder<? extends ItemLike> holder) -> BuiltInRegistries.ITEM.wrapAsHolder(holder.value().asItem()),
                 (Fraction fraction) -> {
                     Fraction fuelBaseValue = Fraction.getFraction(200, 1);
                     return new FurnaceFuel(fraction.multiplyBy(fuelBaseValue).intValue());
                 });
         this.compostables = new DataMapBuilder<>(modId,
                 NeoForgeDataMaps.COMPOSTABLES,
-                (Holder<? extends ItemLike> holder) -> holder.value().asItem().builtInRegistryHolder(),
+                (Holder<? extends ItemLike> holder) -> BuiltInRegistries.ITEM.wrapAsHolder(holder.value().asItem()),
                 Compostable::new);
         this.oxidizables = new DataMapBuilder<>(modId,
                 NeoForgeDataMaps.OXIDIZABLES,
@@ -81,8 +83,8 @@ public final class GameplayContentContextNeoForgeImpl implements GameplayContent
         Preconditions.checkArgument(flammability > 0, "flammability is non-positive");
         Objects.requireNonNull(flammableBlock, "flammable block is null");
         if (this.flammables.isEmpty()) {
-            NeoForgeModContainerHelper.getModEventBus(this.modId).addListener((final FMLCommonSetupEvent evt) -> {
-                evt.enqueueWork(() -> {
+            this.eventBus.addListener((final FMLCommonSetupEvent event) -> {
+                event.enqueueWork(() -> {
                     this.flammables.forEach((Holder<Block> holder, Flammable flammable) -> {
                         ((FireBlock) Blocks.FIRE).setFlammable(holder.value(),
                                 flammable.encouragement(),
@@ -147,7 +149,7 @@ public final class GameplayContentContextNeoForgeImpl implements GameplayContent
             this.factory = (NeoForgeDataProviderContext context) -> {
                 return new DataMapProvider(context.getPackOutput(), context.getRegistries()) {
                     @Override
-                    protected void gather() {
+                    protected void gather(HolderLookup.Provider registries) {
                         Builder<T, R> builder = this.builder(dataMapType);
                         DataMapBuilder.this.values.forEach((K key, V value) -> {
                             builder.add(keyConverter.apply(key), valueConverter.apply(value), false);
@@ -156,8 +158,8 @@ public final class GameplayContentContextNeoForgeImpl implements GameplayContent
 
                     @Override
                     public String getName() {
-                        return super.getName() + " for " +
-                                ResourceKey.create(dataMapType.registryKey(), dataMapType.id());
+                        return super.getName() + " for " + ResourceKey.create(dataMapType.registryKey(),
+                                dataMapType.id());
                     }
                 };
             };
@@ -167,6 +169,7 @@ public final class GameplayContentContextNeoForgeImpl implements GameplayContent
             if (this.values.isEmpty()) {
                 DataProviderHelper.registerDataProviders(this.modId, this.factory);
             }
+
             this.values.put(key, value);
         }
     }
@@ -198,15 +201,16 @@ public final class GameplayContentContextNeoForgeImpl implements GameplayContent
 
         public void register(Holder<Block> key, Holder<Block> value) {
             if (this.values.isEmpty()) {
-                NeoForge.EVENT_BUS.addListener((final BlockEvent.BlockToolModificationEvent evt) -> {
-                    if (evt.getItemAbility() == this.itemAbility && this.predicate.test(evt.getContext())) {
-                        Block block = this.supplier.get().get(evt.getState().getBlock());
+                NeoForge.EVENT_BUS.addListener((final BlockEvent.BlockToolModificationEvent event) -> {
+                    if (event.getItemAbility() == this.itemAbility && this.predicate.test(event.getContext())) {
+                        Block block = this.supplier.get().get(event.getState().getBlock());
                         if (block != null) {
-                            evt.setFinalState(block.defaultBlockState());
+                            event.setFinalState(block.defaultBlockState());
                         }
                     }
                 });
             }
+
             this.values.put(key, value);
         }
     }

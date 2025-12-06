@@ -1,26 +1,18 @@
 package fuzs.puzzleslib.impl.item;
 
-import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.decoration.PaintingVariant;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentInstance;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 public final class CreativeModeTabHelper {
     static final Collection<Item> POTION_ITEMS = ImmutableSet.of(Items.POTION,
@@ -39,50 +31,75 @@ public final class CreativeModeTabHelper {
     }
 
     public static CreativeModeTab.DisplayItemsGenerator getDisplayItems(String modId) {
-        return getDisplayItems(modId, Predicates.alwaysTrue());
-    }
-
-    public static CreativeModeTab.DisplayItemsGenerator getDisplayItems(String modId, Predicate<ItemStack> filter) {
         return (CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) -> {
-            Consumer<ItemStack> itemStacks = (ItemStack itemStack) -> {
-                if (filter.test(itemStack)) output.accept(itemStack);
-            };
-            appendAllItems(modId, itemDisplayParameters.holders(), itemStacks);
-            appendAllEnchantments(modId, itemDisplayParameters.holders(), itemStacks);
-            appendAllPotions(modId, itemDisplayParameters.holders(), itemStacks);
+            generateItemTypes(modId, itemDisplayParameters, output);
+            generateEnchantmentBookTypes(modId, itemDisplayParameters, output);
+            generatePotionEffectTypes(modId, itemDisplayParameters, output);
+            generatePaintingTypes(modId, itemDisplayParameters, output);
         };
     }
 
-    public static void appendAllItems(String modId, HolderLookup.Provider registries, Consumer<ItemStack> itemStacks) {
-        getHoldersFromNamespace(Registries.ITEM, registries, modId).map(ItemStack::new).forEach(itemStacks);
+    public static void generateItemTypes(String modId, CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) {
+        itemDisplayParameters.holders().lookup(Registries.ITEM).ifPresent(registryLookup -> {
+            registryLookup.listElements()
+                    .filter((Holder.Reference<Item> holder) -> holder.key().location().getNamespace().equals(modId))
+                    .map(ItemStack::new)
+                    .forEach((ItemStack itemStack) -> output.accept(itemStack,
+                            CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS));
+        });
     }
 
-    public static void appendAllEnchantments(String modId, HolderLookup.Provider registries, Consumer<ItemStack> itemStacks) {
-        getHoldersFromNamespace(Registries.ENCHANTMENT,
-                registries,
-                modId).map((Holder.Reference<Enchantment> holder) -> new EnchantmentInstance(holder,
-                holder.value().getMaxLevel())).map(EnchantedBookItem::createForEnchantment).forEach(itemStacks);
+    public static void generateEnchantmentBookTypes(String modId, CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) {
+        itemDisplayParameters.holders().lookup(Registries.ENCHANTMENT).ifPresent(registryLookup -> {
+            CreativeModeTabs.generateEnchantmentBookTypesOnlyMaxLevel((ItemStack itemStack, CreativeModeTab.TabVisibility tabVisibility) -> {
+                if (itemStack.getOrDefault(DataComponents.STORED_ENCHANTMENTS, ItemEnchantments.EMPTY)
+                        .keySet()
+                        .stream()
+                        .findAny()
+                        .flatMap(Holder::unwrapKey)
+                        .map(ResourceKey::location)
+                        .map(ResourceLocation::getNamespace)
+                        .filter(modId::equals)
+                        .isPresent()) {
+                    output.accept(itemStack, tabVisibility);
+                }
+            }, registryLookup, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
+        });
     }
 
-    public static void appendAllPotions(String modId, HolderLookup.Provider registries, Consumer<ItemStack> itemStacks) {
-        List<Holder.Reference<Potion>> potions = getHoldersFromNamespace(Registries.POTION,
-                registries,
-                modId).filter((Holder.Reference<Potion> holder) -> !holder.value().getEffects().isEmpty())
-                .sorted(Comparator.comparing((Holder.Reference<Potion> holder) -> holder.value()
-                        .getEffects()
-                        .getFirst()))
-                .toList();
-        for (Item item : POTION_ITEMS) {
-            for (Holder.Reference<Potion> potion : potions) {
-                itemStacks.accept(PotionContents.createItemStack(item, potion));
+    public static void generatePotionEffectTypes(String modId, CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) {
+        itemDisplayParameters.holders().lookup(Registries.POTION).ifPresent(registryLookup -> {
+            for (Item item : POTION_ITEMS) {
+                CreativeModeTabs.generatePotionEffectTypes((ItemStack itemStack, CreativeModeTab.TabVisibility tabVisibility) -> {
+                            if (itemStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY)
+                                    .potion()
+                                    .flatMap(Holder::unwrapKey)
+                                    .map(ResourceKey::location)
+                                    .map(ResourceLocation::getNamespace)
+                                    .filter(modId::equals)
+                                    .isPresent()) {
+                                output.accept(itemStack, tabVisibility);
+                            }
+                        },
+                        registryLookup,
+                        item,
+                        CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS,
+                        itemDisplayParameters.enabledFeatures());
             }
-        }
+        });
     }
 
-    public static <T> Stream<Holder.Reference<T>> getHoldersFromNamespace(ResourceKey<? extends Registry<? extends T>> registryKey, HolderLookup.Provider registries, String modId) {
-        return registries.lookup(registryKey)
-                .stream()
-                .flatMap(HolderLookup::listElements)
-                .filter((Holder.Reference<T> holder) -> holder.key().location().getNamespace().equals(modId));
+    public static void generatePaintingTypes(String modId, CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) {
+        itemDisplayParameters.holders()
+                .lookup(Registries.PAINTING_VARIANT)
+                .ifPresent(registryLookup -> CreativeModeTabs.generatePresetPaintings(output,
+                        itemDisplayParameters.holders(),
+                        registryLookup,
+                        (Holder<PaintingVariant> holder) -> holder.unwrapKey()
+                                .map(ResourceKey::location)
+                                .map(ResourceLocation::getNamespace)
+                                .filter(modId::equals)
+                                .isPresent(),
+                        CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS));
     }
 }

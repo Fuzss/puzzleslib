@@ -8,6 +8,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 
 import java.util.Objects;
 
+@Deprecated
 public record EntityAttributesModifyContextNeoForgeImpl(
         EntityAttributesModifyContext context) implements EntityAttributesModifyContext {
 

@@ -22,6 +22,7 @@ import java.util.stream.Stream;
  * helper class for reflection operations, similar to the Forge thing, but we want to use this on Fabric as well
  */
 @SuppressWarnings("unchecked")
+@Deprecated
 public final class ReflectionHelper {
     /**
      * cache for all fields found by {@link #findField}

@@ -7,7 +7,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 /**
  * register default attributes for our own entities
  */
-@FunctionalInterface
+@Deprecated
 public interface EntityAttributesCreateContext {
 
     /**

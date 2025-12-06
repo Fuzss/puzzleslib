@@ -8,6 +8,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 
+@Deprecated
 public class CopyComponentsShapelessRecipe extends ShapelessRecipe implements CopyComponentsRecipe {
     private final RecipeSerializer<?> recipeSerializer;
     private final Ingredient copyFrom;

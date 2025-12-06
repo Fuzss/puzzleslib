@@ -1,6 +1,8 @@
 package fuzs.puzzleslib.api.core.v1;
 
-import fuzs.puzzleslib.impl.core.CommonFactories;
+import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
+import net.minecraft.Util;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
@@ -16,9 +18,13 @@ import java.util.List;
  * server.
  */
 public interface Proxy {
-    Proxy INSTANCE = ModLoaderEnvironment.INSTANCE.isClient() ?
-            CommonFactories.INSTANCE.getClientProxy() :
-            CommonFactories.INSTANCE.getServerProxy();
+    Proxy INSTANCE = Util.make(() -> {
+        if (ModLoaderEnvironment.INSTANCE.isClient()) {
+            return ServiceProviderHelper.load(ClientProxyImpl.class);
+        } else {
+            return ServiceProviderHelper.load(ProxyImpl.class);
+        }
+    });
 
     /**
      * @return client player from Minecraft singleton when on physical client, otherwise null

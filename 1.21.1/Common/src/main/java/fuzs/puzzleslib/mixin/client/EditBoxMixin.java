@@ -21,21 +21,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 abstract class EditBoxMixin extends AbstractWidget {
     @Shadow
     @Final
-    public Font font;
+    private Font font;
     @Shadow
-    public String value;
+    private String value;
     @Shadow
-    public boolean bordered;
+    private boolean bordered;
     @Shadow
-    public int displayPos;
+    private int displayPos;
     @Shadow
-    public int cursorPos;
+    private int cursorPos;
     @Shadow
-    public int highlightPos;
-    protected long lastClickTime;
-    protected boolean doubleClick;
-    protected int doubleClickHighlightPos;
-    protected int doubleClickCursorPos;
+    private int highlightPos;
+    @Unique
+    private long puzzleslib$lastClickTime;
+    @Unique
+    private boolean puzzleslib$doubleClick;
+    @Unique
+    private int puzzleslib$doubleClickHighlightPos;
+    @Unique
+    private int puzzleslib$doubleClickCursorPos;
 
     public EditBoxMixin(int x, int y, int width, int height, Component message) {
         super(x, y, width, height, message);
@@ -76,21 +80,21 @@ abstract class EditBoxMixin extends AbstractWidget {
         for (int k = 0; k < skippedWords; ++k) {
             if (!backwards) {
                 int l = this.value.length();
-                while (skipConsecutiveSpaces && i == pos && i < l && !isWordChar(this.value.charAt(i))) {
+                while (skipConsecutiveSpaces && i == pos && i < l && !puzzleslib$isWordChar(this.value.charAt(i))) {
                     ++i;
                     pos++;
                 }
 
-                while (i < l && isWordChar(this.value.charAt(i))) {
+                while (i < l && puzzleslib$isWordChar(this.value.charAt(i))) {
                     ++i;
                 }
             } else {
-                while (skipConsecutiveSpaces && i == pos && i > 0 && !isWordChar(this.value.charAt(i - 1))) {
+                while (skipConsecutiveSpaces && i == pos && i > 0 && !puzzleslib$isWordChar(this.value.charAt(i - 1))) {
                     --i;
                     pos--;
                 }
 
-                while (i > 0 && isWordChar(this.value.charAt(i - 1))) {
+                while (i > 0 && puzzleslib$isWordChar(this.value.charAt(i - 1))) {
                     --i;
                 }
             }
@@ -100,7 +104,7 @@ abstract class EditBoxMixin extends AbstractWidget {
     }
 
     @Unique
-    private static boolean isWordChar(char charAt) {
+    private static boolean puzzleslib$isWordChar(char charAt) {
         // break skipping on more than just spaces, from Owo Lib, thanks!
         return charAt == '_' || Character.isAlphabetic(charAt) || Character.isDigit(charAt);
     }
@@ -177,9 +181,9 @@ abstract class EditBoxMixin extends AbstractWidget {
     @Inject(method = "onClick", at = @At("TAIL"))
     public void onClick(double mouseX, double mouseY, CallbackInfo callback) {
         long millis = Util.getMillis();
-        boolean tripleClick = this.doubleClick;
-        this.doubleClick = millis - this.lastClickTime < 250L;
-        if (this.doubleClick) {
+        boolean tripleClick = this.puzzleslib$doubleClick;
+        this.puzzleslib$doubleClick = millis - this.puzzleslib$lastClickTime < 250L;
+        if (this.puzzleslib$doubleClick) {
             if (tripleClick) {
                 // triple click to select all text in the edit box
                 this.moveCursorToEnd(false);
@@ -187,14 +191,14 @@ abstract class EditBoxMixin extends AbstractWidget {
             } else {
                 // double click to select the clicked word
                 // highlight positions is right selection boundary, cursor position is left selection boundary
-                this.doubleClickHighlightPos = this.getWordPosition(1, this.getCursorPosition(), false);
-                this.moveCursorTo(this.doubleClickHighlightPos, false);
-                this.doubleClickCursorPos = this.getWordPosition(-1, this.getCursorPosition(), false);
-                this.moveCursorTo(this.doubleClickCursorPos, true);
+                this.puzzleslib$doubleClickHighlightPos = this.getWordPosition(1, this.getCursorPosition(), false);
+                this.moveCursorTo(this.puzzleslib$doubleClickHighlightPos, false);
+                this.puzzleslib$doubleClickCursorPos = this.getWordPosition(-1, this.getCursorPosition(), false);
+                this.moveCursorTo(this.puzzleslib$doubleClickCursorPos, true);
             }
         }
 
-        this.lastClickTime = millis;
+        this.puzzleslib$lastClickTime = millis;
     }
 
     @Override
@@ -207,24 +211,24 @@ abstract class EditBoxMixin extends AbstractWidget {
         String string = this.font.plainSubstrByWidth(this.value.substring(this.displayPos), this.getInnerWidth());
         int mousePosition = this.font.plainSubstrByWidth(string, i).length() + this.displayPos;
 
-        if (this.doubleClick) {
+        if (this.puzzleslib$doubleClick) {
             // double click drag across text to select individual words
             // dragging outside the edit box will select everything until beginning / end
             if (this.clicked(mouseX, mouseY)) {
                 int rightBoundary = this.getWordPosition(1, mousePosition, false);
-                this.moveCursorTo(Math.max(this.doubleClickHighlightPos, rightBoundary), false);
+                this.moveCursorTo(Math.max(this.puzzleslib$doubleClickHighlightPos, rightBoundary), false);
                 int leftBoundary = this.getWordPosition(-1, mousePosition, false);
-                this.moveCursorTo(Math.min(this.doubleClickCursorPos, leftBoundary), true);
+                this.moveCursorTo(Math.min(this.puzzleslib$doubleClickCursorPos, leftBoundary), true);
             } else {
-                if (mousePosition > this.doubleClickHighlightPos) {
+                if (mousePosition > this.puzzleslib$doubleClickHighlightPos) {
                     this.moveCursorToEnd(false);
                 } else {
-                    this.moveCursorTo(this.doubleClickHighlightPos, false);
+                    this.moveCursorTo(this.puzzleslib$doubleClickHighlightPos, false);
                 }
-                if (mousePosition < this.doubleClickCursorPos) {
+                if (mousePosition < this.puzzleslib$doubleClickCursorPos) {
                     this.moveCursorToStart(true);
                 } else {
-                    this.moveCursorTo(this.doubleClickCursorPos, true);
+                    this.moveCursorTo(this.puzzleslib$doubleClickCursorPos, true);
                 }
             }
         } else {

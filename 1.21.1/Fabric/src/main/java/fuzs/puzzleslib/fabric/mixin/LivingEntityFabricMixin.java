@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.fabric.mixin;
 
 import com.google.common.collect.Sets;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedDouble;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
@@ -23,8 +24,10 @@ import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -79,16 +82,13 @@ abstract class LivingEntityFabricMixin extends Entity {
         if (result.isInterrupt()) callback.cancel();
     }
 
-    @Inject(
-            method = "startUsingItem",
-            at = @At(
-                    value = "FIELD",
+    @Inject(method = "startUsingItem",
+            at = @At(value = "FIELD",
                     target = "Lnet/minecraft/world/entity/LivingEntity;useItemRemaining:I",
-                    shift = At.Shift.AFTER
-            ),
-            cancellable = true
-    )
-    public void startUsingItem(InteractionHand hand, CallbackInfo callback) {
+                    shift = At.Shift.AFTER,
+                    opcode = Opcodes.PUTFIELD),
+            cancellable = true)
+    public void startUsingItem(InteractionHand interactionHand, CallbackInfo callback) {
         // this injects after the field is already updated, so it is fine to use instead of ItemStack::getUseDuration
         DefaultedInt useItemRemaining = DefaultedInt.fromValue(this.useItemRemaining);
         EventResult result = FabricLivingEvents.USE_ITEM_START.invoker()
@@ -142,14 +142,9 @@ abstract class LivingEntityFabricMixin extends Entity {
         throw new RuntimeException();
     }
 
-    @Inject(
-            method = "completeUsingItem",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/item/ItemStack;finishUsingItem(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/world/item/ItemStack;",
-                    shift = At.Shift.BEFORE
-            )
-    )
+    @Inject(method = "completeUsingItem",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/item/ItemStack;finishUsingItem(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/world/item/ItemStack;"))
     protected void completeUsingItem(CallbackInfo callback) {
         this.puzzleslib$originalUseItem.set(this.useItem.copy());
     }
@@ -210,14 +205,10 @@ abstract class LivingEntityFabricMixin extends Entity {
         FabricEventImplHelper.tryOnLivingDrops(LivingEntity.class.cast(this), damageSource, this.lastHurtByPlayerTime);
     }
 
-    @Inject(
-            method = "dropExperience",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/ExperienceOrb;award(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;I)V"
-            ),
-            cancellable = true
-    )
+    @Inject(method = "dropExperience",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/ExperienceOrb;award(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;I)V"),
+            cancellable = true)
     protected void dropExperience(CallbackInfo callback) {
         DefaultedInt experienceReward = DefaultedInt.fromValue(this.getBaseExperienceReward());
         EventResult result = FabricLivingEvents.EXPERIENCE_DROP.invoker()
@@ -271,7 +262,7 @@ abstract class LivingEntityFabricMixin extends Entity {
         if (result.isInterrupt()) callback.setReturnValue(false);
     }
 
-    @ModifyVariable(method = "hurt", at = @At(value = "LOAD", ordinal = 1), ordinal = 0)
+    @ModifyVariable(method = "hurt", at = @At(value = "LOAD", ordinal = 1), ordinal = 0, argsOnly = true)
     public float hurt$0(float amount, DamageSource source) {
         // hook in before any blocking checks are done, there is no good way to cancel the block after this
         // check everything again, it shouldn't affect anything
@@ -291,24 +282,21 @@ abstract class LivingEntityFabricMixin extends Entity {
         return amount;
     }
 
-    @ModifyVariable(
-            method = "hurt",
-            at = @At(
-                    value = "FIELD",
+    @ModifyVariable(method = "hurt",
+            at = @At(value = "FIELD",
                     target = "Lnet/minecraft/world/entity/LivingEntity;walkAnimation:Lnet/minecraft/world/entity/WalkAnimationState;",
-                    shift = At.Shift.BEFORE
-            ),
-            ordinal = 0
-    )
-    public float hurt$1(float amount, DamageSource source) {
+                    opcode = Opcodes.GETFIELD),
+            ordinal = 0,
+            argsOnly = true)
+    public float hurt$1(float damageAmount, DamageSource damageSource) {
         // this is only present if the damage source could be blocked
         if (this.puzzleslib$hurt$damageAmount != 0.0F) {
             // restore original amount when the shield blocking callback was cancelled
-            amount = this.puzzleslib$hurt$damageAmount;
+            damageAmount = this.puzzleslib$hurt$damageAmount;
             this.puzzleslib$hurt$damageAmount = 0.0F;
         }
 
-        return amount;
+        return damageAmount;
     }
 
     @Inject(method = "causeFallDamage", at = @At("HEAD"), cancellable = true)
@@ -379,11 +367,9 @@ abstract class LivingEntityFabricMixin extends Entity {
         return ratioZ;
     }
 
-    @ModifyVariable(
-            method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z",
+    @ModifyVariable(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z",
             at = @At("STORE"),
-            ordinal = 1
-    )
+            ordinal = 1)
     public MobEffectInstance addEffect(@Nullable MobEffectInstance oldEffectInstance, MobEffectInstance effectInstance, @Nullable Entity entity) {
         FabricLivingEvents.MOB_EFFECT_APPLY.invoker()
                 .onMobEffectApply(LivingEntity.class.cast(this), effectInstance, oldEffectInstance, entity);
@@ -410,15 +396,18 @@ abstract class LivingEntityFabricMixin extends Entity {
     @Nullable
     public abstract MobEffectInstance getEffect(Holder<MobEffect> effect);
 
-    @Inject(method = "removeAllEffects", at = @At("HEAD"))
+    @Inject(method = "removeAllEffects", at = @At("HEAD"), cancellable = true)
     public void removeAllEffects(CallbackInfoReturnable<Boolean> callback) {
         if (this.level().isClientSide || this.activeEffects.isEmpty()) return;
         Set<MobEffectInstance> activeEffectsToKeep = Sets.newIdentityHashSet();
         for (MobEffectInstance mobEffectInstance : this.activeEffects.values()) {
             EventResult result = FabricLivingEvents.MOB_EFFECT_REMOVE.invoker()
                     .onMobEffectRemove(LivingEntity.class.cast(this), mobEffectInstance);
-            if (result.isInterrupt()) activeEffectsToKeep.add(mobEffectInstance);
+            if (result.isInterrupt()) {
+                activeEffectsToKeep.add(mobEffectInstance);
+            }
         }
+
         if (!activeEffectsToKeep.isEmpty()) {
             Iterator<MobEffectInstance> iterator = this.activeEffects.values().iterator();
             boolean flag;
@@ -427,6 +416,7 @@ abstract class LivingEntityFabricMixin extends Entity {
                 this.onEffectRemoved(effect);
                 iterator.remove();
             }
+
             callback.setReturnValue(flag);
         }
     }
@@ -434,11 +424,9 @@ abstract class LivingEntityFabricMixin extends Entity {
     @Shadow
     protected abstract void onEffectRemoved(MobEffectInstance effectInstance);
 
-    @ModifyVariable(
-            method = "tickEffects",
+    @ModifyVariable(method = "tickEffects",
             at = @At(value = "INVOKE", target = "Ljava/util/Iterator;remove()V"),
-            ordinal = 0
-    )
+            ordinal = 0)
     protected MobEffectInstance tickEffects(MobEffectInstance mobEffectInstance) {
         FabricLivingEvents.MOB_EFFECT_EXPIRE.invoker()
                 .onMobEffectExpire(LivingEntity.class.cast(this), mobEffectInstance);
@@ -450,11 +438,23 @@ abstract class LivingEntityFabricMixin extends Entity {
         EventImplHelper.onLivingJump(FabricLivingEvents.LIVING_JUMP.invoker(), LivingEntity.class.cast(this));
     }
 
-    @ModifyVariable(method = "getVisibilityPercent", at = @At(value = "TAIL", shift = At.Shift.BEFORE), ordinal = 0)
+    @ModifyVariable(method = "getVisibilityPercent", at = @At("TAIL"), ordinal = 0)
     public double getVisibilityPercent(double value, @Nullable Entity lookingEntity) {
         DefaultedDouble visibilityPercentage = DefaultedDouble.fromValue(value);
-        FabricLivingEvents.LIVING_VISIBILITY.invoker()
-                .onLivingVisibility(LivingEntity.class.cast(this), lookingEntity, visibilityPercentage);
+        FabricLivingEvents.CALCULATE_LIVING_VISIBILITY.invoker()
+                .onCalculateLivingVisibility(LivingEntity.class.cast(this), lookingEntity, visibilityPercentage);
         return visibilityPercentage.getAsOptionalDouble().stream().map(t -> Math.max(t, 0.0)).findAny().orElse(value);
+    }
+
+    @ModifyReturnValue(method = "getProjectile", at = @At("RETURN"))
+    public ItemStack getProjectile(ItemStack projectileItemStack, ItemStack weaponItemStack) {
+        if (weaponItemStack.getItem() instanceof ProjectileWeaponItem) {
+            DefaultedValue<ItemStack> projectileItemStackValue = DefaultedValue.fromValue(projectileItemStack);
+            FabricLivingEvents.PICK_PROJECTILE.invoker()
+                    .onPickProjectile(LivingEntity.class.cast(this), weaponItemStack, projectileItemStackValue);
+            return projectileItemStackValue.getAsOptional().orElse(projectileItemStack);
+        } else {
+            return projectileItemStack;
+        }
     }
 }

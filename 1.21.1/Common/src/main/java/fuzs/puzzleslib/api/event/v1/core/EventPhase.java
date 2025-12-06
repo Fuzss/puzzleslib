@@ -9,14 +9,17 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.function.BiConsumer;
 
 /**
- * Event phases useful for handling <code>net.fabricmc.fabric.api.event.Event</code> on Fabric, equivalent to <code>net.minecraftforge.eventbus.api.EventPriority</code> on Forge.
+ * Event phases useful for handling <code>net.fabricmc.fabric.api.event.Event</code> on Fabric, equivalent to
+ * <code>net.minecraftforge.eventbus.api.EventPriority</code> on Forge.
  */
 @ApiStatus.NonExtendable
 public interface EventPhase {
     /**
      * Fabric's default event phase, equivalent to EventPriority#NORMAL on Forge.
      */
-    EventPhase DEFAULT = new EventPhaseImpl(ResourceLocationHelper.fromNamespaceAndPath("fabric", "default"), null, null);
+    EventPhase DEFAULT = new EventPhaseImpl(ResourceLocationHelper.fromNamespaceAndPath("fabric", "default"),
+            null,
+            null);
     /**
      * A phase to be used directly before the default phase, equivalent to EventPriority#HIGH on Forge.
      */
@@ -35,21 +38,39 @@ public interface EventPhase {
     EventPhase LAST = new EventPhaseImpl(PuzzlesLibMod.id("last"), AFTER, EventPhaseImpl.Ordering.AFTER);
 
     /**
-     * @return the identifier used for registering this phase on Fabric
+     * @return the resource location used for registering this phase on Fabric
      */
-    ResourceLocation identifier();
+    ResourceLocation resourceLocation();
 
     /**
-     * @return another event phase that runs before / after this one, the order is defined by {@link #applyOrdering(BiConsumer)}
+     * @return another event phase that runs before / after this one, the order is defined by
+     *         {@link #applyOrdering(BiConsumer)}
      */
     EventPhase parent();
 
     /**
-     * The ordering defines in which relation this event phase is to {@link #parent()}, if it is supposed to run before or afterward.
+     * The ordering defines in which relation this event phase is to {@link #parent()}, if it is supposed to run before
+     * or afterward.
      *
-     * @param consumer apply event phases to the Fabric event
+     * @param phaseOrderingConsumer apply event phases to the Fabric event
      */
-    void applyOrdering(BiConsumer<ResourceLocation, ResourceLocation> consumer);
+    default void applyOrdering(BiConsumer<ResourceLocation, ResourceLocation> phaseOrderingConsumer) {
+        this.applyOrdering(this.resourceLocation(), phaseOrderingConsumer);
+    }
+
+    /**
+     * The ordering defines in which relation this event phase is to {@link #parent()}, if it is supposed to run before
+     * or afterward.
+     *
+     * @param resourceLocation      the resource location used for registering this phase on Fabric
+     * @param phaseOrderingConsumer apply event phases to the Fabric event
+     */
+    void applyOrdering(ResourceLocation resourceLocation, BiConsumer<ResourceLocation, ResourceLocation> phaseOrderingConsumer);
+
+    /**
+     * @return the ordering value used in relation to {@link #parent()}
+     */
+    int getOrderingValue();
 
     /**
      * Constructs a custom event phase that runs before <code>eventPhase</code>.
@@ -58,7 +79,9 @@ public interface EventPhase {
      * @return the custom event phase
      */
     static EventPhase early(EventPhase eventPhase) {
-        return new EventPhaseImpl(PuzzlesLibMod.id("early_" + eventPhase.identifier().getPath()), eventPhase, EventPhaseImpl.Ordering.BEFORE);
+        return new EventPhaseImpl(PuzzlesLibMod.id("early_" + eventPhase.resourceLocation().getPath()),
+                eventPhase,
+                EventPhaseImpl.Ordering.BEFORE);
     }
 
     /**
@@ -68,6 +91,8 @@ public interface EventPhase {
      * @return the custom event phase
      */
     static EventPhase late(EventPhase eventPhase) {
-        return new EventPhaseImpl(PuzzlesLibMod.id("late_" + eventPhase.identifier().getPath()), eventPhase, EventPhaseImpl.Ordering.AFTER);
+        return new EventPhaseImpl(PuzzlesLibMod.id("late_" + eventPhase.resourceLocation().getPath()),
+                eventPhase,
+                EventPhaseImpl.Ordering.AFTER);
     }
 }

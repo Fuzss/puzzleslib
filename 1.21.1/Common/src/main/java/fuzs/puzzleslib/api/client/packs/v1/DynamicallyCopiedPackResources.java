@@ -35,6 +35,7 @@ import java.util.stream.Stream;
  * fuzs.puzzleslib.api.client.core.v1.ClientModConstructor#onAddResourcePackFinders(PackRepositorySourcesContext)} and
  * {@link fuzs.puzzleslib.api.resources.v1.PackResourcesHelper}.
  */
+@Deprecated
 public class DynamicallyCopiedPackResources extends AbstractModPackResources {
     private final ResourceManager resourceManager;
     private final VanillaPackResources vanillaPackResources;

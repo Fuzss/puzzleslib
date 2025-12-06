@@ -31,9 +31,10 @@ public final class ContainerMenuHelper {
         for (int i = 0; i < containerMenu.slots.size(); i++) {
             Slot slot = containerMenu.slots.get(i);
             if (slot.container instanceof Inventory inventory && inventory.selected == slot.getContainerSlot()) {
-                NonInteractiveResultSlot newSlot = new NonInteractiveResultSlot(slot.container, slot.getContainerSlot(),
-                        slot.x, slot.y
-                ) {
+                NonInteractiveResultSlot newSlot = new NonInteractiveResultSlot(slot.container,
+                        slot.getContainerSlot(),
+                        slot.x,
+                        slot.y) {
                     @Override
                     public boolean isFake() {
                         return false;
@@ -49,34 +50,45 @@ public final class ContainerMenuHelper {
     /**
      * Adds the player inventory slots to an {@link AbstractContainerMenu}.
      *
-     * @param containerMenu menu to add slots to
-     * @param inventory     player inventory instance
-     * @param offsetY       vertical offset
+     * @param abstractContainerMenu menu to add slots to
+     * @param inventory             player inventory instance
+     * @param offsetY               vertical offset
      */
-    public static void addInventorySlots(AbstractContainerMenu containerMenu, Inventory inventory, int offsetY) {
-        addInventorySlots(containerMenu, inventory, 8, offsetY);
+    @Deprecated
+    public static void addInventorySlots(AbstractContainerMenu abstractContainerMenu, Inventory inventory, int offsetY) {
+        addInventorySlots(abstractContainerMenu, inventory, 8, offsetY);
     }
 
     /**
      * Adds the player inventory slots to an {@link AbstractContainerMenu}.
      *
-     * @param containerMenu menu to add slots to
-     * @param inventory     player inventory instance
-     * @param offsetX       horizontal offset
-     * @param offsetY       vertical offset
+     * @param abstractContainerMenu menu to add slots to
+     * @param inventory             player inventory instance
+     * @param offsetX               horizontal offset
+     * @param offsetY               vertical offset
      */
-    public static void addInventorySlots(AbstractContainerMenu containerMenu, Inventory inventory, int offsetX, int offsetY) {
-        final int slotSize = 18;
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 9; ++j) {
-                containerMenu.addSlot(new Slot(inventory, j + i * 9 + 9, offsetX + j * slotSize, offsetY));
+    @Deprecated
+    public static void addInventorySlots(AbstractContainerMenu abstractContainerMenu, Inventory inventory, int offsetX, int offsetY) {
+        addStandardInventorySlots(abstractContainerMenu, inventory, offsetX, offsetY);
+    }
+
+    public static void addInventoryHotbarSlots(AbstractContainerMenu abstractContainerMenu, Container container, int offsetX, int offsetY) {
+        for (int i = 0; i < 9; i++) {
+            abstractContainerMenu.addSlot(new Slot(container, i, offsetX + i * 18, offsetY));
+        }
+    }
+
+    public static void addInventoryExtendedSlots(AbstractContainerMenu abstractContainerMenu, Container container, int offsetX, int offsetY) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 9; j++) {
+                abstractContainerMenu.addSlot(new Slot(container, j + (i + 1) * 9, offsetX + j * 18, offsetY + i * 18));
             }
-            offsetY += slotSize;
         }
-        offsetY += 4;
-        for (int i = 0; i < 9; ++i) {
-            containerMenu.addSlot(new Slot(inventory, i, offsetX + i * slotSize, offsetY));
-        }
+    }
+
+    public static void addStandardInventorySlots(AbstractContainerMenu abstractContainerMenu, Container container, int offsetX, int offsetY) {
+        addInventoryExtendedSlots(abstractContainerMenu, container, offsetX, offsetY);
+        addInventoryHotbarSlots(abstractContainerMenu, container, offsetX, offsetY + 58);
     }
 
     /**

@@ -6,6 +6,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
 @FunctionalInterface
 public interface LivingVisibilityCallback {
     EventInvoker<LivingVisibilityCallback> EVENT = EventInvoker.lookup(LivingVisibilityCallback.class);

@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * A utility class providing an abstraction for {@link ResourceLocation} creation changes in Minecraft 1.21+.
  */
+@Deprecated
 public final class ResourceLocationHelper {
 
     private ResourceLocationHelper() {

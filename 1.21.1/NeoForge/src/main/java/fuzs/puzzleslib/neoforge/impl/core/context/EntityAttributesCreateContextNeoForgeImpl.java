@@ -8,6 +8,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
+@Deprecated
 public record EntityAttributesCreateContextNeoForgeImpl(
         BiConsumer<EntityType<? extends LivingEntity>, AttributeSupplier> consumer) implements EntityAttributesCreateContext {
 

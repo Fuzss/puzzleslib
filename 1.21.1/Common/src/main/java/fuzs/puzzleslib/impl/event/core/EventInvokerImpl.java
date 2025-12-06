@@ -5,7 +5,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
-import fuzs.puzzleslib.impl.core.CommonFactories;
+import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -22,7 +23,7 @@ public final class EventInvokerImpl {
 
     static {
         // initialize events required during start-up early, all other events are initialized when loading has completed
-        CommonFactories.INSTANCE.registerLoadingHandlers();
+        ProxyImpl.get().registerAllLoadingHandlers();
     }
 
     private EventInvokerImpl() {
@@ -33,7 +34,7 @@ public final class EventInvokerImpl {
         if (!initialized) {
             // initialize most of the events as late as possible to avoid loading many classes very early,
             // and being blamed for possible class loading errors that follow
-            CommonFactories.INSTANCE.registerEventHandlers();
+            ProxyImpl.get().registerAllEventHandlers();
             initialized = true;
             while (!DEFERRED_INVOKER_REGISTRATIONS.isEmpty()) {
                 DEFERRED_INVOKER_REGISTRATIONS.poll().run();
@@ -68,15 +69,16 @@ public final class EventInvokerImpl {
 
     @SuppressWarnings("unchecked")
     public static <T> void register(Class<T> clazz, EventInvokerLike<T> invoker, boolean joinInvokers) {
-        EventInvokerLike<T> other = (EventInvokerLike<T>) EVENT_INVOKER_LOOKUP.get(clazz);
-        if (other != null) {
-            if (joinInvokers) {
+        if (joinInvokers) {
+            EventInvokerLike<T> other = (EventInvokerLike<T>) EVENT_INVOKER_LOOKUP.get(clazz);
+            if (other != null) {
                 invoker = join(invoker, other);
-            } else {
-                throw new IllegalArgumentException("duplicate event invoker for type " + clazz);
             }
         }
-        EVENT_INVOKER_LOOKUP.put(clazz, invoker);
+
+        if (EVENT_INVOKER_LOOKUP.put(clazz, invoker) != null && !joinInvokers) {
+            PuzzlesLib.LOGGER.warn("Overriding existing event invoker for type {}", clazz);
+        }
     }
 
     private static <T> EventInvokerLike<T> join(EventInvokerLike<T> invoker, EventInvokerLike<T> other) {

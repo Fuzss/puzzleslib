@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.api.chat.v1;
 
-import fuzs.puzzleslib.impl.chat.FormattedContentSink;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
@@ -11,6 +10,7 @@ import net.minecraft.util.FormattedCharSequence;
  * Useful for text instances returned from {@link net.minecraft.client.StringSplitter} and
  * {@link Component#getVisualOrderText()}.
  */
+@Deprecated
 public class ComponentHelper {
 
     /**
@@ -20,7 +20,7 @@ public class ComponentHelper {
      * @return the new component
      */
     public static Component toComponent(FormattedText formattedText) {
-        return new FormattedContentSink(formattedText).getComponent();
+        return fuzs.puzzleslib.api.util.v1.ComponentHelper.getAsComponent(formattedText);
     }
 
     /**
@@ -30,7 +30,7 @@ public class ComponentHelper {
      * @return the new component
      */
     public static Component toComponent(FormattedCharSequence formattedCharSequence) {
-        return new FormattedContentSink(formattedCharSequence).getComponent();
+        return fuzs.puzzleslib.api.util.v1.ComponentHelper.getAsComponent(formattedCharSequence);
     }
 
     /**
@@ -45,7 +45,7 @@ public class ComponentHelper {
      * @return the string
      */
     public static String toString(FormattedText formattedText) {
-        return new FormattedContentSink(formattedText).getString();
+        return fuzs.puzzleslib.api.util.v1.ComponentHelper.getAsString(formattedText);
     }
 
     /**
@@ -60,6 +60,6 @@ public class ComponentHelper {
      * @return the string
      */
     public static String toString(FormattedCharSequence formattedCharSequence) {
-        return new FormattedContentSink(formattedCharSequence).getString();
+        return fuzs.puzzleslib.api.util.v1.ComponentHelper.getAsString(formattedCharSequence);
     }
 }

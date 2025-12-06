@@ -6,6 +6,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -18,9 +19,15 @@ abstract class ExperienceOrbFabricMixin extends Entity {
         super(entityType, level);
     }
 
-    @Inject(method = "playerTouch", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/player/Player;takeXpDelay:I", ordinal = 1), cancellable = true)
+    @Inject(method = "playerTouch",
+            at = @At(value = "FIELD",
+                    target = "Lnet/minecraft/world/entity/player/Player;takeXpDelay:I",
+                    opcode = Opcodes.PUTFIELD),
+            cancellable = true)
     public void playerTouch(Player player, CallbackInfo callback) {
-        if (FabricPlayerEvents.PICKUP_XP.invoker().onPickupExperience(player, ExperienceOrb.class.cast(this)).isInterrupt()) {
+        if (FabricPlayerEvents.PICKUP_XP.invoker()
+                .onPickupExperience(player, ExperienceOrb.class.cast(this))
+                .isInterrupt()) {
             callback.cancel();
         }
     }

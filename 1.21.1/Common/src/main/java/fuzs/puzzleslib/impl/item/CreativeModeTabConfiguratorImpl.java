@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+@Deprecated
 public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabConfigurator {
     private static final Item[] POTION_ITEMS = new Item[]{Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION, Items.TIPPED_ARROW};
 

@@ -1,7 +1,5 @@
 package fuzs.puzzleslib.api.network.v3;
 
-import fuzs.puzzleslib.api.core.v1.utility.Buildable;
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v3.codec.StreamCodecRegistry;
 import fuzs.puzzleslib.impl.core.ModContext;
@@ -43,7 +41,7 @@ public interface NetworkHandler {
      * @return builder for mod specific network handler with default channel
      */
     static Builder builder(String modId) {
-        return builder(ResourceLocationHelper.fromNamespaceAndPath(modId, "play"));
+        return ModContext.get(modId).getNetworkHandler();
     }
 
     /**
@@ -52,8 +50,9 @@ public interface NetworkHandler {
      * @param channelName id for channel name
      * @return builder for mod specific network handler with default channel
      */
+    @Deprecated
     static Builder builder(ResourceLocation channelName) {
-        return ModContext.get(channelName.getNamespace()).getNetworkHandler(channelName);
+        return builder(channelName.getNamespace());
     }
 
     /**
@@ -140,9 +139,9 @@ public interface NetworkHandler {
     /**
      * Send message from server to all players except one player.
      *
-     * @param playerList all players to send the message to
-     * @param excludePlayer    player to exclude
-     * @param message    message to send
+     * @param playerList    all players to send the message to
+     * @param excludePlayer player to exclude
+     * @param message       message to send
      */
     @Deprecated
     default <T> void sendToAll(Collection<ServerPlayer> playerList, @Nullable ServerPlayer excludePlayer, ClientboundMessage<T> message) {
@@ -258,7 +257,7 @@ public interface NetworkHandler {
     /**
      * A builder for a network handler, allows for registering messages.
      */
-    interface Builder extends NetworkHandlerRegistry, StreamCodecRegistry<Builder>, Buildable {
+    interface Builder extends NetworkHandlerRegistry, StreamCodecRegistry<Builder> {
 
         @Override
         default <B extends ByteBuf, V> Builder registerSerializer(Class<V> type, StreamCodec<? super B, V> streamCodec) {

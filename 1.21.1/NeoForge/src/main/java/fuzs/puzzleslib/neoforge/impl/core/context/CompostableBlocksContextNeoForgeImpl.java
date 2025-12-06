@@ -17,6 +17,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Objects;
 
+@Deprecated
 public record CompostableBlocksContextNeoForgeImpl(String modId,
                                                    Map<Holder<? extends ItemLike>, Compostable> compostingChances) implements CompostableBlocksContext {
 

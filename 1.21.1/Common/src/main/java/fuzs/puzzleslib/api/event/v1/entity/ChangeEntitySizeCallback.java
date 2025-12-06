@@ -6,6 +6,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Pose;
 
+@Deprecated
 @FunctionalInterface
 public interface ChangeEntitySizeCallback {
     EventInvoker<ChangeEntitySizeCallback> EVENT = EventInvoker.lookup(ChangeEntitySizeCallback.class);

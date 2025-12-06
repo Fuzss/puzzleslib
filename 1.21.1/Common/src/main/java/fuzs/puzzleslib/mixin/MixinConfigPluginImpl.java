@@ -73,7 +73,7 @@ public class MixinConfigPluginImpl implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        return PuzzlesLib.isDevelopmentEnvironment() || !DEVELOPMENT_MIXINS.contains(
+        return ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment(PuzzlesLib.MOD_ID) || !DEVELOPMENT_MIXINS.contains(
                 mixinClassName.replaceAll(".+\\.mixin\\.", ""));
     }
 

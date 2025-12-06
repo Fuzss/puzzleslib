@@ -10,7 +10,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 
 /**
  * An adjusted version of {@link net.minecraft.world.ContainerHelper} that allows for using {@link Container} instead of
- * {@link net.minecraft.core.NonNullList}, as well as a custom tag key.
+ * {@link net.minecraft.core.NonNullList}.
  */
 public final class ContainerSerializationHelper {
 

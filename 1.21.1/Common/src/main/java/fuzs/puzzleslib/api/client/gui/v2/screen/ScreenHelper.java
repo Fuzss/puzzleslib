@@ -1,10 +1,9 @@
 package fuzs.puzzleslib.api.client.gui.v2.screen;
 
-import net.minecraft.client.Minecraft;
-
 /**
  * A {@link net.minecraft.client.gui.screens.Screen} related helper class.
  */
+@Deprecated
 public final class ScreenHelper {
 
     private ScreenHelper() {
@@ -15,18 +14,14 @@ public final class ScreenHelper {
      * @return current mouse x position
      */
     public static int getMouseX() {
-        Minecraft minecraft = Minecraft.getInstance();
-        return (int) (minecraft.mouseHandler.xpos() * minecraft.getWindow().getGuiScaledWidth() /
-                minecraft.getWindow().getScreenWidth());
+        return fuzs.puzzleslib.api.client.gui.v2.ScreenHelper.getMouseX();
     }
 
     /**
      * @return current mouse y position
      */
     public static int getMouseY() {
-        Minecraft minecraft = Minecraft.getInstance();
-        return (int) (minecraft.mouseHandler.ypos() * minecraft.getWindow().getGuiScaledHeight() /
-                minecraft.getWindow().getScreenHeight());
+        return fuzs.puzzleslib.api.client.gui.v2.ScreenHelper.getMouseY();
     }
 
     /**
@@ -41,6 +36,6 @@ public final class ScreenHelper {
      * @return is the mouse cursor hovering the defined region
      */
     public static boolean isHovering(int posX, int posY, int width, int height, double mouseX, double mouseY) {
-        return mouseX >= posX && mouseX < posX + width && mouseY >= posY && mouseY < posY + height;
+        return fuzs.puzzleslib.api.client.gui.v2.ScreenHelper.isHovering(posX, posY, width, height, mouseX, mouseY);
     }
 }

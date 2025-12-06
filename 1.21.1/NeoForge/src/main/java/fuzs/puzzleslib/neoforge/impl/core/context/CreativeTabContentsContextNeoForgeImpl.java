@@ -7,6 +7,7 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 
 import java.util.Objects;
 
+@Deprecated
 public record CreativeTabContentsContextNeoForgeImpl(BuildCreativeModeTabContentsEvent evt) implements BuildCreativeModeTabContentsContext {
 
     @Override

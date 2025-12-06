@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
  * The methods additionally to the explosion parameters take an {@link ExplosionFactory}, for providing a custom
  * implementation of {@link Explosion}.
  */
+@Deprecated
 public final class GenericExplosionHelper {
 
     private GenericExplosionHelper() {

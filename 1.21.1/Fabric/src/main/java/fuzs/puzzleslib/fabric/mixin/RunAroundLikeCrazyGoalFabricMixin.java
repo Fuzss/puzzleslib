@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Slice;
 
 @Mixin(RunAroundLikeCrazyGoal.class)
 abstract class RunAroundLikeCrazyGoalFabricMixin extends Goal {
@@ -18,7 +19,10 @@ abstract class RunAroundLikeCrazyGoalFabricMixin extends Goal {
     @Final
     private AbstractHorse horse;
 
-    @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/RandomSource;nextInt(I)I"))
+    @ModifyExpressionValue(method = "tick",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/util/RandomSource;nextInt(I)I"),
+            slice = @Slice(from = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/animal/horse/AbstractHorse;getMaxTemper()I")))
     public int tick(int intValue, @Local Player player) {
         int horseTemper = this.horse.getTemper();
         return FabricEventImplHelper.onAnimalTame(this.horse, player, intValue, horseTemper, intValue < horseTemper);

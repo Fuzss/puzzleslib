@@ -10,6 +10,7 @@ import fuzs.puzzleslib.impl.item.CreativeModeTabHelper;
 import net.minecraft.Util;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
@@ -24,6 +25,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
@@ -283,13 +285,43 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Registers a spawn egg item for an entity type.
      *
+     * @param entityTypeHolder the entity type holder
+     * @return the holder reference
+     */
+    default Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeHolder) {
+        return this.registerLegacySpawnEggItem(entityTypeHolder, -1, -1);
+    }
+
+    /**
+     * Registers a spawn egg item for an entity type.
+     *
+     * @param entityTypeHolder the entity type holder
+     * @param backgroundColor  the background color for the spawn egg texture
+     * @return the holder reference
+     */
+    Holder.Reference<Item> registerLegacySpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeHolder, int backgroundColor);
+
+    /**
+     * Registers a spawn egg item for an entity type.
+     *
+     * @param entityTypeHolder the entity type holder
+     * @param backgroundColor  the background color for the spawn egg texture
+     * @param highlightColor   the spots color for the spawn egg texture
+     * @return the holder reference
+     */
+    Holder.Reference<Item> registerLegacySpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeHolder, int backgroundColor, int highlightColor);
+
+    /**
+     * Registers a spawn egg item for an entity type.
+     *
      * @param entityTypeReference reference for the entity type to register a spawn egg for
      * @param backgroundColor     background color of the spawn egg item
      * @param highlightColor      spots color pf the spawn egg item
      * @return holder reference
      */
+    @Deprecated
     default Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor) {
-        return this.registerSpawnEggItem(entityTypeReference, backgroundColor, highlightColor, new Item.Properties());
+        return this.registerLegacySpawnEggItem(entityTypeReference, backgroundColor, highlightColor);
     }
 
     /**
@@ -301,7 +333,10 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param itemProperties      properties for the item
      * @return holder reference
      */
-    Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor, Item.Properties itemProperties);
+    @Deprecated
+    default Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor, Item.Properties itemProperties) {
+        return this.registerLegacySpawnEggItem(entityTypeReference, backgroundColor, highlightColor);
+    }
 
     /**
      * Register a creative mode tab.
@@ -320,8 +355,11 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return the holder reference
      */
     default Holder.Reference<CreativeModeTab> registerCreativeModeTab(Supplier<ItemStack> iconSupplier) {
-        return this.registerCreativeModeTab(iconSupplier,
-                CreativeModeTabHelper.getDisplayItems(this.makeKey("main").getNamespace()));
+        ResourceLocation resourceLocation = this.makeKey("main");
+        return this.registerCreativeModeTab(resourceLocation.getPath(),
+                iconSupplier,
+                CreativeModeTabHelper.getDisplayItems(resourceLocation.getNamespace()),
+                false);
     }
 
     /**
@@ -349,14 +387,14 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a data component type.
      *
-     * @param path  path for new entry
-     * @param entry supplier for entry to register
+     * @param path     path for new entry
+     * @param operator supplier for entry to register
      * @return holder reference
      */
-    default <T> Holder.Reference<DataComponentType<T>> registerDataComponentType(String path, UnaryOperator<DataComponentType.Builder<T>> entry) {
+    default <T> Holder.Reference<DataComponentType<T>> registerDataComponentType(String path, UnaryOperator<DataComponentType.Builder<T>> operator) {
         return this.register(Registries.DATA_COMPONENT_TYPE,
                 path,
-                () -> entry.apply(DataComponentType.builder()).build());
+                () -> operator.apply(DataComponentType.builder()).build());
     }
 
     /**
@@ -396,12 +434,23 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a potion.
      *
-     * @param path  path for new entry
-     * @param entry supplier for entry to register
-     * @return holder reference
+     * @param path           the registered name
+     * @param potionSupplier supplier for entry to register
+     * @return the holder reference
      */
-    default Holder.Reference<Potion> registerPotion(String path, Supplier<Potion> entry) {
-        return this.register(Registries.POTION, path, entry);
+    default Holder.Reference<Potion> registerPotion(String path, Supplier<Potion> potionSupplier) {
+        return this.registerPotion(path, (String name) -> potionSupplier.get());
+    }
+
+    /**
+     * Register a potion.
+     *
+     * @param path          the registered name
+     * @param potionFactory function for entry to register, receiving the passed path parameter
+     * @return the holder reference
+     */
+    default Holder.Reference<Potion> registerPotion(String path, Function<String, Potion> potionFactory) {
+        return this.register(Registries.POTION, path, () -> potionFactory.apply(path));
     }
 
     /**
@@ -412,6 +461,20 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      */
     default ResourceKey<Enchantment> registerEnchantment(String path) {
         return this.makeResourceKey(Registries.ENCHANTMENT, path);
+    }
+
+    /**
+     * Register an enchantment effect component type.
+     *
+     * @param path     the registered name
+     * @param operator the supplier for entry to register
+     * @param <T>      the component type
+     * @return the holder reference
+     */
+    default <T> Holder.Reference<DataComponentType<T>> registerEnchantmentEffectComponentType(String path, UnaryOperator<DataComponentType.Builder<T>> operator) {
+        return this.register(Registries.ENCHANTMENT_EFFECT_COMPONENT_TYPE,
+                path,
+                () -> operator.apply(DataComponentType.builder()).build());
     }
 
     /**
@@ -434,11 +497,43 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a block entity type.
      *
+     * @param path               the registered name
+     * @param blockEntityFactory factory for every newly created block entity instance
+     * @param validBlock         block allowed to use this block entity
+     * @param <T>                block entity type parameter
+     * @return the holder reference
+     */
+    default <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> blockEntityFactory, Holder<Block> validBlock) {
+        return this.registerBlockEntityType(path, blockEntityFactory, () -> Collections.singleton(validBlock.value()));
+    }
+
+    /**
+     * Register a block entity type.
+     *
+     * @param path               the registered name
+     * @param blockEntityFactory factory for every newly created block entity instance
+     * @param validBlocks        blocks allowed to use this block entity
+     * @param <T>                block entity type parameter
+     * @return the holder reference
+     */
+    default <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> blockEntityFactory, Supplier<Set<Block>> validBlocks) {
+        return this.register((ResourceKey<Registry<BlockEntityType<T>>>) (ResourceKey<?>) Registries.BLOCK_ENTITY_TYPE,
+                path,
+                () -> {
+                    return BlockEntityType.Builder.of(blockEntityFactory::apply,
+                            validBlocks.get().toArray(Block[]::new)).build(null);
+                });
+    }
+
+    /**
+     * Register a block entity type.
+     *
      * @param path  path for new entry
      * @param entry supplier for entry to register
      * @param <T>   block entity type parameter
      * @return holder reference
      */
+    @Deprecated
     @SuppressWarnings("unchecked")
     default <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, Supplier<BlockEntityType.Builder<T>> entry) {
         return this.register((ResourceKey<Registry<BlockEntityType<T>>>) (ResourceKey<?>) Registries.BLOCK_ENTITY_TYPE,
@@ -451,11 +546,39 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a menu type.
      *
+     * @param path         the registered name
+     * @param menuSupplier the menu supplier
+     * @param <T>          the menu type
+     * @return the holder reference
+     */
+    @SuppressWarnings("unchecked")
+    default <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerMenuType(String path, MenuType.MenuSupplier<T> menuSupplier) {
+        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> {
+            return new MenuType<>(menuSupplier, FeatureFlags.DEFAULT_FLAGS);
+        });
+    }
+
+    /**
+     * Register a menu type with additional data for constructing the menu on the client.
+     *
+     * @param path         the registered name
+     * @param menuSupplier the menu supplier
+     * @param streamCodec  the stream codec for additional data
+     * @param <T>          the menu type
+     * @param <S>          the data type
+     * @return the holder reference
+     */
+    <T extends AbstractContainerMenu, S> Holder.Reference<MenuType<T>> registerMenuType(String path, MenuSupplierWithData<T, S> menuSupplier, StreamCodec<? super RegistryFriendlyByteBuf, S> streamCodec);
+
+    /**
+     * Register a menu type.
+     *
      * @param path  path for new entry
      * @param entry supplier for entry to register
      * @param <T>   container menu type parameter
      * @return holder reference
      */
+    @Deprecated
     @SuppressWarnings("unchecked")
     default <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerMenuType(String path, Supplier<MenuType.MenuSupplier<T>> entry) {
         return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> {
@@ -471,6 +594,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param <T>   container menu type
      * @return holder reference
      */
+    @Deprecated
     <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry);
 
     /**
@@ -480,9 +604,36 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param block block valid for this poi type
      * @return holder reference
      */
-    default Holder.Reference<PoiType> registerPoiType(String path, Holder<Block> block) {
-        return this.registerPoiType(path, block::value);
+    default Holder.Reference<PoiType> registerPoiType(String path, Holder<Block> matchingBlock) {
+        return this.registerSetPoiType(path, () -> Collections.singleton(matchingBlock.value()));
     }
+
+    /**
+     * Register a poi type.
+     *
+     * @param path           the registered name
+     * @param matchingBlocks blocks valid for this poi type
+     * @return the holder reference
+     */
+    default Holder.Reference<PoiType> registerSetPoiType(String path, Supplier<Set<Block>> matchingBlocks) {
+        return this.registerPoiType(path, 0, 1, () -> {
+            return matchingBlocks.get()
+                    .stream()
+                    .flatMap((Block block) -> block.getStateDefinition().getPossibleStates().stream())
+                    .collect(ImmutableSet.toImmutableSet());
+        });
+    }
+
+    /**
+     * Register a poi type.
+     *
+     * @param path                the registered name
+     * @param maxTickets          max amount of accessor tickets
+     * @param validRange          distance to search for this poi type
+     * @param matchingBlockStates blocks states valid for this poi type
+     * @return the holder reference
+     */
+    Holder.Reference<PoiType> registerPoiType(String path, int maxTickets, int validRange, Supplier<Set<BlockState>> matchingBlockStates);
 
     /**
      * Register a poi type.
@@ -491,10 +642,9 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param block block valid for this poi type
      * @return holder reference
      */
-    default Holder.Reference<PoiType> registerPoiType(String path, Supplier<Block> block) {
-        return this.registerPoiType(path, () -> {
-            return ImmutableSet.copyOf(block.get().getStateDefinition().getPossibleStates());
-        }, 0, 1);
+    @Deprecated
+    default Holder.Reference<PoiType> registerPoiType(String path, Supplier<Block> matchingBlock) {
+        return this.registerSetPoiType(path, () -> Collections.singleton(matchingBlock.get()));
     }
 
     /**
@@ -506,7 +656,10 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param validRange     distance to search for this poi type
      * @return holder reference
      */
-    Holder.Reference<PoiType> registerPoiType(String path, Supplier<Set<BlockState>> matchingStates, int maxTickets, int validRange);
+    @Deprecated
+    default Holder.Reference<PoiType> registerPoiType(String path, Supplier<Set<BlockState>> matchingStates, int maxTickets, int validRange) {
+        return this.registerPoiType(path, maxTickets, validRange, matchingStates);
+    }
 
     /**
      * Register an argument type.
@@ -654,6 +807,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param repairItem the repair material used in an anvil for restoring item durability
      * @return holder reference
      */
+    @Deprecated
     default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, Holder<Item> repairItem) {
         return this.registerArmorMaterial(path, ItemEquipmentFactories.toArmorTypeMapWithFallback(1), 0, repairItem);
     }
@@ -670,6 +824,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param repairItem       the repair material used in an anvil for restoring item durability
      * @return holder reference
      */
+    @Deprecated
     default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, Map<ArmorItem.Type, Integer> defense, int enchantmentValue, Holder<Item> repairItem) {
         return this.registerArmorMaterial(path,
                 defense,
@@ -695,9 +850,9 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param knockbackResistance knockback resistance value for all slot types of this armor set
      * @return holder reference
      */
+    @Deprecated
     default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, Map<ArmorItem.Type, Integer> defense, int enchantmentValue, Holder<SoundEvent> equipSound, Supplier<Ingredient> repairIngredient, float toughness, float knockbackResistance) {
-        return this.register(Registries.ARMOR_MATERIAL,
-                path,
+        return this.registerArmorMaterial(path,
                 () -> new ArmorMaterial(defense,
                         enchantmentValue,
                         equipSound,
@@ -705,6 +860,17 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
                         Collections.singletonList(new ArmorMaterial.Layer(this.makeKey(path))),
                         toughness,
                         knockbackResistance));
+    }
+
+    /**
+     * Register an armor material.
+     *
+     * @param path                  path for new entry
+     * @param armorMaterialSupplier supplier for entry to register
+     * @return holder reference
+     */
+    default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, Supplier<ArmorMaterial> armorMaterialSupplier) {
+        return this.register(Registries.ARMOR_MATERIAL, path, armorMaterialSupplier);
     }
 
     /**
@@ -736,4 +902,15 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     default ResourceKey<LootTable> registerLootTable(String path) {
         return this.makeResourceKey(Registries.LOOT_TABLE, path);
     }
+
+    /**
+     * Creates an empty tag in the corresponding registry, so that the tag can be used during data generation via
+     * {@link net.minecraft.core.HolderGetter#get(TagKey)} and
+     * {@link net.minecraft.core.HolderGetter#getOrThrow(TagKey)}.
+     *
+     * @param registryKey the registry key
+     * @param tagKey      the tag key
+     * @param <T>         the registry type
+     */
+    <T> void prepareTag(ResourceKey<? extends Registry<? super T>> registryKey, TagKey<T> tagKey);
 }

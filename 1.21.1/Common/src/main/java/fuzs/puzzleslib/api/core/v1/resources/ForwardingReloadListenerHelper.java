@@ -14,6 +14,7 @@ import java.util.function.Supplier;
  * A helper class allowing for making {@link PreparableReloadListener} instances identifiable via the addition of a {@link ResourceLocation} in an effort to help with debugging.
  * <p>Also supports combining multiple reload listeners into one.
  */
+@Deprecated
 @SuppressWarnings("unchecked")
 public final class ForwardingReloadListenerHelper {
 

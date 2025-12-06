@@ -1,13 +1,16 @@
 package fuzs.puzzleslib.api.client.data.v2;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.BlockFamily;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -22,18 +25,26 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.decoration.PaintingVariant;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public abstract class AbstractLanguageProvider implements DataProvider {
     protected final String languageCode;
@@ -58,25 +69,54 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         this.pathProvider = packOutput.createPathProvider(PackOutput.Target.RESOURCE_PACK, "lang");
     }
 
-    public abstract void addTranslations(TranslationBuilder builder);
+    public abstract void addTranslations(TranslationBuilder translationBuilder);
 
     @Override
-    public CompletableFuture<?> run(CachedOutput writer) {
+    public CompletableFuture<?> run(CachedOutput cachedOutput) {
         JsonObject jsonObject = new JsonObject();
-        this.addTranslations((String key, String value) -> {
-            Objects.requireNonNull(key, "key is null");
+        this.addTranslations((String translationKey, String value) -> {
+            Objects.requireNonNull(translationKey, "translation key is null");
             Objects.requireNonNull(value, "value is null");
-            if (jsonObject.has(key)) {
-                throw new IllegalStateException("Duplicate translation key found: " + key);
+            if (jsonObject.has(translationKey)) {
+                throw new IllegalStateException("Created duplicate translation key: " + translationKey);
             } else {
-                jsonObject.addProperty(key, value);
+                jsonObject.addProperty(translationKey, value);
             }
         });
 
-        return DataProvider.saveStable(writer,
-                jsonObject,
-                this.pathProvider.json(ResourceLocationHelper.fromNamespaceAndPath(this.modId, this.languageCode))
-        );
+        this.verifyRequiredTranslationKeys(jsonObject::has, BuiltInRegistries.BLOCK, TranslationBuilder::addBlock);
+        this.verifyRequiredTranslationKeys(jsonObject::has, BuiltInRegistries.ITEM, TranslationBuilder::addItem);
+        this.verifyRequiredTranslationKeys(jsonObject::has,
+                BuiltInRegistries.ENTITY_TYPE,
+                TranslationBuilder::addEntityType);
+        this.verifyRequiredTranslationKeys(jsonObject::has,
+                BuiltInRegistries.ATTRIBUTE,
+                TranslationBuilder::addAttribute);
+        this.verifyRequiredTranslationKeys(jsonObject::has,
+                BuiltInRegistries.MOB_EFFECT,
+                TranslationBuilder::addMobEffect);
+
+        ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(this.modId, this.languageCode);
+        return DataProvider.saveStable(cachedOutput, jsonObject, this.pathProvider.json(resourceLocation));
+    }
+
+    private <T> void verifyRequiredTranslationKeys(Predicate<String> predicate, Registry<T> registry, HolderTranslationCollector<T> holderTranslationCollector) {
+        registry.holders()
+                .filter((Holder.Reference<T> holder) -> holder.key().location().getNamespace().equals(this.modId))
+                .forEach((Holder.Reference<T> holder) -> {
+                    holderTranslationCollector.accept((String translationKey, String value) -> {
+                        Objects.requireNonNull(translationKey, "translation key is null");
+                        if (this.mustHaveTranslationKey(holder, translationKey) && !predicate.test(translationKey)) {
+                            throw new IllegalStateException("Missing translation key '%s' for '%s'".formatted(
+                                    translationKey,
+                                    holder));
+                        }
+                    }, holder, "");
+                });
+    }
+
+    protected boolean mustHaveTranslationKey(Holder.Reference<?> holder, String translationKey) {
+        return true;
     }
 
     @Override
@@ -104,29 +144,83 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add(resourceLocation.toLanguageKey(), additionalKey, value);
         }
 
+        default void add(Component component) {
+            Objects.requireNonNull(component, "component is null");
+            if (component.getContents() instanceof TranslatableContents contents && contents.getFallback() != null) {
+                this.add(contents.getKey(), contents.getFallback());
+            } else {
+                throw new IllegalArgumentException("Unsupported component: " + component);
+            }
+        }
+
+        default void add(Component component, String value) {
+            Objects.requireNonNull(component, "component is null");
+            if (component.getContents() instanceof TranslatableContents contents) {
+                this.add(contents.getKey(), value);
+            } else {
+                throw new IllegalArgumentException("Unsupported component: " + component);
+            }
+        }
+
+        default void add(Holder<?> holder, String value) {
+            this.add(holder, "", value);
+        }
+
+        default void add(Holder<?> holder, String additionalKey, String value) {
+            Objects.requireNonNull(holder, "holder is null");
+            this.add(holder.unwrapKey().orElseThrow(), additionalKey, value);
+        }
+
+        default void add(ResourceKey<?> resourceKey, String value) {
+            this.add(resourceKey, "", value);
+        }
+
+        default void add(ResourceKey<?> resourceKey, String additionalKey, String value) {
+            Objects.requireNonNull(resourceKey, "resource key is null");
+            String registry = Registries.elementsDirPath(resourceKey.registryKey());
+            this.add(registry, resourceKey.location(), additionalKey, value);
+        }
+
+        default void add(String registry, ResourceLocation resourceLocation, String value) {
+            this.add(registry, resourceLocation, "", value);
+        }
+
+        default void add(String registry, ResourceLocation resourceLocation, String additionalKey, String value) {
+            Objects.requireNonNull(registry, "registry is null");
+            Objects.requireNonNull(resourceLocation, "resource location is null");
+            this.add(resourceLocation.toLanguageKey(registry), additionalKey, value);
+        }
+
+        default void add(TagKey<?> tagKey, String value) {
+            Objects.requireNonNull(tagKey, "tag key is null");
+            String registry = Registries.elementsDirPath(tagKey.registry());
+            this.add("tag." + tagKey.location().toLanguageKey(registry), value);
+        }
+
+        default BlockFamilyBuilder blockFamily(String blockValue) {
+            return new BlockFamilyBuilder(this::add, blockValue);
+        }
+
+        default BlockFamilyBuilder blockFamily(String blockValue, String baseBlockValue) {
+            return new BlockFamilyBuilder(this::add, blockValue, baseBlockValue);
+        }
+
+        @Deprecated
         default void add(String registry, Holder<?> holder, String value) {
             Objects.requireNonNull(registry, "registry is null");
             Objects.requireNonNull(holder, "holder is null");
             this.add(registry, holder.unwrapKey().orElseThrow(), value);
         }
 
+        @Deprecated
         default void add(String registry, ResourceKey<?> resourceKey, String value) {
             Objects.requireNonNull(registry, "registry is null");
             Objects.requireNonNull(resourceKey, "resource key is null");
             this.add(registry, resourceKey.location(), value);
         }
 
-        default void add(String registry, ResourceLocation resourceLocation, String value) {
-            Objects.requireNonNull(registry, "registry is null");
-            Objects.requireNonNull(resourceLocation, "resource location is null");
-            this.add(Util.makeDescriptionId(registry, resourceLocation), value);
-        }
-
-        default void add(TagKey<?> tagKey, String value) {
-            this.add("tag." + tagKey.location().toLanguageKey(tagKey.registry().location().getPath()), value);
-        }
-
         default void addBlock(Holder<Block> block, String value) {
+            Objects.requireNonNull(block, "block is null");
             this.add(block.value(), value);
         }
 
@@ -140,6 +234,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void addItem(Holder<Item> item, String value) {
+            Objects.requireNonNull(item, "item is null");
             this.add(item.value(), value);
         }
 
@@ -153,6 +248,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void addSpawnEgg(Item item, String value) {
+            Objects.requireNonNull(item, "item is null");
             if (item instanceof SpawnEggItem) {
                 this.add(item, value + " Spawn Egg");
             } else {
@@ -160,10 +256,12 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             }
         }
 
+        @Deprecated
         default void addEnchantment(ResourceKey<Enchantment> enchantment, String value) {
             this.addEnchantment(enchantment, "", value);
         }
 
+        @Deprecated
         default void addEnchantment(ResourceKey<Enchantment> enchantment, String additionalKey, String value) {
             Objects.requireNonNull(enchantment, "enchantment is null");
             String translationKey = Util.makeDescriptionId(enchantment.registry().getPath(), enchantment.location());
@@ -184,7 +282,8 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add(mobEffect.getDescriptionId(), additionalKey, value);
         }
 
-        default void addEntityType(Holder<EntityType<?>> entityType, String value) {
+        default void addEntityType(Holder<? extends EntityType<?>> entityType, String value) {
+            Objects.requireNonNull(entityType, "entity type is null");
             this.add(entityType.value(), value);
         }
 
@@ -198,6 +297,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void addAttribute(Holder<Attribute> attribute, String value) {
+            Objects.requireNonNull(attribute, "attribute is null");
             this.add(attribute.value(), value);
         }
 
@@ -208,6 +308,11 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         default void add(Attribute attribute, String additionalKey, String value) {
             Objects.requireNonNull(attribute, "attribute is null");
             this.add(attribute.getDescriptionId(), additionalKey, value);
+        }
+
+        default void addStatType(Holder<StatType<?>> statType, String value) {
+            Objects.requireNonNull(statType, "stat type is null");
+            this.add(statType.value(), value);
         }
 
         default void add(StatType<?> statType, String value) {
@@ -224,29 +329,19 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             }
         }
 
-        default void add(GameRules.Key<?> gameRule, String value) {
-            this.add(gameRule, "", value);
-        }
-
-        default void addGameRuleDescription(GameRules.Key<?> gameRule, String value) {
-            this.add(gameRule, "description", value);
-        }
-
-        default void add(GameRules.Key<?> gameRule, String additionalKey, String value) {
-            Objects.requireNonNull(gameRule, "game rule is null");
-            this.add(gameRule.getDescriptionId(), additionalKey, value);
-        }
-
         default void addPotion(Holder<Potion> potion, String value) {
             Objects.requireNonNull(potion, "potion is null");
-            String potionName = Potion.getName(Optional.of(potion), "");
-            this.add("item.minecraft.tipped_arrow.effect." + potionName, "Arrow of " + value);
-            this.add("item.minecraft.potion.effect." + potionName, "Potion of " + value);
-            this.add("item.minecraft.splash_potion.effect." + potionName, "Splash Potion of " + value);
-            this.add("item.minecraft.lingering_potion.effect." + potionName, "Lingering Potion of " + value);
+            Function<Item, String> potionNameGetter = (Item item) -> {
+                return Potion.getName(Optional.of(potion), item.getDescriptionId() + ".effect.");
+            };
+            this.add(potionNameGetter.apply(Items.TIPPED_ARROW), "Arrow of " + value);
+            this.add(potionNameGetter.apply(Items.POTION), "Potion of " + value);
+            this.add(potionNameGetter.apply(Items.SPLASH_POTION), "Splash Potion of " + value);
+            this.add(potionNameGetter.apply(Items.LINGERING_POTION), "Lingering Potion of " + value);
         }
 
         default void addSoundEvent(Holder<SoundEvent> soundEvent, String value) {
+            Objects.requireNonNull(soundEvent, "sound event is null");
             this.add(soundEvent.value(), value);
         }
 
@@ -255,47 +350,43 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add("subtitles." + soundEvent.getLocation().getPath(), value);
         }
 
-        default void add(KeyMapping keyMapping, String value) {
-            Objects.requireNonNull(keyMapping, "key mapping is null");
-            this.add(keyMapping.getName(), value);
+        default void addCreativeModeTab(Holder<CreativeModeTab> creativeModeTab, String value) {
+            Objects.requireNonNull(creativeModeTab, "creative mode tab is null");
+            this.add(creativeModeTab.value(), value);
         }
 
-        default void addKeyCategory(String modId, String value) {
-            this.add("key.categories." + modId, value);
+        default void add(CreativeModeTab creativeModeTab, String value) {
+            Objects.requireNonNull(creativeModeTab, "creative mode tab is null");
+            this.add(creativeModeTab.getDisplayName(), value);
         }
 
+        @Deprecated
         default void addCreativeModeTab(String modId, String value) {
             this.addCreativeModeTab(modId, "main", value);
         }
 
+        @Deprecated
         default void addCreativeModeTab(String modId, String tabId, String value) {
             Objects.requireNonNull(modId, "mod id is null");
             Objects.requireNonNull(tabId, "tab id is null");
             this.addCreativeModeTab(ResourceLocationHelper.fromNamespaceAndPath(modId, tabId), value);
         }
 
+        @Deprecated
         default void addCreativeModeTab(ResourceLocation resourceLocation, String value) {
             Objects.requireNonNull(resourceLocation, "resource location is null");
             this.addCreativeModeTab(ResourceKey.create(Registries.CREATIVE_MODE_TAB, resourceLocation), value);
         }
 
+        @Deprecated
         default void addCreativeModeTab(ResourceKey<CreativeModeTab> resourceKey, String value) {
             Objects.requireNonNull(resourceKey, "resource key is null");
             this.add(BuiltInRegistries.CREATIVE_MODE_TAB.get(resourceKey), value);
         }
 
-        default void add(CreativeModeTab tab, String value) {
-            Objects.requireNonNull(tab, "tab is null");
-            this.add(tab.getDisplayName(), value);
-        }
-
-        default void add(Component component, String value) {
-            Objects.requireNonNull(component, "component is null");
-            if (component.getContents() instanceof TranslatableContents contents) {
-                this.add(contents.getKey(), value);
-            } else {
-                throw new IllegalArgumentException("Unsupported component: " + component);
-            }
+        default void addBiome(ResourceKey<Biome> biome, String value) {
+            Objects.requireNonNull(biome, "biome is null");
+            this.add(biome.location().toLanguageKey("biome"), value);
         }
 
         default void addGenericDamageType(ResourceKey<DamageType> damageType, String value) {
@@ -312,5 +403,171 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             Objects.requireNonNull(damageType, "damage type is null");
             this.add("death.attack." + damageType.location().getPath() + ".item", value);
         }
+
+        default void addPaintingVariant(ResourceKey<PaintingVariant> paintingVariant, String title, String author) {
+            Objects.requireNonNull(paintingVariant, "painting variant is null");
+            // do not use the registry name, it is "painting_variant", not "painting"
+            this.add(paintingVariant.location().toLanguageKey("painting", "title"), title);
+            this.add(paintingVariant.location().toLanguageKey("painting", "author"), author);
+        }
+
+        default void add(KeyMapping keyMapping, String value) {
+            Objects.requireNonNull(keyMapping, "key mapping is null");
+            this.add(keyMapping.getName(), value);
+        }
+
+        default void addKeyCategory(String modId, String value) {
+            this.add("key.categories." + modId, value);
+        }
+
+        default void add(GameRules.Key<?> gameRule, String value) {
+            this.add(gameRule, "", value);
+        }
+
+        default void addGameRuleDescription(GameRules.Key<?> gameRule, String value) {
+            this.add(gameRule, "description", value);
+        }
+
+        default void add(GameRules.Key<?> gameRule, String additionalKey, String value) {
+            Objects.requireNonNull(gameRule, "game rule is null");
+            this.add(gameRule.getDescriptionId(), additionalKey, value);
+        }
+    }
+
+    public static class BlockFamilyBuilder {
+        static final Map<BlockFamily.Variant, BiFunction<BlockFamilyBuilder, Block, BlockFamilyBuilder>> VARIANT_FUNCTIONS = ImmutableMap.<BlockFamily.Variant, BiFunction<BlockFamilyBuilder, Block, BlockFamilyBuilder>>builder()
+                .put(BlockFamily.Variant.BUTTON, BlockFamilyBuilder::button)
+                .put(BlockFamily.Variant.CHISELED, BlockFamilyBuilder::chiseled)
+                .put(BlockFamily.Variant.CRACKED, BlockFamilyBuilder::cracked)
+                .put(BlockFamily.Variant.CUT, BlockFamilyBuilder::cut)
+                .put(BlockFamily.Variant.DOOR, BlockFamilyBuilder::door)
+                .put(BlockFamily.Variant.CUSTOM_FENCE, BlockFamilyBuilder::fence)
+                .put(BlockFamily.Variant.FENCE, BlockFamilyBuilder::fence)
+                .put(BlockFamily.Variant.CUSTOM_FENCE_GATE, BlockFamilyBuilder::fenceGate)
+                .put(BlockFamily.Variant.FENCE_GATE, BlockFamilyBuilder::fenceGate)
+                .put(BlockFamily.Variant.MOSAIC, BlockFamilyBuilder::mosaic)
+                .put(BlockFamily.Variant.SIGN, BlockFamilyBuilder::sign)
+                .put(BlockFamily.Variant.SLAB, BlockFamilyBuilder::slab)
+                .put(BlockFamily.Variant.STAIRS, BlockFamilyBuilder::stairs)
+                .put(BlockFamily.Variant.PRESSURE_PLATE, BlockFamilyBuilder::pressurePlate)
+                .put(BlockFamily.Variant.POLISHED, BlockFamilyBuilder::polished)
+                .put(BlockFamily.Variant.TRAPDOOR, BlockFamilyBuilder::trapdoor)
+                .put(BlockFamily.Variant.WALL, BlockFamilyBuilder::wall)
+                .build();
+        private final BiConsumer<Block, String> valueConsumer;
+        private final String blockValue;
+        private final String baseBlockValue;
+
+        private BlockFamilyBuilder(BiConsumer<Block, String> valueConsumer, String blockValue) {
+            this(valueConsumer, blockValue, blockValue);
+        }
+
+        private BlockFamilyBuilder(BiConsumer<Block, String> valueConsumer, String blockValue, String baseBlockValue) {
+            this.valueConsumer = valueConsumer;
+            this.blockValue = blockValue;
+            this.baseBlockValue = baseBlockValue;
+        }
+
+        public void generateFor(BlockFamily blockFamily) {
+            this.baseBlock(blockFamily.getBaseBlock());
+            blockFamily.getVariants().forEach((BlockFamily.Variant variant, Block block) -> {
+                BiFunction<BlockFamilyBuilder, Block, BlockFamilyBuilder> variantFunction = VARIANT_FUNCTIONS.get(
+                        variant);
+                if (variantFunction != null) {
+                    variantFunction.apply(this, block);
+                }
+            });
+        }
+
+        public BlockFamilyBuilder baseBlock(Block block) {
+            this.valueConsumer.accept(block, this.baseBlockValue);
+            return this;
+        }
+
+        public BlockFamilyBuilder button(Block block) {
+            this.valueConsumer.accept(block, this.blockValue + " Button");
+            return this;
+        }
+
+        public BlockFamilyBuilder chiseled(Block block) {
+            this.valueConsumer.accept(block, "Chiseled " + this.blockValue);
+            return this;
+        }
+
+        public BlockFamilyBuilder cracked(Block block) {
+            this.valueConsumer.accept(block, "Cracked " + this.blockValue);
+            return this;
+        }
+
+        public BlockFamilyBuilder cut(Block block) {
+            this.valueConsumer.accept(block, "Cut " + this.blockValue);
+            return this;
+        }
+
+        public BlockFamilyBuilder door(Block block) {
+            this.valueConsumer.accept(block, this.blockValue + " Door");
+            return this;
+        }
+
+        public BlockFamilyBuilder fence(Block block) {
+            this.valueConsumer.accept(block, this.blockValue + " Fence");
+            return this;
+        }
+
+        public BlockFamilyBuilder fenceGate(Block block) {
+            this.valueConsumer.accept(block, this.blockValue + " Fence Gate");
+            return this;
+        }
+
+        public BlockFamilyBuilder mosaic(Block block) {
+            this.valueConsumer.accept(block, "Mosaic " + this.blockValue);
+            return this;
+        }
+
+        public BlockFamilyBuilder sign(Block block) {
+            this.valueConsumer.accept(block, this.blockValue + " Sign");
+            return this;
+        }
+
+        public BlockFamilyBuilder slab(Block block) {
+            this.valueConsumer.accept(block, this.blockValue + " Slab");
+            return this;
+        }
+
+        public BlockFamilyBuilder hangingSign(Block block) {
+            this.valueConsumer.accept(block, this.blockValue + " Hanging Sign");
+            return this;
+        }
+
+        public BlockFamilyBuilder stairs(Block block) {
+            this.valueConsumer.accept(block, this.blockValue + " Stairs");
+            return this;
+        }
+
+        public BlockFamilyBuilder pressurePlate(Block block) {
+            this.valueConsumer.accept(block, this.blockValue + " Pressure Plate");
+            return this;
+        }
+
+        public BlockFamilyBuilder polished(Block block) {
+            this.valueConsumer.accept(block, "Polished " + this.blockValue);
+            return this;
+        }
+
+        public BlockFamilyBuilder trapdoor(Block block) {
+            this.valueConsumer.accept(block, this.blockValue + " Trapdoor");
+            return this;
+        }
+
+        public BlockFamilyBuilder wall(Block block) {
+            this.valueConsumer.accept(block, this.blockValue + " Wall");
+            return this;
+        }
+    }
+
+    @FunctionalInterface
+    protected interface HolderTranslationCollector<T> {
+
+        void accept(TranslationBuilder translationBuilder, Holder<T> holder, String value);
     }
 }

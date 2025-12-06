@@ -4,6 +4,8 @@ import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
@@ -16,6 +18,14 @@ import java.util.function.Function;
  */
 public class NeoForgeDataProviderContext extends DataProviderContext {
     /**
+     * The client resource manager.
+     */
+    private final ResourceManager clientResourceManager;
+    /**
+     * The server resource manager.
+     */
+    private final ResourceManager serverResourceManager;
+    /**
      * The file helper.
      */
     private final ExistingFileHelper fileHelper;
@@ -26,9 +36,21 @@ public class NeoForgeDataProviderContext extends DataProviderContext {
      * @param registries the registry lookup provider
      * @param fileHelper the file helper
      */
-    public NeoForgeDataProviderContext(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries, ExistingFileHelper fileHelper) {
+    public NeoForgeDataProviderContext(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries, ResourceManager clientResourceManager, ResourceManager serverResourceManager, ExistingFileHelper fileHelper) {
         super(modId, packOutput, registries);
+        this.clientResourceManager = clientResourceManager;
+        this.serverResourceManager = serverResourceManager;
         this.fileHelper = fileHelper;
+    }
+
+    /**
+     * Creates a proper context from the corresponding NeoForge event to be used in actual data-generation.
+     *
+     * @param event the event
+     * @return the new data provider context
+     */
+    public static NeoForgeDataProviderContext fromEvent(GatherDataEvent event) {
+        return fromEvent(event, event.getGenerator().getPackOutput(), event.getLookupProvider());
     }
 
     /**
@@ -42,12 +64,29 @@ public class NeoForgeDataProviderContext extends DataProviderContext {
         return new NeoForgeDataProviderContext(event.getModContainer().getModId(),
                 packOutput,
                 registries,
+                event.getResourceManager(PackType.CLIENT_RESOURCES),
+                event.getResourceManager(PackType.SERVER_DATA),
                 event.getExistingFileHelper());
     }
 
     @Override
+    public ResourceManager getClientResourceManager() {
+        return this.clientResourceManager;
+    }
+
+    @Override
+    public ResourceManager getServerResourceManager() {
+        return this.serverResourceManager;
+    }
+
+    @Override
     public NeoForgeDataProviderContext withRegistries(CompletableFuture<HolderLookup.Provider> registries) {
-        return new NeoForgeDataProviderContext(this.getModId(), this.getPackOutput(), registries, this.fileHelper);
+        return new NeoForgeDataProviderContext(this.getModId(),
+                this.getPackOutput(),
+                registries,
+                this.clientResourceManager,
+                this.serverResourceManager,
+                this.fileHelper);
     }
 
     /**

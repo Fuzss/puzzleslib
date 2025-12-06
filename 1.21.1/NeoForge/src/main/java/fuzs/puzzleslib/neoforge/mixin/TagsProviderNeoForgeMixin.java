@@ -13,7 +13,7 @@ abstract class TagsProviderNeoForgeMixin<T> implements FileHelperDataProvider {
     @Shadow(remap = false)
     @Final
     @Mutable
-    private ExistingFileHelper existingFileHelper;
+    protected ExistingFileHelper existingFileHelper;
 
     @Override
     public void puzzleslib$setExistingFileHelper(ExistingFileHelper fileHelper) {

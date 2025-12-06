@@ -21,14 +21,31 @@ abstract class PlayerRendererFabricMixin extends LivingEntityRenderer<AbstractCl
         super(context, entityModel, f);
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/player/PlayerRenderer;setModelProperties(Lnet/minecraft/client/player/AbstractClientPlayer;)V", shift = At.Shift.AFTER), cancellable = true)
+    @Inject(method = "render(Lnet/minecraft/client/player/AbstractClientPlayer;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/client/renderer/entity/player/PlayerRenderer;setModelProperties(Lnet/minecraft/client/player/AbstractClientPlayer;)V",
+                    shift = At.Shift.AFTER),
+            cancellable = true)
     public void render$0(AbstractClientPlayer entity, float entityYaw, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int packedLight, CallbackInfo callback) {
-        EventResult result = FabricRendererEvents.BEFORE_RENDER_PLAYER.invoker().onBeforeRenderPlayer(entity, PlayerRenderer.class.cast(this), partialTicks, matrixStack, buffer, packedLight);
+        EventResult result = FabricRendererEvents.BEFORE_RENDER_PLAYER.invoker()
+                .onBeforeRenderPlayer(entity,
+                        PlayerRenderer.class.cast(this),
+                        partialTicks,
+                        matrixStack,
+                        buffer,
+                        packedLight);
         if (result.isInterrupt()) callback.cancel();
     }
 
-    @Inject(method = "render", at = @At("TAIL"))
+    @Inject(method = "render(Lnet/minecraft/client/player/AbstractClientPlayer;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
+            at = @At("TAIL"))
     public void render$1(AbstractClientPlayer entity, float entityYaw, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int packedLight, CallbackInfo callback) {
-        FabricRendererEvents.AFTER_RENDER_PLAYER.invoker().onAfterRenderPlayer(entity, PlayerRenderer.class.cast(this), partialTicks, matrixStack, buffer, packedLight);
+        FabricRendererEvents.AFTER_RENDER_PLAYER.invoker()
+                .onAfterRenderPlayer(entity,
+                        PlayerRenderer.class.cast(this),
+                        partialTicks,
+                        matrixStack,
+                        buffer,
+                        packedLight);
     }
 }

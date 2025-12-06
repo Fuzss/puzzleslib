@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 /**
  * A small helper class for splitting instance of {@link FormattedText}. Useful for splitting tooltip components.
  */
+@Deprecated
 public final class ClientComponentSplitter {
 
     private ClientComponentSplitter() {

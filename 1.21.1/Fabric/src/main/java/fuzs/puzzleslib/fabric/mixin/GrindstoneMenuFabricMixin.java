@@ -42,20 +42,24 @@ abstract class GrindstoneMenuFabricMixin extends AbstractContainerMenu implement
         ItemStack bottomInput = this.repairSlots.getItem(1);
         MutableValue<ItemStack> output = MutableValue.fromValue(ItemStack.EMPTY);
         MutableInt experienceReward = MutableInt.fromValue(this.puzzleslib$experience);
-        Player player = EventImplHelper.getPlayerFromContainerMenu(this).orElseThrow(NullPointerException::new);
-        EventResult result = FabricPlayerEvents.GRINDSTONE_UPDATE.invoker().onGrindstoneUpdate(topInput, bottomInput, output, experienceReward, player);
-        if (result.isInterrupt()) {
-            if (result.getAsBoolean()) {
-                this.resultSlots.setItem(0, output.get());
-                this.puzzleslib$experience = experienceReward.getAsInt();
-                this.broadcastChanges();
+        Player player = EventImplHelper.getPlayerFromContainerMenu(this);
+        if (player != null) {
+            EventResult result = FabricPlayerEvents.GRINDSTONE_UPDATE.invoker()
+                    .onGrindstoneUpdate(topInput, bottomInput, output, experienceReward, player);
+            if (result.isInterrupt()) {
+                if (result.getAsBoolean()) {
+                    this.resultSlots.setItem(0, output.get());
+                    this.puzzleslib$experience = experienceReward.getAsInt();
+                    this.broadcastChanges();
+                } else {
+                    this.resultSlots.setItem(0, ItemStack.EMPTY);
+                    this.puzzleslib$experience = -1;
+                }
+
+                callback.cancel();
             } else {
-                this.resultSlots.setItem(0, ItemStack.EMPTY);
                 this.puzzleslib$experience = -1;
             }
-            callback.cancel();
-        } else {
-            this.puzzleslib$experience = -1;
         }
     }
 

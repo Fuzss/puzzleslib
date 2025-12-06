@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.item.v2.crafting;
 
-import fuzs.puzzleslib.impl.core.CommonFactories;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -14,7 +14,7 @@ import java.util.Objects;
  * format, meaning they will not be readable on other mod loaders as well.
  */
 public interface CombinedIngredients {
-    CombinedIngredients INSTANCE = CommonFactories.INSTANCE.getCombinedIngredients();
+    CombinedIngredients INSTANCE = ProxyImpl.get().getCombinedIngredients();
 
     /**
      * Creates an ingredient that matches when its sub-ingredients all match.
