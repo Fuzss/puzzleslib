@@ -1,7 +1,9 @@
 package fuzs.puzzleslib.api.resources.v1;
 
+import fuzs.puzzleslib.api.client.core.v1.context.ResourcePackReloadListenersContext;
 import fuzs.puzzleslib.api.core.v1.ModContainer;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.api.core.v1.context.DataPackReloadListenersContext;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -69,7 +71,9 @@ public final class PackResourcesHelper {
     /**
      * Creates a new resource pack repository source (for the client).
      * <p>
-     * Can be added via {@link fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback}.
+     * Can be added via
+     * {@link
+     * fuzs.puzzleslib.api.client.core.v1.ClientModConstructor#onAddResourcePackReloadListeners(ResourcePackReloadListenersContext)}.
      *
      * @param id      id for the pack, used for internal references and is stored in <code>options.txt</code>
      * @param factory {@link net.minecraft.server.packs.PackResources} implementation supplier
@@ -85,7 +89,9 @@ public final class PackResourcesHelper {
     /**
      * Creates a new resource pack repository source (for the client).
      * <p>
-     * Can be added via {@link fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback}.
+     * Can be added via
+     * {@link
+     * fuzs.puzzleslib.api.client.core.v1.ClientModConstructor#onAddResourcePackReloadListeners(ResourcePackReloadListenersContext)}.
      *
      * @param id            id for the pack, used for internal references and is stored in <code>options.txt</code>
      * @param factory       {@link net.minecraft.server.packs.PackResources} implementation supplier
@@ -116,7 +122,9 @@ public final class PackResourcesHelper {
     /**
      * Creates a new resource pack repository source (for the client).
      * <p>
-     * Can be added via {@link fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback}.
+     * Can be added via
+     * {@link
+     * fuzs.puzzleslib.api.client.core.v1.ClientModConstructor#onAddResourcePackReloadListeners(ResourcePackReloadListenersContext)}.
      *
      * @param id            id for the pack, used for internal references and is stored in <code>options.txt</code>
      * @param factory       {@link net.minecraft.server.packs.PackResources} implementation supplier
@@ -149,7 +157,8 @@ public final class PackResourcesHelper {
     /**
      * Creates a new hidden data pack repository source (for the server).
      * <p>
-     * Can be added via {@link fuzs.puzzleslib.api.event.v1.server.AddDataPackReloadListenersCallback}.
+     * Can be added via
+     * {@link fuzs.puzzleslib.api.core.v1.ModConstructor#onAddDataPackReloadListeners(DataPackReloadListenersContext)}.
      *
      * @param id      id for the pack, used for internal references and is stored in <code>options.txt</code>
      * @param factory {@link net.minecraft.server.packs.PackResources} implementation supplier
@@ -165,7 +174,8 @@ public final class PackResourcesHelper {
     /**
      * Creates a new data pack repository source (for the server).
      * <p>
-     * Can be added via {@link fuzs.puzzleslib.api.event.v1.server.AddDataPackReloadListenersCallback}.
+     * Can be added via
+     * {@link fuzs.puzzleslib.api.core.v1.ModConstructor#onAddDataPackReloadListeners(DataPackReloadListenersContext)}.
      *
      * @param id            id for the pack, used for internal references and is stored in <code>options.txt</code>
      * @param factory       {@link net.minecraft.server.packs.PackResources} implementation supplier
@@ -196,7 +206,8 @@ public final class PackResourcesHelper {
     /**
      * Creates a new data pack repository source (for the server).
      * <p>
-     * Can be added via {@link fuzs.puzzleslib.api.event.v1.server.AddDataPackReloadListenersCallback}.
+     * Can be added via
+     * {@link fuzs.puzzleslib.api.core.v1.ModConstructor#onAddDataPackReloadListeners(DataPackReloadListenersContext)}.
      *
      * @param id            id for the pack, used for internal references and is stored in <code>options.txt</code>
      * @param factory       {@link net.minecraft.server.packs.PackResources} implementation supplier

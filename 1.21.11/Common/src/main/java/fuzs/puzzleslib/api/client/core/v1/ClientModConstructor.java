@@ -204,7 +204,6 @@ public interface ClientModConstructor {
 
     /**
      * @param context register client resource reload listeners
-     * @see fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback
      */
     default void onAddResourcePackReloadListeners(ResourcePackReloadListenersContext context) {
         // NO-OP

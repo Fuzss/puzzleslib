@@ -1,7 +1,10 @@
 package fuzs.puzzleslib.fabric.impl.client.event;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import fuzs.puzzleslib.api.client.event.v1.*;
+import fuzs.puzzleslib.api.client.event.v1.ClientInputEvents;
+import fuzs.puzzleslib.api.client.event.v1.ClientLifecycleEvents;
+import fuzs.puzzleslib.api.client.event.v1.ClientSetupCallback;
+import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.entity.ClientEntityLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.client.event.v1.gui.*;
@@ -15,7 +18,6 @@ import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.fabric.api.client.event.v1.*;
-import fuzs.puzzleslib.fabric.api.event.v1.FabricLifecycleEvents;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.event.data.DefaultedInt;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
@@ -31,7 +33,6 @@ import net.fabricmc.fabric.api.event.client.player.ClientPreAttackCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
-import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -48,9 +49,6 @@ import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -80,16 +78,6 @@ import static fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventInvokerRegistr
 public final class FabricClientEventInvokers {
 
     public static void registerLoadingHandlers() {
-        INSTANCE.register(AddResourcePackReloadListenersCallback.class,
-                FabricLifecycleEvents.LOAD_COMPLETE,
-                (AddResourcePackReloadListenersCallback callback) -> {
-                    return () -> {
-                        callback.onAddResourcePackReloadListeners((ResourceLocation resourceLocation, PreparableReloadListener reloadListener) -> {
-                            ResourceLoader.get(PackType.CLIENT_RESOURCES)
-                                    .registerReloader(resourceLocation, reloadListener);
-                        });
-                    };
-                });
         INSTANCE.register(ScreenOpeningCallback.class, FabricGuiEvents.SCREEN_OPENING);
         INSTANCE.register(ModelLoadingEvents.LoadModel.class,
                 (ModelLoadingEvents.LoadModel callback, @Nullable Object o) -> {
