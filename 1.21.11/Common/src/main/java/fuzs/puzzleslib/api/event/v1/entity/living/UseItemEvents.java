@@ -36,7 +36,7 @@ public final class UseItemEvents {
          *                             {@link net.minecraft.world.item.Item#getUseDuration(ItemStack, LivingEntity)}
          * @return <ul>
          *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the item from starting to be used</li>
-         *         <li>{@link EventResult#PASS PASS} to allow the item to be used continuously, <code>remainingUseDuration</code> will be set as remaining use ticks</li>
+         *         <li>{@link EventResult#PASS PASS} to allow the item to be used continuously</li>
          *         </ul>
          */
         EventResult onUseItemStart(LivingEntity livingEntity, ItemStack itemStack, InteractionHand interactionHand, MutableInt remainingUseDuration);

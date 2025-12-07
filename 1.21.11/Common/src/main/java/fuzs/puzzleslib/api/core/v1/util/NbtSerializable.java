@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.core.v1.utility;
+package fuzs.puzzleslib.api.core.v1.util;
 
 import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.impl.core.NbtSerializableCodec;

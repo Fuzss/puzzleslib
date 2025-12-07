@@ -7,6 +7,7 @@ import net.minecraft.world.item.ItemStack;
  * A helper class for adapting the new {@link InteractionResult} class from the previous {@code InteractionResult},
  * {@code ItemInteractionResult}, and {@code InteractionResultHolder} implementations.
  */
+@Deprecated
 public final class InteractionResultHelper {
     /**
      * An abstraction for {@code InteractionResult#SUCCESS}.

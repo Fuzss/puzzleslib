@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.function.Function;
 
 public final class FabricTagAppender<T> extends AbstractTagAppender<T> {
+    /**
+     * Only fully supported on NeoForge.
+     */
     private final List<TagEntry> removeEntries = new ArrayList<>();
 
     public FabricTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
@@ -28,15 +31,25 @@ public final class FabricTagAppender<T> extends AbstractTagAppender<T> {
 
     @Override
     public AbstractTagAppender<T> remove(ResourceLocation resourceLocation) {
-        // only fully supported on NeoForge
         this.removeEntries.add(TagEntry.element(resourceLocation));
         return this;
     }
 
     @Override
+    public AbstractTagAppender<T> removeOptional(ResourceLocation resourceLocation) {
+        this.removeEntries.add(TagEntry.optionalElement(resourceLocation));
+        return this;
+    }
+
+    @Override
     public AbstractTagAppender<T> removeTag(ResourceLocation resourceLocation) {
-        // only fully supported on NeoForge
         this.removeEntries.add(TagEntry.tag(resourceLocation));
+        return this;
+    }
+
+    @Override
+    public AbstractTagAppender<T> removeOptionalTag(ResourceLocation resourceLocation) {
+        this.removeEntries.add(TagEntry.optionalTag(resourceLocation));
         return this;
     }
 
@@ -46,9 +59,11 @@ public final class FabricTagAppender<T> extends AbstractTagAppender<T> {
         for (TagEntry tagEntry : this.tagBuilder.build()) {
             list.add(tagEntry.toString());
         }
+
         for (TagEntry tagEntry : this.removeEntries) {
             list.add("!" + tagEntry);
         }
+
         return list;
     }
 }

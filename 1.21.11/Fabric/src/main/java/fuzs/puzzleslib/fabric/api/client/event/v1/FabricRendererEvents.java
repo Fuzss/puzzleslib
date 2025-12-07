@@ -18,8 +18,8 @@ public final class FabricRendererEvents {
     /**
      * Called when the block highlight outline for the current hit result is about to be submitted.
      */
-    public static final Event<SubmitBlockOutlineCallback> SUBMIT_BLOCK_OUTLINE = FabricEventFactory.createResultHolder(
-            SubmitBlockOutlineCallback.class);
+    public static final Event<ExtractBlockOutlineCallback> EXTRACT_BLOCK_OUTLINE = FabricEventFactory.createResultHolder(
+            ExtractBlockOutlineCallback.class);
     /**
      * Called during {@link EntityRenderer#extractRenderState(Entity, EntityRenderState, float)}, for setting up the
      * render state of an entity for future rendering.

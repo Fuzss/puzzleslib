@@ -262,7 +262,10 @@ public final class FabricClientEventInvokers {
                     return (ItemStack stack, Item.TooltipContext tooltipContext, TooltipFlag context, List<Component> lines) -> {
                         // This uses some font texture when splitting text or measuring text width.
                         // It will throw if not on the render thread, like some worker or networking.
-                        if (!RenderSystem.isOnRenderThread()) return;
+                        if (!RenderSystem.isOnRenderThread()) {
+                            return;
+                        }
+
                         callback.onItemTooltip(stack, lines, tooltipContext, Minecraft.getInstance().player, context);
                     };
                 });
@@ -276,7 +279,10 @@ public final class FabricClientEventInvokers {
                 (callback, context) -> {
                     Objects.requireNonNull(context, "context is null");
                     return (Minecraft minecraft, Screen screen, int scaledWidth, int scaledHeight) -> {
-                        if (!((Class<?>) context).isInstance(screen)) return;
+                        if (!((Class<?>) context).isInstance(screen)) {
+                            return;
+                        }
+
                         callback.onBeforeInit(minecraft,
                                 screen,
                                 scaledWidth,
@@ -289,7 +295,10 @@ public final class FabricClientEventInvokers {
                 (callback, context) -> {
                     Objects.requireNonNull(context, "context is null");
                     return (Minecraft minecraft, Screen screen, int scaledWidth, int scaledHeight) -> {
-                        if (!((Class<?>) context).isInstance(screen)) return;
+                        if (!((Class<?>) context).isInstance(screen)) {
+                            return;
+                        }
+
                         List<AbstractWidget> widgets = Screens.getButtons(screen);
                         callback.onAfterInit(minecraft,
                                 screen,
@@ -445,6 +454,7 @@ public final class FabricClientEventInvokers {
                                 guiGraphics.pose()
                                         .translate(posX.getAsInt(), posY.getAsInt() - (guiGraphics.guiHeight() - 48));
                             }
+
                             hudElement.render(guiGraphics, deltaTracker);
                             guiGraphics.pose().popMatrix();
                         };
@@ -513,6 +523,7 @@ public final class FabricClientEventInvokers {
                                 }
                             }
                         }
+
                         return false;
                     };
                 });
@@ -522,7 +533,10 @@ public final class FabricClientEventInvokers {
                     return (Player player, Level level, InteractionHand hand, BlockHitResult hitResult) -> {
                         // this is only fired client-side to mimic InputEvent$InteractionKeyMappingTriggered on Forge
                         // proper handling of the Fabric callback with the server-side component is implemented elsewhere
-                        if (!level.isClientSide()) return InteractionResult.PASS;
+                        if (!level.isClientSide()) {
+                            return InteractionResult.PASS;
+                        }
+
                         Minecraft minecraft = Minecraft.getInstance();
                         EventResult eventResult = callback.onUseInteraction(minecraft,
                                 (LocalPlayer) player,
@@ -540,7 +554,10 @@ public final class FabricClientEventInvokers {
                     return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
                         // this is only fired client-side to mimic InputEvent$InteractionKeyMappingTriggered on Forge
                         // proper handling of the Fabric callback with the server-side component is implemented elsewhere
-                        if (!level.isClientSide()) return InteractionResult.PASS;
+                        if (!level.isClientSide()) {
+                            return InteractionResult.PASS;
+                        }
+
                         Minecraft minecraft = Minecraft.getInstance();
                         EventResult eventResult = callback.onUseInteraction(minecraft,
                                 (LocalPlayer) player,
@@ -558,7 +575,10 @@ public final class FabricClientEventInvokers {
                     return (Player player, Level level, InteractionHand hand) -> {
                         // this is only fired client-side to mimic InputEvent$InteractionKeyMappingTriggered on Forge
                         // proper handling of the Fabric callback with the server-side component is implemented elsewhere
-                        if (!level.isClientSide()) return InteractionResult.PASS;
+                        if (!level.isClientSide()) {
+                            return InteractionResult.PASS;
+                        }
+
                         Minecraft minecraft = Minecraft.getInstance();
                         EventResult eventResult = callback.onUseInteraction(minecraft,
                                 (LocalPlayer) player,
@@ -578,7 +598,7 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(FogEvents.Setup.class, FabricRendererEvents.SETUP_FOG);
         INSTANCE.register(FogEvents.Color.class, FabricRendererEvents.FOG_COLOR);
         INSTANCE.register(RenderTooltipCallback.class, FabricGuiEvents.RENDER_TOOLTIP);
-        INSTANCE.register(SubmitBlockOutlineCallback.class, FabricRendererEvents.SUBMIT_BLOCK_OUTLINE);
+        INSTANCE.register(ExtractBlockOutlineCallback.class, FabricRendererEvents.EXTRACT_BLOCK_OUTLINE);
         INSTANCE.register(GameRenderEvents.Before.class, FabricRendererEvents.BEFORE_GAME_RENDER);
         INSTANCE.register(GameRenderEvents.After.class, FabricRendererEvents.AFTER_GAME_RENDER);
         INSTANCE.register(AddToastCallback.class, FabricGuiEvents.ADD_TOAST);
@@ -598,10 +618,14 @@ public final class FabricClientEventInvokers {
                     // (since the Fabric event doesn't allow for retrieving already applied event phase orders),
                     // so we register all screen events during pre-init, which allows post-init to already clear our internal map again
                     net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.BEFORE_INIT.register((Minecraft client, Screen screen, int scaledWidth, int scaledHeight) -> {
-                        if (((Class<?>) context).isInstance(screen)) applyToInvoker.accept(eventGetter.apply(screen));
+                        if (((Class<?>) context).isInstance(screen)) {
+                            applyToInvoker.accept(eventGetter.apply(screen));
+                        }
                     });
                     net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AFTER_INIT.register((Minecraft client, Screen screen, int scaledWidth, int scaledHeight) -> {
-                        if (((Class<?>) context).isInstance(screen)) removeInvoker.accept(eventGetter.apply(screen));
+                        if (((Class<?>) context).isInstance(screen)) {
+                            removeInvoker.accept(eventGetter.apply(screen));
+                        }
                     });
                 });
     }
