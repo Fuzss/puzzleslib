@@ -3,6 +3,7 @@ package fuzs.puzzleslib.fabric.impl.core;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
+import fuzs.puzzleslib.api.core.v2.context.BiomeModificationsContext;
 import fuzs.puzzleslib.fabric.impl.core.context.*;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.impl.item.CopyComponentsRecipe;
@@ -38,7 +39,10 @@ public final class FabricModConstructor implements ModConstructorImpl<ModConstru
         modConstructor.onRegisterFlammableBlocks(new FlammableBlocksContextFabricImpl());
         modConstructor.onRegisterCompostableBlocks(new CompostableBlocksContextFabricImpl());
         modConstructor.onRegisterBlockInteractions(new BlockInteractionsContextFabricImpl());
-        modConstructor.onRegisterBiomeModifications(new BiomeModificationsContextFabricImpl(modId));
+        modConstructor.onRegisterBiomeModifications((BiomeModificationsContext) new BiomeModificationsContextFabricImpl(
+                modId));
+        modConstructor.onRegisterBiomeModifications((fuzs.puzzleslib.api.core.v1.context.BiomeModificationsContext) new BiomeModificationsContextFabricImpl(
+                modId));
         modConstructor.onAddDataPackFinders(new DataPackSourcesContextFabricImpl());
         modConstructor.onRegisterGameRegistries(new GameRegistriesContextFabricImpl());
         modConstructor.onRegisterDataPackRegistries(new DataPackRegistriesContextFabricImpl());

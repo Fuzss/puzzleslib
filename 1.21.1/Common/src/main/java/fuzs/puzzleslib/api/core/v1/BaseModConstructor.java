@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
  * An extension for common and client mod constructors for handling their construction order to guarantee the common
  * constructor to be constructed first.
  */
+@Deprecated
 public interface BaseModConstructor {
 
     /**
