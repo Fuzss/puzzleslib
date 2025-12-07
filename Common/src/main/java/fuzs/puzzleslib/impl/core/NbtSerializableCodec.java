@@ -4,7 +4,7 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
-import fuzs.puzzleslib.api.core.v1.utility.NbtSerializable;
+import fuzs.puzzleslib.api.core.v1.util.NbtSerializable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.RegistryOps;

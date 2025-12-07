@@ -5,7 +5,6 @@ import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricRendererEvents;
 import fuzs.puzzleslib.fabric.impl.client.config.MultiConfigurationScreen;
 import fuzs.puzzleslib.fabric.impl.client.core.context.GuiLayersContextFabricImpl;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
@@ -31,7 +30,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.*;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.Connection;
@@ -41,10 +39,8 @@ import net.minecraft.network.protocol.common.custom.BrandPayload;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.properties.WoodType;
@@ -145,11 +141,6 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     }
 
     @Override
-    public float getPartialTick(EntityRenderState renderState) {
-        return Mth.frac(renderState.ageInTicks);
-    }
-
-    @Override
     public boolean isKeyActiveAndMatches(KeyMapping keyMapping, KeyEvent keyEvent) {
         return keyMapping.matches(keyEvent);
     }
@@ -218,18 +209,13 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
 
     @Override
     public int getLeftStatusBarHeight(ResourceLocation resourceLocation) {
-        resourceLocation = GuiLayersContextFabricImpl.getVanillaGuiLayer(resourceLocation);
-        return HudStatusBarHeightRegistry.getHeight(resourceLocation);
+        ResourceLocation vanillaGuiLayer = GuiLayersContextFabricImpl.getVanillaGuiLayer(resourceLocation);
+        return HudStatusBarHeightRegistry.getHeight(vanillaGuiLayer);
     }
 
     @Override
     public int getRightStatusBarHeight(ResourceLocation resourceLocation) {
-        resourceLocation = GuiLayersContextFabricImpl.getVanillaGuiLayer(resourceLocation);
-        return HudStatusBarHeightRegistry.getHeight(resourceLocation);
-    }
-
-    @Override
-    public <E extends Entity, S extends EntityRenderState> void onUpdateEntityRenderState(EntityRenderer<E, S> renderer, E entity, S renderState, float partialTick) {
-        FabricRendererEvents.EXTRACT_RENDER_STATE.invoker().onExtractRenderState(entity, renderState, partialTick);
+        ResourceLocation vanillaGuiLayer = GuiLayersContextFabricImpl.getVanillaGuiLayer(resourceLocation);
+        return HudStatusBarHeightRegistry.getHeight(vanillaGuiLayer);
     }
 }

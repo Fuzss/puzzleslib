@@ -68,31 +68,6 @@ public final class ContainerMenuHelper {
     }
 
     /**
-     * Adds the player inventory slots to an {@link AbstractContainerMenu}.
-     *
-     * @param abstractContainerMenu menu to add slots to
-     * @param inventory     player inventory instance
-     * @param offsetY       vertical offset
-     */
-    @Deprecated(forRemoval = true)
-    public static void addInventorySlots(AbstractContainerMenu abstractContainerMenu, Inventory inventory, int offsetY) {
-        addInventorySlots(abstractContainerMenu, inventory, 8, offsetY);
-    }
-
-    /**
-     * Adds the player inventory slots to an {@link AbstractContainerMenu}.
-     *
-     * @param abstractContainerMenu menu to add slots to
-     * @param inventory     player inventory instance
-     * @param offsetX       horizontal offset
-     * @param offsetY       vertical offset
-     */
-    @Deprecated(forRemoval = true)
-    public static void addInventorySlots(AbstractContainerMenu abstractContainerMenu, Inventory inventory, int offsetX, int offsetY) {
-        abstractContainerMenu.addStandardInventorySlots(inventory, offsetX, offsetY);
-    }
-
-    /**
      * Allows for creating a container backed by a list of items.
      * <p>
      * Useful for items that are stored on e.g. a block entity, but not accessible via a container, but should be

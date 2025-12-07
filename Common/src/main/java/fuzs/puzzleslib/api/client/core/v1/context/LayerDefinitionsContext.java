@@ -22,31 +22,6 @@ public interface LayerDefinitionsContext {
 
     /**
      * @param modelLayerSet    the model layer location set
-     * @param layerSupplierSet the layer definition supplier set
-     * @see ArmorModelSet#putFrom(ArmorModelSet, ImmutableMap.Builder)
-     */
-    @Deprecated(forRemoval = true)
-    default void registerArmorDefinitionV2(ArmorModelSet<ModelLayerLocation> modelLayerSet, ArmorModelSet<Supplier<LayerDefinition>> layerSupplierSet) {
-        this.registerLayerDefinition(modelLayerSet.head(), layerSupplierSet.head());
-        this.registerLayerDefinition(modelLayerSet.chest(), layerSupplierSet.chest());
-        this.registerLayerDefinition(modelLayerSet.legs(), layerSupplierSet.legs());
-        this.registerLayerDefinition(modelLayerSet.feet(), layerSupplierSet.feet());
-    }
-
-    /**
-     * @param modelLayerSet      the model layer location set
-     * @param layerDefinitionSet the layer definitions
-     * @see ArmorModelSet#putFrom(ArmorModelSet, ImmutableMap.Builder)
-     */
-    @Deprecated(forRemoval = true)
-    default void registerArmorDefinition(ArmorModelSet<ModelLayerLocation> modelLayerSet, ArmorModelSet<LayerDefinition> layerDefinitionSet) {
-        this.registerArmorDefinitionV2(modelLayerSet, layerDefinitionSet.map((LayerDefinition layerDefinition) -> {
-            return () -> layerDefinition;
-        }));
-    }
-
-    /**
-     * @param modelLayerSet    the model layer location set
      * @param layerSetSupplier the layer definition set supplier
      * @see ArmorModelSet#putFrom(ArmorModelSet, ImmutableMap.Builder)
      */

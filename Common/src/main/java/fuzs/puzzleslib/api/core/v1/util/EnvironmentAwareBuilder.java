@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.core.v1.utility;
+package fuzs.puzzleslib.api.core.v1.util;
 
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.ModLoader;

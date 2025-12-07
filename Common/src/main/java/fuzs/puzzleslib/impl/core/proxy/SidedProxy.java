@@ -2,16 +2,12 @@ package fuzs.puzzleslib.impl.core.proxy;
 
 import fuzs.puzzleslib.api.util.v1.CommonHelper;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
-
-import java.util.Collections;
-import java.util.List;
 
 public interface SidedProxy {
 
@@ -49,11 +45,6 @@ public interface SidedProxy {
 
     default boolean hasAltDown() {
         return false;
-    }
-
-    @Deprecated
-    default List<Component> splitTooltipLines(Component component) {
-        return Collections.singletonList(component);
     }
 
     default void registerConfigurationScreen(String modId, String... otherModIds) {

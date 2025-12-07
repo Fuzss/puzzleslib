@@ -27,13 +27,25 @@ public final class NeoForgeTagAppender<T> extends AbstractTagAppender<T> {
 
     @Override
     public AbstractTagAppender<T> remove(ResourceLocation resourceLocation) {
-        this.tagBuilder.removeElement(resourceLocation);
+        this.tagBuilder.remove(TagEntry.element(resourceLocation));
+        return this;
+    }
+
+    @Override
+    public AbstractTagAppender<T> removeOptional(ResourceLocation resourceLocation) {
+        this.tagBuilder.remove(TagEntry.optionalElement(resourceLocation));
         return this;
     }
 
     @Override
     public AbstractTagAppender<T> removeTag(ResourceLocation resourceLocation) {
-        this.tagBuilder.removeTag(resourceLocation);
+        this.tagBuilder.remove(TagEntry.tag(resourceLocation));
+        return this;
+    }
+
+    @Override
+    public AbstractTagAppender<T> removeOptionalTag(ResourceLocation resourceLocation) {
+        this.tagBuilder.remove(TagEntry.optionalTag(resourceLocation));
         return this;
     }
 
@@ -43,9 +55,11 @@ public final class NeoForgeTagAppender<T> extends AbstractTagAppender<T> {
         for (TagEntry tagEntry : this.tagBuilder.build()) {
             list.add(new ExtraCodecs.TagOrElementLocation(tagEntry.getId(), tagEntry.isTag()).toString());
         }
+
         for (TagEntry tagEntry : this.tagBuilder.getRemoveEntries().toList()) {
             list.add("!" + new ExtraCodecs.TagOrElementLocation(tagEntry.getId(), tagEntry.isTag()));
         }
+
         return list;
     }
 

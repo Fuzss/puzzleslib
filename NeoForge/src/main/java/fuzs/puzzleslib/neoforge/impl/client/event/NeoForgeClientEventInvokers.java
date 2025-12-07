@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.neoforge.impl.client.event;
 
-import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fuzs.puzzleslib.api.client.event.v1.*;
 import fuzs.puzzleslib.api.client.event.v1.entity.ClientEntityLevelEvents;
@@ -30,6 +29,7 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.state.BlockOutlineRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.util.Mth;
@@ -42,6 +42,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.event.lifecycle.ClientStartedEvent;
@@ -55,6 +56,7 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -80,12 +82,12 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(ScreenOpeningCallback.class,
                 ScreenEvent.Opening.class,
                 (ScreenOpeningCallback callback, ScreenEvent.Opening event) -> {
-                    EventResultHolder<Screen> eventResult = callback.onScreenOpening(event.getCurrentScreen(),
+                    EventResultHolder<@Nullable Screen> eventResult = callback.onScreenOpening(event.getCurrentScreen(),
                             event.getNewScreen());
                     // returning the current screen should ideally cause no change at all,
                     // which is implemented fine on NeoForge via cancelling the event,
                     // on Fabric though the screen will be initialized again, after Screen::remove having been called
-                    eventResult.ifInterrupt((Screen screen) -> {
+                    eventResult.ifInterrupt((@Nullable Screen screen) -> {
                         if (screen == event.getCurrentScreen()) {
                             event.setCanceled(true);
                         } else {
@@ -173,7 +175,10 @@ public final class NeoForgeClientEventInvokers {
                 (ItemTooltipCallback callback, ItemTooltipEvent event) -> {
                     // This uses some font texture when splitting text or measuring text width.
                     // It will throw if not on the render thread, like some worker or networking.
-                    if (!RenderSystem.isOnRenderThread()) return;
+                    if (!RenderSystem.isOnRenderThread()) {
+                        return;
+                    }
+
                     callback.onItemTooltip(event.getItemStack(),
                             event.getToolTip(),
                             event.getContext(),
@@ -188,7 +193,9 @@ public final class NeoForgeClientEventInvokers {
                             event.getPoseStack(),
                             event.getSubmitNodeCollector(),
                             event.getCameraRenderState());
-                    if (eventResult.isInterrupt()) event.setCanceled(true);
+                    if (eventResult.isInterrupt()) {
+                        event.setCanceled(true);
+                    }
                 });
         INSTANCE.register(PrepareInventoryMobEffectsCallback.class,
                 ScreenEvent.RenderInventoryMobEffects.class,
@@ -200,13 +207,18 @@ public final class NeoForgeClientEventInvokers {
                             event.getAvailableSpace(),
                             fullSizeRendering,
                             horizontalOffset);
-                    if (eventResult.isInterrupt()) event.setCanceled(true);
+                    if (eventResult.isInterrupt()) {
+                        event.setCanceled(true);
+                    }
                 });
         INSTANCE.register(ComputeFovModifierCallback.class,
                 ComputeFovModifierEvent.class,
                 (ComputeFovModifierCallback callback, ComputeFovModifierEvent event) -> {
                     float fovEffectScale = Minecraft.getInstance().options.fovEffectScale().get().floatValue();
-                    if (fovEffectScale == 0.0F) return;
+                    if (fovEffectScale == 0.0F) {
+                        return;
+                    }
+
                     // reverse fovEffectScale calculations applied by vanilla in return statement / by Forge when setting up the event
                     // this approach is chosen so the callback may work with the actual fov modifier, and does not have to deal with the fovEffectScale option,
                     // which is applied automatically regardless
@@ -265,7 +277,9 @@ public final class NeoForgeClientEventInvokers {
                 (callback, event) -> {
                     EventResult eventResult = callback.onBeforeMouseClick(event.getScreen(),
                             event.getMouseButtonEvent());
-                    if (eventResult.isInterrupt()) event.setCanceled(true);
+                    if (eventResult.isInterrupt()) {
+                        event.setCanceled(true);
+                    }
                 });
         registerScreenEvent(ScreenMouseEvents.AfterMouseClick.class,
                 ScreenEvent.MouseButtonPressed.Post.class,
@@ -277,7 +291,9 @@ public final class NeoForgeClientEventInvokers {
                 (callback, event) -> {
                     EventResult eventResult = callback.onBeforeMouseRelease(event.getScreen(),
                             event.getMouseButtonEvent());
-                    if (eventResult.isInterrupt()) event.setCanceled(true);
+                    if (eventResult.isInterrupt()) {
+                        event.setCanceled(true);
+                    }
                 });
         registerScreenEvent(ScreenMouseEvents.AfterMouseRelease.class,
                 ScreenEvent.MouseButtonReleased.Post.class,
@@ -292,7 +308,9 @@ public final class NeoForgeClientEventInvokers {
                             event.getMouseY(),
                             event.getScrollDeltaX(),
                             event.getScrollDeltaY());
-                    if (eventResult.isInterrupt()) event.setCanceled(true);
+                    if (eventResult.isInterrupt()) {
+                        event.setCanceled(true);
+                    }
                 });
         registerScreenEvent(ScreenMouseEvents.AfterMouseScroll.class,
                 ScreenEvent.MouseScrolled.Post.class,
@@ -310,7 +328,9 @@ public final class NeoForgeClientEventInvokers {
                             event.getMouseButtonEvent(),
                             event.getDragX(),
                             event.getDragY());
-                    if (eventResult.isInterrupt()) event.setCanceled(true);
+                    if (eventResult.isInterrupt()) {
+                        event.setCanceled(true);
+                    }
                 });
         registerScreenEvent(ScreenMouseEvents.AfterMouseDrag.class,
                 ScreenEvent.MouseDragged.Post.class,
@@ -324,7 +344,9 @@ public final class NeoForgeClientEventInvokers {
                 ScreenEvent.KeyPressed.Pre.class,
                 (callback, event) -> {
                     EventResult eventResult = callback.onBeforeKeyPress(event.getScreen(), event.getKeyEvent());
-                    if (eventResult.isInterrupt()) event.setCanceled(true);
+                    if (eventResult.isInterrupt()) {
+                        event.setCanceled(true);
+                    }
                 });
         registerScreenEvent(ScreenKeyboardEvents.AfterKeyPress.class,
                 ScreenEvent.KeyPressed.Post.class,
@@ -335,7 +357,9 @@ public final class NeoForgeClientEventInvokers {
                 ScreenEvent.KeyReleased.Pre.class,
                 (callback, event) -> {
                     EventResult eventResult = callback.onBeforeKeyRelease(event.getScreen(), event.getKeyEvent());
-                    if (eventResult.isInterrupt()) event.setCanceled(true);
+                    if (eventResult.isInterrupt()) {
+                        event.setCanceled(true);
+                    }
                 });
         registerScreenEvent(ScreenKeyboardEvents.AfterKeyRelease.class,
                 ScreenEvent.KeyReleased.Post.class,
@@ -347,7 +371,9 @@ public final class NeoForgeClientEventInvokers {
                 (callback, event) -> {
                     EventResult eventResult = callback.onBeforeCharacterType(event.getScreen(),
                             event.getCharacterEvent());
-                    if (eventResult.isInterrupt()) event.setCanceled(true);
+                    if (eventResult.isInterrupt()) {
+                        event.setCanceled(true);
+                    }
                 });
         registerScreenEvent(ScreenKeyboardEvents.AfterCharacterType.class,
                 ScreenEvent.CharacterTyped.Post.class,
@@ -372,7 +398,10 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(ClientEntityLevelEvents.Load.class,
                 EntityJoinLevelEvent.class,
                 (ClientEntityLevelEvents.Load callback, EntityJoinLevelEvent event) -> {
-                    if (!(event.getLevel() instanceof ClientLevel clientLevel)) return;
+                    if (!(event.getLevel() instanceof ClientLevel clientLevel)) {
+                        return;
+                    }
+
                     EventResult eventResult = callback.onEntityLoad(event.getEntity(), clientLevel);
                     if (eventResult.isInterrupt()) {
                         if (event.getEntity() instanceof Player) {
@@ -386,14 +415,19 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(ClientEntityLevelEvents.Unload.class,
                 EntityLeaveLevelEvent.class,
                 (ClientEntityLevelEvents.Unload callback, EntityLeaveLevelEvent event) -> {
-                    if (!(event.getLevel() instanceof ClientLevel clientLevel)) return;
+                    if (!(event.getLevel() instanceof ClientLevel clientLevel)) {
+                        return;
+                    }
+
                     callback.onEntityUnload(event.getEntity(), clientLevel);
                 });
         INSTANCE.register(ClientInputEvents.MouseClick.class,
                 InputEvent.MouseButton.Pre.class,
                 (ClientInputEvents.MouseClick callback, InputEvent.MouseButton.Pre event) -> {
                     EventResult eventResult = callback.onMouseClick(event.getMouseButtonInfo(), event.getAction());
-                    if (eventResult.isInterrupt()) event.setCanceled(true);
+                    if (eventResult.isInterrupt()) {
+                        event.setCanceled(true);
+                    }
                 });
         INSTANCE.register(ClientInputEvents.MouseScroll.class,
                 InputEvent.MouseScrollingEvent.class,
@@ -403,7 +437,9 @@ public final class NeoForgeClientEventInvokers {
                             event.isRightDown(),
                             event.getScrollDeltaX(),
                             event.getScrollDeltaY());
-                    if (eventResult.isInterrupt()) event.setCanceled(true);
+                    if (eventResult.isInterrupt()) {
+                        event.setCanceled(true);
+                    }
                 });
         INSTANCE.register(ClientInputEvents.KeyPress.class,
                 InputEvent.Key.class,
@@ -426,19 +462,26 @@ public final class NeoForgeClientEventInvokers {
                 });
         INSTANCE.register(SubmitLivingEntityEvents.Before.class, RenderLivingEvent.Pre.class, (callback, event) -> {
             EventResult eventResult = callback.onBeforeSubmitLivingEntity(event.getRenderState(),
-                    event.getRenderer(), event.getPoseStack(),
+                    event.getRenderer(),
+                    event.getPoseStack(),
                     event.getSubmitNodeCollector());
-            if (eventResult.isInterrupt()) event.setCanceled(true);
+            if (eventResult.isInterrupt()) {
+                event.setCanceled(true);
+            }
         });
         INSTANCE.register(SubmitLivingEntityEvents.After.class, RenderLivingEvent.Post.class, (callback, event) -> {
             callback.onAfterSubmitLivingEntity(event.getRenderState(),
-                    event.getRenderer(), event.getPoseStack(),
+                    event.getRenderer(),
+                    event.getPoseStack(),
                     event.getSubmitNodeCollector());
         });
         INSTANCE.register(RenderHandEvents.MainHand.class,
                 RenderHandEvent.class,
                 (RenderHandEvents.MainHand callback, RenderHandEvent event) -> {
-                    if (event.getHand() != InteractionHand.MAIN_HAND) return;
+                    if (event.getHand() != InteractionHand.MAIN_HAND) {
+                        return;
+                    }
+
                     Minecraft minecraft = Minecraft.getInstance();
                     ItemInHandRenderer itemInHandRenderer = minecraft.getEntityRenderDispatcher()
                             .getItemInHandRenderer();
@@ -454,12 +497,17 @@ public final class NeoForgeClientEventInvokers {
                             event.getInterpolatedPitch(),
                             event.getSwingProgress(),
                             event.getEquipProgress());
-                    if (eventResult.isInterrupt()) event.setCanceled(true);
+                    if (eventResult.isInterrupt()) {
+                        event.setCanceled(true);
+                    }
                 });
         INSTANCE.register(RenderHandEvents.OffHand.class,
                 RenderHandEvent.class,
                 (RenderHandEvents.OffHand callback, RenderHandEvent event) -> {
-                    if (event.getHand() != InteractionHand.OFF_HAND) return;
+                    if (event.getHand() != InteractionHand.OFF_HAND) {
+                        return;
+                    }
+
                     Minecraft minecraft = Minecraft.getInstance();
                     ItemInHandRenderer itemInHandRenderer = minecraft.getEntityRenderDispatcher()
                             .getItemInHandRenderer();
@@ -475,30 +523,44 @@ public final class NeoForgeClientEventInvokers {
                             event.getInterpolatedPitch(),
                             event.getSwingProgress(),
                             event.getEquipProgress());
-                    if (eventResult.isInterrupt()) event.setCanceled(true);
+                    if (eventResult.isInterrupt()) {
+                        event.setCanceled(true);
+                    }
                 });
         INSTANCE.register(ClientLevelTickEvents.Start.class,
                 LevelTickEvent.Pre.class,
                 (ClientLevelTickEvents.Start callback, LevelTickEvent.Pre event) -> {
-                    if (!(event.getLevel() instanceof ClientLevel clientLevel)) return;
+                    if (!(event.getLevel() instanceof ClientLevel clientLevel)) {
+                        return;
+                    }
+
                     callback.onStartLevelTick(Minecraft.getInstance(), clientLevel);
                 });
         INSTANCE.register(ClientLevelTickEvents.End.class,
                 LevelTickEvent.Post.class,
                 (ClientLevelTickEvents.End callback, LevelTickEvent.Post event) -> {
-                    if (!(event.getLevel() instanceof ClientLevel clientLevel)) return;
+                    if (!(event.getLevel() instanceof ClientLevel clientLevel)) {
+                        return;
+                    }
+
                     callback.onEndLevelTick(Minecraft.getInstance(), clientLevel);
                 });
         INSTANCE.register(ClientChunkEvents.Load.class,
                 ChunkEvent.Load.class,
                 (ClientChunkEvents.Load callback, ChunkEvent.Load event) -> {
-                    if (!(event.getLevel() instanceof ClientLevel clientLevel)) return;
+                    if (!(event.getLevel() instanceof ClientLevel clientLevel)) {
+                        return;
+                    }
+
                     callback.onChunkLoad(clientLevel, event.getChunk());
                 });
         INSTANCE.register(ClientChunkEvents.Unload.class,
                 ChunkEvent.Unload.class,
                 (ClientChunkEvents.Unload callback, ChunkEvent.Unload event) -> {
-                    if (!(event.getLevel() instanceof ClientLevel clientLevel)) return;
+                    if (!(event.getLevel() instanceof ClientLevel clientLevel)) {
+                        return;
+                    }
+
                     callback.onChunkUnload(clientLevel, event.getChunk());
                 });
         INSTANCE.register(ClientPlayerNetworkEvents.Join.class,
@@ -509,7 +571,10 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(ClientPlayerNetworkEvents.Leave.class,
                 ClientPlayerNetworkEvent.LoggingOut.class,
                 (ClientPlayerNetworkEvents.Leave callback, ClientPlayerNetworkEvent.LoggingOut event) -> {
-                    if (event.getPlayer() == null || event.getMultiPlayerGameMode() == null) return;
+                    if (event.getPlayer() == null || event.getMultiPlayerGameMode() == null) {
+                        return;
+                    }
+
                     Objects.requireNonNull(event.getConnection(), "connection is null");
                     callback.onPlayerLeave(event.getPlayer(), event.getMultiPlayerGameMode(), event.getConnection());
                 });
@@ -524,7 +589,10 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(InteractionInputEvents.Attack.class,
                 InputEvent.InteractionKeyMappingTriggered.class,
                 (InteractionInputEvents.Attack callback, InputEvent.InteractionKeyMappingTriggered event) -> {
-                    if (!event.isAttack()) return;
+                    if (!event.isAttack()) {
+                        return;
+                    }
+
                     Minecraft minecraft = Minecraft.getInstance();
                     if (minecraft.hitResult != null) {
                         EventResult eventResult = callback.onAttackInteraction(minecraft,
@@ -541,7 +609,10 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(InteractionInputEvents.Use.class,
                 InputEvent.InteractionKeyMappingTriggered.class,
                 (InteractionInputEvents.Use callback, InputEvent.InteractionKeyMappingTriggered event) -> {
-                    if (!event.isUseItem()) return;
+                    if (!event.isUseItem()) {
+                        return;
+                    }
+
                     Minecraft minecraft = Minecraft.getInstance();
                     // add in more checks that also run on Fabric
                     if (minecraft.hitResult != null && minecraft.player.getItemInHand(event.getHand())
@@ -564,7 +635,10 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(InteractionInputEvents.Pick.class,
                 InputEvent.InteractionKeyMappingTriggered.class,
                 (InteractionInputEvents.Pick callback, InputEvent.InteractionKeyMappingTriggered event) -> {
-                    if (!event.isPickBlock()) return;
+                    if (!event.isPickBlock()) {
+                        return;
+                    }
+
                     Minecraft minecraft = Minecraft.getInstance();
                     EventResult eventResult = callback.onPickInteraction(minecraft,
                             minecraft.player,
@@ -576,13 +650,19 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(ClientLevelEvents.Load.class,
                 LevelEvent.Load.class,
                 (ClientLevelEvents.Load callback, LevelEvent.Load event) -> {
-                    if (!(event.getLevel() instanceof ClientLevel clientLevel)) return;
+                    if (!(event.getLevel() instanceof ClientLevel clientLevel)) {
+                        return;
+                    }
+
                     callback.onLevelLoad(Minecraft.getInstance(), clientLevel);
                 });
         INSTANCE.register(ClientLevelEvents.Unload.class,
                 LevelEvent.Unload.class,
                 (ClientLevelEvents.Unload callback, LevelEvent.Unload event) -> {
-                    if (!(event.getLevel() instanceof ClientLevel clientLevel)) return;
+                    if (!(event.getLevel() instanceof ClientLevel clientLevel)) {
+                        return;
+                    }
+
                     callback.onLevelUnload(Minecraft.getInstance(), clientLevel);
                 });
         INSTANCE.register(MovementInputUpdateCallback.class,
@@ -595,9 +675,12 @@ public final class NeoForgeClientEventInvokers {
                 (RenderBlockOverlayCallback callback, RenderBlockScreenEffectEvent event) -> {
                     EventResult eventResult = callback.onRenderBlockOverlay((LocalPlayer) event.getPlayer(),
                             event.getPoseStack(),
-                            Minecraft.getInstance().renderBuffers().bufferSource(),
-                            event.getBlockState());
-                    if (eventResult.isInterrupt()) event.setCanceled(true);
+                            event.getBufferSource(),
+                            event.getBlockState(),
+                            event.getMaterials());
+                    if (eventResult.isInterrupt()) {
+                        event.setCanceled(true);
+                    }
                 });
         INSTANCE.register(FogEvents.Setup.class,
                 ViewportEvent.RenderFog.class,
@@ -625,26 +708,27 @@ public final class NeoForgeClientEventInvokers {
                             event.getY(),
                             event.getComponents(),
                             event.getTooltipPositioner());
-                    if (eventResult.isInterrupt()) event.setCanceled(true);
+                    if (eventResult.isInterrupt()) {
+                        event.setCanceled(true);
+                    }
                 });
-        INSTANCE.register(SubmitBlockOutlineCallback.class,
+        INSTANCE.register(ExtractBlockOutlineCallback.class,
                 ExtractBlockOutlineRenderStateEvent.class,
-                (SubmitBlockOutlineCallback callback, ExtractBlockOutlineRenderStateEvent event) -> {
-                    EventResultHolder<SubmitBlockOutlineCallback.@Nullable CustomBlockOutlineRenderer> eventResult = callback.onSubmitBlockOutline(
-                            event.getLevelRenderer(),
-                            event.getLevel(),
+                (ExtractBlockOutlineCallback callback, ExtractBlockOutlineRenderStateEvent event) -> {
+                    EventResultHolder<@Nullable VoxelShape> eventResult = callback.onExtractBlockOutline(event.getLevel(),
+                            event.getBlockPos(),
                             event.getBlockState(),
                             event.getHitResult(),
-                            event.getCollisionContext(),
-                            event.getCamera());
-                    eventResult.ifDeny((SubmitBlockOutlineCallback.@Nullable CustomBlockOutlineRenderer customRenderer) -> {
-                        Preconditions.checkArgument(customRenderer == null,
-                                "custom block outline renderer is not null");
+                            event.getCollisionContext());
+                    eventResult.ifInterrupt((@Nullable VoxelShape voxelShape) -> {
                         event.setCanceled(true);
-                    });
-                    eventResult.ifAllow((SubmitBlockOutlineCallback.@Nullable CustomBlockOutlineRenderer customRenderer) -> {
-                        Objects.requireNonNull(customRenderer, "custom block outline renderer is null");
-                        event.addCustomRenderer(customRenderer::render);
+                        if (voxelShape != null) {
+                            event.getLevelRenderState().blockOutlineRenderState = new BlockOutlineRenderState(event.getBlockPos(),
+                                    event.isInTranslucentPass(),
+                                    event.isHighContrast(),
+                                    voxelShape,
+                                    Collections.emptyList());
+                        }
                     });
                 });
         INSTANCE.register(GameRenderEvents.Before.class,
@@ -664,7 +748,9 @@ public final class NeoForgeClientEventInvokers {
                 (AddToastCallback callback, ToastAddEvent event) -> {
                     Minecraft minecraft = Minecraft.getInstance();
                     EventResult eventResult = callback.onAddToast(minecraft.getToastManager(), event.getToast());
-                    if (eventResult.isInterrupt()) event.setCanceled(true);
+                    if (eventResult.isInterrupt()) {
+                        event.setCanceled(true);
+                    }
                 });
         INSTANCE.register(ComputeFieldOfViewCallback.class,
                 ViewportEvent.ComputeFov.class,
@@ -687,7 +773,9 @@ public final class NeoForgeClientEventInvokers {
                             event.getBoundChatType(),
                             playerChatMessage,
                             isOverlay);
-                    if (eventResult.isInterrupt()) event.setCanceled(true);
+                    if (eventResult.isInterrupt()) {
+                        event.setCanceled(true);
+                    }
                 });
         INSTANCE.register(GatherEffectScreenTooltipCallback.class,
                 GatherEffectScreenTooltipsEvent.class,
@@ -701,7 +789,9 @@ public final class NeoForgeClientEventInvokers {
     private static <T, E extends ScreenEvent> void registerScreenEvent(Class<T> clazz, Class<E> eventClazz, BiConsumer<T, E> converter) {
         INSTANCE.register(clazz, eventClazz, (T callback, E event, @Nullable Object context) -> {
             Objects.requireNonNull(context, "context is null");
-            if (!((Class<?>) context).isInstance(event.getScreen())) return;
+            if (!((Class<?>) context).isInstance(event.getScreen())) {
+                return;
+            }
             converter.accept(callback, event);
         });
     }
