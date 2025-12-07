@@ -166,8 +166,6 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
     }
 
     public static void registerEventHandlers() {
-        INSTANCE.register(AddDataPackReloadListenersCallback.class,
-                FabricLifecycleEvents.ADD_DATA_PACK_RELOAD_LISTENERS);
         INSTANCE.register(TagsUpdatedCallback.class,
                 CommonLifecycleEvents.TAGS_LOADED,
                 (TagsUpdatedCallback callback) -> {

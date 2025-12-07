@@ -1056,13 +1056,6 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 (RegisterPotionBrewingMixesCallback callback, RegisterBrewingRecipesEvent event) -> {
                     callback.onRegisterPotionBrewingMixes(new NeoForgePotionBrewingBuilder(event.getBuilder()));
                 });
-        INSTANCE.register(AddDataPackReloadListenersCallback.class,
-                AddServerReloadListenersEvent.class,
-                (AddDataPackReloadListenersCallback callback, AddServerReloadListenersEvent event) -> {
-                    callback.onAddDataPackReloadListeners(event.getServerResources(),
-                            event.getServerResources().getRegistryLookup(),
-                            event::addListener);
-                });
         INSTANCE.register(RefreshEntityDimensionsCallback.class,
                 EntityEvent.Size.class,
                 (RefreshEntityDimensionsCallback callback, EntityEvent.Size event) -> {

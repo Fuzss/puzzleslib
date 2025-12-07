@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [v21.11.0-1.21.11] - 2025-12-08
 
+### Added
+
+- Add `DataPackReloadListenersContext`
+
 ### Changed
 
 - Update to Minecraft 1.21.11
@@ -25,3 +29,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove `ContainerMenuHelper::addInventorySlots`
 - Remove `RegistryManager::registerLegacySpawnEggItem`
 - Replace `SearchTreeType` with vanilla's `ContextKey`
+- Remove `AddDataPackReloadListenersCallback` & `AddResourcePackReloadListenersCallback`

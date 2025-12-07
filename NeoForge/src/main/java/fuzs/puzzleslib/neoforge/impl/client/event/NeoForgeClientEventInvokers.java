@@ -1,7 +1,10 @@
 package fuzs.puzzleslib.neoforge.impl.client.event;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import fuzs.puzzleslib.api.client.event.v1.*;
+import fuzs.puzzleslib.api.client.event.v1.ClientInputEvents;
+import fuzs.puzzleslib.api.client.event.v1.ClientLifecycleEvents;
+import fuzs.puzzleslib.api.client.event.v1.ClientSetupCallback;
+import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.entity.ClientEntityLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.client.event.v1.gui.*;
@@ -73,11 +76,6 @@ public final class NeoForgeClientEventInvokers {
                 FMLClientSetupEvent.class,
                 (ClientSetupCallback callback, FMLClientSetupEvent event) -> {
                     event.enqueueWork(callback::onClientSetup);
-                });
-        INSTANCE.register(AddResourcePackReloadListenersCallback.class,
-                AddClientReloadListenersEvent.class,
-                (AddResourcePackReloadListenersCallback callback, AddClientReloadListenersEvent event) -> {
-                    callback.onAddResourcePackReloadListeners(event::addListener);
                 });
         INSTANCE.register(ScreenOpeningCallback.class,
                 ScreenEvent.Opening.class,

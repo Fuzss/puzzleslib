@@ -2,6 +2,7 @@ package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
 import com.google.common.collect.ImmutableMap;
 import fuzs.puzzleslib.api.client.core.v1.context.ResourcePackReloadListenersContext;
+import fuzs.puzzleslib.neoforge.impl.core.context.DataPackReloadListenersContextNeoForgeImpl;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
@@ -47,14 +48,10 @@ public record ResourcePackReloadListenersContextNeoForgeImpl(AddClientReloadList
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(otherResourceLocation, "other resource location is null");
         Objects.requireNonNull(reloadListener, "reload listener is null");
-        if (VANILLA_CLIENT_RELOAD_LISTENERS.containsKey(resourceLocation)) {
-            this.event.addListener(otherResourceLocation, reloadListener);
-            this.event.addDependency(VANILLA_CLIENT_RELOAD_LISTENERS.get(resourceLocation), otherResourceLocation);
-        } else if (VANILLA_CLIENT_RELOAD_LISTENERS.containsKey(otherResourceLocation)) {
-            this.event.addListener(resourceLocation, reloadListener);
-            this.event.addDependency(resourceLocation, VANILLA_CLIENT_RELOAD_LISTENERS.get(otherResourceLocation));
-        } else {
-            throw new RuntimeException("Unknown reload listeners: " + resourceLocation + ", " + otherResourceLocation);
-        }
+        DataPackReloadListenersContextNeoForgeImpl.registerReloadListener(this.event,
+                resourceLocation,
+                otherResourceLocation,
+                reloadListener,
+                VANILLA_CLIENT_RELOAD_LISTENERS);
     }
 }
