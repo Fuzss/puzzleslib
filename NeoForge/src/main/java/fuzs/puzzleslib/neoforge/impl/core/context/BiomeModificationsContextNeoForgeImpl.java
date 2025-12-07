@@ -8,7 +8,8 @@ import com.mojang.serialization.MapCodec;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingContext;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.biome.v1.BiomeModificationContext;
-import fuzs.puzzleslib.api.core.v1.context.BiomeModificationsContext;
+import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
+import fuzs.puzzleslib.api.core.v2.context.BiomeModificationsContext;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.api.resources.v1.DynamicPackResources;
 import fuzs.puzzleslib.api.resources.v1.PackResourcesHelper;
@@ -31,15 +32,11 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.BiConsumer;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public final class BiomeModificationsContextNeoForgeImpl implements BiomeModificationsContext {
+public final class BiomeModificationsContextNeoForgeImpl implements BiomeModificationsContext, fuzs.puzzleslib.api.core.v1.context.BiomeModificationsContext {
     private static final ExistingFileHelper EMPTY_FILE_HANDLER = new ExistingFileHelper(Collections.emptySet(),
             Collections.emptySet(),
             false,
@@ -49,19 +46,34 @@ public final class BiomeModificationsContextNeoForgeImpl implements BiomeModific
     private final Multimap<BiomeLoadingPhase, Map.Entry<Predicate<BiomeLoadingContext>, Consumer<BiomeModificationContext>>> biomeModifications = HashMultimap.create();
     private final String modId;
     private final IEventBus eventBus;
+    private final Set<ContentRegistrationFlags> contentRegistrationFlags;
 
-    public BiomeModificationsContextNeoForgeImpl(String modId, IEventBus eventBus) {
+    public BiomeModificationsContextNeoForgeImpl(String modId, IEventBus eventBus, Set<ContentRegistrationFlags> contentRegistrationFlags) {
         this.modId = modId;
         this.eventBus = eventBus;
+        this.contentRegistrationFlags = contentRegistrationFlags;
     }
 
     @Override
     public void register(BiomeLoadingPhase biomeLoadingPhase, Predicate<BiomeLoadingContext> biomeSelector, Consumer<BiomeModificationContext> biomeModifier) {
-        BiConsumer<Holder<MapCodec<? extends BiomeModifier>>, BiomeModifier> providerRegistrar = this::registerProviderPack;
-        this.registerBiomeModification(biomeLoadingPhase, biomeSelector, biomeModifier, providerRegistrar);
+        if (this.contentRegistrationFlags.contains(ContentRegistrationFlags.BIOME_MODIFICATIONS)) {
+            Objects.requireNonNull(biomeLoadingPhase, "biome loading phase is null");
+            Objects.requireNonNull(biomeSelector, "biome selector is null");
+            Objects.requireNonNull(biomeModifier, "biome modifier is null");
+            this.biomeModifications.put(biomeLoadingPhase, Map.entry(biomeSelector, biomeModifier));
+        } else {
+            ContentRegistrationFlags.throwForFlag(ContentRegistrationFlags.BIOME_MODIFICATIONS);
+        }
     }
 
-    private void registerProviderPack(Holder<MapCodec<? extends BiomeModifier>> holder, BiomeModifier biomeModifier) {
+    @Deprecated
+    public void registerProviderPack() {
+        if (!this.contentRegistrationFlags.contains(ContentRegistrationFlags.BIOME_MODIFICATIONS)) {
+            return;
+        }
+
+        BiomeModifier biomeModifier = new BiomeModifierImpl();
+        Holder<MapCodec<? extends BiomeModifier>> holder = this.registerBiomeModifier(biomeModifier);
         this.eventBus.addListener((final AddPackFindersEvent event) -> {
             if (event.getPackType() == PackType.SERVER_DATA) {
                 event.addRepositorySource(PackResourcesHelper.buildServerPack(holder.getKey().location(),
@@ -87,11 +99,23 @@ public final class BiomeModificationsContextNeoForgeImpl implements BiomeModific
 
     @Override
     public void registerBiomeModification(BiomeLoadingPhase biomeLoadingPhase, Predicate<BiomeLoadingContext> biomeSelector, Consumer<BiomeModificationContext> biomeModifier) {
-        BiConsumer<Holder<MapCodec<? extends BiomeModifier>>, BiomeModifier> providerRegistrar = this::registerDataProvider;
-        this.registerBiomeModification(biomeLoadingPhase, biomeSelector, biomeModifier, providerRegistrar);
+        if (!this.contentRegistrationFlags.contains(ContentRegistrationFlags.BIOME_MODIFICATIONS)) {
+            Objects.requireNonNull(biomeLoadingPhase, "biome loading phase is null");
+            Objects.requireNonNull(biomeSelector, "biome selector is null");
+            Objects.requireNonNull(biomeModifier, "biome modifier is null");
+            if (this.biomeModifications.isEmpty()) {
+                this.registerDataProvider();
+            }
+
+            this.biomeModifications.put(biomeLoadingPhase, Map.entry(biomeSelector, biomeModifier));
+        } else {
+            ContentRegistrationFlags.throwForFlag(ContentRegistrationFlags.BIOME_MODIFICATIONS);
+        }
     }
 
-    private void registerDataProvider(Holder<MapCodec<? extends BiomeModifier>> holder, BiomeModifier biomeModifier) {
+    private void registerDataProvider() {
+        BiomeModifier biomeModifierImpl = new BiomeModifierImpl();
+        Holder<MapCodec<? extends BiomeModifier>> holder = this.registerBiomeModifier(biomeModifierImpl);
         DataProviderHelper.registerDataProviders(this.modId, (NeoForgeDataProviderContext context) -> {
             return new JsonCodecProvider<>(context.getPackOutput(),
                     PackOutput.Target.DATA_PACK,
@@ -103,28 +127,18 @@ public final class BiomeModificationsContextNeoForgeImpl implements BiomeModific
                     context.getFileHelper()) {
                 @Override
                 protected void gather() {
-                    this.unconditional(holder.getKey().location(), biomeModifier);
+                    this.unconditional(holder.getKey().location(), biomeModifierImpl);
                 }
             };
         });
     }
 
-    private void registerBiomeModification(BiomeLoadingPhase biomeLoadingPhase, Predicate<BiomeLoadingContext> biomeSelector, Consumer<BiomeModificationContext> biomeModifier, BiConsumer<Holder<MapCodec<? extends BiomeModifier>>, BiomeModifier> providerRegistrar) {
-        Objects.requireNonNull(biomeLoadingPhase, "biome loading phase is null");
-        Objects.requireNonNull(biomeSelector, "biome selector is null");
-        Objects.requireNonNull(biomeModifier, "biome modifier is null");
-        if (this.biomeModifications.isEmpty()) {
-            BiomeModifier biomeModifierImpl = new BiomeModifierImpl();
-            DeferredRegister<MapCodec<? extends BiomeModifier>> deferredRegister = DeferredRegister.create(
-                    NeoForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS,
-                    this.modId);
-            deferredRegister.register(this.eventBus);
-            Holder<MapCodec<? extends BiomeModifier>> holder = deferredRegister.register("biome_modifications",
-                    biomeModifierImpl::codec);
-            providerRegistrar.accept(holder, biomeModifierImpl);
-        }
-
-        this.biomeModifications.put(biomeLoadingPhase, Map.entry(biomeSelector, biomeModifier));
+    private Holder<MapCodec<? extends BiomeModifier>> registerBiomeModifier(BiomeModifier biomeModifier) {
+        DeferredRegister<MapCodec<? extends BiomeModifier>> deferredRegister = DeferredRegister.create(
+                NeoForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS,
+                this.modId);
+        deferredRegister.register(this.eventBus);
+        return deferredRegister.register("biome_modifications", biomeModifier::codec);
     }
 
     /**

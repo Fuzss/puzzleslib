@@ -2,6 +2,7 @@ package fuzs.puzzleslib.neoforge.impl.core;
 
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
+import fuzs.puzzleslib.api.core.v2.context.BiomeModificationsContext;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.impl.item.CopyComponentsRecipe;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
@@ -32,7 +33,12 @@ public final class NeoForgeModConstructor implements ModConstructorImpl<ModConst
             // these need to run immediately, as they register content for data generation,
             // which cannot be added during common setup, as it does not run during data generation
             modConstructor.onRegisterGameplayContent(new GameplayContentContextNeoForgeImpl(modId, eventBus));
-            modConstructor.onRegisterBiomeModifications(new BiomeModificationsContextNeoForgeImpl(modId, eventBus));
+            BiomeModificationsContextNeoForgeImpl biomeModificationsContext = new BiomeModificationsContextNeoForgeImpl(
+                    modId,
+                    eventBus,
+                    contentRegistrationFlags);
+            biomeModificationsContext.registerProviderPack();
+            modConstructor.onRegisterBiomeModifications((BiomeModificationsContext) biomeModificationsContext);
             modConstructor.onRegisterCompostableBlocks(new CompostableBlocksContextNeoForgeImpl(modId));
             modConstructor.onRegisterCreativeModeTabs(new CreativeModeTabContextNeoForgeImpl(eventBus));
             if (contentRegistrationFlags.contains(ContentRegistrationFlags.COPY_RECIPES)) {
@@ -46,6 +52,7 @@ public final class NeoForgeModConstructor implements ModConstructorImpl<ModConst
                 event.enqueueWork(() -> {
                     modConstructor.onCommonSetup();
                     modConstructor.onRegisterVillagerTrades(new VillagerTradesContextNeoForgeImpl());
+                    modConstructor.onRegisterBiomeModifications((fuzs.puzzleslib.api.core.v1.context.BiomeModificationsContext) biomeModificationsContext);
                     modConstructor.onRegisterFuelBurnTimes(new FuelBurnTimesContextNeoForgeImpl());
                     modConstructor.onRegisterFlammableBlocks(new FlammableBlocksContextNeoForgeImpl());
                     modConstructor.onRegisterBlockInteractions(new BlockInteractionsContextNeoForgeImpl());

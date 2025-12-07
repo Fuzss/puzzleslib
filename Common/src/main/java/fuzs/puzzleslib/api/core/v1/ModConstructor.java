@@ -89,6 +89,15 @@ public interface ModConstructor extends BaseModConstructor {
      * @param context allows for registering modifications (including additions and removals) to biomes loaded from the
      *                current data pack
      */
+    default void onRegisterBiomeModifications(final fuzs.puzzleslib.api.core.v2.context.BiomeModificationsContext context) {
+        // NO-OP
+    }
+
+    /**
+     * @param context allows for registering modifications (including additions and removals) to biomes loaded from the
+     *                current data pack
+     */
+    @Deprecated
     default void onRegisterBiomeModifications(final BiomeModificationsContext context) {
         // NO-OP
     }

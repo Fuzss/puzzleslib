@@ -5,7 +5,7 @@ import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingContext;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.biome.v1.BiomeModificationContext;
-import fuzs.puzzleslib.api.core.v1.context.BiomeModificationsContext;
+import fuzs.puzzleslib.api.core.v2.context.BiomeModificationsContext;
 import fuzs.puzzleslib.fabric.impl.biome.*;
 import net.fabricmc.fabric.api.biome.v1.BiomeModification;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
@@ -19,7 +19,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public final class BiomeModificationsContextFabricImpl implements BiomeModificationsContext {
+public final class BiomeModificationsContextFabricImpl implements BiomeModificationsContext, fuzs.puzzleslib.api.core.v1.context.BiomeModificationsContext {
     private static final Map<BiomeLoadingPhase, ModificationPhase> BIOME_PHASE_CONVERSIONS = Maps.immutableEnumMap(
             ImmutableMap.of(BiomeLoadingPhase.ADDITIONS,
                     ModificationPhase.ADDITIONS,
