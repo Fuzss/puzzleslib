@@ -213,6 +213,7 @@ accessible  method  net/minecraft/world/entity/Entity   canAddPassenger (Lnet/mi
 extendable  method  net/minecraft/client/renderer/blockentity/ChestRenderer render  (Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lnet/minecraft/client/model/geom/ModelPart;Lnet/minecraft/client/model/geom/ModelPart;Lnet/minecraft/client/model/geom/ModelPart;FII)V
 accessible  field   net/minecraft/client/renderer/blockentity/ChestRenderer xmasTextures    Z
 accessible  method  net/minecraft/client/particle/ParticleDescription   <init>  (Ljava/util/List;)V
+transitive-accessible   field   net/minecraft/client/resources/model/ModelManager   VANILLA_ATLASES Ljava/util/Map;
 transitive-accessible	class	net/minecraft/client/model/geom/ModelPart$Vertex
 transitive-accessible	class	net/minecraft/client/model/geom/ModelPart$Polygon
 accessible	method	net/minecraft/data/DataGenerator$PackGenerator  <init>  (Lnet/minecraft/data/DataGenerator;ZLjava/lang/String;Lnet/minecraft/data/PackOutput;)V

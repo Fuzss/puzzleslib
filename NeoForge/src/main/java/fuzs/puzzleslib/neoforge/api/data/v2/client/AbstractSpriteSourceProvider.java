@@ -8,6 +8,7 @@ import net.neoforged.neoforge.common.data.SpriteSourceProvider;
 
 import java.util.concurrent.CompletableFuture;
 
+@Deprecated
 public abstract class AbstractSpriteSourceProvider extends SpriteSourceProvider {
 
     public AbstractSpriteSourceProvider(NeoForgeDataProviderContext context) {

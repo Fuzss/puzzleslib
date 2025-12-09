@@ -3,6 +3,7 @@ package fuzs.puzzleslib.fabric.impl.client.core;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.client.ConfigScreenFactoryRegistry;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
+import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
@@ -10,6 +11,7 @@ import fuzs.puzzleslib.fabric.impl.client.event.FabricGuiEventHelper;
 import fuzs.puzzleslib.fabric.impl.client.init.FabricItemDisplayOverrides;
 import fuzs.puzzleslib.fabric.impl.client.key.FabricKeyMappingHelper;
 import fuzs.puzzleslib.fabric.impl.core.FabricCommonProxy;
+import fuzs.puzzleslib.fabric.impl.core.context.PayloadTypesContextFabricImpl;
 import fuzs.puzzleslib.fabric.mixin.client.accessor.MultiPlayerGameModeFabricAccessor;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import fuzs.puzzleslib.impl.client.init.ItemDisplayOverridesImpl;
@@ -97,6 +99,11 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     public Connection getConnection(PacketListener packetListener) {
         return packetListener instanceof ClientCommonPacketListenerImpl clientPacketListener ?
                 clientPacketListener.connection : super.getConnection(packetListener);
+    }
+
+    @Override
+    public PayloadTypesContext createPayloadTypesContext(String modId) {
+        return new PayloadTypesContextFabricImpl.ClientImpl(modId);
     }
 
     @Override

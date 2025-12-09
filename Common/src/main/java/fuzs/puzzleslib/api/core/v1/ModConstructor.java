@@ -56,6 +56,14 @@ public interface ModConstructor extends BaseModConstructor {
     }
 
     /**
+     * @param context register custom messages that are compatible with vanilla
+     *                {@link net.minecraft.network.protocol.Packet Packets}
+     */
+    default void onRegisterPayloadTypes(PayloadTypesContext context) {
+        // NO-OP
+    }
+
+    /**
      * @param context register attributes for entities
      */
     default void onRegisterEntityAttributes(EntityAttributesContext context) {

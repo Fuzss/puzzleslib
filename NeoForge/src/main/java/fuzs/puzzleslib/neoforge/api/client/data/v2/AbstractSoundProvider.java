@@ -1,7 +1,7 @@
-package fuzs.puzzleslib.neoforge.api.data.v2.client;
+package fuzs.puzzleslib.neoforge.api.client.data.v2;
 
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.neoforge.api.data.v2.core.NeoForgeDataProviderContext;
+import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -9,17 +9,14 @@ import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.common.data.SoundDefinition;
 import net.neoforged.neoforge.common.data.SoundDefinitionsProvider;
 
-@Deprecated
-public abstract class AbstractSoundDefinitionProvider extends SoundDefinitionsProvider {
-    protected final String modId;
+public abstract class AbstractSoundProvider extends SoundDefinitionsProvider {
 
-    public AbstractSoundDefinitionProvider(NeoForgeDataProviderContext context) {
+    public AbstractSoundProvider(NeoForgeDataProviderContext context) {
         this(context.getModId(), context.getPackOutput(), context.getFileHelper());
     }
 
-    public AbstractSoundDefinitionProvider(String modId, PackOutput packOutput, ExistingFileHelper fileHelper) {
+    public AbstractSoundProvider(String modId, PackOutput packOutput, ExistingFileHelper fileHelper) {
         super(packOutput, modId, fileHelper);
-        this.modId = modId;
     }
 
     protected static SoundDefinition.Sound sound(SoundEvent soundEvent) {
@@ -28,10 +25,10 @@ public abstract class AbstractSoundDefinitionProvider extends SoundDefinitionsPr
 
     @Override
     public final void registerSounds() {
-        this.addSoundDefinitions();
+        this.addSounds();
     }
 
-    public abstract void addSoundDefinitions();
+    public abstract void addSounds();
 
     protected void add(SoundEvent soundEvent, String... sounds) {
         SoundDefinition definition = definition();
@@ -57,20 +54,24 @@ public abstract class AbstractSoundDefinitionProvider extends SoundDefinitionsPr
         this.add(soundEvent, definition);
     }
 
-    protected void add(final SoundEvent soundEvent, final SoundDefinition.Sound... sounds) {
+    protected void add(SoundEvent soundEvent, SoundDefinition.Sound... sounds) {
         this.add(soundEvent.getLocation(), definition().with(sounds));
     }
 
+    protected void addRecord(Holder<SoundEvent> soundEvent) {
+        ResourceLocation resourceLocation = soundEvent.unwrap().orThrow().location().withPrefix("records/");
+        SoundDefinition soundDefinition = definition().with(sound(resourceLocation).stream());
+        this.add(soundEvent.value(), soundDefinition);
+        soundDefinition.subtitle(null);
+    }
+
     @Override
-    protected void add(final ResourceLocation soundEvent, final SoundDefinition definition) {
+    protected void add(ResourceLocation soundEvent, SoundDefinition definition) {
         super.add(soundEvent, definition.subtitle("subtitles." + soundEvent.getPath()));
     }
 
-    protected ResourceLocation id(String path) {
-        return ResourceLocationHelper.fromNamespaceAndPath(this.modId, path);
-    }
-
-    protected ResourceLocation vanilla(String path) {
-        return ResourceLocationHelper.withDefaultNamespace(path);
+    @Override
+    public String getName() {
+        return "Sounds";
     }
 }
