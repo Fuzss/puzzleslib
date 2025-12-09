@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.core.proxy;
 
-import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.Proxy;
+import fuzs.puzzleslib.api.util.v1.CommonHelper;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.TickTask;
@@ -9,7 +9,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,8 +28,7 @@ public interface SidedProxy extends Proxy {
     }
 
     default RegistryAccess getRegistryAccess() {
-        return CommonAbstractions.INSTANCE.getMinecraftServer() != null ?
-                CommonAbstractions.INSTANCE.getMinecraftServer().registryAccess() : null;
+        return CommonHelper.getMinecraftServer() != null ? CommonHelper.getMinecraftServer().registryAccess() : null;
     }
 
     default Player getClientPlayer() {

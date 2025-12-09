@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.core;
 
+import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
@@ -25,13 +26,15 @@ public interface FabricProxy extends ProxyImpl {
 
     boolean notHidden(String id);
 
-    void setupHandshakePayload(CustomPacketPayload.Type<BrandPayload> payloadType);
+    PayloadTypesContext createPayloadTypesContext(String modId);
 
     @Deprecated
     <M1, M2> void registerClientReceiver(CustomPacketPayload.Type<CustomPacketPayloadAdapter<M1>> type, BiConsumer<Throwable, Consumer<Component>> disconnectExceptionally, Function<M1, ClientboundMessage<M2>> messageAdapter);
 
     @Deprecated
     <M1, M2> void registerServerReceiver(CustomPacketPayload.Type<CustomPacketPayloadAdapter<M1>> type, BiConsumer<Throwable, Consumer<Component>> disconnectExceptionally, Function<M1, ServerboundMessage<M2>> messageAdapter);
+
+    void setupHandshakePayload(CustomPacketPayload.Type<BrandPayload> payloadType);
 
     default boolean shouldStartDestroyBlock(BlockPos blockPos) {
         throw new RuntimeException("Should start destroy block accessed for wrong side!");

@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.core;
 
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
+import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
 import fuzs.puzzleslib.api.init.v3.GameRulesFactory;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryFactory;
@@ -13,6 +14,7 @@ import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.impl.network.codec.CustomPacketPayloadAdapter;
 import fuzs.puzzleslib.neoforge.impl.attachment.NeoForgeDataAttachmentRegistryImpl;
+import fuzs.puzzleslib.neoforge.impl.core.context.PayloadTypesContextNeoForgeImpl;
 import fuzs.puzzleslib.neoforge.impl.data.NeoForgeTagAppender;
 import fuzs.puzzleslib.neoforge.impl.event.ForwardingLootPoolBuilder;
 import fuzs.puzzleslib.neoforge.impl.event.ForwardingLootTableBuilder;
@@ -62,6 +64,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.neoforged.neoforge.common.extensions.ICommonPacketListener;
 import net.neoforged.neoforge.entity.PartEntity;
 import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -193,6 +196,26 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     }
 
     @Override
+    public PayloadTypesContext createPayloadTypesContext(String modId, RegisterPayloadHandlersEvent event) {
+        return new PayloadTypesContextNeoForgeImpl.ServerImpl(modId, event);
+    }
+
+    @Override
+    public <M1, M2> CompletableFuture<Void> registerClientReceiver(CustomPacketPayloadAdapter<M1> payload, IPayloadContext context, Function<M1, ClientboundMessage<M2>> adapter) {
+        return CompletableFuture.allOf();
+    }
+
+    @Override
+    public <M1, M2> CompletableFuture<Void> registerServerReceiver(CustomPacketPayloadAdapter<M1> payload, IPayloadContext context, Function<M1, ServerboundMessage<M2>> adapter) {
+        return context.enqueueWork(() -> {
+            ServerPlayer player = (ServerPlayer) context.player();
+            ServerboundMessage<M2> message = adapter.apply(payload.unwrap());
+            message.getHandler()
+                    .handle(message.unwrap(), player.server, player.connection, player, player.serverLevel());
+        });
+    }
+
+    @Override
     public ModConstructorImpl<ModConstructor> getModConstructorImpl() {
         return new NeoForgeModConstructor();
     }
@@ -265,20 +288,5 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     @Override
     public boolean isPiglinCurrency(ItemStack itemStack) {
         return itemStack.isPiglinCurrency();
-    }
-
-    @Override
-    public <M1, M2> CompletableFuture<Void> registerClientReceiver(CustomPacketPayloadAdapter<M1> payload, IPayloadContext context, Function<M1, ClientboundMessage<M2>> adapter) {
-        return CompletableFuture.allOf();
-    }
-
-    @Override
-    public <M1, M2> CompletableFuture<Void> registerServerReceiver(CustomPacketPayloadAdapter<M1> payload, IPayloadContext context, Function<M1, ServerboundMessage<M2>> adapter) {
-        return context.enqueueWork(() -> {
-            ServerPlayer player = (ServerPlayer) context.player();
-            ServerboundMessage<M2> message = adapter.apply(payload.unwrap());
-            message.getHandler()
-                    .handle(message.unwrap(), player.server, player.connection, player, player.serverLevel());
-        });
     }
 }

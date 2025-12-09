@@ -30,6 +30,7 @@ public final class FabricModConstructor implements ModConstructorImpl<ModConstru
         }
 
         modConstructor.onCommonSetup();
+        modConstructor.onRegisterPayloadTypes(FabricProxy.get().createPayloadTypesContext(modId));
         modConstructor.onRegisterEntityAttributes(new EntityAttributesContextFabricImpl());
         modConstructor.onEntityAttributeCreation(new EntityAttributesCreateContextFabricImpl());
         modConstructor.onEntityAttributeModification(new EntityAttributesModifyContextFabricImpl());

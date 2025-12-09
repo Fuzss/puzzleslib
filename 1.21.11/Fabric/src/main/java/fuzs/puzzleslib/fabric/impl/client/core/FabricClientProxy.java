@@ -87,17 +87,17 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     }
 
     @Override
+    public PayloadTypesContext createPayloadTypesContext(String modId) {
+        return new PayloadTypesContextFabricImpl.ClientImpl(modId);
+    }
+
+    @Override
     public void setupHandshakePayload(CustomPacketPayload.Type<BrandPayload> payloadType) {
         super.setupHandshakePayload(payloadType);
         ClientPlayNetworking.registerGlobalReceiver(payloadType,
                 (BrandPayload payload, ClientPlayNetworking.Context context) -> {
                     // NO-OP
                 });
-    }
-
-    @Override
-    public PayloadTypesContext createPayloadTypesContext(String modId) {
-        return new PayloadTypesContextFabricImpl.ClientImpl(modId);
     }
 
     @Override

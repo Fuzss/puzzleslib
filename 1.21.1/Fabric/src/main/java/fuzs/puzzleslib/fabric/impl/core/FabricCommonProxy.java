@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.core;
 
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
+import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents;
@@ -12,6 +13,7 @@ import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
 import fuzs.puzzleslib.fabric.impl.attachment.FabricDataAttachmentRegistryImpl;
+import fuzs.puzzleslib.fabric.impl.core.context.PayloadTypesContextFabricImpl;
 import fuzs.puzzleslib.fabric.impl.data.FabricTagAppender;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventInvokerRegistryImpl;
 import fuzs.puzzleslib.fabric.impl.event.SpawnTypeMob;
@@ -227,6 +229,11 @@ public class FabricCommonProxy implements FabricProxy {
     @Override
     public void finishConfigurationTask(ServerConfigurationPacketListener packetListener, ConfigurationTask.Type type) {
         ((ServerConfigurationPacketListenerImpl) packetListener).completeTask(type);
+    }
+
+    @Override
+    public PayloadTypesContext createPayloadTypesContext(String modId) {
+        return new PayloadTypesContextFabricImpl.ServerImpl(modId);
     }
 
     @Override

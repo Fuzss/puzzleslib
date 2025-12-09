@@ -17,6 +17,7 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
@@ -57,6 +58,9 @@ public final class NeoForgeModConstructor implements ModConstructorImpl<ModConst
                     modConstructor.onRegisterFlammableBlocks(new FlammableBlocksContextNeoForgeImpl());
                     modConstructor.onRegisterBlockInteractions(new BlockInteractionsContextNeoForgeImpl());
                 });
+            });
+            eventBus.addListener((final RegisterPayloadHandlersEvent event) -> {
+                modConstructor.onRegisterPayloadTypes(NeoForgeProxy.get().createPayloadTypesContext(modId, event));
             });
             eventBus.addListener((final RegisterSpawnPlacementsEvent event) -> {
                 modConstructor.onRegisterSpawnPlacements(new SpawnPlacementsContextNeoForgeImpl(event));

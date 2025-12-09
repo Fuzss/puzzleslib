@@ -3,6 +3,7 @@ package fuzs.puzzleslib.neoforge.impl.client.core;
 import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
+import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import fuzs.puzzleslib.impl.client.init.ItemDisplayOverridesImpl;
@@ -14,6 +15,7 @@ import fuzs.puzzleslib.neoforge.impl.client.event.NeoForgeClientEventInvokers;
 import fuzs.puzzleslib.neoforge.impl.client.init.NeoForgeItemDisplayOverrides;
 import fuzs.puzzleslib.neoforge.impl.client.key.NeoForgeKeyMappingHelper;
 import fuzs.puzzleslib.neoforge.impl.core.NeoForgeCommonProxy;
+import fuzs.puzzleslib.neoforge.impl.core.context.PayloadTypesContextNeoForgeImpl;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -44,6 +46,7 @@ import net.neoforged.neoforge.client.extensions.common.IClientMobEffectExtension
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.Arrays;
@@ -64,6 +67,11 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
     public void registerAllEventHandlers() {
         super.registerAllEventHandlers();
         NeoForgeClientEventInvokers.registerEventHandlers();
+    }
+
+    @Override
+    public PayloadTypesContext createPayloadTypesContext(String modId, RegisterPayloadHandlersEvent event) {
+        return new PayloadTypesContextNeoForgeImpl.ClientImpl(modId, event);
     }
 
     @Override

@@ -37,7 +37,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public final class BiomeModificationsContextNeoForgeImpl implements BiomeModificationsContext, fuzs.puzzleslib.api.core.v1.context.BiomeModificationsContext {
-    private static final ExistingFileHelper EMPTY_FILE_HANDLER = new ExistingFileHelper(Collections.emptySet(),
+    public static final ExistingFileHelper EMPTY_FILE_HANDLER = new ExistingFileHelper(Collections.emptySet(),
             Collections.emptySet(),
             false,
             null,

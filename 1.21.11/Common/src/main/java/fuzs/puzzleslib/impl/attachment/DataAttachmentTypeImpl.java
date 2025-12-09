@@ -77,7 +77,7 @@ public final class DataAttachmentTypeImpl<T, V> implements DataAttachmentType<T,
     }
 
     @Override
-    public void update(T holder, UnaryOperator<V> valueUpdater) {
+    public void apply(T holder, UnaryOperator<V> valueUpdater) {
         this.set(holder, valueUpdater.apply(this.get(holder)));
     }
 }
