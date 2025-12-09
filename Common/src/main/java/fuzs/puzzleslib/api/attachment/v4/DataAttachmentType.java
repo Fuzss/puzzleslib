@@ -55,5 +55,5 @@ public interface DataAttachmentType<T, V> {
      * @param holder       the attachment holder
      * @param valueUpdater the update operation to apply
      */
-    void update(T holder, UnaryOperator<V> valueUpdater);
+    void apply(T holder, UnaryOperator<V> valueUpdater);
 }
