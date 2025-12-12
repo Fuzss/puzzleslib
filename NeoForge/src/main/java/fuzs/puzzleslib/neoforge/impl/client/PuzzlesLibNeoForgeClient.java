@@ -22,6 +22,7 @@ public class PuzzlesLibNeoForgeClient {
         if (ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironmentWithoutDataGeneration(PuzzlesLib.MOD_ID)) {
             ClientModConstructor.construct(PuzzlesLibMod.id("client/development"), PuzzlesLibClientDevelopment::new);
         }
+
         registerLoadingHandlers(modContainer.getEventBus());
     }
 

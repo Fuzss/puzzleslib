@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.impl.content.client;
 
+import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.core.v1.context.GuiLayersContext;
@@ -18,6 +19,9 @@ import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.debug.DebugScreenEntries;
+import net.minecraft.client.gui.components.debug.DebugScreenEntryStatus;
+import net.minecraft.client.gui.components.debug.DebugScreenProfile;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.components.toasts.Toast;
@@ -32,6 +36,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.scores.DisplaySlot;
@@ -40,13 +45,40 @@ import net.minecraft.world.scores.Scoreboard;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class PuzzlesLibClientDevelopment implements ClientModConstructor {
+    private static final Map<Identifier, DebugScreenEntryStatus> DEFAULT_DEBUG_SCREEN_PROFILE = Stream.of(
+                    DebugScreenEntries.BIOME,
+                    DebugScreenEntries.CHUNK_RENDER_STATS,
+                    DebugScreenEntries.ENTITY_RENDER_STATS,
+                    DebugScreenEntries.ENTITY_SPAWN_COUNTS,
+                    DebugScreenEntries.FPS,
+                    DebugScreenEntries.GAME_VERSION,
+                    DebugScreenEntries.LIGHT_LEVELS,
+                    DebugScreenEntries.LOCAL_DIFFICULTY,
+                    DebugScreenEntries.LOOKING_AT_BLOCK,
+                    DebugScreenEntries.LOOKING_AT_ENTITY,
+                    DebugScreenEntries.LOOKING_AT_FLUID,
+                    DebugScreenEntries.MEMORY,
+                    DebugScreenEntries.PARTICLE_RENDER_STATS,
+                    DebugScreenEntries.PLAYER_POSITION,
+                    DebugScreenEntries.PLAYER_SECTION_POSITION,
+                    DebugScreenEntries.SYSTEM_SPECS,
+                    DebugScreenEntries.TPS)
+            .collect(ImmutableMap.toImmutableMap(Function.identity(),
+                    (Identifier identifier) -> DebugScreenEntryStatus.IN_OVERLAY));
 
     @Override
     public void onConstructMod() {
         registerEventHandlers();
+        DebugScreenEntries.PROFILES = ImmutableMap.<DebugScreenProfile, Map<Identifier, DebugScreenEntryStatus>>builder()
+                .putAll(DebugScreenEntries.PROFILES)
+                .put(DebugScreenProfile.DEFAULT, DEFAULT_DEBUG_SCREEN_PROFILE)
+                .buildKeepingLast();
     }
 
     private static void registerEventHandlers() {
@@ -57,6 +89,7 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
                 screen.getUiState().setGameMode(WorldCreationUiState.SelectedGameMode.CREATIVE);
                 screen.getUiState().setAllowCommands(true);
             }
+
             return EventResultHolder.pass();
         });
         ScreenEvents.beforeInit(TitleScreen.class)

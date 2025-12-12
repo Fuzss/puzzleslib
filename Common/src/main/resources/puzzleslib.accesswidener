@@ -312,6 +312,7 @@ transitive-accessible   class   net/minecraft/client/gui/Gui$HeartType
 transitive-accessible   method  net/minecraft/world/inventory/AbstractContainerMenu addInventoryHotbarSlots (Lnet/minecraft/world/Container;II)V
 transitive-accessible   method  net/minecraft/world/inventory/AbstractContainerMenu addInventoryExtendedSlots   (Lnet/minecraft/world/Container;II)V
 transitive-accessible   method  net/minecraft/world/inventory/AbstractContainerMenu addStandardInventorySlots   (Lnet/minecraft/world/Container;II)V
+mutable field   net/minecraft/client/gui/components/debug/DebugScreenEntries    PROFILES    Ljava/util/Map;
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;
