@@ -34,7 +34,8 @@ abstract class EffectsInInventoryFabricMixin {
         EventResult eventResult = FabricGuiEvents.INVENTORY_MOB_EFFECTS.invoker()
                 .onPrepareInventoryMobEffects(this.screen, maxWidth, smallWidgetsValue, horizontalPositionValue);
         if (smallWidgetsValue.getAsBoolean() != smallWidgets) {
-            maxWidgetWidth = smallWidgetsValue.getAsBoolean() ? maxWidth - 7 : 32;
+            // Careful, this is inverted compared to vanilla.
+            maxWidgetWidth = smallWidgetsValue.getAsBoolean() ? 32 : maxWidth - 7;
         }
 
         if (eventResult.isPass()) {

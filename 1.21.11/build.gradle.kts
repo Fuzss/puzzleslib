@@ -8,8 +8,14 @@ subprojects {
 
     spotless {
         java {
+            importOrder()
             endWithNewline()
             removeUnusedImports()
+            formatAnnotations()
+        }
+
+        format("MountsOfMayhem") {
+            target("src/main/java/**/*.java")
 
             replaceRegex(
                 "Update @Nullable import",

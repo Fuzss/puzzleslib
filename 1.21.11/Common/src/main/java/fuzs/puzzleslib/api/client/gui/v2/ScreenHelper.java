@@ -51,7 +51,7 @@ public final class ScreenHelper {
      */
     public static boolean isDoubleClick(MouseButtonEvent mouseButtonEvent) {
         MouseHandler mouseHandler = Minecraft.getInstance().mouseHandler;
-        if (mouseHandler.lastClick != null) {
+        if (mouseHandler.lastClick == null) {
             return false;
         } else if (mouseHandler.lastClick.screen() != Minecraft.getInstance().screen) {
             return false;
