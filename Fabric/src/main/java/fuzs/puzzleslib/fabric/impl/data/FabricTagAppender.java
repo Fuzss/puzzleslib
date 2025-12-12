@@ -2,11 +2,11 @@ package fuzs.puzzleslib.fabric.impl.data;
 
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
 import net.fabricmc.fabric.impl.datagen.FabricTagBuilder;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagBuilder;
 import net.minecraft.tags.TagEntry;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,6 @@ public final class FabricTagAppender<T> extends AbstractTagAppender<T> {
         super(tagBuilder, keyExtractor);
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     @Override
     public AbstractTagAppender<T> setReplace(boolean replace) {
         ((FabricTagBuilder) this.tagBuilder).fabric_setReplace(replace);
@@ -30,26 +29,26 @@ public final class FabricTagAppender<T> extends AbstractTagAppender<T> {
     }
 
     @Override
-    public AbstractTagAppender<T> remove(ResourceLocation resourceLocation) {
-        this.removeEntries.add(TagEntry.element(resourceLocation));
+    public AbstractTagAppender<T> remove(Identifier identifier) {
+        this.removeEntries.add(TagEntry.element(identifier));
         return this;
     }
 
     @Override
-    public AbstractTagAppender<T> removeOptional(ResourceLocation resourceLocation) {
-        this.removeEntries.add(TagEntry.optionalElement(resourceLocation));
+    public AbstractTagAppender<T> removeOptional(Identifier identifier) {
+        this.removeEntries.add(TagEntry.optionalElement(identifier));
         return this;
     }
 
     @Override
-    public AbstractTagAppender<T> removeTag(ResourceLocation resourceLocation) {
-        this.removeEntries.add(TagEntry.tag(resourceLocation));
+    public AbstractTagAppender<T> removeTag(Identifier identifier) {
+        this.removeEntries.add(TagEntry.tag(identifier));
         return this;
     }
 
     @Override
-    public AbstractTagAppender<T> removeOptionalTag(ResourceLocation resourceLocation) {
-        this.removeEntries.add(TagEntry.optionalTag(resourceLocation));
+    public AbstractTagAppender<T> removeOptionalTag(Identifier identifier) {
+        this.removeEntries.add(TagEntry.optionalTag(identifier));
         return this;
     }
 

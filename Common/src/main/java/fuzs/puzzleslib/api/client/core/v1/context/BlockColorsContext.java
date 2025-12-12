@@ -2,7 +2,7 @@ package fuzs.puzzleslib.api.client.core.v1.context;
 
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.world.level.block.Block;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Register block color providers, like tint getters for leaves or grass.

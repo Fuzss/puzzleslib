@@ -13,7 +13,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
@@ -151,7 +151,7 @@ public final class CodecExtras {
      * @return the codec
      */
     public static <A> Codec<A> decodeOnly(Decoder<A> decoder) {
-        return Codec.of(Codec.unit(() -> {
+        return Codec.of(MapCodec.unitCodec(() -> {
             throw new UnsupportedOperationException("Cannot encode with decode-only codec! Decoder:" + decoder);
         }), decoder, "DecodeOnly[" + decoder + "]");
     }

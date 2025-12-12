@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 
 import java.util.Objects;
 

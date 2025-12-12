@@ -49,8 +49,8 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -75,7 +75,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.*;
@@ -150,17 +150,17 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         Objects.requireNonNull(context, "context is null");
         ResourceKey<? extends Registry<T>> resourceKey = (ResourceKey<? extends Registry<T>>) context;
         Registry<T> registry = LookupHelper.getRegistry(resourceKey).orElseThrow();
-        BiConsumer<ResourceLocation, Supplier<T>> registrar = (ResourceLocation resourceLocation, Supplier<T> supplier) -> {
-            Registry.register(registry, resourceLocation, supplier.get());
+        BiConsumer<Identifier, Supplier<T>> registrar = (Identifier identifier, Supplier<T> supplier) -> {
+            Registry.register(registry, identifier, supplier.get());
         };
         net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback.event(registry)
-                .register((int rawId, ResourceLocation id, T object) -> {
+                .register((int rawId, Identifier id, T object) -> {
                     callback.onRegistryEntryAdded(registry, id, object, registrar);
                 });
         // do not register directly to prevent ConcurrentModificationException
-        Map<ResourceLocation, Supplier<T>> toRegister = Maps.newLinkedHashMap();
+        Map<Identifier, Supplier<T>> toRegister = Maps.newLinkedHashMap();
         for (Map.Entry<ResourceKey<T>, T> entry : registry.entrySet()) {
-            callback.onRegistryEntryAdded(registry, entry.getKey().location(), entry.getValue(), toRegister::put);
+            callback.onRegistryEntryAdded(registry, entry.getKey().identifier(), entry.getValue(), toRegister::put);
         }
         toRegister.forEach(registrar);
     }
@@ -318,7 +318,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(LivingFallCallback.class, FabricLivingEvents.LIVING_FALL);
         INSTANCE.register(LootTableLoadCallback.class, LootTableEvents.MODIFY, (LootTableLoadCallback callback) -> {
             return (ResourceKey<LootTable> key, LootTable.Builder tableBuilder, LootTableSource source, HolderLookup.Provider registries) -> {
-                callback.onLootTableLoad(key.location(), tableBuilder, registries);
+                callback.onLootTableLoad(key.identifier(), tableBuilder, registries);
             };
         });
         INSTANCE.register(ItemEntityEvents.Touch.class, FabricPlayerEvents.ITEM_TOUCH);
@@ -569,7 +569,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             } else {
                 // to make sure phase has consumer phase ordering, we keep track of phases we have already added an ordering for in this event in #knownEventPhases
                 this.registerEventPhaseIfNecessary(eventPhase);
-                this.event.register(eventPhase.resourceLocation(), this.converter.apply(callback, context));
+                this.event.register(eventPhase.identifier(), this.converter.apply(callback, context));
             }
         }
 
@@ -592,7 +592,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 EventPhase parentEventPhase = eventPhase;
                 while ((parentEventPhase = parentEventPhase.parent()) != null && parentEventPhase.parent() != null) {
                     if (eventPhase.getOrderingValue() != parentEventPhase.getOrderingValue()) {
-                        parentEventPhase.applyOrdering(eventPhase.resourceLocation(), event::addPhaseOrdering);
+                        parentEventPhase.applyOrdering(eventPhase.identifier(), event::addPhaseOrdering);
                         break;
                     }
                 }

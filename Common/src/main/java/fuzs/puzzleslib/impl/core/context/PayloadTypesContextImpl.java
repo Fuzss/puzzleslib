@@ -4,7 +4,7 @@ import fuzs.puzzleslib.api.core.v1.ModContainer;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -17,10 +17,10 @@ public abstract class PayloadTypesContextImpl implements PayloadTypesContext {
     private static final Map<Class<?>, CustomPacketPayload.Type<?>> MESSAGE_TYPES = new IdentityHashMap<>();
 
     private final AtomicInteger discriminator = new AtomicInteger();
-    protected final ResourceLocation channelName;
+    protected final Identifier channelName;
 
     protected PayloadTypesContextImpl(String modId) {
-        this.channelName = ResourceLocation.fromNamespaceAndPath(modId, "main");
+        this.channelName = Identifier.fromNamespaceAndPath(modId, "main");
     }
 
     @SuppressWarnings("unchecked")
@@ -33,8 +33,8 @@ public abstract class PayloadTypesContextImpl implements PayloadTypesContext {
     }
 
     protected synchronized final <T extends CustomPacketPayload> CustomPacketPayload.Type<T> registerPayloadType(Class<T> clazz) {
-        ResourceLocation resourceLocation = this.channelName.withSuffix("/" + this.discriminator.getAndIncrement());
-        CustomPacketPayload.Type<T> type = new CustomPacketPayload.Type<>(resourceLocation);
+        Identifier identifier = this.channelName.withSuffix("/" + this.discriminator.getAndIncrement());
+        CustomPacketPayload.Type<T> type = new CustomPacketPayload.Type<>(identifier);
         MESSAGE_TYPES.put(clazz, type);
         return type;
     }

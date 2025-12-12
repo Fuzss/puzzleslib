@@ -3,7 +3,7 @@ package fuzs.puzzleslib.api.client.renderer.v1;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.util.context.ContextKey;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 

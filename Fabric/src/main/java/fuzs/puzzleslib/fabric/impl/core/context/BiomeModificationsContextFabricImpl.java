@@ -11,7 +11,7 @@ import net.fabricmc.fabric.api.biome.v1.BiomeModification;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;
 import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.Map;
@@ -33,7 +33,7 @@ public final class BiomeModificationsContextFabricImpl implements BiomeModificat
     private final BiomeModification biomeModification;
 
     public BiomeModificationsContextFabricImpl(String modId) {
-        this.biomeModification = BiomeModifications.create(ResourceLocation.fromNamespaceAndPath(modId,
+        this.biomeModification = BiomeModifications.create(Identifier.fromNamespaceAndPath(modId,
                 "biome_modifiers"));
     }
 

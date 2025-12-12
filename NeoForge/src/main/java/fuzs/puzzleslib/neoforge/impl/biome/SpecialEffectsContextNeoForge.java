@@ -2,16 +2,9 @@ package fuzs.puzzleslib.neoforge.impl.biome;
 
 import fuzs.puzzleslib.api.biome.v1.SpecialEffectsContext;
 import fuzs.puzzleslib.neoforge.mixin.accessor.BiomeSpecialEffectsBuilderNeoForgeAccessor;
-import net.minecraft.core.Holder;
-import net.minecraft.sounds.Music;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.util.random.WeightedList;
-import net.minecraft.world.level.biome.AmbientAdditionsSettings;
-import net.minecraft.world.level.biome.AmbientMoodSettings;
-import net.minecraft.world.level.biome.AmbientParticleSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.neoforged.neoforge.common.world.BiomeSpecialEffectsBuilder;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -24,16 +17,6 @@ import java.util.Optional;
 public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) implements SpecialEffectsContext {
 
     @Override
-    public void setFogColor(int fogColor) {
-        this.context.fogColor(fogColor);
-    }
-
-    @Override
-    public int getFogColor() {
-        return this.context.getFogColor();
-    }
-
-    @Override
     public void setWaterColor(int waterColor) {
         this.context.waterColor(waterColor);
     }
@@ -41,26 +24,6 @@ public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) 
     @Override
     public int getWaterColor() {
         return this.context.waterColor();
-    }
-
-    @Override
-    public void setWaterFogColor(int waterFogColor) {
-        this.context.waterFogColor(waterFogColor);
-    }
-
-    @Override
-    public int getWaterFogColor() {
-        return this.context.getWaterFogColor();
-    }
-
-    @Override
-    public void setSkyColor(int skyColor) {
-        this.context.skyColor(skyColor);
-    }
-
-    @Override
-    public int getSkyColor() {
-        return this.context.getSkyColor();
     }
 
     @Override
@@ -75,6 +38,17 @@ public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) 
     }
 
     @Override
+    public void setDryFoliageColorOverride(Optional<Integer> dryFoliageColorOverride) {
+        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setDryFoliageColorOverride(
+                dryFoliageColorOverride);
+    }
+
+    @Override
+    public Optional<Integer> getDryFoliageColorOverride() {
+        return this.context.getDryFoliageColorOverride();
+    }
+
+    @Override
     public void setGrassColorOverride(Optional<Integer> grassColorOverride) {
         ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setGrassColorOverride(grassColorOverride);
     }
@@ -85,7 +59,7 @@ public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) 
     }
 
     @Override
-    public void setGrassColorModifier(@NotNull BiomeSpecialEffects.GrassColorModifier grassColorModifier) {
+    public void setGrassColorModifier(BiomeSpecialEffects.@NonNull GrassColorModifier grassColorModifier) {
         Objects.requireNonNull(grassColorModifier, "grass color modifier is null");
         this.context.grassColorModifier(grassColorModifier);
     }
@@ -93,59 +67,5 @@ public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) 
     @Override
     public BiomeSpecialEffects.GrassColorModifier getGrassColorModifier() {
         return this.context.getGrassColorModifier();
-    }
-
-    @Override
-    public void setAmbientParticleSettings(Optional<AmbientParticleSettings> ambientParticleSettings) {
-        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setAmbientParticle(
-                ambientParticleSettings);
-    }
-
-    @Override
-    public Optional<AmbientParticleSettings> getAmbientParticleSettings() {
-        return this.context.getAmbientParticle();
-    }
-
-    @Override
-    public void setAmbientLoopSoundEvent(Optional<Holder<SoundEvent>> ambientLoopSoundEvent) {
-        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setAmbientLoopSoundEvent(
-                ambientLoopSoundEvent);
-    }
-
-    @Override
-    public Optional<Holder<SoundEvent>> getAmbientLoopSoundEvent() {
-        return this.context.getAmbientLoopSound();
-    }
-
-    @Override
-    public void setAmbientMoodSettings(Optional<AmbientMoodSettings> ambientMoodSettings) {
-        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setAmbientMoodSettings(
-                ambientMoodSettings);
-    }
-
-    @Override
-    public Optional<AmbientMoodSettings> getAmbientMoodSettings() {
-        return this.context.getAmbientMoodSound();
-    }
-
-    @Override
-    public void setAmbientAdditionsSettings(Optional<AmbientAdditionsSettings> ambientAdditionsSettings) {
-        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setAmbientAdditionsSettings(
-                ambientAdditionsSettings);
-    }
-
-    @Override
-    public Optional<AmbientAdditionsSettings> getAmbientAdditionsSettings() {
-        return this.context.getAmbientAdditionsSound();
-    }
-
-    @Override
-    public void setBackgroundMusic(Optional<WeightedList<Music>> backgroundMusic) {
-        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setBackgroundMusic(backgroundMusic);
-    }
-
-    @Override
-    public Optional<WeightedList<Music>> getBackgroundMusic() {
-        return this.context.getBackgroundMusic();
     }
 }

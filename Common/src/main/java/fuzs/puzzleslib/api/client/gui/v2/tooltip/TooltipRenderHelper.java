@@ -12,14 +12,14 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositione
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -236,7 +236,7 @@ public final class TooltipRenderHelper {
      * @param posX              the position on x-axis; would be mouse cursor x for vanilla
      * @param posY              the position on y-axis; would be mouse cursor y for vanilla
      * @param tooltipComponents components to render in the tooltip
-     * @see GuiGraphics#renderTooltip(Font, List, int, int, ClientTooltipPositioner, ResourceLocation)
+     * @see GuiGraphics#renderTooltip(Font, List, int, int, ClientTooltipPositioner, Identifier)
      */
     public static void renderTooltipComponents(GuiGraphics guiGraphics, int posX, int posY, List<? extends ClientTooltipComponent> tooltipComponents) {
         renderTooltipComponents(guiGraphics, posX, posY, tooltipComponents, null);
@@ -256,11 +256,10 @@ public final class TooltipRenderHelper {
      * @param posX              the position on x-axis; would be mouse cursor x for vanilla
      * @param posY              the position on y-axis; would be mouse cursor y for vanilla
      * @param tooltipComponents the components to render in the tooltip
-     * @param tooltipStyle      the optional resource location for overriding the background and frame sprites of the
-     *                          tooltip
-     * @see GuiGraphics#renderTooltip(Font, List, int, int, ClientTooltipPositioner, ResourceLocation)
+     * @param tooltipStyle      the optional identifier for overriding the background and frame sprites of the tooltip
+     * @see GuiGraphics#renderTooltip(Font, List, int, int, ClientTooltipPositioner, Identifier)
      */
-    public static void renderTooltipComponents(GuiGraphics guiGraphics, int posX, int posY, List<? extends ClientTooltipComponent> tooltipComponents, @Nullable ResourceLocation tooltipStyle) {
+    public static void renderTooltipComponents(GuiGraphics guiGraphics, int posX, int posY, List<? extends ClientTooltipComponent> tooltipComponents, @Nullable Identifier tooltipStyle) {
 
         Font font = Minecraft.getInstance().font;
 

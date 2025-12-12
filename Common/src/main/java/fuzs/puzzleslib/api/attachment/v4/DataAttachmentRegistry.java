@@ -7,7 +7,7 @@ import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -121,10 +121,10 @@ public final class DataAttachmentRegistry {
          * <p>
          * Can be called multiple times with different inputs.
          *
-         * @param resourceLocation the resource location
+         * @param identifier the identifier
          * @return the attachment type
          */
-        DataAttachmentType<T, V> build(ResourceLocation resourceLocation);
+        DataAttachmentType<T, V> build(Identifier identifier);
     }
 
     /**

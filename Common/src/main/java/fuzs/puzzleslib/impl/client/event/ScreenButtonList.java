@@ -3,7 +3,7 @@ package fuzs.puzzleslib.impl.client.event;
 import fuzs.puzzleslib.api.core.v1.util.TransformingForwardingList;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 

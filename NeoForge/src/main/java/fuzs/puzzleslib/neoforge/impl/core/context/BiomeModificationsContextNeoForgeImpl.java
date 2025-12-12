@@ -57,13 +57,13 @@ public final class BiomeModificationsContextNeoForgeImpl implements BiomeModific
             DataProviderHelper.registerDataProviders(this.modId, (NeoForgeDataProviderContext context) -> {
                 return new JsonCodecProvider<>(context.getPackOutput(),
                         PackOutput.Target.DATA_PACK,
-                        NeoForgeRegistries.Keys.BIOME_MODIFIERS.location().toString().replace(':', '/'),
+                        NeoForgeRegistries.Keys.BIOME_MODIFIERS.identifier().toString().replace(':', '/'),
                         BiomeModifier.DIRECT_CODEC,
                         context.getRegistries(),
                         context.getModId()) {
                     @Override
                     protected void gather() {
-                        this.unconditional(holder.getKey().location(), biomeModifierImpl);
+                        this.unconditional(holder.getKey().identifier(), biomeModifierImpl);
                     }
                 };
             });

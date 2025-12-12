@@ -57,7 +57,7 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -774,13 +774,6 @@ public final class NeoForgeClientEventInvokers {
                     if (eventResult.isInterrupt()) {
                         event.setCanceled(true);
                     }
-                });
-        INSTANCE.register(GatherEffectScreenTooltipCallback.class,
-                GatherEffectScreenTooltipsEvent.class,
-                (GatherEffectScreenTooltipCallback callback, GatherEffectScreenTooltipsEvent event) -> {
-                    callback.onGatherEffectScreenTooltip(event.getScreen(),
-                            event.getEffectInstance(),
-                            event.getTooltip());
                 });
     }
 

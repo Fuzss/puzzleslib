@@ -14,51 +14,51 @@ import net.minecraft.client.renderer.item.properties.select.SelectItemModelPrope
 import net.minecraft.client.renderer.item.properties.select.SelectItemModelProperty;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.renderer.special.SpecialModelRenderers;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Objects;
 
 public final class ItemModelsContextFabricImpl implements ItemModelsContext {
 
     @Override
-    public void registerItemModel(ResourceLocation resourceLocation, MapCodec<? extends ItemModel.Unbaked> codec) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
+    public void registerItemModel(Identifier identifier, MapCodec<? extends ItemModel.Unbaked> codec) {
+        Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(codec, "codec is null");
-        ItemModels.ID_MAPPER.put(resourceLocation, codec);
+        ItemModels.ID_MAPPER.put(identifier, codec);
     }
 
     @Override
-    public void registerSpecialModelRenderer(ResourceLocation resourceLocation, MapCodec<? extends SpecialModelRenderer.Unbaked> codec) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
+    public void registerSpecialModelRenderer(Identifier identifier, MapCodec<? extends SpecialModelRenderer.Unbaked> codec) {
+        Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(codec, "codec is null");
-        SpecialModelRenderers.ID_MAPPER.put(resourceLocation, codec);
+        SpecialModelRenderers.ID_MAPPER.put(identifier, codec);
     }
 
     @Override
-    public void registerItemTintSource(ResourceLocation resourceLocation, MapCodec<? extends ItemTintSource> codec) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
+    public void registerItemTintSource(Identifier identifier, MapCodec<? extends ItemTintSource> codec) {
+        Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(codec, "codec is null");
-        ItemTintSources.ID_MAPPER.put(resourceLocation, codec);
+        ItemTintSources.ID_MAPPER.put(identifier, codec);
     }
 
     @Override
-    public void registerSelectItemModelProperty(ResourceLocation resourceLocation, SelectItemModelProperty.Type<?, ?> type) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
+    public void registerSelectItemModelProperty(Identifier identifier, SelectItemModelProperty.Type<?, ?> type) {
+        Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(type, "type is null");
-        SelectItemModelProperties.ID_MAPPER.put(resourceLocation, type);
+        SelectItemModelProperties.ID_MAPPER.put(identifier, type);
     }
 
     @Override
-    public void registerConditionalItemModelProperty(ResourceLocation resourceLocation, MapCodec<? extends ConditionalItemModelProperty> codec) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
+    public void registerConditionalItemModelProperty(Identifier identifier, MapCodec<? extends ConditionalItemModelProperty> codec) {
+        Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(codec, "codec is null");
-        ConditionalItemModelProperties.ID_MAPPER.put(resourceLocation, codec);
+        ConditionalItemModelProperties.ID_MAPPER.put(identifier, codec);
     }
 
     @Override
-    public void registerRangeSelectItemModelProperty(ResourceLocation resourceLocation, MapCodec<? extends RangeSelectItemModelProperty> codec) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
+    public void registerRangeSelectItemModelProperty(Identifier identifier, MapCodec<? extends RangeSelectItemModelProperty> codec) {
+        Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(codec, "codec is null");
-        RangeSelectItemModelProperties.ID_MAPPER.put(resourceLocation, codec);
+        RangeSelectItemModelProperties.ID_MAPPER.put(identifier, codec);
     }
 }

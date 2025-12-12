@@ -5,9 +5,9 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.decoration.PaintingVariant;
+import net.minecraft.world.entity.decoration.painting.PaintingVariant;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
@@ -24,9 +24,9 @@ public final class CreativeModeTabHelper {
         // NO-OP
     }
 
-    public static Component getTitle(ResourceLocation resourceLocation) {
-        String translationKey = "itemGroup.%s.%s".formatted(resourceLocation.getNamespace(),
-                resourceLocation.getPath());
+    public static Component getTitle(Identifier identifier) {
+        String translationKey = "itemGroup.%s.%s".formatted(identifier.getNamespace(),
+                identifier.getPath());
         return Component.translatable(translationKey);
     }
 
@@ -42,7 +42,7 @@ public final class CreativeModeTabHelper {
     public static void generateItemTypes(String modId, CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) {
         itemDisplayParameters.holders().lookup(Registries.ITEM).ifPresent(registryLookup -> {
             registryLookup.listElements()
-                    .filter((Holder.Reference<Item> holder) -> holder.key().location().getNamespace().equals(modId))
+                    .filter((Holder.Reference<Item> holder) -> holder.key().identifier().getNamespace().equals(modId))
                     .map(ItemStack::new)
                     .forEach((ItemStack itemStack) -> output.accept(itemStack,
                             CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS));
@@ -57,8 +57,8 @@ public final class CreativeModeTabHelper {
                         .stream()
                         .findAny()
                         .flatMap(Holder::unwrapKey)
-                        .map(ResourceKey::location)
-                        .map(ResourceLocation::getNamespace)
+                        .map(ResourceKey::identifier)
+                        .map(Identifier::getNamespace)
                         .filter(modId::equals)
                         .isPresent()) {
                     output.accept(itemStack, tabVisibility);
@@ -74,8 +74,8 @@ public final class CreativeModeTabHelper {
                             if (itemStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY)
                                     .potion()
                                     .flatMap(Holder::unwrapKey)
-                                    .map(ResourceKey::location)
-                                    .map(ResourceLocation::getNamespace)
+                                    .map(ResourceKey::identifier)
+                                    .map(Identifier::getNamespace)
                                     .filter(modId::equals)
                                     .isPresent()) {
                                 output.accept(itemStack, tabVisibility);
@@ -96,8 +96,8 @@ public final class CreativeModeTabHelper {
                         itemDisplayParameters.holders(),
                         registryLookup,
                         (Holder<PaintingVariant> holder) -> holder.unwrapKey()
-                                .map(ResourceKey::location)
-                                .map(ResourceLocation::getNamespace)
+                                .map(ResourceKey::identifier)
+                                .map(Identifier::getNamespace)
                                 .filter(modId::equals)
                                 .isPresent(),
                         CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS));

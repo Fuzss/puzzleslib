@@ -2,7 +2,7 @@ package fuzs.puzzleslib.neoforge.impl.attachment.builder;
 
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.neoforge.attachment.AttachmentType;
 
@@ -33,8 +33,8 @@ public final class NeoForgeEntityDataAttachmentBuilder<V> extends NeoForgeDataAt
     }
 
     @Override
-    void configureBuilder(ResourceLocation resourceLocation, AttachmentType.Builder<V> builder) {
-        super.configureBuilder(resourceLocation, builder);
+    void configureBuilder(Identifier identifier, AttachmentType.Builder<V> builder) {
+        super.configureBuilder(identifier, builder);
         if (this.copyOnDeath) {
             Objects.requireNonNull(this.codec, "codec is null");
             builder.copyOnDeath();

@@ -1,13 +1,12 @@
 package fuzs.puzzleslib.api.client.gui.v2.components;
 
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 
 import java.util.function.ToIntFunction;
@@ -27,7 +26,8 @@ import java.util.function.ToIntFunction;
 public class SpritelessImageButton extends Button {
     /**
      * The texture layout used in the old {@link net.minecraft.client.gui.components.ImageButton}.
-     * <p>The order from top to bottom is:
+     * <p>
+     * The order from top to bottom is:
      * <ul>
      * <li>Active</li>
      * <li>Hovered</li>
@@ -39,7 +39,8 @@ public class SpritelessImageButton extends Button {
     };
     /**
      * The texture layout used in the old <code>textures/gui/widgets.png</code>.
-     * <p>The order from top to bottom is:
+     * <p>
+     * The order from top to bottom is:
      * <ul>
      * <li>Inactive</li>
      * <li>Active</li>
@@ -58,7 +59,8 @@ public class SpritelessImageButton extends Button {
     /**
      * The texture layout used in the old {@link net.minecraft.client.gui.components.ImageButton} for buttons that are
      * always active.
-     * <p>The order from top to bottom is:
+     * <p>
+     * The order from top to bottom is:
      * <ul>
      * <li>Active / Inactive</li>
      * <li>Hovered</li>
@@ -68,7 +70,7 @@ public class SpritelessImageButton extends Button {
         return button.isHoveredOrFocused() ? 1 : 0;
     };
 
-    public ResourceLocation resourceLocation;
+    public Identifier identifier;
     public int xTexStart;
     public int yTexStart;
     public int yDiffTex;
@@ -77,15 +79,15 @@ public class SpritelessImageButton extends Button {
     private ToIntFunction<Button> textureLayout = TEXTURE_LAYOUT;
     private boolean drawBackground;
 
-    public SpritelessImageButton(int x, int y, int width, int height, int xTexStart, int yTexStart, ResourceLocation resourceLocation, OnPress onPress) {
-        this(x, y, width, height, xTexStart, yTexStart, height, resourceLocation, onPress);
+    public SpritelessImageButton(int x, int y, int width, int height, int xTexStart, int yTexStart, Identifier identifier, OnPress onPress) {
+        this(x, y, width, height, xTexStart, yTexStart, height, identifier, onPress);
     }
 
-    public SpritelessImageButton(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex, ResourceLocation resourceLocation, OnPress onPress) {
-        this(x, y, width, height, xTexStart, yTexStart, yDiffTex, resourceLocation, 256, 256, onPress);
+    public SpritelessImageButton(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex, Identifier identifier, OnPress onPress) {
+        this(x, y, width, height, xTexStart, yTexStart, yDiffTex, identifier, 256, 256, onPress);
     }
 
-    public SpritelessImageButton(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex, ResourceLocation resourceLocation, int textureWidth, int textureHeight, OnPress onPress) {
+    public SpritelessImageButton(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex, Identifier identifier, int textureWidth, int textureHeight, OnPress onPress) {
         this(x,
                 y,
                 width,
@@ -93,21 +95,21 @@ public class SpritelessImageButton extends Button {
                 xTexStart,
                 yTexStart,
                 yDiffTex,
-                resourceLocation,
+                identifier,
                 textureWidth,
                 textureHeight,
                 onPress,
                 CommonComponents.EMPTY);
     }
 
-    public SpritelessImageButton(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex, ResourceLocation resourceLocation, int textureWidth, int textureHeight, OnPress onPress, Component message) {
+    public SpritelessImageButton(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex, Identifier identifier, int textureWidth, int textureHeight, OnPress onPress, Component message) {
         super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
         this.textureWidth = textureWidth;
         this.textureHeight = textureHeight;
         this.xTexStart = xTexStart;
         this.yTexStart = yTexStart;
         this.yDiffTex = yDiffTex;
-        this.resourceLocation = resourceLocation;
+        this.identifier = identifier;
     }
 
     public SpritelessImageButton setTextureCoordinates(int xTexStart, int yTexStart) {
@@ -136,7 +138,8 @@ public class SpritelessImageButton extends Button {
     /**
      * Draws the vanilla button texture when rendering so that sprites provided by this implementation can be drawn on
      * top.
-     * <p>This does, however, not include drawing the button message.
+     * <p>
+     * This does, however, not include drawing the button message.
      *
      * @return builder instance
      */
@@ -146,12 +149,13 @@ public class SpritelessImageButton extends Button {
     }
 
     @Override
-    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
         if (this.drawBackground) {
-            super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+            this.renderDefaultSprite(guiGraphics);
         }
+
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
-                this.resourceLocation,
+                this.identifier,
                 this.getX(),
                 this.getY(),
                 this.xTexStart,
@@ -161,11 +165,6 @@ public class SpritelessImageButton extends Button {
                 this.textureWidth,
                 this.textureHeight,
                 ARGB.white(this.alpha));
-    }
-
-    @Override
-    public void renderString(GuiGraphics guiGraphics, Font font, int color) {
-        // NO-OP
     }
 
     /**

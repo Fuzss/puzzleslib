@@ -1,12 +1,12 @@
 package fuzs.puzzleslib.api.client.gui.v2;
 
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.world.effect.MobEffectInstance;
 
 /**
@@ -51,8 +51,17 @@ public final class ScreenHelper {
      */
     public static boolean isDoubleClick(MouseButtonEvent mouseButtonEvent) {
         MouseHandler mouseHandler = Minecraft.getInstance().mouseHandler;
-        return Util.getMillis() - mouseHandler.lastClickTime < 250L
-                && mouseHandler.lastClickButton == mouseButtonEvent.button();
+        if (mouseHandler.lastClick != null) {
+            return false;
+        } else if (mouseHandler.lastClick.screen() != Minecraft.getInstance().screen) {
+            return false;
+        } else if (mouseHandler.lastClickButton != mouseButtonEvent.button()) {
+            return false;
+        } else if (Util.getMillis() - mouseHandler.lastClick.time() >= 250L) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -75,11 +84,11 @@ public final class ScreenHelper {
      * <p>
      * In vanilla this includes player health and armor level.
      *
-     * @param resourceLocation the height provider location
+     * @param identifier the height provider location
      * @return the status bar render height
      */
-    public static int getLeftStatusBarHeight(ResourceLocation resourceLocation) {
-        return ClientProxyImpl.get().getLeftStatusBarHeight(resourceLocation);
+    public static int getLeftStatusBarHeight(Identifier identifier) {
+        return ClientProxyImpl.get().getLeftStatusBarHeight(identifier);
     }
 
     /**
@@ -87,11 +96,11 @@ public final class ScreenHelper {
      * <p>
      * In vanilla this includes player food level, vehicle health and air bubbles.
      *
-     * @param resourceLocation the height provider location
+     * @param identifier the height provider location
      * @return the status bar render height
      */
-    public static int getRightStatusBarHeight(ResourceLocation resourceLocation) {
-        return ClientProxyImpl.get().getRightStatusBarHeight(resourceLocation);
+    public static int getRightStatusBarHeight(Identifier identifier) {
+        return ClientProxyImpl.get().getRightStatusBarHeight(identifier);
     }
 
     /**

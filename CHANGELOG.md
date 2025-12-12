@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v21.11.0-1.21.11] - 2025-12-08
+## [v21.11.0-1.21.11] - 2025-12-12
 
 ### Added
 
@@ -30,3 +30,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove `RegistryManager::registerLegacySpawnEggItem`
 - Replace `SearchTreeType` with vanilla's `ContextKey`
 - Remove `AddDataPackReloadListenersCallback` & `AddResourcePackReloadListenersCallback`
+- Remove `GatherEffectScreenTooltipCallback` as the current implementation is not flexible enough for proper usage

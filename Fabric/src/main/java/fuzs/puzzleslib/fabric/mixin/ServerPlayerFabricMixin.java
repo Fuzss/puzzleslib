@@ -10,11 +10,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -30,15 +30,15 @@ abstract class ServerPlayerFabricMixin extends Player implements CapturedDropsEn
         super(level, gameProfile);
     }
 
-    @Inject(method = "drop(Z)Z",
+    @Inject(method = "drop(Z)V",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/server/level/ServerPlayer;drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;"),
             cancellable = true)
-    public void drop(CallbackInfoReturnable<Boolean> callback, @Local ItemStack itemStack) {
+    public void drop(CallbackInfo callback, @Local ItemStack itemStack) {
         EventResult eventResult = FabricPlayerEvents.ITEM_TOSS.invoker()
                 .onItemToss(ServerPlayer.class.cast(this), itemStack);
         if (eventResult.isInterrupt()) {
-            callback.setReturnValue(false);
+            callback.cancel();
         }
     }
 

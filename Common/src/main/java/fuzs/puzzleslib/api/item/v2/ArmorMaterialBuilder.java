@@ -2,13 +2,13 @@ package fuzs.puzzleslib.api.item.v2;
 
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
-import net.minecraft.Util;
 import net.minecraft.core.Holder;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Util;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
@@ -23,7 +23,7 @@ import java.util.Objects;
  * A builder class for {@link ArmorMaterial}.
  */
 public final class ArmorMaterialBuilder {
-    private static final ResourceLocation NO_RENDER_ASSET_ID = PuzzlesLibMod.id("no_render");
+    private static final Identifier NO_RENDER_ASSET_ID = PuzzlesLibMod.id("no_render");
 
     private int durability;
     private Map<ArmorType, Integer> defense = Util.make(new EnumMap<>(ArmorType.class),
@@ -57,7 +57,7 @@ public final class ArmorMaterialBuilder {
      * @param repairIngredient the repair material used in an anvil for restoring item durability
      * @return the builder
      */
-    public static ArmorMaterialBuilder of(ResourceLocation assetId, TagKey<Item> repairIngredient) {
+    public static ArmorMaterialBuilder of(Identifier assetId, TagKey<Item> repairIngredient) {
         return new ArmorMaterialBuilder().setRepairIngredient(repairIngredient).setAssetId(assetId);
     }
 
@@ -187,7 +187,7 @@ public final class ArmorMaterialBuilder {
      *                {@code assets/<namespace>/equipment/<path>.json}
      * @return the builder
      */
-    public ArmorMaterialBuilder setAssetId(ResourceLocation assetId) {
+    public ArmorMaterialBuilder setAssetId(Identifier assetId) {
         Objects.requireNonNull(assetId, "asset id is null");
         return this.setAssetId(ResourceKey.create(EquipmentAssets.ROOT_ID, assetId));
     }

@@ -3,7 +3,7 @@ package fuzs.puzzleslib.neoforge.impl.core.context;
 import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
 import fuzs.puzzleslib.api.resources.v1.PackResourcesHelper;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
@@ -21,14 +21,14 @@ public record DataPackSourcesContextNeoForgeImpl(AddPackFindersEvent event) impl
     }
 
     @Override
-    public void registerBuiltInPack(ResourceLocation resourceLocation, Component displayName, boolean shouldAddAutomatically) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
+    public void registerBuiltInPack(Identifier identifier, Component displayName, boolean shouldAddAutomatically) {
+        Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(displayName, "display name is null");
-        registerBuiltInPack(this.event, resourceLocation, displayName, shouldAddAutomatically, PackType.SERVER_DATA);
+        registerBuiltInPack(this.event, identifier, displayName, shouldAddAutomatically, PackType.SERVER_DATA);
     }
 
-    public static void registerBuiltInPack(AddPackFindersEvent event, ResourceLocation resourceLocation, Component displayName, boolean shouldAddAutomatically, PackType packType) {
-        event.addPackFinders(PackResourcesHelper.getBuiltInPack(resourceLocation, packType),
+    public static void registerBuiltInPack(AddPackFindersEvent event, Identifier identifier, Component displayName, boolean shouldAddAutomatically, PackType packType) {
+        event.addPackFinders(PackResourcesHelper.getBuiltInPack(identifier, packType),
                 packType,
                 displayName,
                 shouldAddAutomatically ? PackSource.BUILT_IN : PackSource.FEATURE,

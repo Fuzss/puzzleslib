@@ -3,7 +3,7 @@ package fuzs.puzzleslib.impl.attachment;
 import com.google.common.collect.ImmutableMap;
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentType;
 import net.minecraft.core.RegistryAccess;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Objects;
@@ -45,7 +45,7 @@ public final class DataAttachmentTypeImpl<T, V> implements DataAttachmentType<T,
         if (this.attachmentType.hasData(holder)) {
             V value = this.attachmentType.getData(holder);
             // do not support setting null values (Fabric does not), the attachment type can still be removed though
-            Objects.requireNonNull(value, () -> "value for " + this.attachmentType.resourceLocation() + " is null");
+            Objects.requireNonNull(value, () -> "value for " + this.attachmentType.identifier() + " is null");
             return value;
         } else {
             return null;

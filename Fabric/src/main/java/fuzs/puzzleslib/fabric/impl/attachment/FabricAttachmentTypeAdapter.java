@@ -3,8 +3,8 @@ package fuzs.puzzleslib.fabric.impl.attachment;
 import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -12,7 +12,7 @@ import java.util.Objects;
 public record FabricAttachmentTypeAdapter<T extends AttachmentTarget, A>(AttachmentType<A> attachmentType) implements AttachmentTypeAdapter<T, A> {
 
     @Override
-    public ResourceLocation resourceLocation() {
+    public Identifier identifier() {
         return this.attachmentType.identifier();
     }
 

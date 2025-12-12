@@ -8,7 +8,6 @@ import fuzs.puzzleslib.api.client.renderer.v1.model.ModelLoadingHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.SpecialBlockModelRenderer;
@@ -18,8 +17,9 @@ import net.minecraft.client.renderer.texture.SpriteLoader;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.Util;
 import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.block.Block;
@@ -34,10 +34,10 @@ import java.util.stream.Collectors;
 
 public final class BlockStateResolverContextNeoForgeImpl implements BlockStateResolverContext {
     private final ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
-    private final Function<ResourceLocation, TextureAtlasSprite> textureGetter;
+    private final Function<Identifier, TextureAtlasSprite> textureGetter;
     private final ResolvedModel missingModel;
     private final Supplier<TextureAtlasSprite> missingSprite;
-    private final Map<ResourceLocation, ResolvedModel> resolvedModels;
+    private final Map<Identifier, ResolvedModel> resolvedModels;
     private final BiConsumer<BlockState, BlockStateModel> blockStateModelOutput;
     private final Function<Map<BlockState, BlockStateModel.UnbakedRoot>, ModelBakery> modelBakeryFactory;
 
@@ -67,7 +67,7 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
     public void registerBlockStateResolver(Block block, Consumer<BiConsumer<BlockState, BlockStateModel.UnbakedRoot>> blockStateConsumer) {
         ModelDiscovery modelDiscovery = new ModelDiscovery(Collections.emptyMap(), this.missingModel.wrapped());
         modelDiscovery.uncachedResolver = (Object object) -> {
-            ResourceLocation resourcelocation = (ResourceLocation) object;
+            Identifier resourcelocation = (Identifier) object;
             ResolvedModel resolvedModel = this.resolvedModels.get(resourcelocation);
             if (resolvedModel instanceof ModelDiscovery.ModelWrapper modelWrapper) {
                 return modelWrapper;
@@ -110,7 +110,7 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
      * {@link ModelManager#loadModels(SpriteLoader.Preparations, ModelBakery, Object2IntMap, EntityModelSet,
      * SpecialBlockModelRenderer, Executor)}.
      */
-    private static ModelBakery.BakingResult loadModels(ProfilerFiller profiler, Function<ResourceLocation, TextureAtlasSprite> textureGetter, ModelBakery modelBakery, Supplier<TextureAtlasSprite> missingSprite) {
+    private static ModelBakery.BakingResult loadModels(ProfilerFiller profiler, Function<Identifier, TextureAtlasSprite> textureGetter, ModelBakery modelBakery, Supplier<TextureAtlasSprite> missingSprite) {
         profiler.push(PuzzlesLibMod.id("baking").toString());
         final Multimap<String, Material> multimap = HashMultimap.create();
         final Multimap<String, String> multimap1 = HashMultimap.create();

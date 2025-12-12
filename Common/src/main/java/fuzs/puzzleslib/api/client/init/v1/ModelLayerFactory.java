@@ -4,7 +4,7 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.blockentity.HangingSignRenderer;
 import net.minecraft.client.renderer.entity.ArmorModelSet;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.properties.WoodType;
 
 /**
@@ -39,7 +39,7 @@ public interface ModelLayerFactory {
      * @return the new model layer location
      */
     default ModelLayerLocation registerModelLayer(String path, String layer) {
-        ModelLayerLocation modelLayerLocation = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(this.modId(),
+        ModelLayerLocation modelLayerLocation = new ModelLayerLocation(Identifier.fromNamespaceAndPath(this.modId(),
                 path), layer);
         if (!ModelLayers.ALL_MODELS.add(modelLayerLocation)) {
             throw new IllegalStateException("Duplicate registration for " + modelLayerLocation);

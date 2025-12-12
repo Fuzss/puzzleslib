@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.core.v1.util;
 
 import com.google.common.base.Function;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.AbstractList;
 import java.util.List;

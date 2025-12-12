@@ -3,7 +3,7 @@ package fuzs.puzzleslib.api.core.v1;
 import com.google.common.collect.ImmutableMap;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.*;

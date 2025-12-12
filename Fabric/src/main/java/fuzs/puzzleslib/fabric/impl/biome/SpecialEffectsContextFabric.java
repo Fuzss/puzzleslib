@@ -2,30 +2,14 @@ package fuzs.puzzleslib.fabric.impl.biome;
 
 import fuzs.puzzleslib.api.biome.v1.SpecialEffectsContext;
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
-import net.minecraft.core.Holder;
-import net.minecraft.sounds.Music;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.util.random.WeightedList;
-import net.minecraft.world.level.biome.AmbientAdditionsSettings;
-import net.minecraft.world.level.biome.AmbientMoodSettings;
-import net.minecraft.world.level.biome.AmbientParticleSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public record SpecialEffectsContextFabric(BiomeSpecialEffects specialEffects,
                                           BiomeModificationContext.EffectsContext context) implements SpecialEffectsContext {
-
-    @Override
-    public void setFogColor(int fogColor) {
-        this.context.setFogColor(fogColor);
-    }
-
-    @Override
-    public int getFogColor() {
-        return this.specialEffects.getFogColor();
-    }
 
     @Override
     public void setWaterColor(int waterColor) {
@@ -34,27 +18,7 @@ public record SpecialEffectsContextFabric(BiomeSpecialEffects specialEffects,
 
     @Override
     public int getWaterColor() {
-        return this.specialEffects.getWaterColor();
-    }
-
-    @Override
-    public void setWaterFogColor(int waterFogColor) {
-        this.context.setWaterFogColor(waterFogColor);
-    }
-
-    @Override
-    public int getWaterFogColor() {
-        return this.specialEffects.getWaterFogColor();
-    }
-
-    @Override
-    public void setSkyColor(int skyColor) {
-        this.context.setSkyColor(skyColor);
-    }
-
-    @Override
-    public int getSkyColor() {
-        return this.specialEffects.getSkyColor();
+        return this.specialEffects.waterColor();
     }
 
     @Override
@@ -64,7 +28,17 @@ public record SpecialEffectsContextFabric(BiomeSpecialEffects specialEffects,
 
     @Override
     public Optional<Integer> getFoliageColorOverride() {
-        return this.specialEffects.getFoliageColorOverride();
+        return this.specialEffects.foliageColorOverride();
+    }
+
+    @Override
+    public void setDryFoliageColorOverride(Optional<Integer> dryFoliageColorOverride) {
+        this.context.setDryFoliageColor(dryFoliageColorOverride);
+    }
+
+    @Override
+    public Optional<Integer> getDryFoliageColorOverride() {
+        return this.specialEffects.dryFoliageColorOverride();
     }
 
     @Override
@@ -74,66 +48,17 @@ public record SpecialEffectsContextFabric(BiomeSpecialEffects specialEffects,
 
     @Override
     public Optional<Integer> getGrassColorOverride() {
-        return this.specialEffects.getGrassColorOverride();
+        return this.specialEffects.grassColorOverride();
     }
 
     @Override
-    public void setGrassColorModifier(@NotNull BiomeSpecialEffects.GrassColorModifier grassColorModifier) {
+    public void setGrassColorModifier(BiomeSpecialEffects.@NonNull GrassColorModifier grassColorModifier) {
+        Objects.requireNonNull(grassColorModifier, "grass color modifier is null");
         this.context.setGrassColorModifier(grassColorModifier);
     }
 
     @Override
     public BiomeSpecialEffects.GrassColorModifier getGrassColorModifier() {
-        return this.specialEffects.getGrassColorModifier();
-    }
-
-    @Override
-    public void setAmbientParticleSettings(Optional<AmbientParticleSettings> ambientParticleSettings) {
-        this.context.setParticleConfig(ambientParticleSettings);
-    }
-
-    @Override
-    public Optional<AmbientParticleSettings> getAmbientParticleSettings() {
-        return this.specialEffects.getAmbientParticleSettings();
-    }
-
-    @Override
-    public void setAmbientLoopSoundEvent(Optional<Holder<SoundEvent>> ambientLoopSoundEvent) {
-        this.context.setAmbientSound(ambientLoopSoundEvent);
-    }
-
-    @Override
-    public Optional<Holder<SoundEvent>> getAmbientLoopSoundEvent() {
-        return this.specialEffects.getAmbientLoopSoundEvent();
-    }
-
-    @Override
-    public void setAmbientMoodSettings(Optional<AmbientMoodSettings> ambientMoodSettings) {
-        this.context.setMoodSound(ambientMoodSettings);
-    }
-
-    @Override
-    public Optional<AmbientMoodSettings> getAmbientMoodSettings() {
-        return this.specialEffects.getAmbientMoodSettings();
-    }
-
-    @Override
-    public void setAmbientAdditionsSettings(Optional<AmbientAdditionsSettings> ambientAdditionsSettings) {
-        this.context.setAdditionsSound(ambientAdditionsSettings);
-    }
-
-    @Override
-    public Optional<AmbientAdditionsSettings> getAmbientAdditionsSettings() {
-        return this.specialEffects.getAmbientAdditionsSettings();
-    }
-
-    @Override
-    public void setBackgroundMusic(Optional<WeightedList<Music>> backgroundMusic) {
-        this.context.setMusic(backgroundMusic);
-    }
-
-    @Override
-    public Optional<WeightedList<Music>> getBackgroundMusic() {
-        return this.specialEffects.getBackgroundMusic();
+        return this.specialEffects.grassColorModifier();
     }
 }

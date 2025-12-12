@@ -5,7 +5,7 @@ import fuzs.puzzleslib.api.core.v1.context.DataPackReloadListenersContext;
 import net.fabricmc.fabric.api.resource.v1.DataResourceLoader;
 import net.fabricmc.fabric.api.resource.v1.reloader.ResourceReloaderKeys;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.ReloadableServerResources;
 
 import java.lang.ref.WeakReference;
@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public final class DataPackReloadListenersContextFabricImpl implements DataPackReloadListenersContext {
-    private static final Map<ResourceLocation, ResourceLocation> VANILLA_SERVER_RELOAD_LISTENERS = ImmutableMap.<ResourceLocation, ResourceLocation>builder()
+    private static final Map<Identifier, Identifier> VANILLA_SERVER_RELOAD_LISTENERS = ImmutableMap.<Identifier, Identifier>builder()
             .put(RECIPES, ResourceReloaderKeys.Server.RECIPES)
             .put(FUNCTIONS, ResourceReloaderKeys.Server.FUNCTIONS)
             .put(ADVANCEMENTS, ResourceReloaderKeys.Server.ADVANCEMENTS)
@@ -26,32 +26,32 @@ public final class DataPackReloadListenersContextFabricImpl implements DataPackR
     }
 
     @Override
-    public void registerReloadListener(ResourceLocation resourceLocation, PreparableReloadListenerFactory reloadListenerFactory) {
-        Objects.requireNonNull(resourceLocation, "id is null");
+    public void registerReloadListener(Identifier identifier, PreparableReloadListenerFactory reloadListenerFactory) {
+        Objects.requireNonNull(identifier, "id is null");
         Objects.requireNonNull(reloadListenerFactory, "reload listener factory is null");
-        this.registerReloadListenerFactory(resourceLocation, reloadListenerFactory);
+        this.registerReloadListenerFactory(identifier, reloadListenerFactory);
     }
 
     @Override
-    public void registerReloadListener(ResourceLocation resourceLocation, ResourceLocation otherResourceLocation, PreparableReloadListenerFactory reloadListenerFactory) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
-        Objects.requireNonNull(otherResourceLocation, "other resource location is null");
+    public void registerReloadListener(Identifier identifier, Identifier otherResourceLocation, PreparableReloadListenerFactory reloadListenerFactory) {
+        Objects.requireNonNull(identifier, "identifier is null");
+        Objects.requireNonNull(otherResourceLocation, "other identifier is null");
         Objects.requireNonNull(reloadListenerFactory, "reload listener factory is null");
-        if (VANILLA_SERVER_RELOAD_LISTENERS.containsKey(resourceLocation)) {
+        if (VANILLA_SERVER_RELOAD_LISTENERS.containsKey(identifier)) {
             this.registerReloadListenerFactory(otherResourceLocation, reloadListenerFactory);
             DataResourceLoader.get()
-                    .addReloaderOrdering(VANILLA_SERVER_RELOAD_LISTENERS.get(resourceLocation), otherResourceLocation);
+                    .addReloaderOrdering(VANILLA_SERVER_RELOAD_LISTENERS.get(identifier), otherResourceLocation);
         } else if (VANILLA_SERVER_RELOAD_LISTENERS.containsKey(otherResourceLocation)) {
-            this.registerReloadListenerFactory(resourceLocation, reloadListenerFactory);
+            this.registerReloadListenerFactory(identifier, reloadListenerFactory);
             DataResourceLoader.get()
-                    .addReloaderOrdering(resourceLocation, VANILLA_SERVER_RELOAD_LISTENERS.get(otherResourceLocation));
+                    .addReloaderOrdering(identifier, VANILLA_SERVER_RELOAD_LISTENERS.get(otherResourceLocation));
         } else {
-            throw new RuntimeException("Unknown reload listeners: " + resourceLocation + ", " + otherResourceLocation);
+            throw new RuntimeException("Unknown reload listeners: " + identifier + ", " + otherResourceLocation);
         }
     }
 
-    private void registerReloadListenerFactory(ResourceLocation resourceLocation, PreparableReloadListenerFactory reloadListenerFactory) {
-        DataResourceLoader.get().registerReloader(resourceLocation, (HolderLookup.Provider registries) -> {
+    private void registerReloadListenerFactory(Identifier identifier, PreparableReloadListenerFactory reloadListenerFactory) {
+        DataResourceLoader.get().registerReloader(identifier, (HolderLookup.Provider registries) -> {
             ReloadableServerResources reloadableServerResources = RELOADABLE_SERVER_RESOURCES_REFERENCE.get().get();
             Objects.requireNonNull(reloadableServerResources, "reloadable server resources is null");
             return reloadListenerFactory.apply(reloadableServerResources, registries);

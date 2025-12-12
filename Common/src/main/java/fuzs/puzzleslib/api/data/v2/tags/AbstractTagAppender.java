@@ -2,11 +2,11 @@ package fuzs.puzzleslib.api.data.v2.tags;
 
 import net.minecraft.core.Holder;
 import net.minecraft.data.tags.TagAppender;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagBuilder;
 import net.minecraft.tags.TagKey;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -28,21 +28,21 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
         return this.setReplace(true);
     }
 
-    public AbstractTagAppender<T> add(ResourceLocation resourceLocation) {
-        this.tagBuilder.addElement(resourceLocation);
+    public AbstractTagAppender<T> add(Identifier identifier) {
+        this.tagBuilder.addElement(identifier);
         return this;
     }
 
-    public AbstractTagAppender<T> add(ResourceLocation... resourceLocations) {
-        for (ResourceLocation resourceLocation : resourceLocations) {
-            this.add(resourceLocation);
+    public AbstractTagAppender<T> add(Identifier... identifiers) {
+        for (Identifier identifier : identifiers) {
+            this.add(identifier);
         }
 
         return this;
     }
 
     public AbstractTagAppender<T> addKey(ResourceKey<? extends T> resourceKey) {
-        return this.add(resourceKey.location());
+        return this.add(resourceKey.identifier());
     }
 
     @SafeVarargs
@@ -83,7 +83,7 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
     }
 
     public AbstractTagAppender<T> addOptional(String string) {
-        return this.addOptional(ResourceLocation.parse(string));
+        return this.addOptional(Identifier.parse(string));
     }
 
     public AbstractTagAppender<T> addOptional(String... strings) {
@@ -94,21 +94,21 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
         return this;
     }
 
-    public AbstractTagAppender<T> addOptional(ResourceLocation resourceLocation) {
-        this.tagBuilder.addOptionalElement(resourceLocation);
+    public AbstractTagAppender<T> addOptional(Identifier identifier) {
+        this.tagBuilder.addOptionalElement(identifier);
         return this;
     }
 
-    public AbstractTagAppender<T> addOptional(ResourceLocation... resourceLocations) {
-        for (ResourceLocation resourceLocation : resourceLocations) {
-            this.add(resourceLocation);
+    public AbstractTagAppender<T> addOptional(Identifier... identifiers) {
+        for (Identifier identifier : identifiers) {
+            this.add(identifier);
         }
 
         return this;
     }
 
     public AbstractTagAppender<T> addOptionalKey(ResourceKey<? extends T> resourceKey) {
-        return this.addOptional(resourceKey.location());
+        return this.addOptional(resourceKey.identifier());
     }
 
     @SafeVarargs
@@ -147,14 +147,14 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
         return this;
     }
 
-    public AbstractTagAppender<T> addTag(ResourceLocation resourceLocation) {
-        this.tagBuilder.addTag(resourceLocation);
+    public AbstractTagAppender<T> addTag(Identifier identifier) {
+        this.tagBuilder.addTag(identifier);
         return this;
     }
 
-    public AbstractTagAppender<T> addTag(ResourceLocation... resourceLocations) {
-        for (ResourceLocation resourceLocation : resourceLocations) {
-            this.addTag(resourceLocation);
+    public AbstractTagAppender<T> addTag(Identifier... identifiers) {
+        for (Identifier identifier : identifiers) {
+            this.addTag(identifier);
         }
 
         return this;
@@ -175,7 +175,7 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
     }
 
     public AbstractTagAppender<T> addOptionalTag(String string) {
-        return this.addOptionalTag(ResourceLocation.parse(string));
+        return this.addOptionalTag(Identifier.parse(string));
     }
 
     public AbstractTagAppender<T> addOptionalTag(String... strings) {
@@ -186,14 +186,14 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
         return this;
     }
 
-    public AbstractTagAppender<T> addOptionalTag(ResourceLocation resourceLocation) {
-        this.tagBuilder.addOptionalTag(resourceLocation);
+    public AbstractTagAppender<T> addOptionalTag(Identifier identifier) {
+        this.tagBuilder.addOptionalTag(identifier);
         return this;
     }
 
-    public AbstractTagAppender<T> addOptionalTag(ResourceLocation... resourceLocations) {
-        for (ResourceLocation resourceLocation : resourceLocations) {
-            this.addOptionalTag(resourceLocation);
+    public AbstractTagAppender<T> addOptionalTag(Identifier... identifiers) {
+        for (Identifier identifier : identifiers) {
+            this.addOptionalTag(identifier);
         }
 
         return this;
@@ -213,18 +213,18 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
         return this;
     }
 
-    public abstract AbstractTagAppender<T> remove(ResourceLocation resourceLocation);
+    public abstract AbstractTagAppender<T> remove(Identifier identifier);
 
-    public AbstractTagAppender<T> remove(ResourceLocation... resourceLocations) {
-        for (ResourceLocation resourceLocation : resourceLocations) {
-            this.remove(resourceLocation);
+    public AbstractTagAppender<T> remove(Identifier... identifiers) {
+        for (Identifier identifier : identifiers) {
+            this.remove(identifier);
         }
 
         return this;
     }
 
     public AbstractTagAppender<T> removeKey(ResourceKey<? extends T> resourceKey) {
-        return this.remove(resourceKey.location());
+        return this.remove(resourceKey.identifier());
     }
 
     @SafeVarargs
@@ -263,7 +263,7 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
     }
 
     public AbstractTagAppender<T> removeOptional(String string) {
-        return this.removeOptional(ResourceLocation.parse(string));
+        return this.removeOptional(Identifier.parse(string));
     }
 
     public AbstractTagAppender<T> removeOptional(String... strings) {
@@ -274,18 +274,18 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
         return this;
     }
 
-    public abstract AbstractTagAppender<T> removeOptional(ResourceLocation resourceLocation);
+    public abstract AbstractTagAppender<T> removeOptional(Identifier identifier);
 
-    public AbstractTagAppender<T> removeOptional(ResourceLocation... resourceLocations) {
-        for (ResourceLocation resourceLocation : resourceLocations) {
-            this.removeOptional(resourceLocation);
+    public AbstractTagAppender<T> removeOptional(Identifier... identifiers) {
+        for (Identifier identifier : identifiers) {
+            this.removeOptional(identifier);
         }
 
         return this;
     }
 
     public AbstractTagAppender<T> removeOptionalKey(ResourceKey<? extends T> resourceKey) {
-        return this.removeOptional(resourceKey.location());
+        return this.removeOptional(resourceKey.identifier());
     }
 
     @SafeVarargs
@@ -323,11 +323,11 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
         return this;
     }
 
-    public abstract AbstractTagAppender<T> removeTag(ResourceLocation resourceLocation);
+    public abstract AbstractTagAppender<T> removeTag(Identifier identifier);
 
-    public AbstractTagAppender<T> removeTag(ResourceLocation... resourceLocations) {
-        for (ResourceLocation resourceLocation : resourceLocations) {
-            this.removeTag(resourceLocation);
+    public AbstractTagAppender<T> removeTag(Identifier... identifiers) {
+        for (Identifier identifier : identifiers) {
+            this.removeTag(identifier);
         }
 
         return this;
@@ -338,7 +338,7 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
     }
 
     public AbstractTagAppender<T> removeOptionalTag(String string) {
-        return this.removeOptionalTag(ResourceLocation.parse(string));
+        return this.removeOptionalTag(Identifier.parse(string));
     }
 
     public AbstractTagAppender<T> removeOptionalTag(String... strings) {
@@ -349,11 +349,11 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
         return this;
     }
 
-    public abstract AbstractTagAppender<T> removeOptionalTag(ResourceLocation resourceLocation);
+    public abstract AbstractTagAppender<T> removeOptionalTag(Identifier identifier);
 
-    public AbstractTagAppender<T> removeOptionalTag(ResourceLocation... resourceLocations) {
-        for (ResourceLocation resourceLocation : resourceLocations) {
-            this.removeOptionalTag(resourceLocation);
+    public AbstractTagAppender<T> removeOptionalTag(Identifier... identifiers) {
+        for (Identifier identifier : identifiers) {
+            this.removeOptionalTag(identifier);
         }
 
         return this;

@@ -38,7 +38,7 @@ public interface MutableInt extends IntConsumer, IntSupplier {
      *
      * @param operator operator to apply to contained value
      */
-    default void mapInt(IntUnaryOperator operator) {
+    default void mapAsInt(IntUnaryOperator operator) {
         this.accept(operator.applyAsInt(this.getAsInt()));
     }
 }

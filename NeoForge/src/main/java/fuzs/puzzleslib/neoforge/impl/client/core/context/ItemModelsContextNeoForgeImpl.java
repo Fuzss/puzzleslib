@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.item.properties.conditional.ConditionalItem
 import net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemModelProperty;
 import net.minecraft.client.renderer.item.properties.select.SelectItemModelProperty;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.event.*;
 
 import java.util.Objects;
@@ -17,60 +17,60 @@ import java.util.Objects;
 public final class ItemModelsContextNeoForgeImpl extends AbstractNeoForgeContext implements ItemModelsContext {
 
     @Override
-    public void registerItemModel(ResourceLocation resourceLocation, MapCodec<? extends ItemModel.Unbaked> codec) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
+    public void registerItemModel(Identifier identifier, MapCodec<? extends ItemModel.Unbaked> codec) {
+        Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(codec, "codec is null");
         this.registerForEvent(RegisterItemModelsEvent.class, (RegisterItemModelsEvent event) -> {
-            event.register(resourceLocation, codec);
+            event.register(identifier, codec);
         });
     }
 
     @Override
-    public void registerSpecialModelRenderer(ResourceLocation resourceLocation, MapCodec<? extends SpecialModelRenderer.Unbaked> codec) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
+    public void registerSpecialModelRenderer(Identifier identifier, MapCodec<? extends SpecialModelRenderer.Unbaked> codec) {
+        Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(codec, "codec is null");
         this.registerForEvent(RegisterSpecialModelRendererEvent.class, (RegisterSpecialModelRendererEvent event) -> {
-            event.register(resourceLocation, codec);
+            event.register(identifier, codec);
         });
     }
 
     @Override
-    public void registerItemTintSource(ResourceLocation resourceLocation, MapCodec<? extends ItemTintSource> codec) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
+    public void registerItemTintSource(Identifier identifier, MapCodec<? extends ItemTintSource> codec) {
+        Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(codec, "codec is null");
         this.registerForEvent(RegisterColorHandlersEvent.ItemTintSources.class,
                 (RegisterColorHandlersEvent.ItemTintSources event) -> {
-                    event.register(resourceLocation, codec);
+                    event.register(identifier, codec);
                 });
     }
 
     @Override
-    public void registerSelectItemModelProperty(ResourceLocation resourceLocation, SelectItemModelProperty.Type<?, ?> type) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
+    public void registerSelectItemModelProperty(Identifier identifier, SelectItemModelProperty.Type<?, ?> type) {
+        Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(type, "type is null");
         this.registerForEvent(RegisterSelectItemModelPropertyEvent.class,
                 (RegisterSelectItemModelPropertyEvent event) -> {
-                    event.register(resourceLocation, type);
+                    event.register(identifier, type);
                 });
     }
 
     @Override
-    public void registerConditionalItemModelProperty(ResourceLocation resourceLocation, MapCodec<? extends ConditionalItemModelProperty> codec) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
+    public void registerConditionalItemModelProperty(Identifier identifier, MapCodec<? extends ConditionalItemModelProperty> codec) {
+        Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(codec, "codec is null");
         this.registerForEvent(RegisterConditionalItemModelPropertyEvent.class,
                 (RegisterConditionalItemModelPropertyEvent event) -> {
-                    event.register(resourceLocation, codec);
+                    event.register(identifier, codec);
                 });
     }
 
     @Override
-    public void registerRangeSelectItemModelProperty(ResourceLocation resourceLocation, MapCodec<? extends RangeSelectItemModelProperty> codec) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
+    public void registerRangeSelectItemModelProperty(Identifier identifier, MapCodec<? extends RangeSelectItemModelProperty> codec) {
+        Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(codec, "codec is null");
         this.registerForEvent(RegisterRangeSelectItemModelPropertyEvent.class,
                 (RegisterRangeSelectItemModelPropertyEvent event) -> {
-                    event.register(resourceLocation, codec);
+                    event.register(identifier, codec);
                 });
     }
 }

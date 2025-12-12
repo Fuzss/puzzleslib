@@ -38,12 +38,6 @@ public final class FabricGuiEvents {
      * {@link net.minecraft.client.gui.components.toasts.ToastManager#addToast(Toast)}.
      */
     public static final Event<AddToastCallback> ADD_TOAST = FabricEventFactory.createResult(AddToastCallback.class);
-    /**
-     * Called when tooltip lines are gathered for an effect widget in the player inventory when it is hovered by the
-     * cursor.
-     */
-    public static final Event<GatherEffectScreenTooltipCallback> GATHER_EFFECT_SCREEN_TOOLTIP = FabricEventFactory.create(
-            GatherEffectScreenTooltipCallback.class);
 
     private FabricGuiEvents() {
         // NO-OP

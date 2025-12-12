@@ -1,19 +1,19 @@
 package fuzs.puzzleslib.neoforge.impl.attachment;
 
 import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.registries.DeferredHolder;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
 public record NeoForgeAttachmentTypeAdapter<T extends IAttachmentHolder, A>(DeferredHolder<AttachmentType<?>, AttachmentType<A>> attachmentType) implements AttachmentTypeAdapter<T, A> {
 
     @Override
-    public ResourceLocation resourceLocation() {
-        return this.attachmentType.getKey().location();
+    public Identifier identifier() {
+        return this.attachmentType.getKey().identifier();
     }
 
     @Override

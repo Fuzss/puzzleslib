@@ -13,7 +13,7 @@ import net.minecraft.world.inventory.GrindstoneMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 import java.util.OptionalDouble;
@@ -59,8 +59,7 @@ public final class EventImplHelper {
         return null;
     }
 
-    @Nullable
-    public static Map.Entry<GrindstoneMenu, Player> getGrindstoneMenuFromInputs(ItemStack primaryItemStack, ItemStack secondaryItemStack) {
+    public static Map.@Nullable Entry<GrindstoneMenu, Player> getGrindstoneMenuFromInputs(ItemStack primaryItemStack, ItemStack secondaryItemStack) {
         MinecraftServer minecraftServer = ProxyImpl.get().getMinecraftServer();
         if (minecraftServer != null) {
             for (ServerPlayer serverPlayer : minecraftServer.getPlayerList().getPlayers()) {

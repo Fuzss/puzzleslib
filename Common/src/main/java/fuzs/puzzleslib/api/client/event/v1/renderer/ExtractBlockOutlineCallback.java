@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @FunctionalInterface
 public interface ExtractBlockOutlineCallback {
@@ -23,7 +23,7 @@ public interface ExtractBlockOutlineCallback {
      * @param hitResult        the hit result to render the outline for
      * @param collisionContext the collision context for the camera entity
      * @return <ul>
-     *         <li>{@link EventResultHolder#interrupt(Object)} to pass a custom {@link VoxelShape}; or potentially {@link null} to prevent any outline from rendering</li>
+     *         <li>{@link EventResultHolder#interrupt(Object)} to pass a custom {@link VoxelShape}; or potentially {@code null} to prevent any outline from rendering</li>
      *         <li>{@link EventResultHolder#pass()} to allow vanilla outline rendering to happen without changes</li>
      *         </ul>
      */

@@ -3,7 +3,7 @@ package fuzs.puzzleslib.api.client.data.v2.models;
 import net.minecraft.client.data.models.model.ModelLocationUtils;
 import net.minecraft.client.data.models.model.TextureMapping;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
@@ -28,7 +28,7 @@ public final class ModelLocationHelper {
      * @param block the block
      * @return the default block model location, prefixed with {@link #BLOCK_PATH}
      */
-    public static ResourceLocation getBlockModel(Block block) {
+    public static Identifier getBlockModel(Block block) {
         return ModelLocationUtils.getModelLocation(block);
     }
 
@@ -37,32 +37,32 @@ public final class ModelLocationHelper {
      * @param suffix the block model suffix
      * @return the block model location, prefixed with {@link #BLOCK_PATH}
      */
-    public static ResourceLocation getBlockModel(Block block, String suffix) {
+    public static Identifier getBlockModel(Block block, String suffix) {
         return ModelLocationUtils.getModelLocation(block, suffix);
     }
 
     /**
-     * @param resourceLocation the block location
+     * @param identifier the block location
      * @return the default block model location, prefixed with {@link #BLOCK_PATH}
      */
-    public static ResourceLocation getBlockModel(ResourceLocation resourceLocation) {
-        return resourceLocation.withPrefix(BLOCK_PATH + "/");
+    public static Identifier getBlockModel(Identifier identifier) {
+        return identifier.withPrefix(BLOCK_PATH + "/");
     }
 
     /**
-     * @param resourceLocation the block location
+     * @param identifier the block location
      * @param suffix           the block model suffix
      * @return the block model location, prefixed with {@link #BLOCK_PATH}
      */
-    public static ResourceLocation getBlockModel(ResourceLocation resourceLocation, String suffix) {
-        return getBlockModel(resourceLocation).withSuffix(suffix);
+    public static Identifier getBlockModel(Identifier identifier, String suffix) {
+        return getBlockModel(identifier).withSuffix(suffix);
     }
 
     /**
      * @param block the block
      * @return the default block texture location, prefixed with {@link #BLOCK_PATH}
      */
-    public static ResourceLocation getBlockTexture(Block block) {
+    public static Identifier getBlockTexture(Block block) {
         return TextureMapping.getBlockTexture(block);
     }
 
@@ -71,32 +71,32 @@ public final class ModelLocationHelper {
      * @param suffix the block texture suffix
      * @return the block texture location, prefixed with {@link #BLOCK_PATH}
      */
-    public static ResourceLocation getBlockTexture(Block block, String suffix) {
+    public static Identifier getBlockTexture(Block block, String suffix) {
         return TextureMapping.getBlockTexture(block, suffix);
     }
 
     /**
-     * @param resourceLocation the block location
+     * @param identifier the block location
      * @return the default block texture location, prefixed with {@link #BLOCK_PATH}
      */
-    public static ResourceLocation getBlockTexture(ResourceLocation resourceLocation) {
-        return resourceLocation.withPrefix(BLOCK_PATH + "/");
+    public static Identifier getBlockTexture(Identifier identifier) {
+        return identifier.withPrefix(BLOCK_PATH + "/");
     }
 
     /**
-     * @param resourceLocation the block location
+     * @param identifier the block location
      * @param suffix           the block texture suffix
      * @return the block texture location, prefixed with {@link #BLOCK_PATH}
      */
-    public static ResourceLocation getBlockTexture(ResourceLocation resourceLocation, String suffix) {
-        return getBlockTexture(resourceLocation).withSuffix(suffix);
+    public static Identifier getBlockTexture(Identifier identifier, String suffix) {
+        return getBlockTexture(identifier).withSuffix(suffix);
     }
 
     /**
      * @param block the block
      * @return the block registry key
      */
-    public static ResourceLocation getBlockLocation(Block block) {
+    public static Identifier getBlockLocation(Block block) {
         return BuiltInRegistries.BLOCK.getKey(block);
     }
 
@@ -105,7 +105,7 @@ public final class ModelLocationHelper {
      * @param suffix the block key suffix
      * @return the block registry key
      */
-    public static ResourceLocation getBlockLocation(Block block, String suffix) {
+    public static Identifier getBlockLocation(Block block, String suffix) {
         return getBlockLocation(block).withSuffix(suffix);
     }
 
@@ -121,7 +121,7 @@ public final class ModelLocationHelper {
      * @param item the item
      * @return the default item model location, prefixed with {@link #ITEM_PATH}
      */
-    public static ResourceLocation getItemModel(Item item) {
+    public static Identifier getItemModel(Item item) {
         return ModelLocationUtils.getModelLocation(item);
     }
 
@@ -130,32 +130,32 @@ public final class ModelLocationHelper {
      * @param suffix the item model suffix
      * @return the item model location, prefixed with {@link #ITEM_PATH}
      */
-    public static ResourceLocation getItemModel(Item item, String suffix) {
+    public static Identifier getItemModel(Item item, String suffix) {
         return ModelLocationUtils.getModelLocation(item, suffix);
     }
 
     /**
-     * @param resourceLocation the item location
+     * @param identifier the item location
      * @return the default item model location, prefixed with {@link #ITEM_PATH}
      */
-    public static ResourceLocation getItemModel(ResourceLocation resourceLocation) {
-        return resourceLocation.withPrefix(ITEM_PATH + "/");
+    public static Identifier getItemModel(Identifier identifier) {
+        return identifier.withPrefix(ITEM_PATH + "/");
     }
 
     /**
-     * @param resourceLocation the item location
+     * @param identifier the item location
      * @param suffix           the item model suffix
      * @return the item model location, prefixed with {@link #ITEM_PATH}
      */
-    public static ResourceLocation getItemModel(ResourceLocation resourceLocation, String suffix) {
-        return getItemModel(resourceLocation).withSuffix(suffix);
+    public static Identifier getItemModel(Identifier identifier, String suffix) {
+        return getItemModel(identifier).withSuffix(suffix);
     }
 
     /**
      * @param item the item
      * @return the default item texture location, prefixed with {@link #ITEM_PATH}
      */
-    public static ResourceLocation getItemTexture(Item item) {
+    public static Identifier getItemTexture(Item item) {
         return TextureMapping.getItemTexture(item);
     }
 
@@ -164,32 +164,32 @@ public final class ModelLocationHelper {
      * @param suffix the item texture suffix
      * @return the item texture location, prefixed with {@link #ITEM_PATH}
      */
-    public static ResourceLocation getItemTexture(Item item, String suffix) {
+    public static Identifier getItemTexture(Item item, String suffix) {
         return TextureMapping.getItemTexture(item, suffix);
     }
 
     /**
-     * @param resourceLocation the item location
+     * @param identifier the item location
      * @return the default item texture location, prefixed with {@link #ITEM_PATH}
      */
-    public static ResourceLocation getItemTexture(ResourceLocation resourceLocation) {
-        return resourceLocation.withPrefix(ITEM_PATH + "/");
+    public static Identifier getItemTexture(Identifier identifier) {
+        return identifier.withPrefix(ITEM_PATH + "/");
     }
 
     /**
-     * @param resourceLocation the item location
+     * @param identifier the item location
      * @param suffix           the item texture suffix
      * @return the item texture location, prefixed with {@link #ITEM_PATH}
      */
-    public static ResourceLocation getItemTexture(ResourceLocation resourceLocation, String suffix) {
-        return getItemTexture(resourceLocation).withSuffix(suffix);
+    public static Identifier getItemTexture(Identifier identifier, String suffix) {
+        return getItemTexture(identifier).withSuffix(suffix);
     }
 
     /**
      * @param item the item
      * @return the item registry key
      */
-    public static ResourceLocation getItemLocation(Item item) {
+    public static Identifier getItemLocation(Item item) {
         return BuiltInRegistries.ITEM.getKey(item);
     }
 
@@ -198,7 +198,7 @@ public final class ModelLocationHelper {
      * @param suffix the item key suffix
      * @return the item registry key
      */
-    public static ResourceLocation getItemLocation(Item item, String suffix) {
+    public static Identifier getItemLocation(Item item, String suffix) {
         return getItemLocation(item).withSuffix(suffix);
     }
 

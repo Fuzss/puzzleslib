@@ -6,8 +6,8 @@ import fuzs.puzzleslib.api.config.v3.Config;
 import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.impl.config.ConfigDataHolderImpl;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -26,7 +26,7 @@ public final class ConfigBuilder {
         // NO-OP
     }
 
-    public static <T extends ConfigCore> void build(ModConfigSpec.Builder builder, ConfigDataHolderImpl<?> context, @NotNull T o) {
+    public static <T extends ConfigCore> void build(ModConfigSpec.Builder builder, ConfigDataHolderImpl<?> context, @NonNull T o) {
         Objects.requireNonNull(o, "object is null");
         build(builder, context, o.getClass(), o);
     }

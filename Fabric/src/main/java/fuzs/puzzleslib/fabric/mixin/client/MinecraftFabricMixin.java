@@ -15,7 +15,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.Connection;
 import net.minecraft.world.phys.HitResult;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -102,16 +102,17 @@ abstract class MinecraftFabricMixin {
         }
     }
 
-    @Inject(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;Z)V",
+    @Inject(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;ZZ)V",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/client/renderer/GameRenderer;resetData()V",
                     shift = At.Shift.AFTER))
-    public void disconnect(Screen screen, boolean keepResourcePacks, CallbackInfo callback) {
+    public void disconnect(Screen screen, boolean keepResourcePacks, boolean stopSoundManager, CallbackInfo callback) {
         if (this.player != null && this.gameMode != null) {
             Connection connection = this.player.connection.getConnection();
             Objects.requireNonNull(connection, "connection is null");
             FabricClientPlayerEvents.PLAYER_LEAVE.invoker().onPlayerLeave(this.player, this.gameMode, connection);
         }
+
         if (this.level != null) {
             FabricClientLevelEvents.UNLOAD_LEVEL.invoker().onLevelUnload(Minecraft.class.cast(this), this.level);
         }
@@ -122,7 +123,9 @@ abstract class MinecraftFabricMixin {
         if (this.hitResult != null && this.hitResult.getType() != HitResult.Type.MISS) {
             EventResult result = FabricClientPlayerEvents.PICK_INTERACTION_INPUT.invoker()
                     .onPickInteraction(Minecraft.class.cast(this), this.player, this.hitResult);
-            if (result.isInterrupt()) callback.cancel();
+            if (result.isInterrupt()) {
+                callback.cancel();
+            }
         }
     }
 }

@@ -61,7 +61,7 @@ public class MultiConfigurationScreen extends OptionsSubScreen {
     @Override
     protected void init() {
         super.init();
-        this.configurationScreen.init(this.minecraft, this.width, this.height);
+        this.configurationScreen.init(this.width, this.height);
     }
 
     @Override

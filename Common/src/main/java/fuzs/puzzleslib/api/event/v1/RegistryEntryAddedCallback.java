@@ -2,8 +2,8 @@ package fuzs.puzzleslib.api.event.v1;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -25,10 +25,10 @@ public interface RegistryEntryAddedCallback<T> {
      * Note that the implementation is only designed for built-in registries and probably will not work with dynamic
      * registries.
      *
-     * @param registry  the read-only registry
-     * @param id        the resource location for the added entry
-     * @param entry     the added entry
-     * @param registrar access to the registry for adding additional entries
+     * @param registry   the read-only registry
+     * @param identifier the identifier for the added entry
+     * @param entry      the added entry
+     * @param registrar  access to the registry for adding additional entries
      */
-    void onRegistryEntryAdded(Registry<T> registry, ResourceLocation id, T entry, BiConsumer<ResourceLocation, Supplier<T>> registrar);
+    void onRegistryEntryAdded(Registry<T> registry, Identifier identifier, T entry, BiConsumer<Identifier, Supplier<T>> registrar);
 }

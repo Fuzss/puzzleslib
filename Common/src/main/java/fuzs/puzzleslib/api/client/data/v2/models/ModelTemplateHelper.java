@@ -3,7 +3,7 @@ package fuzs.puzzleslib.api.client.data.v2.models;
 import net.minecraft.client.data.models.model.ModelTemplate;
 import net.minecraft.client.data.models.model.TextureMapping;
 import net.minecraft.client.data.models.model.TextureSlot;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 
 import java.util.Optional;
@@ -14,22 +14,22 @@ public final class ModelTemplateHelper {
         // NO-OP
     }
 
-    public static ModelTemplate createBlockModelTemplate(ResourceLocation resourceLocation, TextureSlot... requiredSlots) {
-        return createBlockModelTemplate(resourceLocation, "", requiredSlots);
+    public static ModelTemplate createBlockModelTemplate(Identifier identifier, TextureSlot... requiredSlots) {
+        return createBlockModelTemplate(identifier, "", requiredSlots);
     }
 
-    public static ModelTemplate createBlockModelTemplate(ResourceLocation resourceLocation, String suffix, TextureSlot... requiredSlots) {
-        return new ModelTemplate(Optional.of(ModelLocationHelper.getBlockModel(resourceLocation)),
+    public static ModelTemplate createBlockModelTemplate(Identifier identifier, String suffix, TextureSlot... requiredSlots) {
+        return new ModelTemplate(Optional.of(ModelLocationHelper.getBlockModel(identifier)),
                 Optional.of(suffix),
                 requiredSlots);
     }
 
-    public static ModelTemplate createItemModelTemplate(ResourceLocation resourceLocation, TextureSlot... requiredSlots) {
-        return createItemModelTemplate(resourceLocation, "", requiredSlots);
+    public static ModelTemplate createItemModelTemplate(Identifier identifier, TextureSlot... requiredSlots) {
+        return createItemModelTemplate(identifier, "", requiredSlots);
     }
 
-    public static ModelTemplate createItemModelTemplate(ResourceLocation resourceLocation, String suffix, TextureSlot... requiredSlots) {
-        return new ModelTemplate(Optional.of(ModelLocationHelper.getItemModel(resourceLocation)),
+    public static ModelTemplate createItemModelTemplate(Identifier identifier, String suffix, TextureSlot... requiredSlots) {
+        return new ModelTemplate(Optional.of(ModelLocationHelper.getItemModel(identifier)),
                 Optional.of(suffix),
                 requiredSlots);
     }
@@ -39,9 +39,9 @@ public final class ModelTemplateHelper {
     }
 
     public static TextureMapping createParticleTextureMapping(Block block, String suffix) {
-        ResourceLocation resourceLocation = TextureMapping.getBlockTexture(block, suffix);
-        return new TextureMapping().put(TextureSlot.TEXTURE, resourceLocation)
-                .put(TextureSlot.PARTICLE, resourceLocation);
+        Identifier identifier = TextureMapping.getBlockTexture(block, suffix);
+        return new TextureMapping().put(TextureSlot.TEXTURE, identifier)
+                .put(TextureSlot.PARTICLE, identifier);
     }
 
     public static TextureMapping createSingleSlotMapping(TextureSlot textureSlot, Block block) {

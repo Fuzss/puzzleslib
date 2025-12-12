@@ -3,7 +3,7 @@ package fuzs.puzzleslib.api.resources.v1;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.impl.resources.ModPackResourcesSupplier;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.*;
 import net.minecraft.server.packs.metadata.MetadataSectionType;
 import net.minecraft.server.packs.repository.Pack;
@@ -13,7 +13,7 @@ import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraft.world.flag.FeatureFlagSet;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,7 +84,7 @@ public class AbstractModPackResources implements PackResources {
 
     @Nullable
     @Override
-    public IoSupplier<InputStream> getResource(PackType packType, ResourceLocation location) {
+    public IoSupplier<InputStream> getResource(PackType packType, Identifier location) {
         return null;
     }
 
@@ -120,7 +120,7 @@ public class AbstractModPackResources implements PackResources {
      * @return the namespace from the internal id
      */
     public String getNamespace() {
-        return ResourceLocation.parse(this.packId()).getNamespace();
+        return Identifier.parse(this.packId()).getNamespace();
     }
 
     /**
@@ -137,7 +137,7 @@ public class AbstractModPackResources implements PackResources {
      * Creates a new pack for registering a repository source.
      *
      * @param packType             type marking this pack as containing data or resource pack resources
-     * @param resourceLocation     id for the pack, used for internal references and is stored in
+     * @param identifier     id for the pack, used for internal references and is stored in
      *                             <code>options.txt</code>
      * @param factory              {@link net.minecraft.server.packs.PackResources} implementation supplier
      * @param titleComponent       the title of this pack shown in the pack selection screen
@@ -152,8 +152,8 @@ public class AbstractModPackResources implements PackResources {
      * @param featureFlagSet       {@link net.minecraft.world.flag.FeatureFlags} enabled through this pack
      * @return the pack to be used for creating a {@link RepositorySource}
      */
-    public static Pack buildPack(PackType packType, ResourceLocation resourceLocation, Supplier<AbstractModPackResources> factory, Component titleComponent, Component descriptionComponent, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden, FeatureFlagSet featureFlagSet) {
-        PackLocationInfo info = new PackLocationInfo(resourceLocation.toString(),
+    public static Pack buildPack(PackType packType, Identifier identifier, Supplier<AbstractModPackResources> factory, Component titleComponent, Component descriptionComponent, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden, FeatureFlagSet featureFlagSet) {
+        PackLocationInfo info = new PackLocationInfo(identifier.toString(),
                 titleComponent,
                 PackSource.BUILT_IN,
                 Optional.empty());
@@ -161,7 +161,7 @@ public class AbstractModPackResources implements PackResources {
                 info,
                 createSupplier(factory),
                 descriptionComponent);
-        Pack.Metadata metadata = PackResourcesHelper.createPackInfo(resourceLocation,
+        Pack.Metadata metadata = PackResourcesHelper.createPackInfo(identifier,
                 descriptionComponent,
                 PackCompatibility.COMPATIBLE,
                 featureFlagSet,

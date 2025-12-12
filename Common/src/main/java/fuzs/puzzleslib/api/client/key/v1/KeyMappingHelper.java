@@ -6,7 +6,7 @@ import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.glfw.GLFW;
 
@@ -21,7 +21,7 @@ public interface KeyMappingHelper {
      * @see net.minecraft.resources.ResourceKey#VALUES
      */
     @ApiStatus.Internal
-    Map<ResourceLocation, KeyMapping.Category> KEY_CATEGORIES = new MapMaker().weakValues().makeMap();
+    Map<Identifier, KeyMapping.Category> KEY_CATEGORIES = new MapMaker().weakValues().makeMap();
 
     /**
      * Retrieve the registered {@link KeyActivationContext} for a {@link KeyMapping}, will default to
@@ -46,24 +46,24 @@ public interface KeyMappingHelper {
     /**
      * Register an unbound modded key mapping with a custom category.
      *
-     * @param resourceLocation key mapping identifier for defining name and category keys
+     * @param identifier key mapping identifier for defining name and category keys
      * @return key mapping instance
      */
-    static KeyMapping registerUnboundKeyMapping(ResourceLocation resourceLocation) {
-        return registerKeyMapping(resourceLocation, InputConstants.UNKNOWN.getValue());
+    static KeyMapping registerUnboundKeyMapping(Identifier identifier) {
+        return registerKeyMapping(identifier, InputConstants.UNKNOWN.getValue());
     }
 
     /**
      * Register a modded key mapping with a custom category.
      *
-     * @param resourceLocation key mapping identifier for defining name and category keys
+     * @param identifier key mapping identifier for defining name and category keys
      * @param keyCode          the default key, get the value from {@link com.mojang.blaze3d.platform.InputConstants}
      * @return key mapping instance
      */
-    static KeyMapping registerKeyMapping(ResourceLocation resourceLocation, int keyCode) {
-        return new KeyMapping("key." + resourceLocation.toLanguageKey(),
+    static KeyMapping registerKeyMapping(Identifier identifier, int keyCode) {
+        return new KeyMapping("key." + identifier.toLanguageKey(),
                 keyCode,
-                KEY_CATEGORIES.computeIfAbsent(resourceLocation.withPath("main"), KeyMapping.Category::new));
+                KEY_CATEGORIES.computeIfAbsent(identifier.withPath("main"), KeyMapping.Category::new));
     }
 
     /**

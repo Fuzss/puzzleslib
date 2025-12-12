@@ -4,7 +4,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.resources.model.UnbakedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
 public final class ModelLoadingEvents {
@@ -21,14 +21,14 @@ public final class ModelLoadingEvents {
         /**
          * An event that runs for every unbaked model. Allows for replacing the model.
          *
-         * @param resourceLocation the resource location for the model
+         * @param identifier the identifier for the model
          * @param unbakedModel     the unbaked model
          * @return <ul>
          *         <li>{@link EventResultHolder#interrupt(Object)} to replace the model</li>
          *         <li>{@link EventResultHolder#pass()} to allow the original model to be used</li>
          *         </ul>
          */
-        EventResultHolder<UnbakedModel> onLoadModel(ResourceLocation resourceLocation, UnbakedModel unbakedModel);
+        EventResultHolder<UnbakedModel> onLoadModel(Identifier identifier, UnbakedModel unbakedModel);
     }
 
     @FunctionalInterface

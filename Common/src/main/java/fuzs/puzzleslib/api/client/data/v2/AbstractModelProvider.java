@@ -14,7 +14,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -67,7 +67,7 @@ public abstract class AbstractModelProvider implements DataProvider {
 
     private <T> boolean isValid(Holder.Reference<T> holder) {
         if (!this.skipAllValidation()) {
-            if (holder.key().location().getNamespace().equals(this.modId)) {
+            if (holder.key().identifier().getNamespace().equals(this.modId)) {
                 return !this.skipValidation.contains(holder.value());
             } else {
                 return false;
@@ -106,11 +106,11 @@ public abstract class AbstractModelProvider implements DataProvider {
 
         void accept(Item item, ItemModel.Unbaked model, ClientItem.Properties properties);
 
-        default void accept(ResourceLocation resourceLocation, ItemModel.Unbaked model) {
-            this.accept(resourceLocation, model, ClientItem.Properties.DEFAULT);
+        default void accept(Identifier identifier, ItemModel.Unbaked model) {
+            this.accept(identifier, model, ClientItem.Properties.DEFAULT);
         }
 
-        void accept(ResourceLocation resourceLocation, ItemModel.Unbaked model, ClientItem.Properties properties);
+        void accept(Identifier identifier, ItemModel.Unbaked model, ClientItem.Properties properties);
     }
 
     static class BlockStateOutputImpl extends ModelProvider.BlockStateGeneratorCollector {
@@ -122,11 +122,11 @@ public abstract class AbstractModelProvider implements DataProvider {
 
         @Override
         public void validate() {
-            List<ResourceLocation> list = BuiltInRegistries.BLOCK.listElements()
+            List<Identifier> list = BuiltInRegistries.BLOCK.listElements()
                     // apply a filter, so we only consider our own content
                     .filter(this.filter)
                     .filter((Holder.Reference<Block> holder) -> !this.generators.containsKey(holder.value()))
-                    .map((Holder.Reference<Block> holder) -> holder.key().location())
+                    .map((Holder.Reference<Block> holder) -> holder.key().identifier())
                     .toList();
             if (!list.isEmpty()) {
                 throw new IllegalStateException("Missing blockstate definitions for: " + list);
@@ -135,7 +135,7 @@ public abstract class AbstractModelProvider implements DataProvider {
     }
 
     static class ItemModelOutputImpl extends ModelProvider.ItemInfoCollector implements CustomItemModelOutput {
-        private final Map<ResourceLocation, ClientItem> additionalItemInfos = new HashMap<>();
+        private final Map<Identifier, ClientItem> additionalItemInfos = new HashMap<>();
         private final Predicate<Holder.Reference<Item>> filter;
 
         public ItemModelOutputImpl(Predicate<Holder.Reference<Item>> filter) {
@@ -148,10 +148,10 @@ public abstract class AbstractModelProvider implements DataProvider {
         }
 
         @Override
-        public void accept(ResourceLocation resourceLocation, ItemModel.Unbaked model, ClientItem.Properties properties) {
-            ClientItem clientItem = this.additionalItemInfos.put(resourceLocation, new ClientItem(model, properties));
+        public void accept(Identifier identifier, ItemModel.Unbaked model, ClientItem.Properties properties) {
+            ClientItem clientItem = this.additionalItemInfos.put(identifier, new ClientItem(model, properties));
             if (clientItem != null) {
-                throw new IllegalStateException("Duplicate item model definition for " + resourceLocation);
+                throw new IllegalStateException("Duplicate item model definition for " + identifier);
             }
         }
 
@@ -161,8 +161,8 @@ public abstract class AbstractModelProvider implements DataProvider {
             BuiltInRegistries.ITEM.listElements().filter(this.filter).forEach((Holder.Reference<Item> item) -> {
                 if (!this.copies.containsKey(item.value())) {
                     if (item.value() instanceof BlockItem blockItem && !this.itemInfos.containsKey(blockItem)) {
-                        ResourceLocation resourceLocation = ModelLocationUtils.getModelLocation(blockItem.getBlock());
-                        this.accept(blockItem, ItemModelUtils.plainModel(resourceLocation));
+                        Identifier identifier = ModelLocationUtils.getModelLocation(blockItem.getBlock());
+                        this.accept(blockItem, ItemModelUtils.plainModel(identifier));
                     }
                 }
             });
@@ -174,11 +174,11 @@ public abstract class AbstractModelProvider implements DataProvider {
                     this.register(item, clientItem);
                 }
             });
-            List<ResourceLocation> list = BuiltInRegistries.ITEM.listElements()
+            List<Identifier> list = BuiltInRegistries.ITEM.listElements()
                     // apply a filter, so we only consider our own content
                     .filter(this.filter)
                     .filter((Holder.Reference<Item> item) -> !this.itemInfos.containsKey(item.value()))
-                    .map((Holder.Reference<Item> item) -> item.key().location())
+                    .map((Holder.Reference<Item> item) -> item.key().identifier())
                     .toList();
             if (!list.isEmpty()) {
                 throw new IllegalStateException("Missing item model definitions for: " + list);

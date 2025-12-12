@@ -5,7 +5,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
 public final class ModelBakingEvents {
@@ -59,7 +59,7 @@ public final class ModelBakingEvents {
         /**
          * An event that runs for every unbaked item model. Allows for replacing the model.
          *
-         * @param resourceLocation the resource location for the item
+         * @param identifier the identifier for the item
          * @param unbakedModel     the unbaked item model
          * @param context          the item baking context instance
          * @return <ul>
@@ -67,7 +67,7 @@ public final class ModelBakingEvents {
          *         <li>{@link EventResultHolder#pass()} to allow the original model to be used</li>
          *         </ul>
          */
-        EventResultHolder<ItemModel.Unbaked> onBeforeBakeItem(ResourceLocation resourceLocation, ItemModel.Unbaked unbakedModel, ItemModel.BakingContext context);
+        EventResultHolder<ItemModel.Unbaked> onBeforeBakeItem(Identifier identifier, ItemModel.Unbaked unbakedModel, ItemModel.BakingContext context);
     }
 
     @FunctionalInterface
@@ -76,7 +76,7 @@ public final class ModelBakingEvents {
         /**
          * An event that runs for every baked item model. Allows for replacing the model.
          *
-         * @param resourceLocation the resource location for the item
+         * @param identifier the identifier for the item
          * @param bakedModel       the baked item model
          * @param unbakedModel     the original unbaked item model
          * @param context          the item baking context instance
@@ -85,6 +85,6 @@ public final class ModelBakingEvents {
          *         <li>{@link EventResultHolder#pass()} to allow the original model to be used</li>
          *         </ul>
          */
-        EventResultHolder<ItemModel> onAfterBakeItem(ResourceLocation resourceLocation, ItemModel bakedModel, ItemModel.Unbaked unbakedModel, ItemModel.BakingContext context);
+        EventResultHolder<ItemModel> onAfterBakeItem(Identifier identifier, ItemModel bakedModel, ItemModel.Unbaked unbakedModel, ItemModel.BakingContext context);
     }
 }

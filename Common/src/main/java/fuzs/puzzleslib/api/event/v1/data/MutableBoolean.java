@@ -46,7 +46,7 @@ public interface MutableBoolean extends BooleanSupplier {
      *
      * @param operator operator to apply to contained value
      */
-    default void mapBoolean(UnaryOperator<Boolean> operator) {
+    default void mapAsBoolean(UnaryOperator<Boolean> operator) {
         this.accept(operator.apply(this.getAsBoolean()));
     }
 }

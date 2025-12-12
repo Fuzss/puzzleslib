@@ -3,7 +3,7 @@ package fuzs.puzzleslib.neoforge.api.client.data.v2;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.neoforged.neoforge.common.data.SoundDefinition;
 import net.neoforged.neoforge.common.data.SoundDefinitionsProvider;
@@ -37,9 +37,9 @@ public abstract class AbstractSoundProvider extends SoundDefinitionsProvider {
         this.add(soundEvent, definition);
     }
 
-    protected void add(SoundEvent soundEvent, ResourceLocation... sounds) {
+    protected void add(SoundEvent soundEvent, Identifier... sounds) {
         SoundDefinition definition = definition();
-        for (ResourceLocation sound : sounds) {
+        for (Identifier sound : sounds) {
             definition.with(sound(sound));
         }
         this.add(soundEvent, definition);
@@ -58,14 +58,14 @@ public abstract class AbstractSoundProvider extends SoundDefinitionsProvider {
     }
 
     protected void addRecord(Holder<SoundEvent> soundEvent) {
-        ResourceLocation resourceLocation = soundEvent.unwrap().orThrow().location().withPrefix("records/");
-        SoundDefinition soundDefinition = definition().with(sound(resourceLocation).stream());
+        Identifier identifier = soundEvent.unwrap().orThrow().identifier().withPrefix("records/");
+        SoundDefinition soundDefinition = definition().with(sound(identifier).stream());
         this.add(soundEvent.value(), soundDefinition);
         soundDefinition.subtitle(null);
     }
 
     @Override
-    protected void add(ResourceLocation soundEvent, SoundDefinition definition) {
+    protected void add(Identifier soundEvent, SoundDefinition definition) {
         super.add(soundEvent, definition.subtitle("subtitles." + soundEvent.getPath()));
     }
 

@@ -4,7 +4,7 @@ import fuzs.puzzleslib.api.core.v1.context.*;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Supplier;
 
@@ -21,17 +21,17 @@ public interface ModConstructor {
      * @param modConstructorSupplier the mod instance for the setup
      */
     static void construct(String modId, Supplier<ModConstructor> modConstructorSupplier) {
-        construct(ResourceLocation.fromNamespaceAndPath(modId, "common"), modConstructorSupplier);
+        construct(Identifier.fromNamespaceAndPath(modId, "common"), modConstructorSupplier);
     }
 
     /**
      * Construct the {@link ModConstructor} instance to begin initialization of a mod.
      *
-     * @param resourceLocation       the identifier for the provided mod instance
+     * @param identifier       the identifier for the provided mod instance
      * @param modConstructorSupplier the mod instance for the setup
      */
-    static void construct(ResourceLocation resourceLocation, Supplier<ModConstructor> modConstructorSupplier) {
-        ModConstructorImpl.construct(resourceLocation,
+    static void construct(Identifier identifier, Supplier<ModConstructor> modConstructorSupplier) {
+        ModConstructorImpl.construct(identifier,
                 modConstructorSupplier,
                 ProxyImpl.get()::getModConstructorImpl,
                 ModContext::runBeforeConstruction);

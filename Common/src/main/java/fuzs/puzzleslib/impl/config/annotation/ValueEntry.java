@@ -2,7 +2,7 @@ package fuzs.puzzleslib.impl.config.annotation;
 
 import fuzs.puzzleslib.impl.config.ConfigDataHolderImpl;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;

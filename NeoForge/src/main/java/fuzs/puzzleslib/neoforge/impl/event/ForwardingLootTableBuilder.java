@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.event;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -32,7 +32,7 @@ public final class ForwardingLootTableBuilder extends LootTable.Builder {
     }
 
     @Override
-    public LootTable.Builder setRandomSequence(ResourceLocation randomSequence) {
+    public LootTable.Builder setRandomSequence(Identifier randomSequence) {
         this.lootTable.randomSequence = Optional.of(randomSequence);
         return this;
     }

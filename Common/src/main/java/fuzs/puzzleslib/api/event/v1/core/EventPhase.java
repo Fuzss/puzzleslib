@@ -2,7 +2,7 @@ package fuzs.puzzleslib.api.event.v1.core;
 
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.event.core.EventPhaseImpl;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.BiConsumer;
@@ -16,7 +16,7 @@ public interface EventPhase {
     /**
      * Fabric's default event phase, equivalent to EventPriority#NORMAL on Forge.
      */
-    EventPhase DEFAULT = new EventPhaseImpl(ResourceLocation.fromNamespaceAndPath("fabric", "default"), null, null);
+    EventPhase DEFAULT = new EventPhaseImpl(Identifier.fromNamespaceAndPath("fabric", "default"), null, null);
     /**
      * A phase to be used directly before the default phase, equivalent to EventPriority#HIGH on Forge.
      */
@@ -35,9 +35,9 @@ public interface EventPhase {
     EventPhase LAST = new EventPhaseImpl(PuzzlesLibMod.id("last"), AFTER, EventPhaseImpl.Ordering.AFTER);
 
     /**
-     * @return the resource location used for registering this phase on Fabric
+     * @return the identifier used for registering this phase on Fabric
      */
-    ResourceLocation resourceLocation();
+    Identifier identifier();
 
     /**
      * @return another event phase that runs before / after this one, the order is defined by
@@ -51,18 +51,18 @@ public interface EventPhase {
      *
      * @param phaseOrderingConsumer apply event phases to the Fabric event
      */
-    default void applyOrdering(BiConsumer<ResourceLocation, ResourceLocation> phaseOrderingConsumer) {
-        this.applyOrdering(this.resourceLocation(), phaseOrderingConsumer);
+    default void applyOrdering(BiConsumer<Identifier, Identifier> phaseOrderingConsumer) {
+        this.applyOrdering(this.identifier(), phaseOrderingConsumer);
     }
 
     /**
      * The ordering defines in which relation this event phase is to {@link #parent()}, if it is supposed to run before
      * or afterward.
      *
-     * @param resourceLocation      the resource location used for registering this phase on Fabric
+     * @param identifier      the identifier used for registering this phase on Fabric
      * @param phaseOrderingConsumer apply event phases to the Fabric event
      */
-    void applyOrdering(ResourceLocation resourceLocation, BiConsumer<ResourceLocation, ResourceLocation> phaseOrderingConsumer);
+    void applyOrdering(Identifier identifier, BiConsumer<Identifier, Identifier> phaseOrderingConsumer);
 
     /**
      * @return the ordering value used in relation to {@link #parent()}
@@ -76,7 +76,7 @@ public interface EventPhase {
      * @return the custom event phase
      */
     static EventPhase early(EventPhase eventPhase) {
-        return new EventPhaseImpl(PuzzlesLibMod.id("early_" + eventPhase.resourceLocation().getPath()),
+        return new EventPhaseImpl(PuzzlesLibMod.id("early_" + eventPhase.identifier().getPath()),
                 eventPhase,
                 EventPhaseImpl.Ordering.BEFORE);
     }
@@ -88,7 +88,7 @@ public interface EventPhase {
      * @return the custom event phase
      */
     static EventPhase late(EventPhase eventPhase) {
-        return new EventPhaseImpl(PuzzlesLibMod.id("late_" + eventPhase.resourceLocation().getPath()),
+        return new EventPhaseImpl(PuzzlesLibMod.id("late_" + eventPhase.identifier().getPath()),
                 eventPhase,
                 EventPhaseImpl.Ordering.AFTER);
     }

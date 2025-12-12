@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.event;
 
 import net.minecraft.world.entity.item.ItemEntity;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 

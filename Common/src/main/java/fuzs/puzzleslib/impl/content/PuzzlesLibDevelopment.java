@@ -2,9 +2,9 @@ package fuzs.puzzleslib.impl.content;
 
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import org.objectweb.asm.Type;
 
 import java.lang.reflect.Field;
@@ -35,18 +35,19 @@ public class PuzzlesLibDevelopment extends PuzzlesLib implements ModConstructor 
     }
 
     private static void initializeGameRules() {
-        GameRuleValueOverrides.setValue(GameRules.RULE_DAYLIGHT, false);
-        GameRuleValueOverrides.setValue(GameRules.RULE_WEATHER_CYCLE, false);
-        GameRuleValueOverrides.setValue(GameRules.RULE_KEEPINVENTORY, true);
-        GameRuleValueOverrides.setValue(GameRules.RULE_DOFIRETICK, false);
-        GameRuleValueOverrides.setValue(GameRules.RULE_MOBGRIEFING, false);
-        GameRuleValueOverrides.setValue(GameRules.RULE_DOINSOMNIA, false);
-        GameRuleValueOverrides.setValue(GameRules.RULE_DO_PATROL_SPAWNING, false);
-        GameRuleValueOverrides.setValue(GameRules.RULE_DO_TRADER_SPAWNING, false);
-        GameRuleValueOverrides.setValue(GameRules.RULE_DO_VINES_SPREAD, false);
-        GameRuleValueOverrides.setValue(GameRules.RULE_MAX_ENTITY_CRAMMING, 0);
-        GameRuleValueOverrides.setValue(GameRules.RULE_PLAYERS_NETHER_PORTAL_DEFAULT_DELAY, 1);
-        GameRuleValueOverrides.setValue(GameRules.RULE_COMMANDBLOCKOUTPUT, false);
+        GameRules.ADVANCE_TIME.defaultValue = Boolean.FALSE;
+        GameRules.ADVANCE_TIME.defaultValue = Boolean.FALSE;
+        GameRules.ADVANCE_WEATHER.defaultValue = Boolean.FALSE;
+        GameRules.KEEP_INVENTORY.defaultValue = true;
+        GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER.defaultValue = 0;
+        GameRules.MOB_GRIEFING.defaultValue = Boolean.FALSE;
+        GameRules.SPAWN_PHANTOMS.defaultValue = Boolean.FALSE;
+        GameRules.SPAWN_PATROLS.defaultValue = Boolean.FALSE;
+        GameRules.SPAWN_WANDERING_TRADERS.defaultValue = Boolean.FALSE;
+        GameRules.SPREAD_VINES.defaultValue = Boolean.FALSE;
+        GameRules.MAX_ENTITY_CRAMMING.defaultValue = 0;
+        GameRules.PLAYERS_NETHER_PORTAL_DEFAULT_DELAY.defaultValue = 1;
+        GameRules.COMMAND_BLOCK_OUTPUT.defaultValue = Boolean.FALSE;
     }
 
     public static void printClazzComponentsWithoutAccess(Class<?> clazz) {
@@ -58,6 +59,7 @@ public class PuzzlesLibDevelopment extends PuzzlesLib implements ModConstructor 
                         Type.getDescriptor(field.getType()));
             }
         }
+
         for (Method method : clazz.getDeclaredMethods()) {
             if (!Modifier.isPublic(method.getModifiers()) && !method.isSynthetic()) {
                 LOGGER.info("transitive-accessible\tmethod\t{}\t{}\t{}",
@@ -68,7 +70,7 @@ public class PuzzlesLibDevelopment extends PuzzlesLib implements ModConstructor 
         }
     }
 
-    public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    public static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 }

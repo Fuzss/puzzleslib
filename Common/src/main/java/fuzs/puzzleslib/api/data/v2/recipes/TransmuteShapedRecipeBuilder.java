@@ -16,7 +16,7 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.ItemLike;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -100,7 +100,7 @@ public class TransmuteShapedRecipeBuilder extends ShapedRecipeBuilder {
     @Override
     public void save(RecipeOutput recipeOutput, ResourceKey<Recipe<?>> resourceKey) {
         Objects.requireNonNull(this.input, "input is null");
-        super.save(new TransformingRecipeOutput(recipeOutput, (Recipe<?> recipe) -> {
+        super.save(TransformingRecipeOutput.transformed(recipeOutput, (Recipe<?> recipe) -> {
             return new TransmuteShapedRecipe(TransmuteShapedRecipeBuilder.this.recipeSerializer,
                     (ShapedRecipe) recipe,
                     TransmuteShapedRecipeBuilder.this.input);

@@ -8,8 +8,8 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.TagsProvider;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagBuilder;
 import net.minecraft.tags.TagKey;
 import org.jetbrains.annotations.ApiStatus;
@@ -37,15 +37,15 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     protected TagBuilder getOrCreateRawBuilder(TagKey<T> tagKey) {
         // use our own tag builder implementation
         return this.builders.computeIfAbsent(tagKey.location(),
-                (ResourceLocation resourceLocation) -> new SortingTagBuilder());
+                (Identifier identifier) -> new SortingTagBuilder());
     }
 
     public AbstractTagAppender<T> tag(String string) {
-        return this.tag(ResourceLocation.parse(string));
+        return this.tag(Identifier.parse(string));
     }
 
-    public AbstractTagAppender<T> tag(ResourceLocation resourceLocation) {
-        return this.tag(TagKey.create(this.registryKey, resourceLocation));
+    public AbstractTagAppender<T> tag(Identifier identifier) {
+        return this.tag(TagKey.create(this.registryKey, identifier));
     }
 
     public AbstractTagAppender<T> tag(TagKey<T> tagKey) {

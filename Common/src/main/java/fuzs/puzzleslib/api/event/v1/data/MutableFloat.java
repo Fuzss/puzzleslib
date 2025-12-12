@@ -50,7 +50,7 @@ public interface MutableFloat {
      *
      * @param operator operator to apply to contained value
      */
-    default void mapFloat(UnaryOperator<Float> operator) {
+    default void mapAsFloat(UnaryOperator<Float> operator) {
         this.accept(operator.apply(this.getAsFloat()));
     }
 }

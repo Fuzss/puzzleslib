@@ -16,13 +16,10 @@ import fuzs.puzzleslib.api.client.event.v1.model.ModelLoadingEvents;
 import fuzs.puzzleslib.api.client.event.v1.renderer.*;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.fabric.api.client.event.v1.*;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.event.data.DefaultedInt;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
-import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
-import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
@@ -43,11 +40,8 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.client.renderer.item.ItemModel;
-import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -62,7 +56,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -81,85 +75,85 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ScreenOpeningCallback.class, FabricGuiEvents.SCREEN_OPENING);
         INSTANCE.register(ModelLoadingEvents.LoadModel.class,
                 (ModelLoadingEvents.LoadModel callback, @Nullable Object o) -> {
-                    ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
-                        pluginContext.modifyModelOnLoad()
-                                .register(ModelModifier.OVERRIDE_PHASE,
-                                        (UnbakedModel model, ModelModifier.OnLoad.Context context) -> {
-                                            EventResultHolder<UnbakedModel> eventResult = callback.onLoadModel(context.id(),
-                                                    model);
-                                            return eventResult.getInterrupt().orElse(model);
-                                        });
-                    });
+//                    ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
+//                        pluginContext.modifyModelOnLoad()
+//                                .register(ModelModifier.OVERRIDE_PHASE,
+//                                        (UnbakedModel model, ModelModifier.OnLoad.Context context) -> {
+//                                            EventResultHolder<UnbakedModel> eventResult = callback.onLoadModel(context.id(),
+//                                                    model);
+//                                            return eventResult.getInterrupt().orElse(model);
+//                                        });
+//                    });
                 });
         INSTANCE.register(ModelBakingEvents.BeforeItem.class,
                 (ModelBakingEvents.BeforeItem callback, @Nullable Object o) -> {
-                    ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
-                        pluginContext.modifyItemModelBeforeBake()
-                                .register(ModelModifier.OVERRIDE_PHASE,
-                                        (ItemModel.Unbaked model, ModelModifier.BeforeBakeItem.Context context) -> {
-                                            EventResultHolder<ItemModel.Unbaked> eventResult = callback.onBeforeBakeItem(
-                                                    context.itemId(),
-                                                    model,
-                                                    context.bakeContext());
-                                            return eventResult.getInterrupt().orElse(model);
-                                        });
-                    });
+//                    ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
+//                        pluginContext.modifyItemModelBeforeBake()
+//                                .register(ModelModifier.OVERRIDE_PHASE,
+//                                        (ItemModel.Unbaked model, ModelModifier.BeforeBakeItem.Context context) -> {
+//                                            EventResultHolder<ItemModel.Unbaked> eventResult = callback.onBeforeBakeItem(
+//                                                    context.itemId(),
+//                                                    model,
+//                                                    context.bakeContext());
+//                                            return eventResult.getInterrupt().orElse(model);
+//                                        });
+//                    });
                 });
         INSTANCE.register(ModelBakingEvents.AfterItem.class,
                 (ModelBakingEvents.AfterItem callback, @Nullable Object o) -> {
-                    ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
-                        pluginContext.modifyItemModelAfterBake()
-                                .register(ModelModifier.OVERRIDE_PHASE,
-                                        (ItemModel model, ModelModifier.AfterBakeItem.Context context) -> {
-                                            EventResultHolder<ItemModel> eventResult = callback.onAfterBakeItem(context.itemId(),
-                                                    model,
-                                                    context.sourceModel(),
-                                                    context.bakeContext());
-                                            return eventResult.getInterrupt().orElse(model);
-                                        });
-                    });
+//                    ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
+//                        pluginContext.modifyItemModelAfterBake()
+//                                .register(ModelModifier.OVERRIDE_PHASE,
+//                                        (ItemModel model, ModelModifier.AfterBakeItem.Context context) -> {
+//                                            EventResultHolder<ItemModel> eventResult = callback.onAfterBakeItem(context.itemId(),
+//                                                    model,
+//                                                    context.sourceModel(),
+//                                                    context.bakeContext());
+//                                            return eventResult.getInterrupt().orElse(model);
+//                                        });
+//                    });
                 });
         INSTANCE.register(ModelLoadingEvents.LoadBlockModel.class,
                 (ModelLoadingEvents.LoadBlockModel callback, @Nullable Object o) -> {
-                    ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
-                        pluginContext.modifyBlockModelOnLoad()
-                                .register(ModelModifier.OVERRIDE_PHASE,
-                                        (BlockStateModel.UnbakedRoot model, ModelModifier.OnLoadBlock.Context context) -> {
-                                            EventResultHolder<BlockStateModel.UnbakedRoot> eventResult = callback.onLoadBlockModel(
-                                                    context.state(),
-                                                    model);
-                                            return eventResult.getInterrupt().orElse(model);
-                                        });
-                    });
+//                    ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
+//                        pluginContext.modifyBlockModelOnLoad()
+//                                .register(ModelModifier.OVERRIDE_PHASE,
+//                                        (BlockStateModel.UnbakedRoot model, ModelModifier.OnLoadBlock.Context context) -> {
+//                                            EventResultHolder<BlockStateModel.UnbakedRoot> eventResult = callback.onLoadBlockModel(
+//                                                    context.state(),
+//                                                    model);
+//                                            return eventResult.getInterrupt().orElse(model);
+//                                        });
+//                    });
                 });
         INSTANCE.register(ModelBakingEvents.BeforeBlock.class,
                 (ModelBakingEvents.BeforeBlock callback, @Nullable Object o) -> {
-                    ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
-                        pluginContext.modifyBlockModelBeforeBake()
-                                .register(ModelModifier.OVERRIDE_PHASE,
-                                        (BlockStateModel.UnbakedRoot model, ModelModifier.BeforeBakeBlock.Context context) -> {
-                                            EventResultHolder<BlockStateModel.UnbakedRoot> eventResult = callback.onBeforeBakeBlock(
-                                                    context.state(),
-                                                    model,
-                                                    context.baker());
-                                            return eventResult.getInterrupt().orElse(model);
-                                        });
-                    });
+//                    ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
+//                        pluginContext.modifyBlockModelBeforeBake()
+//                                .register(ModelModifier.OVERRIDE_PHASE,
+//                                        (BlockStateModel.UnbakedRoot model, ModelModifier.BeforeBakeBlock.Context context) -> {
+//                                            EventResultHolder<BlockStateModel.UnbakedRoot> eventResult = callback.onBeforeBakeBlock(
+//                                                    context.state(),
+//                                                    model,
+//                                                    context.baker());
+//                                            return eventResult.getInterrupt().orElse(model);
+//                                        });
+//                    });
                 });
         INSTANCE.register(ModelBakingEvents.AfterBlock.class,
                 (ModelBakingEvents.AfterBlock callback, @Nullable Object o) -> {
-                    ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
-                        pluginContext.modifyBlockModelAfterBake()
-                                .register(ModelModifier.OVERRIDE_PHASE,
-                                        (BlockStateModel model, ModelModifier.AfterBakeBlock.Context context) -> {
-                                            EventResultHolder<BlockStateModel> eventResult = callback.onAfterBakeBlock(
-                                                    context.state(),
-                                                    model,
-                                                    context.sourceModel(),
-                                                    context.baker());
-                                            return eventResult.getInterrupt().orElse(model);
-                                        });
-                    });
+//                    ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
+//                        pluginContext.modifyBlockModelAfterBake()
+//                                .register(ModelModifier.OVERRIDE_PHASE,
+//                                        (BlockStateModel model, ModelModifier.AfterBakeBlock.Context context) -> {
+//                                            EventResultHolder<BlockStateModel> eventResult = callback.onAfterBakeBlock(
+//                                                    context.state(),
+//                                                    model,
+//                                                    context.sourceModel(),
+//                                                    context.baker());
+//                                            return eventResult.getInterrupt().orElse(model);
+//                                        });
+//                    });
                 });
         INSTANCE.register(ClientLifecycleEvents.Started.class,
                 net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents.CLIENT_STARTED,
@@ -592,7 +586,6 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(AddToastCallback.class, FabricGuiEvents.ADD_TOAST);
         INSTANCE.register(ComputeFieldOfViewCallback.class, FabricRendererEvents.COMPUTE_FIELD_OF_VIEW);
         INSTANCE.register(ChatMessageReceivedCallback.class, FabricClientEvents.CHAT_MESSAGE_RECEIVED);
-        INSTANCE.register(GatherEffectScreenTooltipCallback.class, FabricGuiEvents.GATHER_EFFECT_SCREEN_TOOLTIP);
         INSTANCE.register(ExtractRenderStateCallback.class, FabricRendererEvents.EXTRACT_RENDER_STATE);
     }
 

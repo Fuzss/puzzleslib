@@ -6,7 +6,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public final class MobEffectEvents {
     public static final EventInvoker<Affects> AFFECTS = EventInvoker.lookup(Affects.class);

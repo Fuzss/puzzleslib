@@ -2,12 +2,12 @@ package fuzs.puzzleslib.fabric.impl.core.context;
 
 import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
 import fuzs.puzzleslib.api.resources.v1.PackResourcesHelper;
-import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
-import net.fabricmc.fabric.impl.resource.loader.ResourceManagerHelperImpl;
+import net.fabricmc.fabric.api.resource.v1.pack.PackActivationType;
+import net.fabricmc.fabric.impl.resource.ResourceLoaderImpl;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.RepositorySource;
@@ -26,23 +26,20 @@ public final class DataPackSourcesContextFabricImpl implements PackRepositorySou
     }
 
     @Override
-    public void registerBuiltInPack(ResourceLocation resourceLocation, Component displayName, boolean shouldAddAutomatically) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
+    public void registerBuiltInPack(Identifier identifier, Component displayName, boolean shouldAddAutomatically) {
+        Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(displayName, "display name is null");
-        registerBuiltInPack(resourceLocation, displayName, shouldAddAutomatically, PackType.SERVER_DATA);
+        registerBuiltInPack(identifier, displayName, shouldAddAutomatically, PackType.SERVER_DATA);
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    public static void registerBuiltInPack(ResourceLocation resourceLocation, Component displayName, boolean shouldAddAutomatically, PackType packType) {
-        ModContainer modContainer = FabricLoader.getInstance()
-                .getModContainer(resourceLocation.getNamespace())
-                .orElseThrow();
-        ResourceManagerHelperImpl.registerBuiltinResourcePack(resourceLocation,
-                PackResourcesHelper.getBuiltInPack(resourceLocation, packType).getPath(),
+    public static void registerBuiltInPack(Identifier identifier, Component displayName, boolean shouldAddAutomatically, PackType packType) {
+        ModContainer modContainer = FabricLoader.getInstance().getModContainer(identifier.getNamespace()).orElseThrow();
+        ResourceLoaderImpl.registerBuiltinPack(identifier,
+                PackResourcesHelper.getBuiltInPack(identifier, packType).getPath(),
                 modContainer,
                 displayName,
-                shouldAddAutomatically ? ResourcePackActivationType.DEFAULT_ENABLED :
-                        ResourcePackActivationType.NORMAL);
+                shouldAddAutomatically ? PackActivationType.DEFAULT_ENABLED : PackActivationType.NORMAL);
     }
 
     public static void addAll(PackRepository packRepository) {

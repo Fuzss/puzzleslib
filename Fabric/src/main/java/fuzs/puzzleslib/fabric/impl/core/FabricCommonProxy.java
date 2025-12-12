@@ -2,10 +2,11 @@ package fuzs.puzzleslib.fabric.impl.core;
 
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
+import fuzs.puzzleslib.api.data.v2.AbstractRecipeProvider;
+import fuzs.puzzleslib.api.data.v2.recipes.TransformingRecipeOutput;
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents;
-import fuzs.puzzleslib.api.init.v3.GameRulesFactory;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryFactory;
 import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
 import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
@@ -14,7 +15,6 @@ import fuzs.puzzleslib.fabric.impl.core.context.PayloadTypesContextFabricImpl;
 import fuzs.puzzleslib.fabric.impl.data.FabricTagAppender;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventInvokerRegistryImpl;
 import fuzs.puzzleslib.fabric.impl.event.SpawnReasonMob;
-import fuzs.puzzleslib.fabric.impl.init.FabricGameRulesFactory;
 import fuzs.puzzleslib.fabric.impl.init.FabricRegistryFactory;
 import fuzs.puzzleslib.fabric.impl.item.FabricToolTypeHelper;
 import fuzs.puzzleslib.fabric.impl.item.crafting.FabricCombinedIngredients;
@@ -27,8 +27,14 @@ import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.CachedOutput;
+import net.minecraft.data.PackOutput;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.chat.Component;
@@ -39,8 +45,8 @@ import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.network.protocol.common.custom.BrandPayload;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.configuration.ServerConfigurationPacketListener;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -55,7 +61,7 @@ import net.minecraft.tags.TagBuilder;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.boss.EnderDragonPart;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -63,20 +69,23 @@ import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 public class FabricCommonProxy implements FabricProxy {
     private final Set<String> hiddenPacks = new HashSet<>();
@@ -109,9 +118,9 @@ public class FabricCommonProxy implements FabricProxy {
     }
 
     @Override
-    public Pack.Metadata createPackInfo(ResourceLocation resourceLocation, Component descriptionComponent, PackCompatibility packCompatibility, FeatureFlagSet featureFlagSet, boolean hidden) {
+    public Pack.Metadata createPackInfo(Identifier identifier, Component descriptionComponent, PackCompatibility packCompatibility, FeatureFlagSet featureFlagSet, boolean hidden) {
         if (hidden) {
-            this.hiddenPacks.add(resourceLocation.toString());
+            this.hiddenPacks.add(identifier.toString());
         }
 
         return new Pack.Metadata(descriptionComponent, packCompatibility, featureFlagSet, Collections.emptyList());
@@ -223,11 +232,6 @@ public class FabricCommonProxy implements FabricProxy {
     }
 
     @Override
-    public GameRulesFactory getGameRulesFactory() {
-        return new FabricGameRulesFactory();
-    }
-
-    @Override
     public ToolTypeHelper getToolTypeHelper() {
         return new FabricToolTypeHelper();
     }
@@ -248,6 +252,48 @@ public class FabricCommonProxy implements FabricProxy {
     }
 
     @Override
+    public RecipeOutput getTransformingRecipeOutput(RecipeOutput recipeOutput, UnaryOperator<Recipe<?>> operator) {
+        return new TransformingRecipeOutput() {
+            @Override
+            public RecipeOutput recipeOutput() {
+                return recipeOutput;
+            }
+
+            @Override
+            public UnaryOperator<Recipe<?>> operator() {
+                return operator;
+            }
+        };
+    }
+
+    @Override
+    public RecipeOutput getRecipeProviderOutput(CachedOutput output, String modId, PackOutput packOutput, HolderLookup.Provider registries, Consumer<CompletableFuture<?>> consumer) {
+        return new AbstractRecipeProvider.RecipeOutputImpl(output, modId, packOutput, registries, consumer) {
+            // NO-OP
+        };
+    }
+
+    @Override
+    public RecipeOutput getThrowingRecipeOutput() {
+        return new RecipeOutput() {
+            @Override
+            public void accept(ResourceKey<Recipe<?>> resourceKey, Recipe<?> recipe, @Nullable AdvancementHolder advancementHolder) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public Advancement.Builder advancement() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void includeRootAdvancement() {
+                throw new UnsupportedOperationException();
+            }
+        };
+    }
+
+    @Override
     public boolean canEquip(ItemStack itemStack, EquipmentSlot equipmentSlot, LivingEntity livingEntity) {
         return equipmentSlot == livingEntity.getEquipmentSlotForItem(itemStack);
     }
@@ -259,7 +305,7 @@ public class FabricCommonProxy implements FabricProxy {
 
     @Override
     public boolean isMobGriefingAllowed(ServerLevel serverLevel, @Nullable Entity entity) {
-        return serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+        return serverLevel.getGameRules().get(GameRules.MOB_GRIEFING);
     }
 
     @Override

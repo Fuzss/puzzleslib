@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.item.properties.conditional.ConditionalItem
 import net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemModelProperty;
 import net.minecraft.client.renderer.item.properties.select.SelectItemModelProperty;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Register codecs for handling custom item model types and properties.
@@ -17,48 +17,48 @@ public interface ItemModelsContext {
     /**
      * Register a codec for a custom {@link ItemModel.Unbaked} type.
      *
-     * @param resourceLocation the resource location
+     * @param identifier the identifier
      * @param codec            the corresponding codec for the type
      */
-    void registerItemModel(ResourceLocation resourceLocation, MapCodec<? extends ItemModel.Unbaked> codec);
+    void registerItemModel(Identifier identifier, MapCodec<? extends ItemModel.Unbaked> codec);
 
     /**
      * Register a codec for a custom {@link SpecialModelRenderer.Unbaked} type.
      *
-     * @param resourceLocation the resource location
+     * @param identifier the identifier
      * @param codec            the corresponding codec for the type
      */
-    void registerSpecialModelRenderer(ResourceLocation resourceLocation, MapCodec<? extends SpecialModelRenderer.Unbaked> codec);
+    void registerSpecialModelRenderer(Identifier identifier, MapCodec<? extends SpecialModelRenderer.Unbaked> codec);
 
     /**
      * Register a codec for a custom {@link ItemTintSource} type.
      *
-     * @param resourceLocation the resource location
+     * @param identifier the identifier
      * @param codec            the corresponding codec for the type
      */
-    void registerItemTintSource(ResourceLocation resourceLocation, MapCodec<? extends ItemTintSource> codec);
+    void registerItemTintSource(Identifier identifier, MapCodec<? extends ItemTintSource> codec);
 
     /**
      * Register a type for a custom {@link SelectItemModelProperty} implementation.
      *
-     * @param resourceLocation the resource location
+     * @param identifier the identifier
      * @param type             the corresponding codec for the type
      */
-    void registerSelectItemModelProperty(ResourceLocation resourceLocation, SelectItemModelProperty.Type<?, ?> type);
+    void registerSelectItemModelProperty(Identifier identifier, SelectItemModelProperty.Type<?, ?> type);
 
     /**
      * Register a codec for a custom {@link ConditionalItemModelProperty} type.
      *
-     * @param resourceLocation the resource location
+     * @param identifier the identifier
      * @param codec            the corresponding codec for the type
      */
-    void registerConditionalItemModelProperty(ResourceLocation resourceLocation, MapCodec<? extends ConditionalItemModelProperty> codec);
+    void registerConditionalItemModelProperty(Identifier identifier, MapCodec<? extends ConditionalItemModelProperty> codec);
 
     /**
      * Register a codec for a custom {@link RangeSelectItemModelProperty} type.
      *
-     * @param resourceLocation the resource location
+     * @param identifier the identifier
      * @param codec            the corresponding codec for the type
      */
-    void registerRangeSelectItemModelProperty(ResourceLocation resourceLocation, MapCodec<? extends RangeSelectItemModelProperty> codec);
+    void registerRangeSelectItemModelProperty(Identifier identifier, MapCodec<? extends RangeSelectItemModelProperty> codec);
 }

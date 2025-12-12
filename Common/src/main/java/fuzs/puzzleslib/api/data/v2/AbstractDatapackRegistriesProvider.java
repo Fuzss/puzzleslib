@@ -3,7 +3,6 @@ package fuzs.puzzleslib.api.data.v2;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.api.data.v2.core.RegistriesDataProvider;
 import fuzs.puzzleslib.api.init.v3.registry.ResourceKeyHelper;
-import net.minecraft.Util;
 import net.minecraft.core.*;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.registries.RegistriesDatapackGenerator;
@@ -13,6 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Util;
 import net.minecraft.world.damagesource.DamageEffects;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.item.Instrument;
@@ -53,15 +53,15 @@ public abstract class AbstractDatapackRegistriesProvider extends RegistriesDatap
     }
 
     public static void registerEnchantment(BootstrapContext<Enchantment> context, ResourceKey<Enchantment> resourceKey, Enchantment.Builder builder) {
-        context.register(resourceKey, builder.build(resourceKey.location()));
+        context.register(resourceKey, builder.build(resourceKey.identifier()));
     }
 
     public static void registerDamageType(BootstrapContext<DamageType> context, ResourceKey<DamageType> resourceKey) {
-        context.register(resourceKey, new DamageType(resourceKey.location().getPath(), 0.1F));
+        context.register(resourceKey, new DamageType(resourceKey.identifier().getPath(), 0.1F));
     }
 
     public static void registerDamageType(BootstrapContext<DamageType> context, ResourceKey<DamageType> resourceKey, DamageEffects damageEffects) {
-        context.register(resourceKey, new DamageType(resourceKey.location().getPath(), 0.1F, damageEffects));
+        context.register(resourceKey, new DamageType(resourceKey.identifier().getPath(), 0.1F, damageEffects));
     }
 
     public static void registerTrimMaterial(BootstrapContext<TrimMaterial> context, ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor) {
@@ -71,7 +71,7 @@ public abstract class AbstractDatapackRegistriesProvider extends RegistriesDatap
     public static void registerTrimMaterial(BootstrapContext<TrimMaterial> context, ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor, Map<ResourceKey<EquipmentAsset>, String> overrideArmorAssets) {
         Component component = ResourceKeyHelper.getComponent(resourceKey)
                 .withStyle(Style.EMPTY.withColor(descriptionColor));
-        MaterialAssetGroup materialAssetGroup = MaterialAssetGroup.create(resourceKey.location().getPath(),
+        MaterialAssetGroup materialAssetGroup = MaterialAssetGroup.create(resourceKey.identifier().getPath(),
                 overrideArmorAssets);
         TrimMaterial trimMaterial = new TrimMaterial(materialAssetGroup, component);
         context.register(resourceKey, trimMaterial);

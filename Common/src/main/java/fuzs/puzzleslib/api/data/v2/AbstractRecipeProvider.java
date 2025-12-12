@@ -7,13 +7,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.JsonOps;
-import com.mojang.serialization.Lifecycle;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -22,9 +21,9 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.flag.FeatureFlags;
@@ -35,7 +34,8 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -44,25 +44,8 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public abstract class AbstractRecipeProvider extends RecipeProvider implements DataProvider {
-    static final RegistryAccess EMPTY_REGISTRY_ACCESS = new RegistryAccess.ImmutableRegistryAccess(List.of(new MappedRegistry<>(
-            Registries.ITEM,
-            Lifecycle.stable())));
-    static final RecipeOutput EMPTY_RECIPE_OUTPUT = new RecipeOutput() {
-        @Override
-        public void accept(ResourceKey<Recipe<?>> resourceKey, Recipe<?> recipe, @Nullable AdvancementHolder advancementHolder) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Advancement.Builder advancement() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void includeRootAdvancement() {
-            throw new UnsupportedOperationException();
-        }
-    };
+    static final RegistryAccess REGISTRY_ACCESS = RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY);
+    static final RecipeOutput RECIPE_OUTPUT = ProxyImpl.get().getThrowingRecipeOutput();
     private static final Map<BlockFamily.Variant, BiFunction<ItemLike, ItemLike, RecipeBuilder>> STONECUTTING_BUILDERS = ImmutableMap.<BlockFamily.Variant, BiFunction<ItemLike, ItemLike, RecipeBuilder>>builder()
             .put(BlockFamily.Variant.CHISELED,
                     (itemLike, itemLike2) -> SingleItemRecipeBuilder.stonecutting(Ingredient.of(itemLike2),
@@ -100,7 +83,7 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
     }
 
     public AbstractRecipeProvider(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
-        super(EMPTY_REGISTRY_ACCESS, EMPTY_RECIPE_OUTPUT);
+        super(REGISTRY_ACCESS, RECIPE_OUTPUT);
         this.modId = modId;
         this.packOutput = packOutput;
         this.registries = registries;
@@ -126,6 +109,7 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
                         return new JsonPrimitive(replaceWith.toString());
                     }
                 }
+
                 return jsonElement;
             } else if (jsonElement.isJsonArray()) {
                 JsonArray jsonArray = jsonElement.getAsJsonArray();
@@ -139,6 +123,7 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
                 }
             }
         }
+
         return jsonElement;
     }
 
@@ -252,9 +237,9 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
     }
 
     public static String getCraftingMethodRecipeName(ItemLike resultItem, RecipeSerializer<?> recipeSerializer) {
-        ResourceLocation resourceLocation = BuiltInRegistries.RECIPE_SERIALIZER.getKey(recipeSerializer);
-        Objects.requireNonNull(resourceLocation, "resource location is null");
-        return getCraftingMethodRecipeName(resultItem, resourceLocation.getPath());
+        Identifier identifier = BuiltInRegistries.RECIPE_SERIALIZER.getKey(recipeSerializer);
+        Objects.requireNonNull(identifier, "identifier is null");
+        return getCraftingMethodRecipeName(resultItem, identifier.getPath());
     }
 
     public static String getCraftingMethodRecipeName(ItemLike resultItem, String craftingMethod) {
@@ -279,12 +264,13 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
         // leading to some files silently failing to generate at all
         return this.registries.thenCompose((HolderLookup.Provider registries) -> {
             List<CompletableFuture<?>> completableFutures = new ArrayList<>();
-            RecipeOutput recipeOutput = new RecipeOutputImpl(output, registries, completableFutures::add);
+            RecipeOutput recipeOutput = ProxyImpl.get()
+                    .getRecipeProviderOutput(output, this.modId, this.packOutput, registries, completableFutures::add);
             this.injectRegistries(registries, recipeOutput);
             this.addRecipes(recipeOutput);
             return CompletableFuture.allOf(completableFutures.toArray(CompletableFuture[]::new));
         }).thenRun(() -> {
-            this.injectRegistries(EMPTY_REGISTRY_ACCESS, EMPTY_RECIPE_OUTPUT);
+            this.injectRegistries(REGISTRY_ACCESS, RECIPE_OUTPUT);
         });
     }
 
@@ -295,12 +281,12 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
     }
 
     public final HolderLookup.Provider registries() {
-        Preconditions.checkState(super.registries != EMPTY_REGISTRY_ACCESS, "registry access is empty");
+        Preconditions.checkState(super.registries != REGISTRY_ACCESS, "registry access is empty");
         return super.registries;
     }
 
     public final HolderGetter<Item> items() {
-        Preconditions.checkState(super.registries != EMPTY_REGISTRY_ACCESS, "registry access is empty");
+        Preconditions.checkState(super.registries != REGISTRY_ACCESS, "registry access is empty");
         return super.items;
     }
 
@@ -316,20 +302,21 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
         return "Recipes";
     }
 
-    private class RecipeOutputImpl implements RecipeOutput {
+    @ApiStatus.Internal
+    public static abstract class RecipeOutputImpl implements RecipeOutput {
         private final CachedOutput output;
+        private final String modId;
         private final PackOutput.PathProvider recipePathProvider;
         private final PackOutput.PathProvider advancementPathProvider;
         private final HolderLookup.Provider registries;
         private final Consumer<CompletableFuture<?>> consumer;
         private final Set<ResourceKey<Recipe<?>>> recipes = new HashSet<>();
 
-        public RecipeOutputImpl(CachedOutput output, HolderLookup.Provider registries, Consumer<CompletableFuture<?>> consumer) {
+        protected RecipeOutputImpl(CachedOutput output, String modId, PackOutput packOutput, HolderLookup.Provider registries, Consumer<CompletableFuture<?>> consumer) {
             this.output = output;
-            this.recipePathProvider = AbstractRecipeProvider.this.packOutput.createRegistryElementsPathProvider(
-                    Registries.RECIPE);
-            this.advancementPathProvider = AbstractRecipeProvider.this.packOutput.createRegistryElementsPathProvider(
-                    Registries.ADVANCEMENT);
+            this.modId = modId;
+            this.recipePathProvider = packOutput.createRegistryElementsPathProvider(Registries.RECIPE);
+            this.advancementPathProvider = packOutput.createRegistryElementsPathProvider(Registries.ADVANCEMENT);
             this.registries = registries;
             this.consumer = consumer;
         }
@@ -339,9 +326,8 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
             final ResourceKey<Recipe<?>> originalResourceKey = resourceKey;
             // relocate all recipes to the mod id, so they do not depend on the item namespace which would
             // place e.g. new recipes for vanilla items in 'minecraft' which is not desired
-            ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(AbstractRecipeProvider.this.modId,
-                    resourceKey.location().getPath());
-            resourceKey = ResourceKey.create(Registries.RECIPE, resourceLocation);
+            Identifier identifier = Identifier.fromNamespaceAndPath(this.modId, resourceKey.identifier().getPath());
+            resourceKey = ResourceKey.create(Registries.RECIPE, identifier);
             if (!this.recipes.add(resourceKey)) {
                 throw new IllegalStateException("Duplicate recipe " + resourceKey);
             } else {
@@ -349,13 +335,13 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
                         this.registries,
                         Recipe.CODEC,
                         recipe,
-                        this.recipePathProvider.json(resourceKey.location())));
+                        this.recipePathProvider.json(resourceKey.identifier())));
                 if (advancementHolder != null) {
                     RegistryOps<JsonElement> registryOps = this.registries.createSerializationContext(JsonOps.INSTANCE);
                     JsonElement jsonElement = Advancement.CODEC.encodeStart(registryOps, advancementHolder.value())
                             .getOrThrow();
                     jsonElement = searchAndReplaceValue(jsonElement, originalResourceKey, resourceKey);
-                    ResourceLocation advancementLocation = ResourceLocation.fromNamespaceAndPath(AbstractRecipeProvider.this.modId,
+                    Identifier advancementLocation = Identifier.fromNamespaceAndPath(this.modId,
                             advancementHolder.id().getPath());
                     this.consumer.accept(DataProvider.saveStable(this.output,
                             jsonElement,

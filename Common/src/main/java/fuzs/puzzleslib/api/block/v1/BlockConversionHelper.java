@@ -3,8 +3,8 @@ package fuzs.puzzleslib.api.block.v1;
 import fuzs.puzzleslib.api.event.v1.server.TagsUpdatedCallback;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -32,14 +32,14 @@ public final class BlockConversionHelper {
      * The id property is also set on the new instance.
      *
      * @param block            the original block
-     * @param resourceLocation the id for the new block
+     * @param identifier the id for the new block
      * @return the new block properties instance
      */
-    public static BlockBehaviour.Properties copyBlockProperties(Block block, ResourceLocation resourceLocation) {
+    public static BlockBehaviour.Properties copyBlockProperties(Block block, Identifier identifier) {
         return BlockBehaviour.Properties.ofFullCopy(block)
                 .overrideLootTable(block.getLootTable())
                 .overrideDescription(block.getDescriptionId())
-                .setId(ResourceKey.create(Registries.BLOCK, resourceLocation));
+                .setId(ResourceKey.create(Registries.BLOCK, identifier));
     }
 
     /**
@@ -62,8 +62,8 @@ public final class BlockConversionHelper {
      */
     public static void setItemForBlock(Block block, Item item) {
         Objects.requireNonNull(block,
-                () -> "block " + (item != null ? "for item '" + BuiltInRegistries.ITEM.getKey(item) + "' " : "") +
-                        "is null");
+                () -> "block " + (item != null ? "for item '" + BuiltInRegistries.ITEM.getKey(item) + "' " : "")
+                        + "is null");
         Objects.requireNonNull(item, () -> "item for block '" + BuiltInRegistries.BLOCK.getKey(block) + "' is null");
         Item.BY_BLOCK.put(block, item);
         block.item = item;
@@ -78,12 +78,15 @@ public final class BlockConversionHelper {
      */
     public static void setBlockForItem(BlockItem item, Block block) {
         Objects.requireNonNull(item,
-                () -> "item " + (block != null ? "for block '" + BuiltInRegistries.BLOCK.getKey(block) + "' " : "") +
-                        "is null");
+                () -> "item " + (block != null ? "for block '" + BuiltInRegistries.BLOCK.getKey(block) + "' " : "")
+                        + "is null");
         Objects.requireNonNull(block, () -> "block for item '" + BuiltInRegistries.ITEM.getKey(item) + "' is null");
         Block oldBlock = item.getBlock();
         // block can somehow be null on Forge apparently
-        if (oldBlock != null) oldBlock.item = item;
+        if (oldBlock != null) {
+            oldBlock.item = item;
+        }
+
         item.block = block;
     }
 
@@ -97,8 +100,8 @@ public final class BlockConversionHelper {
     @SuppressWarnings("deprecation")
     public static void copyBoundTags(Block from, Block to) {
         Objects.requireNonNull(from,
-                () -> "source " + (to != null ? "for target '" + BuiltInRegistries.BLOCK.getKey(to) + "' " : "") +
-                        "is null");
+                () -> "source " + (to != null ? "for target '" + BuiltInRegistries.BLOCK.getKey(to) + "' " : "")
+                        + "is null");
         Objects.requireNonNull(to, () -> "target for source '" + BuiltInRegistries.BLOCK.getKey(from) + "' is null");
         Set<TagKey<Block>> fromTagKeys = from.builtInRegistryHolder().tags().collect(Collectors.toSet());
         Set<TagKey<Block>> toTagKeys = to.builtInRegistryHolder().tags().collect(Collectors.toSet());

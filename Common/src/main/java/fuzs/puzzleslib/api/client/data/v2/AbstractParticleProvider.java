@@ -8,9 +8,9 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -18,12 +18,12 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public abstract class AbstractParticleProvider implements DataProvider {
-    public static final Codec<ParticleDescription> CODEC = ResourceLocation.CODEC.listOf()
+    public static final Codec<ParticleDescription> CODEC = Identifier.CODEC.listOf()
             .fieldOf("textures")
             .xmap(ParticleDescription::new, ParticleDescription::getTextures)
             .codec();
 
-    private final Map<ResourceLocation, ParticleDescription> values = new LinkedHashMap<>();
+    private final Map<Identifier, ParticleDescription> values = new LinkedHashMap<>();
     private final PackOutput.PathProvider pathProvider;
     @Nullable
     private final ResourceManager clientResourceManager;
@@ -57,26 +57,26 @@ public abstract class AbstractParticleProvider implements DataProvider {
         this.add(particleType, BuiltInRegistries.PARTICLE_TYPE.getKey(particleType), indexStart, indexEnd);
     }
 
-    public void add(ParticleType<?> particleType, ResourceLocation resourceLocation, int indexEnd) {
-        this.add(BuiltInRegistries.PARTICLE_TYPE.getKey(particleType), resourceLocation, indexEnd);
+    public void add(ParticleType<?> particleType, Identifier identifier, int indexEnd) {
+        this.add(BuiltInRegistries.PARTICLE_TYPE.getKey(particleType), identifier, indexEnd);
     }
 
-    public void add(ParticleType<?> particleType, ResourceLocation resourceLocation, int indexStart, int indexEnd) {
-        this.add(BuiltInRegistries.PARTICLE_TYPE.getKey(particleType), resourceLocation, indexStart, indexEnd);
+    public void add(ParticleType<?> particleType, Identifier identifier, int indexStart, int indexEnd) {
+        this.add(BuiltInRegistries.PARTICLE_TYPE.getKey(particleType), identifier, indexStart, indexEnd);
     }
 
-    public void add(ResourceLocation id, ResourceLocation resourceLocation, int indexEnd) {
-        this.add(id, resourceLocation, 0, indexEnd);
+    public void add(Identifier id, Identifier identifier, int indexEnd) {
+        this.add(id, identifier, 0, indexEnd);
     }
 
-    public void add(ResourceLocation id, ResourceLocation resourceLocation, int indexStart, int indexEnd) {
+    public void add(Identifier id, Identifier identifier, int indexStart, int indexEnd) {
         if (indexEnd == -1) {
-            this.add(id, new ParticleDescription(Collections.singletonList(resourceLocation)));
+            this.add(id, new ParticleDescription(Collections.singletonList(identifier)));
         } else {
-            List<ResourceLocation> textures = IntStream.rangeClosed(Math.min(indexStart, indexEnd),
+            List<Identifier> textures = IntStream.rangeClosed(Math.min(indexStart, indexEnd),
                             Math.max(indexStart, indexEnd))
-                    .mapToObj((int index) -> ResourceLocation.fromNamespaceAndPath(resourceLocation.getNamespace(),
-                            resourceLocation.getPath() + "_" + index))
+                    .mapToObj((int index) -> Identifier.fromNamespaceAndPath(identifier.getNamespace(),
+                            identifier.getPath() + "_" + index))
                     .collect(Collectors.toList());
             if (indexEnd < indexStart) {
                 Collections.reverse(textures);
@@ -86,7 +86,7 @@ public abstract class AbstractParticleProvider implements DataProvider {
         }
     }
 
-    public void add(ResourceLocation id, ParticleDescription particleDescription) {
+    public void add(Identifier id, ParticleDescription particleDescription) {
         if (this.clientResourceManager != null) {
             this.validate(id, particleDescription, this.clientResourceManager);
         }
@@ -96,15 +96,15 @@ public abstract class AbstractParticleProvider implements DataProvider {
         }
     }
 
-    protected void validate(ResourceLocation id, ParticleDescription particleDescription, ResourceManager resourceManager) {
+    protected void validate(Identifier id, ParticleDescription particleDescription, ResourceManager resourceManager) {
         Objects.requireNonNull(resourceManager, "resource manager is null");
         List<String> missingTextures = particleDescription.getTextures()
                 .stream()
-                .filter((ResourceLocation resourceLocation) -> {
-                    return resourceManager.getResource(resourceLocation.withPath((String string) -> "textures/particle/"
+                .filter((Identifier identifier) -> {
+                    return resourceManager.getResource(identifier.withPath((String string) -> "textures/particle/"
                             + string + ".png")).isEmpty();
                 })
-                .map(ResourceLocation::toString)
+                .map(Identifier::toString)
                 .toList();
         if (!missingTextures.isEmpty()) {
             throw new IllegalArgumentException(

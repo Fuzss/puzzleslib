@@ -5,7 +5,7 @@ import net.minecraft.util.random.Weighted;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Set;
@@ -125,7 +125,7 @@ public interface MobSpawnSettingsContext {
      * @return the {@link net.minecraft.world.level.biome.MobSpawnSettings.MobSpawnCost} for the given
      *         <code>type</code>
      */
-    @Nullable MobSpawnSettings.MobSpawnCost getSpawnCost(EntityType<?> entityType);
+    MobSpawnSettings.@Nullable MobSpawnCost getSpawnCost(EntityType<?> entityType);
 
     /**
      * Associated JSON property: <code>creature_spawn_probability</code>.

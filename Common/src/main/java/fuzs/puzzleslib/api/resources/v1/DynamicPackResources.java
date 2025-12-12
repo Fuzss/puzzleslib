@@ -7,12 +7,12 @@ import com.google.common.hash.HashCode;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.api.data.v2.core.RegistriesDataProvider;
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import net.minecraft.FileUtil;
 import net.minecraft.data.DataProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.IoSupplier;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.util.FileUtil;
+import org.jspecify.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -40,10 +40,9 @@ public class DynamicPackResources extends AbstractModPackResources {
      */
     protected final DataProviderContext.Factory[] factories;
     /**
-     * A map containing all generated files stored by {@link PackType} and path (in form of a
-     * {@link ResourceLocation}).
+     * A map containing all generated files stored by {@link PackType} and path (in form of a {@link Identifier}).
      */
-    private Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> paths;
+    private Map<PackType, Map<Identifier, IoSupplier<InputStream>>> paths;
 
     /**
      * @param factories the {@link net.minecraft.data.DataProvider} factories used by this pack resources instances
@@ -65,18 +64,18 @@ public class DynamicPackResources extends AbstractModPackResources {
 
     /**
      * Runs all the supplied {@link net.minecraft.data.DataProvider}s, but instead of writing the generated files to
-     * disk collects the input streams stored by {@link PackType} and path (in form of a {@link ResourceLocation}).
+     * disk collects the input streams stored by {@link PackType} and path (in form of a {@link Identifier}).
      *
      * @param modId     the mod id namespace required for the data provider context
      * @param factories the data provider factories
      * @return map containing all generated files
      */
-    public static Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> generatePathsFromProviders(String modId, DataProviderContext.Factory... factories) {
+    public static Map<PackType, Map<Identifier, IoSupplier<InputStream>>> generatePathsFromProviders(String modId, DataProviderContext.Factory... factories) {
         try {
             Stopwatch stopwatch = Stopwatch.createStarted();
             // start with a map for each type, as data generation below runs on a thread pool,
             // they will override each other when creating the maps
-            Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> paths = Arrays.stream(PackType.values())
+            Map<PackType, Map<Identifier, IoSupplier<InputStream>>> paths = Arrays.stream(PackType.values())
                     .collect(Collectors.toMap(Function.identity(), (PackType packType) -> new ConcurrentHashMap<>()));
             DataProviderContext context = DataProviderContext.ofPath(modId);
             for (DataProviderContext.Factory factory : factories) {
@@ -94,17 +93,17 @@ public class DynamicPackResources extends AbstractModPackResources {
                         Objects.requireNonNull(packType,
                                 () -> "pack type for directory %s is null".formatted(strings.getFirst()));
                         String path = strings.stream().skip(2).collect(Collectors.joining("/"));
-                        ResourceLocation resourceLocation = ResourceLocation.tryBuild(strings.get(1), path);
-                        if (resourceLocation != null) {
-                            paths.get(packType).put(resourceLocation, () -> new ByteArrayInputStream(data));
+                        Identifier identifier = Identifier.tryBuild(strings.get(1), path);
+                        if (identifier != null) {
+                            paths.get(packType).put(identifier, () -> new ByteArrayInputStream(data));
                         }
                     }
                 }).join();
             }
-            Iterator<Map.Entry<PackType, Map<ResourceLocation, IoSupplier<InputStream>>>> iterator = paths.entrySet()
+            Iterator<Map.Entry<PackType, Map<Identifier, IoSupplier<InputStream>>>> iterator = paths.entrySet()
                     .iterator();
             while (iterator.hasNext()) {
-                Map.Entry<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> entry = iterator.next();
+                Map.Entry<PackType, Map<Identifier, IoSupplier<InputStream>>> entry = iterator.next();
                 if (!entry.getValue().isEmpty()) {
                     entry.setValue(ImmutableMap.copyOf(entry.getValue()));
                 } else {
@@ -123,21 +122,21 @@ public class DynamicPackResources extends AbstractModPackResources {
         }
     }
 
-    protected Map<ResourceLocation, IoSupplier<InputStream>> getPathsForType(PackType packType) {
-        Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> paths = this.paths;
+    protected Map<Identifier, IoSupplier<InputStream>> getPathsForType(PackType packType) {
+        Map<PackType, Map<Identifier, IoSupplier<InputStream>>> paths = this.paths;
         if (paths == null) {
             paths = this.paths = this.generatePathsFromProviders();
         }
         return paths.getOrDefault(packType, Collections.emptyMap());
     }
 
-    protected Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> generatePathsFromProviders() {
+    protected Map<PackType, Map<Identifier, IoSupplier<InputStream>>> generatePathsFromProviders() {
         return generatePathsFromProviders(this.getNamespace(), this.factories);
     }
 
     @Nullable
     @Override
-    public IoSupplier<InputStream> getResource(PackType packType, ResourceLocation location) {
+    public IoSupplier<InputStream> getResource(PackType packType, Identifier location) {
         return this.getPathsForType(packType).get(location);
     }
 
@@ -146,10 +145,10 @@ public class DynamicPackResources extends AbstractModPackResources {
         this.getPathsForType(packType)
                 .entrySet()
                 .stream()
-                .filter((Map.Entry<ResourceLocation, IoSupplier<InputStream>> entry) -> {
+                .filter((Map.Entry<Identifier, IoSupplier<InputStream>> entry) -> {
                     return entry.getKey().getNamespace().equals(namespace) && entry.getKey().getPath().startsWith(path);
                 })
-                .forEach((Map.Entry<ResourceLocation, IoSupplier<InputStream>> entry) -> {
+                .forEach((Map.Entry<Identifier, IoSupplier<InputStream>> entry) -> {
                     resourceOutput.accept(entry.getKey(), entry.getValue());
                 });
     }
@@ -159,7 +158,7 @@ public class DynamicPackResources extends AbstractModPackResources {
         return this.getPathsForType(packType)
                 .keySet()
                 .stream()
-                .map(ResourceLocation::getNamespace)
+                .map(Identifier::getNamespace)
                 .collect(Collectors.toSet());
     }
 }

@@ -3,7 +3,7 @@ package fuzs.puzzleslib.neoforge.impl.client.core.context;
 import com.google.common.collect.ImmutableMap;
 import fuzs.puzzleslib.api.client.core.v1.context.ResourcePackReloadListenersContext;
 import fuzs.puzzleslib.neoforge.impl.core.context.DataPackReloadListenersContextNeoForgeImpl;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.resources.VanillaClientListeners;
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public record ResourcePackReloadListenersContextNeoForgeImpl(AddClientReloadListenersEvent event) implements ResourcePackReloadListenersContext {
-    private static final Map<ResourceLocation, ResourceLocation> VANILLA_CLIENT_RELOAD_LISTENERS = ImmutableMap.<ResourceLocation, ResourceLocation>builder()
+    private static final Map<Identifier, Identifier> VANILLA_CLIENT_RELOAD_LISTENERS = ImmutableMap.<Identifier, Identifier>builder()
             .put(LANGUAGES, VanillaClientListeners.LANGUAGE)
             .put(TEXTURES, VanillaClientListeners.TEXTURES)
             .put(SHADERS, VanillaClientListeners.SHADERS)
@@ -37,19 +37,19 @@ public record ResourcePackReloadListenersContextNeoForgeImpl(AddClientReloadList
             .build();
 
     @Override
-    public void registerReloadListener(ResourceLocation resourceLocation, PreparableReloadListener reloadListener) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
+    public void registerReloadListener(Identifier identifier, PreparableReloadListener reloadListener) {
+        Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(reloadListener, "reload listener is null");
-        this.event.addListener(resourceLocation, reloadListener);
+        this.event.addListener(identifier, reloadListener);
     }
 
     @Override
-    public void registerReloadListener(ResourceLocation resourceLocation, ResourceLocation otherResourceLocation, PreparableReloadListener reloadListener) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
-        Objects.requireNonNull(otherResourceLocation, "other resource location is null");
+    public void registerReloadListener(Identifier identifier, Identifier otherResourceLocation, PreparableReloadListener reloadListener) {
+        Objects.requireNonNull(identifier, "identifier is null");
+        Objects.requireNonNull(otherResourceLocation, "other identifier is null");
         Objects.requireNonNull(reloadListener, "reload listener is null");
         DataPackReloadListenersContextNeoForgeImpl.registerReloadListener(this.event,
-                resourceLocation,
+                identifier,
                 otherResourceLocation,
                 reloadListener,
                 VANILLA_CLIENT_RELOAD_LISTENERS);

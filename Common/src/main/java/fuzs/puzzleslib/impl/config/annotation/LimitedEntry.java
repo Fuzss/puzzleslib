@@ -3,7 +3,7 @@ package fuzs.puzzleslib.impl.config.annotation;
 import com.google.common.base.Predicates;
 import fuzs.puzzleslib.api.config.v3.Config;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;

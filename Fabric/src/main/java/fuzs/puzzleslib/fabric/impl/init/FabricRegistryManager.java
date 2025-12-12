@@ -21,8 +21,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.syncher.EntityDataSerializer;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -40,7 +40,7 @@ import java.util.function.Supplier;
 
 public final class FabricRegistryManager extends RegistryManagerImpl {
     private static final ResourceKey<Registry<EntityDataSerializer<?>>> ENTITY_DATA_SERIALIZERS_REGISTRY_KEY = ResourceKey.createRegistryKey(
-            ResourceLocation.withDefaultNamespace("entity_data_serializers"));
+            Identifier.withDefaultNamespace("entity_data_serializers"));
 
     private boolean isFrozen;
 
@@ -133,7 +133,7 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
                 path);
         Holder.Reference<EntityDataSerializer<T>> holder = new DirectReferenceHolder<>(resourceKey,
                 entityDataSerializerSupplier.get());
-        FabricTrackedDataRegistry.register(holder.key().location(), holder.value());
+        FabricTrackedDataRegistry.register(holder.key().identifier(), holder.value());
         return holder;
     }
 
