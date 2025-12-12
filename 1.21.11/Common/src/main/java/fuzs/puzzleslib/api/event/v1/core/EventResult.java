@@ -44,8 +44,7 @@ public enum EventResult {
     DENY(true, false);
 
     private final boolean interrupt;
-    @Nullable
-    private final Boolean value;
+    @Nullable private final Boolean value;
 
     EventResult(boolean interrupt) {
         this(interrupt, null);

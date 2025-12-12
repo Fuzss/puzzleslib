@@ -27,8 +27,7 @@ abstract class GrindstoneMenuFabricMixin extends AbstractContainerMenu implement
     @Shadow
     @Final
     Container repairSlots;
-    @Unique
-    private OptionalInt puzzleslib$experiencePointReward = OptionalInt.empty();
+    @Unique private OptionalInt puzzleslib$experiencePointReward = OptionalInt.empty();
 
     protected GrindstoneMenuFabricMixin(@Nullable MenuType<?> menuType, int containerId) {
         super(menuType, containerId);

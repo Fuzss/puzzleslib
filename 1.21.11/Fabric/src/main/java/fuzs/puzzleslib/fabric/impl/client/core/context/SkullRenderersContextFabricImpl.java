@@ -25,8 +25,7 @@ public final class SkullRenderersContextFabricImpl implements SkullRenderersCont
         SKULL_MODEL_FACTORIES.put(skullBlockType, skullModelFactory);
     }
 
-    @Nullable
-    public static SkullModelBase createSkullModel(SkullBlock.Type skullBlockType, EntityModelSet entityModelSet) {
+    @Nullable public static SkullModelBase createSkullModel(SkullBlock.Type skullBlockType, EntityModelSet entityModelSet) {
         Function<EntityModelSet, SkullModelBase> skullModelFactory = SKULL_MODEL_FACTORIES.get(skullBlockType);
         return skullModelFactory != null ? skullModelFactory.apply(entityModelSet) : null;
     }

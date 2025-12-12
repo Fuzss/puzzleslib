@@ -109,8 +109,7 @@ public class FabricCommonProxy implements FabricProxy {
                 return menuProvider.getDisplayName();
             }
 
-            @Nullable
-            @Override
+            @Nullable @Override
             public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
                 return menuProvider.createMenu(containerId, inventory, player);
             }

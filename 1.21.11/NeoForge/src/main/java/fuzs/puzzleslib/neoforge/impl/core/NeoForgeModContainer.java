@@ -17,8 +17,7 @@ import java.util.stream.Stream;
 public final class NeoForgeModContainer implements ModContainer {
     private final IModInfo metadata;
     private final List<ModContainer> children;
-    @Nullable
-    private ModContainer parent;
+    @Nullable private ModContainer parent;
 
     public NeoForgeModContainer(IModInfo metadata) {
         this.metadata = metadata;
@@ -97,8 +96,7 @@ public final class NeoForgeModContainer implements ModContainer {
         return Collections.unmodifiableList(this.children);
     }
 
-    @Nullable
-    @Override
+    @Nullable @Override
     public ModContainer getParent() {
         return this.parent;
     }

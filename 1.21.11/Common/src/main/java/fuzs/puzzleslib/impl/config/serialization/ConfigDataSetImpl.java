@@ -135,14 +135,12 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         return this.toSet().contains(o);
     }
 
-    @NonNull
-    @Override
+    @NonNull @Override
     public Object[] toArray() {
         return this.toSet().toArray();
     }
 
-    @NonNull
-    @Override
+    @NonNull @Override
     public <T1> T1[] toArray(@NonNull T1[] a) {
         return this.toSet().toArray(a);
     }
@@ -182,8 +180,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         this.toMap().clear();
     }
 
-    @Nullable
-    @Override
+    @Nullable @Override
     public Object[] get(T entry) {
         return this.toMap().get(entry);
     }

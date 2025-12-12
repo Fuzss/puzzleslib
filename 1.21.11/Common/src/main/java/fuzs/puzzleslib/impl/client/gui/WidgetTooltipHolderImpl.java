@@ -26,11 +26,9 @@ import java.util.function.Supplier;
 public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
     private final AbstractWidget abstractWidget;
     private List<? extends FormattedText> tooltipLines;
-    @Nullable
-    private final BiFunction<ClientTooltipPositioner, AbstractWidget, ClientTooltipPositioner> tooltipPositionerFactory;
+    @Nullable private final BiFunction<ClientTooltipPositioner, AbstractWidget, ClientTooltipPositioner> tooltipPositionerFactory;
     private final Function<List<? extends FormattedText>, List<FormattedCharSequence>> tooltipLineProcessor;
-    @Nullable
-    private final Supplier<List<? extends FormattedText>> tooltipLinesSupplier;
+    @Nullable private final Supplier<List<? extends FormattedText>> tooltipLinesSupplier;
 
     public WidgetTooltipHolderImpl(AbstractWidget abstractWidget, TooltipBuilderImpl builder) {
         this.abstractWidget = abstractWidget;
@@ -76,8 +74,7 @@ public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
         holder.set(tooltip);
     }
 
-    @NonNull
-    @Override
+    @NonNull @Override
     public Tooltip get() {
         Tooltip tooltip = super.get();
         Objects.requireNonNull(tooltip, "tooltip is null");
@@ -92,8 +89,7 @@ public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
         }
     }
 
-    @Nullable
-    private List<? extends FormattedText> getLinesForNextRenderPass() {
+    @Nullable private List<? extends FormattedText> getLinesForNextRenderPass() {
         return this.tooltipLinesSupplier != null ? this.tooltipLinesSupplier.get() : null;
     }
 

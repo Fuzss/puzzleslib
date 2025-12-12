@@ -24,11 +24,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Mob.class)
 abstract class MobFabricMixin extends LivingEntity implements SpawnReasonMob {
     @Shadow
-    @Nullable
-    private LivingEntity target;
-    @Unique
-    @Nullable
-    private EntitySpawnReason puzzleslib$spawnReason;
+    @Nullable private LivingEntity target;
+    @Unique @Nullable private EntitySpawnReason puzzleslib$spawnReason;
 
     protected MobFabricMixin(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
@@ -40,8 +37,7 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnReasonMob {
     }
 
     @Override
-    @Nullable
-    public final EntitySpawnReason puzzleslib$getSpawnReason() {
+    @Nullable public final EntitySpawnReason puzzleslib$getSpawnReason() {
         return this.puzzleslib$spawnReason;
     }
 

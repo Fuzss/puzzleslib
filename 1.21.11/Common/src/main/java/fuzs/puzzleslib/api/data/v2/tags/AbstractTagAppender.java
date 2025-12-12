@@ -14,8 +14,7 @@ import java.util.function.Function;
 
 public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
     protected final TagBuilder tagBuilder;
-    @Nullable
-    private final Function<T, ResourceKey<T>> keyExtractor;
+    @Nullable private final Function<T, ResourceKey<T>> keyExtractor;
 
     public AbstractTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
         this.tagBuilder = tagBuilder;

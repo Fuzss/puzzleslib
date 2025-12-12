@@ -77,24 +77,21 @@ public interface KeyActivationHandler {
     /**
      * @return handler for processing the key press at the beginning of each client tick
      */
-    @Nullable
-    default Consumer<Minecraft> gameHandler() {
+    @Nullable default Consumer<Minecraft> gameHandler() {
         return null;
     }
 
     /**
      * @return screen super type to register the screen handler for
      */
-    @Nullable
-    default Class<? extends Screen> screenType() {
+    @Nullable default Class<? extends Screen> screenType() {
         return null;
     }
 
     /**
      * @return handler for processing the key press in {@link Screen#keyPressed(KeyEvent)}
      */
-    @Nullable
-    default Consumer<? extends Screen> screenHandler() {
+    @Nullable default Consumer<? extends Screen> screenHandler() {
         return null;
     }
 

@@ -15,9 +15,7 @@ import java.util.Objects;
 
 @Mixin(KeyMapping.class)
 abstract class KeyMappingFabricMixin implements ActivationContextKeyMapping {
-    @Nullable
-    @Unique
-    private KeyActivationContext puzzleslib$keyActivationContext;
+    @Nullable @Unique private KeyActivationContext puzzleslib$keyActivationContext;
 
     @Inject(method = "isDown", at = @At("HEAD"), cancellable = true)
     public void isDown(CallbackInfoReturnable<Boolean> callback) {

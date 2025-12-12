@@ -16,8 +16,7 @@ import org.spongepowered.asm.mixin.injection.Slice;
 
 @Mixin(Camera.class)
 abstract class CameraFabricMixin {
-    @Unique
-    private float puzzleslib$zRot;
+    @Unique private float puzzleslib$zRot;
 
     @WrapOperation(method = "setup",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FF)V", ordinal = 0),

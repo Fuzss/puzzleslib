@@ -48,12 +48,9 @@ public final class ScreenSkipper {
         }
     }
 
-    @Nullable
-    private final Component titleComponent;
-    @Nullable
-    private final Component buttonComponent;
-    @Nullable
-    private final Component lastTitleComponent;
+    @Nullable private final Component titleComponent;
+    @Nullable private final Component buttonComponent;
+    @Nullable private final Component lastTitleComponent;
     private final int skipButtons;
     private final boolean singleTrigger;
     private EventResult trigger;

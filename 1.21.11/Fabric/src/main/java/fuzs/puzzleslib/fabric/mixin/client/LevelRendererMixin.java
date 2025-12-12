@@ -30,8 +30,7 @@ abstract class LevelRendererMixin {
     @Final
     private Minecraft minecraft;
     @Shadow
-    @Nullable
-    private ClientLevel level;
+    @Nullable private ClientLevel level;
 
     @Inject(method = "extractBlockOutline",
             at = @At(value = "INVOKE",

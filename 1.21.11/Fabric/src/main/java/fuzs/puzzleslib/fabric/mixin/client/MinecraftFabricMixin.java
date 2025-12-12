@@ -36,20 +36,15 @@ abstract class MinecraftFabricMixin {
     @Final
     private DeltaTracker.Timer deltaTracker;
     @Shadow
-    @Nullable
-    public ClientLevel level;
+    @Nullable public ClientLevel level;
     @Shadow
-    @Nullable
-    public LocalPlayer player;
+    @Nullable public LocalPlayer player;
     @Shadow
-    @Nullable
-    public MultiPlayerGameMode gameMode;
+    @Nullable public MultiPlayerGameMode gameMode;
     @Shadow
-    @Nullable
-    public HitResult hitResult;
+    @Nullable public HitResult hitResult;
     @Shadow
-    @Nullable
-    public Screen screen;
+    @Nullable public Screen screen;
 
     @Inject(method = "<init>",
             at = @At(value = "INVOKE",

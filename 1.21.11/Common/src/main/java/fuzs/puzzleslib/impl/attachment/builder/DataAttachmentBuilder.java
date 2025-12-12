@@ -19,12 +19,9 @@ import java.util.function.Predicate;
 
 public abstract class DataAttachmentBuilder<T, V, B extends DataAttachmentRegistry.Builder<T, V, B>> implements DataAttachmentRegistry.Builder<T, V, B> {
     protected final Map<Predicate<T>, Function<RegistryAccess, V>> defaultValues = new LinkedHashMap<>();
-    @Nullable
-    protected Codec<V> codec;
-    @Nullable
-    protected StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec;
-    @Nullable
-    private Function<T, PlayerSet> synchronizationTargets;
+    @Nullable protected Codec<V> codec;
+    @Nullable protected StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec;
+    @Nullable private Function<T, PlayerSet> synchronizationTargets;
 
     @Override
     public B defaultValue(Function<RegistryAccess, V> defaultValueProvider) {

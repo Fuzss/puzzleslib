@@ -20,8 +20,7 @@ public final class RenderStateExtraData {
      * @param <T>         the value type
      * @return the render property value associated with the key
      */
-    @Nullable
-    public static <T> T get(EntityRenderState renderState, ContextKey<T> key) {
+    @Nullable public static <T> T get(EntityRenderState renderState, ContextKey<T> key) {
         return ClientProxyImpl.get().getRenderProperty(renderState, key);
     }
 

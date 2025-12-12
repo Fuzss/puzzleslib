@@ -134,8 +134,7 @@ public class DynamicPackResources extends AbstractModPackResources {
         return generatePathsFromProviders(this.getNamespace(), this.factories);
     }
 
-    @Nullable
-    @Override
+    @Nullable @Override
     public IoSupplier<InputStream> getResource(PackType packType, Identifier location) {
         return this.getPathsForType(packType).get(location);
     }

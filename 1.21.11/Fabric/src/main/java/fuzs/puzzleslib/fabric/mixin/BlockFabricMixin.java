@@ -25,9 +25,7 @@ import java.util.Objects;
 
 @Mixin(Block.class)
 abstract class BlockFabricMixin extends BlockBehaviour {
-    @Unique
-    @Nullable
-    private int[] puzzleslib$capturedExperience;
+    @Unique @Nullable private int[] puzzleslib$capturedExperience;
 
     public BlockFabricMixin(Properties properties) {
         super(properties);

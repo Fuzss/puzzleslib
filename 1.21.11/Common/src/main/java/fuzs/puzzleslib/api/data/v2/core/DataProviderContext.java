@@ -103,16 +103,14 @@ public class DataProviderContext {
     /**
      * @return the client resource manager
      */
-    @Nullable
-    public ResourceManager getClientResourceManager() {
+    @Nullable public ResourceManager getClientResourceManager() {
         return null;
     }
 
     /**
      * @return the server resource manager
      */
-    @Nullable
-    public ResourceManager getServerResourceManager() {
+    @Nullable public ResourceManager getServerResourceManager() {
         return null;
     }
 

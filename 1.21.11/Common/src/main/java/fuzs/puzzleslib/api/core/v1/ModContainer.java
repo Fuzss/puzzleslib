@@ -86,8 +86,7 @@ public interface ModContainer {
     /**
      * @return parent mod when provided via jar-in-jar systems
      */
-    @Nullable
-    ModContainer getParent();
+    @Nullable ModContainer getParent();
 
     /**
      * @param modId the mod id

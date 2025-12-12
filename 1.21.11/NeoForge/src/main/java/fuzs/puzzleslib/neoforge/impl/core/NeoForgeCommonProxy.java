@@ -98,8 +98,7 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
                 return menuProvider.getDisplayName();
             }
 
-            @Nullable
-            @Override
+            @Nullable @Override
             public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
                 return menuProvider.createMenu(containerId, inventory, player);
             }

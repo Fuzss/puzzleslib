@@ -22,8 +22,7 @@ abstract class GameRendererFabricMixin {
     @Final
     private Camera mainCamera;
     @Shadow
-    @Nullable
-    private Identifier postEffectId;
+    @Nullable private Identifier postEffectId;
 
     @Inject(method = "checkEntityPostEffect", at = @At("TAIL"))
     public void checkEntityPostEffect(@Nullable Entity entity, CallbackInfo callback) {

@@ -23,14 +23,10 @@ abstract class EditBoxMixin extends AbstractWidget {
     private int cursorPos;
     @Shadow
     private int highlightPos;
-    @Unique
-    private long puzzleslib$lastClickTime;
-    @Unique
-    private boolean puzzleslib$doubleClick;
-    @Unique
-    private int puzzleslib$doubleClickHighlightPos;
-    @Unique
-    private int puzzleslib$doubleClickCursorPos;
+    @Unique private long puzzleslib$lastClickTime;
+    @Unique private boolean puzzleslib$doubleClick;
+    @Unique private int puzzleslib$doubleClickHighlightPos;
+    @Unique private int puzzleslib$doubleClickCursorPos;
 
     public EditBoxMixin(int x, int y, int width, int height, Component message) {
         super(x, y, width, height, message);
@@ -97,8 +93,7 @@ abstract class EditBoxMixin extends AbstractWidget {
         callback.setReturnValue(i);
     }
 
-    @Unique
-    private static boolean puzzleslib$isWordChar(char charAt) {
+    @Unique private static boolean puzzleslib$isWordChar(char charAt) {
         // break skipping on more than just spaces, from Owo Lib, thanks!
         return charAt == '_' || Character.isAlphabetic(charAt) || Character.isDigit(charAt);
     }
