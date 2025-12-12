@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.event.v1.core;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 public final class EventResultHolder<T> {
     private static final EventResultHolder<?> PASS = new EventResultHolder<>();
 
-    @NotNull
+    @NonNull
     private final EventResult result;
     @Nullable
     private final T value;
@@ -38,7 +38,7 @@ public final class EventResultHolder<T> {
     /**
      * internal constructor
      */
-    private EventResultHolder(@NotNull EventResult result, @Nullable T value) {
+    private EventResultHolder(@NonNull EventResult result, @Nullable T value) {
         Objects.requireNonNull(result, "result is null");
         Objects.requireNonNull(value, "value is null");
         this.result = result;

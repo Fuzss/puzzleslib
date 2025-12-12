@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import com.mojang.serialization.Lifecycle;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.Util;
 import net.minecraft.core.*;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -15,9 +14,10 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.EntityLootSubProvider;
 import net.minecraft.data.loot.LootTableSubProvider;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ProblemReporter;
+import net.minecraft.util.Util;
 import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.RandomSequence;
 import net.minecraft.world.entity.EntityType;
@@ -103,7 +103,7 @@ public final class AbstractLootProvider {
                             consumer.accept(resourceKey, builder);
                         } else if (!this.skipValidationFor(resourceKey)) {
                             throw new IllegalStateException("Missing loot table '%s' for '%s'".formatted(optional,
-                                    holder.key().location()));
+                                    holder.key().identifier()));
                         }
                     }
                 }
@@ -134,8 +134,8 @@ public final class AbstractLootProvider {
             return this.skipValidation.contains(resourceKey);
         }
 
-        public void skipValidation(ResourceLocation resourceLocation) {
-            this.skipValidation(ResourceKey.create(Registries.LOOT_TABLE, resourceLocation));
+        public void skipValidation(Identifier identifier) {
+            this.skipValidation(ResourceKey.create(Registries.LOOT_TABLE, identifier));
         }
 
         public void skipValidation(ResourceKey<LootTable> resourceKey) {
@@ -169,7 +169,7 @@ public final class AbstractLootProvider {
         protected Stream<Holder.Reference<Block>> getRegistryEntries() {
             return BuiltInRegistries.BLOCK.listElements()
                     .filter((Holder.Reference<Block> holder) -> holder.key()
-                            .location()
+                            .identifier()
                             .getNamespace()
                             .equals(this.modId));
         }
@@ -230,18 +230,18 @@ public final class AbstractLootProvider {
                             throw new IllegalStateException(String.format(Locale.ROOT,
                                     "Missing loot table '%s' for '%s'",
                                     resourceKey,
-                                    holder.key().location()));
+                                    holder.key().identifier()));
                         }
                     }
                     if (map != null) {
-                        map.forEach((resourceLocation, builder) -> {
-                            if (!lootTables.add(resourceLocation)) {
+                        map.forEach((identifier, builder) -> {
+                            if (!lootTables.add(identifier)) {
                                 throw new IllegalStateException(String.format(Locale.ROOT,
                                         "Duplicate loot table '%s' for '%s'",
-                                        resourceLocation,
-                                        holder.key().location()));
+                                        identifier,
+                                        holder.key().identifier()));
                             } else {
-                                consumer.accept(resourceLocation, builder);
+                                consumer.accept(identifier, builder);
                             }
                         });
                     }
@@ -250,10 +250,10 @@ public final class AbstractLootProvider {
                             "Weird loot table(s) '%s' for '%s', not a LivingEntity so should not have loot",
                             map.keySet()
                                     .stream()
-                                    .map(ResourceKey::location)
-                                    .map(ResourceLocation::toString)
+                                    .map(ResourceKey::identifier)
+                                    .map(Identifier::toString)
                                     .collect(Collectors.joining(",")),
-                            holder.key().location()));
+                            holder.key().identifier()));
                 }
             });
             if (!this.map.isEmpty()) {
@@ -283,8 +283,8 @@ public final class AbstractLootProvider {
             return this.skipValidation.contains(resourceKey);
         }
 
-        public void skipValidation(ResourceLocation resourceLocation) {
-            this.skipValidation(ResourceKey.create(Registries.LOOT_TABLE, resourceLocation));
+        public void skipValidation(Identifier identifier) {
+            this.skipValidation(ResourceKey.create(Registries.LOOT_TABLE, identifier));
         }
 
         public void skipValidation(ResourceKey<LootTable> resourceKey) {
@@ -302,7 +302,7 @@ public final class AbstractLootProvider {
         protected Stream<Holder.Reference<EntityType<?>>> getRegistryEntries() {
             return BuiltInRegistries.ENTITY_TYPE.listElements()
                     .filter((Holder.Reference<EntityType<?>> holder) -> holder.key()
-                            .location()
+                            .identifier()
                             .getNamespace()
                             .equals(this.modId));
         }
@@ -370,8 +370,8 @@ public final class AbstractLootProvider {
             return this.skipValidation.contains(resourceKey);
         }
 
-        public void skipValidation(ResourceLocation resourceLocation) {
-            this.skipValidation(ResourceKey.create(Registries.LOOT_TABLE, resourceLocation));
+        public void skipValidation(Identifier identifier) {
+            this.skipValidation(ResourceKey.create(Registries.LOOT_TABLE, identifier));
         }
 
         public void skipValidation(ResourceKey<LootTable> resourceKey) {
@@ -402,18 +402,16 @@ public final class AbstractLootProvider {
                     false);
             ResourceKey<LootTable> defaultKey = ResourceKey.create(Registries.LOOT_TABLE, registry.getDefaultKey());
             registry.register(defaultKey, LootTable.EMPTY, RegistrationInfo.BUILT_IN);
-            Map<RandomSupport.Seed128bit, ResourceLocation> seeds = new Object2ObjectOpenHashMap<>();
+            Map<RandomSupport.Seed128bit, Identifier> seeds = new Object2ObjectOpenHashMap<>();
             this.generate((ResourceKey<LootTable> resourceKey, LootTable.Builder builder) -> {
-                ResourceLocation resourceLocation = resourceKey.location();
-                ResourceLocation oldResourceLocation = seeds.put(RandomSequence.seedForKey(resourceLocation),
-                        resourceLocation);
-                if (oldResourceLocation != null) {
+                Identifier identifier = resourceKey.identifier();
+                Identifier oldIdentifier = seeds.put(RandomSequence.seedForKey(identifier), identifier);
+                if (oldIdentifier != null) {
                     Util.logAndPauseIfInIde(
-                            "Loot table random sequence seed collision on " + oldResourceLocation + " and "
-                                    + resourceKey);
+                            "Loot table random sequence seed collision on " + oldIdentifier + " and " + resourceKey);
                 }
 
-                builder.setRandomSequence(resourceLocation);
+                builder.setRandomSequence(identifier);
                 LootTable lootTable = builder.setParamSet(this.paramSet()).build();
                 registry.register(resourceKey, lootTable, RegistrationInfo.BUILT_IN);
             });
@@ -429,7 +427,7 @@ public final class AbstractLootProvider {
                     .map((Map.Entry<ResourceKey<LootTable>, LootTable> entry) -> {
                         ResourceKey<LootTable> resourceKey = entry.getKey();
                         LootTable lootTable = entry.getValue();
-                        Path path = this.pathProvider().json(resourceKey.location());
+                        Path path = this.pathProvider().json(resourceKey.identifier());
                         return DataProvider.saveStable(output, registries, LootTable.DIRECT_CODEC, lootTable, path);
                     })
                     .toArray(CompletableFuture[]::new));

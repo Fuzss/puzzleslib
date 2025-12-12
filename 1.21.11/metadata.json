@@ -1,0 +1,53 @@
+{
+    "mod": {
+        "id": "puzzleslib",
+        "group": "fuzs.puzzleslib",
+        "name": "Puzzles Lib",
+        "version": "21.11.0",
+        "authors": [
+            "Fuzs"
+        ],
+        "description": "Why it's called Puzzles, you ask? That's the puzzle!",
+        "license": "MPL-2.0"
+    },
+    "dependencies": [
+        {
+            "name": "fabricapi",
+            "type": "required",
+            "platforms": [
+                "fabric"
+            ]
+        },
+        {
+            "name": "forgeconfigapiport",
+            "type": "required",
+            "platforms": [
+                "fabric"
+            ]
+        }
+    ],
+    "links": [
+        {
+            "name": "curseforge",
+            "slug": "puzzles-lib",
+            "id": "495476"
+        },
+        {
+            "name": "github",
+            "slug": "puzzleslib"
+        },
+        {
+            "name": "modrinth",
+            "slug": "puzzles-lib",
+            "id": "QAGBst4M"
+        }
+    ],
+    "environments": {
+        "client": "required",
+        "server": "required"
+    },
+    "platforms": [
+        "fabric",
+        "neoforge"
+    ]
+}

@@ -5,8 +5,8 @@ import fuzs.puzzleslib.api.data.v2.tags.AbstractTagProvider;
 import fuzs.puzzleslib.impl.config.serialization.RegistryProvider;
 import fuzs.puzzleslib.impl.data.SortingTagBuilder;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
 import java.util.Map;
@@ -72,7 +72,7 @@ public interface KeyedValueProvider<T> {
                 .peek(Objects::requireNonNull)
                 .map(valueProvider::getKey)
                 .filter(Objects::nonNull)
-                .map(ResourceLocation::toString)
+                .map(Identifier::toString)
                 .collect(Collectors.toList());
     }
 
@@ -82,7 +82,7 @@ public interface KeyedValueProvider<T> {
      * @param name registered identifier
      * @return the value corresponding to the identifier
      */
-    Optional<T> getValue(ResourceLocation name);
+    Optional<T> getValue(Identifier name);
 
     /**
      * Get am identifier via the provider.
@@ -90,14 +90,14 @@ public interface KeyedValueProvider<T> {
      * @param value registered value
      * @return the identifier corresponding to the value
      */
-    ResourceLocation getKey(T value);
+    Identifier getKey(T value);
 
     /**
      * Stream of all values paired with identifier available through this provider.
      *
      * @return all values including corresponding identifier
      */
-    Stream<Map.Entry<ResourceLocation, T>> stream();
+    Stream<Map.Entry<Identifier, T>> stream();
 
     /**
      * Stream of all values available through this provider.

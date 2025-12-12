@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.attachment.v4;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.UnaryOperator;
 

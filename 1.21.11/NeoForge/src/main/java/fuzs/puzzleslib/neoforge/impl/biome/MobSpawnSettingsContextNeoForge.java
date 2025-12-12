@@ -7,7 +7,7 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.neoforged.neoforge.common.world.MobSpawnSettingsBuilder;
 import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Set;
@@ -70,7 +70,7 @@ public record MobSpawnSettingsContextNeoForge(MobSpawnSettingsBuilder context) i
     }
 
     @Override
-    public @Nullable MobSpawnSettings.MobSpawnCost getSpawnCost(EntityType<?> entityType) {
+    public MobSpawnSettings.@Nullable MobSpawnCost getSpawnCost(EntityType<?> entityType) {
         return this.context.getCost(entityType);
     }
 

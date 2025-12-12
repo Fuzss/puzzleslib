@@ -1,11 +1,11 @@
 package fuzs.puzzleslib.impl.attachment;
 
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 
 public interface AttachmentTypeAdapter<T, V> {
 
-    ResourceLocation resourceLocation();
+    Identifier identifier();
 
     boolean hasData(T holder);
 

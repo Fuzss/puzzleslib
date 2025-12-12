@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.event.v1.core;
 
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Main event class for common events.

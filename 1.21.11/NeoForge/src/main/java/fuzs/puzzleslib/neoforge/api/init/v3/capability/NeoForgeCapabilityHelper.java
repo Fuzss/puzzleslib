@@ -5,7 +5,7 @@ import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.Entity;
@@ -26,7 +26,7 @@ import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
 import net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -131,8 +131,8 @@ public final class NeoForgeCapabilityHelper {
     /**
      * Register an {@link ICapabilityProvider} for {@link EntityType EntityTypes}.
      * <p>
-     * An example is {@link net.minecraft.world.entity.vehicle.ChestBoat} and
-     * {@link net.minecraft.world.entity.vehicle.MinecartHopper}.
+     * An example is {@link net.minecraft.world.entity.vehicle.boat.ChestBoat} and
+     * {@link net.minecraft.world.entity.vehicle.minecart.MinecartHopper}.
      *
      * @param entityTypes entity types to register
      * @param <T>         entity super type
@@ -175,14 +175,13 @@ public final class NeoForgeCapabilityHelper {
     @SafeVarargs
     public static <T> void register(BiConsumer<RegisterCapabilitiesEvent, T> consumer, Holder<? extends T>... types) {
         Preconditions.checkState(types.length > 0, "capability provider types is empty");
-        ResourceLocation resourceLocation = types[0].unwrapKey().orElseThrow().location();
-        NeoForgeModContainerHelper.getOptionalModEventBus(resourceLocation.getNamespace())
-                .ifPresent((IEventBus eventBus) -> {
-                    eventBus.addListener((final RegisterCapabilitiesEvent event) -> {
-                        for (Holder<? extends T> holder : types) {
-                            consumer.accept(event, holder.value());
-                        }
-                    });
-                });
+        Identifier identifier = types[0].unwrapKey().orElseThrow().identifier();
+        NeoForgeModContainerHelper.getOptionalModEventBus(identifier.getNamespace()).ifPresent((IEventBus eventBus) -> {
+            eventBus.addListener((final RegisterCapabilitiesEvent event) -> {
+                for (Holder<? extends T> holder : types) {
+                    consumer.accept(event, holder.value());
+                }
+            });
+        });
     }
 }

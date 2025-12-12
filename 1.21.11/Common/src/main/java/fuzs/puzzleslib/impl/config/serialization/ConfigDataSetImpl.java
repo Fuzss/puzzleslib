@@ -8,10 +8,10 @@ import fuzs.puzzleslib.api.event.v1.server.TagsUpdatedCallback;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -135,15 +135,15 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         return this.toSet().contains(o);
     }
 
-    @NotNull
+    @NonNull
     @Override
     public Object[] toArray() {
         return this.toSet().toArray();
     }
 
-    @NotNull
+    @NonNull
     @Override
-    public <T1> T1[] toArray(@NotNull T1[] a) {
+    public <T1> T1[] toArray(@NonNull T1[] a) {
         return this.toSet().toArray(a);
     }
 
@@ -158,22 +158,22 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
     }
 
     @Override
-    public boolean containsAll(@NotNull Collection<?> c) {
+    public boolean containsAll(@NonNull Collection<?> c) {
         return this.toSet().containsAll(c);
     }
 
     @Override
-    public boolean addAll(@NotNull Collection<? extends T> c) {
+    public boolean addAll(@NonNull Collection<? extends T> c) {
         return this.toSet().addAll(c);
     }
 
     @Override
-    public boolean removeAll(@NotNull Collection<?> c) {
+    public boolean removeAll(@NonNull Collection<?> c) {
         return this.toSet().removeAll(c);
     }
 
     @Override
-    public boolean retainAll(@NotNull Collection<?> c) {
+    public boolean retainAll(@NonNull Collection<?> c) {
         return this.toSet().retainAll(c);
     }
 
@@ -290,7 +290,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
      * @param source entry string source
      * @return entry holder from <code>source</code>
      *
-     * @throws RuntimeException if the format is no valid {@link ResourceLocation}
+     * @throws RuntimeException if the format is no valid {@link Identifier}
      */
     private EntryHolder<?, T> deserialize(String source) throws RuntimeException {
         boolean inverted = source.startsWith("!");
@@ -303,7 +303,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
             source = source.substring(1);
         }
 
-        // this is necessary when applying regex matching later on, since existing resource locations are converted to string, and they will contain "minecraft"
+        // this is necessary when applying regex matching later on, since existing identifiers are converted to string, and they will contain "minecraft"
         if (!source.contains(":")) {
             source = "minecraft:" + source;
         }
@@ -321,8 +321,8 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
 
     /**
      * holds a single entry from a string list, ready to be dissolved into registry entries when required
-     * <p>supports pattern matching for {@link ResourceLocation} path, therefore input and path are stored separately
-     * instead of as {@link ResourceLocation}
+     * <p>supports pattern matching for {@link Identifier} path, therefore input and path are stored separately
+     * instead of as {@link Identifier}
      *
      * @param <D> raw value type, single registry entry or tag
      * @param <E> value type for set, result from dissolving
@@ -336,7 +336,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
          */
         public final boolean inverted;
         /**
-         * the raw {@link ResourceLocation} to parse
+         * the raw {@link Identifier} to parse
          */
         private final String input;
         /**
@@ -346,7 +346,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         private Object[] data = EMPTY_DATA;
 
         /**
-         * @param input    input part of {@link ResourceLocation}
+         * @param input    input part of {@link Identifier}
          * @param inverted is this holder meant to exclude entries from being added to the set
          */
         protected EntryHolder(String providerName, String input, boolean inverted) {
@@ -379,13 +379,11 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         private Collection<D> findRegistryMatches(String s) {
             Collection<D> matches = new HashSet<>();
             if (!s.contains("*")) {
-                Optional.ofNullable(ResourceLocation.tryParse(s)).flatMap(this::toValue).ifPresent(matches::add);
+                Optional.ofNullable(Identifier.tryParse(s)).flatMap(this::toValue).ifPresent(matches::add);
             } else {
                 String regexSource = s.replace("*", "[a-z0-9/._-]*");
                 this.allValues()
-                        .filter((Map.Entry<ResourceLocation, D> entry) -> entry.getKey()
-                                .toString()
-                                .matches(regexSource))
+                        .filter((Map.Entry<Identifier, D> entry) -> entry.getKey().toString().matches(regexSource))
                         .map(Map.Entry::getValue)
                         .forEach(matches::add);
             }
@@ -405,15 +403,15 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         protected abstract Stream<E> dissolveValue(D entry);
 
         /**
-         * @param resourceLocation the key associated with a value
-         * @return value from registry for the provided resource location
+         * @param identifier the key associated with a value
+         * @return value from registry for the provided identifier
          */
-        protected abstract Optional<D> toValue(ResourceLocation resourceLocation);
+        protected abstract Optional<D> toValue(Identifier identifier);
 
         /**
          * @return all registry values for pattern matching
          */
-        protected abstract Stream<Map.Entry<ResourceLocation, D>> allValues();
+        protected abstract Stream<Map.Entry<Identifier, D>> allValues();
     }
 
     /**
@@ -429,7 +427,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
 
         /**
          * @param valueProvider the registry to compile values from
-         * @param source        the raw {@link ResourceLocation} to parse
+         * @param source        the raw {@link Identifier} to parse
          * @param inverted      is this holder meant to exclude entries from being added to the set
          */
         RegistryEntryHolder(KeyedValueProvider<T> valueProvider, String source, boolean inverted) {
@@ -443,12 +441,12 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         }
 
         @Override
-        protected Optional<T> toValue(ResourceLocation resourceLocation) {
-            return this.valueProvider.getValue(resourceLocation);
+        protected Optional<T> toValue(Identifier identifier) {
+            return this.valueProvider.getValue(identifier);
         }
 
         @Override
-        protected Stream<Map.Entry<ResourceLocation, T>> allValues() {
+        protected Stream<Map.Entry<Identifier, T>> allValues() {
             return this.valueProvider.stream();
         }
     }
@@ -466,7 +464,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
 
         /**
          * @param registryProvider the registry to compile values from
-         * @param source           the raw {@link ResourceLocation} to parse
+         * @param source           the raw {@link Identifier} to parse
          * @param inverted         is this holder meant to exclude entries from being added to the set
          */
         TagEntryHolder(RegistryProvider<T> registryProvider, String source, boolean inverted) {
@@ -480,14 +478,14 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         }
 
         @Override
-        protected Optional<TagKey<T>> toValue(ResourceLocation resourceLocation) {
-            TagKey<T> tag = TagKey.create(this.registry.key(), resourceLocation);
+        protected Optional<TagKey<T>> toValue(Identifier identifier) {
+            TagKey<T> tag = TagKey.create(this.registry.key(), identifier);
             if (this.registry.get(tag).isEmpty()) return Optional.empty();
             return Optional.of(tag);
         }
 
         @Override
-        protected Stream<Map.Entry<ResourceLocation, TagKey<T>>> allValues() {
+        protected Stream<Map.Entry<Identifier, TagKey<T>>> allValues() {
             return this.registry.listTagIds().map(tagKey -> Map.entry(tagKey.location(), tagKey));
         }
     }

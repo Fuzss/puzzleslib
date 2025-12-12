@@ -4,7 +4,7 @@ import fuzs.puzzleslib.api.client.key.v1.KeyActivationContext;
 import fuzs.puzzleslib.fabric.impl.client.key.ActivationContextKeyMapping;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.input.KeyEvent;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;

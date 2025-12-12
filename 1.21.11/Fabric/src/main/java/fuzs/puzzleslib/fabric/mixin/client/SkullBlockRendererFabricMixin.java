@@ -2,11 +2,11 @@ package fuzs.puzzleslib.fabric.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import fuzs.puzzleslib.fabric.impl.client.core.context.SkullRenderersContextFabricImpl;
-import net.minecraft.client.model.SkullModelBase;
 import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.model.object.skull.SkullModelBase;
 import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
 import net.minecraft.world.level.block.SkullBlock;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 

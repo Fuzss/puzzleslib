@@ -2,6 +2,9 @@ package fuzs.puzzleslib.api.init.v3.registry;
 
 import com.google.common.collect.ImmutableSet;
 import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import fuzs.puzzleslib.api.core.v1.util.EnvironmentAwareBuilder;
 import fuzs.puzzleslib.impl.core.ModContext;
@@ -19,8 +22,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.syncher.EntityDataSerializer;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
@@ -31,6 +34,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
+import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -48,6 +52,10 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.gamerules.GameRule;
+import net.minecraft.world.level.gamerules.GameRuleCategory;
+import net.minecraft.world.level.gamerules.GameRuleType;
+import net.minecraft.world.level.gamerules.GameRuleTypeVisitor;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.storage.loot.LootTable;
 
@@ -88,12 +96,12 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     }
 
     /**
-     * Create a new {@link ResourceLocation} for the set mod id.
+     * Create a new {@link Identifier} for the set mod id.
      *
      * @param path path for location
-     * @return resource location for set namespace
+     * @return identifier for set namespace
      */
-    ResourceLocation makeKey(String path);
+    Identifier makeKey(String path);
 
     /**
      * Creates a lazy holder reference that will update when used.
@@ -230,7 +238,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return the holder reference
      */
     default Holder.Reference<Item> registerBlockItem(Holder<Block> block, BiFunction<Block, Item.Properties, ? extends BlockItem> itemFactory, Supplier<Item.Properties> itemPropertiesSupplier) {
-        return this.registerItem(block.unwrapKey().orElseThrow().location().getPath(),
+        return this.registerItem(block.unwrapKey().orElseThrow().identifier().getPath(),
                 (Item.Properties itemProperties) -> {
                     return itemFactory.apply(block.value(), itemProperties);
                 },
@@ -244,7 +252,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return the holder reference
      */
     default Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeHolder) {
-        return this.registerItem(entityTypeHolder.unwrapKey().orElseThrow().location().getPath() + "_spawn_egg",
+        return this.registerItem(entityTypeHolder.unwrapKey().orElseThrow().identifier().getPath() + "_spawn_egg",
                 SpawnEggItem::new,
                 () -> new Item.Properties().spawnEgg(entityTypeHolder.value()));
     }
@@ -266,10 +274,10 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return the holder reference
      */
     default Holder.Reference<CreativeModeTab> registerCreativeModeTab(Supplier<ItemStack> iconSupplier) {
-        ResourceLocation resourceLocation = this.makeKey("main");
-        return this.registerCreativeModeTab(resourceLocation.getPath(),
+        Identifier identifier = this.makeKey("main");
+        return this.registerCreativeModeTab(identifier.getPath(),
                 iconSupplier,
-                CreativeModeTabHelper.getDisplayItems(resourceLocation.getNamespace()),
+                CreativeModeTabHelper.getDisplayItems(identifier.getNamespace()),
                 false);
     }
 
@@ -529,11 +537,11 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      */
     default <T extends Recipe<?>> Holder.Reference<RecipeType<T>> registerRecipeType(String path) {
         return this.register(Registries.RECIPE_TYPE, path, () -> {
-            ResourceLocation resourceLocation = this.makeKey(path);
+            Identifier identifier = this.makeKey(path);
             return new RecipeType<>() {
                 @Override
                 public String toString() {
-                    return "RecipeType[" + resourceLocation + "]";
+                    return "RecipeType[" + identifier + "]";
                 }
             };
         });
@@ -547,11 +555,11 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      */
     default Holder.Reference<RecipeBookCategory> registerRecipeBookCategory(String path) {
         return this.register(Registries.RECIPE_BOOK_CATEGORY, path, () -> {
-            ResourceLocation resourceLocation = this.makeKey(path);
+            Identifier identifier = this.makeKey(path);
             return new RecipeBookCategory() {
                 @Override
                 public String toString() {
-                    return "RecipeBookCategory[" + resourceLocation + "]";
+                    return "RecipeBookCategory[" + identifier + "]";
                 }
             };
         });
@@ -637,6 +645,62 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
             return new RangedAttribute(descriptionId, defaultValue, minValue, maxValue).setSyncable(syncable)
                     .setSentiment(sentiment);
         });
+    }
+
+    /**
+     * Register a boolean based {@link GameRule}.
+     *
+     * @param path             the registered name
+     * @param gameRuleCategory the category for the game rules screen shown during world creation
+     * @param defaultValue     the default value for the game rule
+     * @return the game rule holder reference
+     */
+    default Holder.Reference<GameRule<Boolean>> registerGameRule(String path, GameRuleCategory gameRuleCategory, boolean defaultValue) {
+        return this.register(Registries.GAME_RULE,
+                path,
+                () -> new GameRule<>(gameRuleCategory,
+                        GameRuleType.BOOL,
+                        BoolArgumentType.bool(),
+                        GameRuleTypeVisitor::visitBoolean,
+                        Codec.BOOL,
+                        (Boolean value) -> value ? 1 : 0,
+                        defaultValue,
+                        FeatureFlagSet.of()));
+    }
+
+    /**
+     * Register an integer based {@link GameRule}.
+     *
+     * @param path             the registered name
+     * @param gameRuleCategory the category for the game rules screen shown during world creation
+     * @param defaultValue     the default value for the game rule
+     * @return the game rule holder reference
+     */
+    default Holder.Reference<GameRule<Integer>> registerGameRule(String path, GameRuleCategory gameRuleCategory, int defaultValue) {
+        return this.registerGameRule(path, gameRuleCategory, defaultValue, 0, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Register an integer based {@link GameRule}.
+     *
+     * @param path             the registered name
+     * @param gameRuleCategory the category for the game rules screen shown during world creation
+     * @param defaultValue     the default value for the game rule
+     * @param minValue         the minimum value for this rule
+     * @param maxValue         the maximum value for this rule
+     * @return the game rule holder reference
+     */
+    default Holder.Reference<GameRule<Integer>> registerGameRule(String path, GameRuleCategory gameRuleCategory, int defaultValue, int minValue, int maxValue) {
+        return this.register(Registries.GAME_RULE,
+                path,
+                () -> new GameRule<>(gameRuleCategory,
+                        GameRuleType.INT,
+                        IntegerArgumentType.integer(minValue, maxValue),
+                        GameRuleTypeVisitor::visitInteger,
+                        Codec.intRange(minValue, maxValue),
+                        integer -> integer,
+                        defaultValue,
+                        FeatureFlagSet.of()));
     }
 
     /**

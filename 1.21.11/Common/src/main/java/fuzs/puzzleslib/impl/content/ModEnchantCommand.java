@@ -28,8 +28,10 @@ import net.minecraft.world.item.enchantment.ItemEnchantments;
 import java.util.Collection;
 
 /**
- * An improved version of {@link net.minecraft.server.commands.EnchantCommand} allowing for removing and changing
- * enchantments, additionally featuring a slightly more convenient command syntax.
+ * An improved version of the vanilla {@code /enchant} allowing for removing and changing enchantments, additionally
+ * featuring a slightly more convenient command syntax.
+ *
+ * @see net.minecraft.server.commands.EnchantCommand
  */
 public class ModEnchantCommand {
     public static final String KEY_REMOVE_SUCCESS_SINGLE = "commands.enchant.remove.success.single";
@@ -48,7 +50,7 @@ public class ModEnchantCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context) {
         dispatcher.register(Commands.literal("enchant")
-                .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.argument("targets", EntityArgument.entities())
                         .then(Commands.argument("enchantment",
                                         ResourceArgument.resource(context, Registries.ENCHANTMENT))
@@ -87,8 +89,8 @@ public class ModEnchantCommand {
                 if (!itemStack.isEmpty()) {
 
                     ItemEnchantments itemEnchantments = EnchantmentHelper.getEnchantmentsForCrafting(itemStack);
-                    if (level == 0 || (isBook(itemStack) || enchantment.value().canEnchant(itemStack)) &&
-                            isEnchantmentCompatible(itemEnchantments, enchantment)) {
+                    if (level == 0 || (isBook(itemStack) || enchantment.value().canEnchant(itemStack))
+                            && isEnchantmentCompatible(itemEnchantments, enchantment)) {
 
                         ItemEnchantments.Mutable mutable = new ItemEnchantments.Mutable(itemEnchantments);
                         if (mutable.getLevel(enchantment) != level) {

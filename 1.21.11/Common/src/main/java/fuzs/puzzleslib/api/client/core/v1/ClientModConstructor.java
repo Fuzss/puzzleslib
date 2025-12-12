@@ -7,7 +7,7 @@ import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
@@ -27,17 +27,17 @@ public interface ClientModConstructor {
      * @param modConstructorSupplier the mod instance for the setup
      */
     static void construct(String modId, Supplier<ClientModConstructor> modConstructorSupplier) {
-        construct(ResourceLocation.fromNamespaceAndPath(modId, "client"), modConstructorSupplier);
+        construct(Identifier.fromNamespaceAndPath(modId, "client"), modConstructorSupplier);
     }
 
     /**
      * Construct the {@link ClientModConstructor} instance to begin client-side initialization of a mod.
      *
-     * @param resourceLocation       the identifier for the provided mod instance
+     * @param identifier       the identifier for the provided mod instance
      * @param modConstructorSupplier the mod instance for the setup
      */
-    static void construct(ResourceLocation resourceLocation, Supplier<ClientModConstructor> modConstructorSupplier) {
-        ModConstructorImpl.construct(resourceLocation,
+    static void construct(Identifier identifier, Supplier<ClientModConstructor> modConstructorSupplier) {
+        ModConstructorImpl.construct(identifier,
                 modConstructorSupplier,
                 ClientProxyImpl.get()::getClientModConstructorImpl);
     }

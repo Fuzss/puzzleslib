@@ -2,9 +2,9 @@ package fuzs.puzzleslib.api.init.v3.registry;
 
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Create new {@link Registry Registries}.
@@ -47,7 +47,7 @@ public interface RegistryFactory {
      * @return the new registry
      */
     default <T> Registry<T> create(ResourceKey<Registry<T>> registryKey, @Nullable String defaultKey) {
-        return this.create(registryKey, defaultKey != null ? registryKey.location().withPath(defaultKey) : null);
+        return this.create(registryKey, defaultKey != null ? registryKey.identifier().withPath(defaultKey) : null);
     }
 
     /**
@@ -60,7 +60,8 @@ public interface RegistryFactory {
      * @return the new registry
      */
     default <T> Registry<T> createSynced(ResourceKey<Registry<T>> registryKey, @Nullable String defaultKey) {
-        return this.createSynced(registryKey, defaultKey != null ? registryKey.location().withPath(defaultKey) : null);
+        return this.createSynced(registryKey,
+                defaultKey != null ? registryKey.identifier().withPath(defaultKey) : null);
     }
 
     /**
@@ -71,7 +72,7 @@ public interface RegistryFactory {
      * @param <T>         the registry value type
      * @return the new registry
      */
-    <T> Registry<T> create(ResourceKey<Registry<T>> registryKey, @Nullable ResourceLocation defaultKey);
+    <T> Registry<T> create(ResourceKey<Registry<T>> registryKey, @Nullable Identifier defaultKey);
 
     /**
      * Create a synchronized {@link net.minecraft.core.DefaultedMappedRegistry}, so that numeric registry ids can be
@@ -82,5 +83,5 @@ public interface RegistryFactory {
      * @param <T>         the registry value type
      * @return the new registry
      */
-    <T> Registry<T> createSynced(ResourceKey<Registry<T>> registryKey, @Nullable ResourceLocation defaultKey);
+    <T> Registry<T> createSynced(ResourceKey<Registry<T>> registryKey, @Nullable Identifier defaultKey);
 }

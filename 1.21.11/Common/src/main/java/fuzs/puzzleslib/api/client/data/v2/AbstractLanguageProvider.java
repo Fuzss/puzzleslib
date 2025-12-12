@@ -14,8 +14,8 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.stats.StatType;
 import net.minecraft.tags.TagKey;
@@ -23,16 +23,16 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.decoration.PaintingVariant;
+import net.minecraft.world.entity.decoration.painting.PaintingVariant;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.gamerules.GameRule;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Map;
@@ -44,7 +44,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public abstract class AbstractLanguageProvider implements DataProvider {
-    private final ResourceLocation filePath;
+    private final Identifier filePath;
     private final PackOutput.PathProvider pathProvider;
 
     public AbstractLanguageProvider(DataProviderContext context) {
@@ -60,7 +60,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
     }
 
     public AbstractLanguageProvider(String languageCode, String modId, PackOutput packOutput) {
-        this.filePath = ResourceLocation.fromNamespaceAndPath(modId, languageCode);
+        this.filePath = Identifier.fromNamespaceAndPath(modId, languageCode);
         this.pathProvider = packOutput.createPathProvider(PackOutput.Target.RESOURCE_PACK, "lang");
     }
 
@@ -97,7 +97,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
     private <T> void verifyRequiredTranslationKeys(Predicate<String> predicate, Registry<T> registry, HolderTranslationCollector<T> holderTranslationCollector) {
         registry.listElements()
                 .filter((Holder.Reference<T> holder) -> holder.key()
-                        .location()
+                        .identifier()
                         .getNamespace()
                         .equals(this.filePath.getNamespace()))
                 .forEach((Holder.Reference<T> holder) -> {
@@ -132,13 +132,13 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add(translationKey + (additionalKey.isEmpty() ? "" : "." + additionalKey), value);
         }
 
-        default void add(ResourceLocation resourceLocation, String value) {
-            this.add(resourceLocation, "", value);
+        default void add(Identifier identifier, String value) {
+            this.add(identifier, "", value);
         }
 
-        default void add(ResourceLocation resourceLocation, String additionalKey, String value) {
-            Objects.requireNonNull(resourceLocation, "resource location is null");
-            this.add(resourceLocation.toLanguageKey(), additionalKey, value);
+        default void add(Identifier identifier, String additionalKey, String value) {
+            Objects.requireNonNull(identifier, "resource identifier is null");
+            this.add(identifier.toLanguageKey(), additionalKey, value);
         }
 
         default void add(Component component) {
@@ -175,17 +175,17 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         default void add(ResourceKey<?> resourceKey, String additionalKey, String value) {
             Objects.requireNonNull(resourceKey, "resource key is null");
             String registry = Registries.elementsDirPath(resourceKey.registryKey());
-            this.add(registry, resourceKey.location(), additionalKey, value);
+            this.add(registry, resourceKey.identifier(), additionalKey, value);
         }
 
-        default void add(String registry, ResourceLocation resourceLocation, String value) {
-            this.add(registry, resourceLocation, "", value);
+        default void add(String registry, Identifier identifier, String value) {
+            this.add(registry, identifier, "", value);
         }
 
-        default void add(String registry, ResourceLocation resourceLocation, String additionalKey, String value) {
+        default void add(String registry, Identifier identifier, String additionalKey, String value) {
             Objects.requireNonNull(registry, "registry is null");
-            Objects.requireNonNull(resourceLocation, "resource location is null");
-            this.add(resourceLocation.toLanguageKey(registry), additionalKey, value);
+            Objects.requireNonNull(identifier, "resource identifier is null");
+            this.add(identifier.toLanguageKey(registry), additionalKey, value);
         }
 
         default void add(TagKey<?> tagKey, String value) {
@@ -333,29 +333,29 @@ public abstract class AbstractLanguageProvider implements DataProvider {
 
         default void addBiome(ResourceKey<Biome> biome, String value) {
             Objects.requireNonNull(biome, "biome is null");
-            this.add(biome.location().toLanguageKey("biome"), value);
+            this.add(biome.identifier().toLanguageKey("biome"), value);
         }
 
         default void addGenericDamageType(ResourceKey<DamageType> damageType, String value) {
             Objects.requireNonNull(damageType, "damage type is null");
-            this.add("death.attack." + damageType.location().getPath(), value);
+            this.add("death.attack." + damageType.identifier().getPath(), value);
         }
 
         default void addPlayerDamageType(ResourceKey<DamageType> damageType, String value) {
             Objects.requireNonNull(damageType, "damage type is null");
-            this.add("death.attack." + damageType.location().getPath() + ".player", value);
+            this.add("death.attack." + damageType.identifier().getPath() + ".player", value);
         }
 
         default void addItemDamageType(ResourceKey<DamageType> damageType, String value) {
             Objects.requireNonNull(damageType, "damage type is null");
-            this.add("death.attack." + damageType.location().getPath() + ".item", value);
+            this.add("death.attack." + damageType.identifier().getPath() + ".item", value);
         }
 
         default void addPaintingVariant(ResourceKey<PaintingVariant> paintingVariant, String title, String author) {
             Objects.requireNonNull(paintingVariant, "painting variant is null");
             // do not use the registry name, it is "painting_variant", not "painting"
-            this.add(paintingVariant.location().toLanguageKey("painting", "title"), title);
-            this.add(paintingVariant.location().toLanguageKey("painting", "author"), author);
+            this.add(paintingVariant.identifier().toLanguageKey("painting", "title"), title);
+            this.add(paintingVariant.identifier().toLanguageKey("painting", "author"), author);
         }
 
         default void add(KeyMapping keyMapping, String value) {
@@ -364,18 +364,18 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void addKeyCategory(String modId, String value) {
-            this.add(new KeyMapping.Category(ResourceLocation.fromNamespaceAndPath(modId, "main")).label(), value);
+            this.add(new KeyMapping.Category(Identifier.fromNamespaceAndPath(modId, "main")).label(), value);
         }
 
-        default void add(GameRules.Key<?> gameRule, String value) {
+        default void add(GameRule<?> gameRule, String value) {
             this.add(gameRule, "", value);
         }
 
-        default void addGameRuleDescription(GameRules.Key<?> gameRule, String value) {
+        default void addGameRuleDescription(GameRule<?> gameRule, String value) {
             this.add(gameRule, "description", value);
         }
 
-        default void add(GameRules.Key<?> gameRule, String additionalKey, String value) {
+        default void add(GameRule<?> gameRule, String additionalKey, String value) {
             Objects.requireNonNull(gameRule, "game rule is null");
             this.add(gameRule.getDescriptionId(), additionalKey, value);
         }

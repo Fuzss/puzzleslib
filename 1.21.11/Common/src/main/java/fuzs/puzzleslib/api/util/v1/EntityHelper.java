@@ -7,7 +7,7 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ServerLevelAccessor;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -50,8 +50,8 @@ public final class EntityHelper {
     }
 
     /**
-     * Called instead of directly checking {@link net.minecraft.world.level.GameRules#RULE_MOBGRIEFING}, allows for a
-     * dedicated NeoForge event to run.
+     * Called instead of directly checking {@link net.minecraft.world.level.gamerules.GameRules#MOB_GRIEFING}, allows
+     * for a dedicated NeoForge event to run.
      *
      * @param serverLevel the level mob griefing is happening in
      * @param entity      the entity responsible for triggering the game rule check
@@ -64,7 +64,7 @@ public final class EntityHelper {
 
     /**
      * Get the parent mob from a possible mob part entity, like
-     * {@link net.minecraft.world.entity.boss.EnderDragonPart}.
+     * {@link net.minecraft.world.entity.boss.enderdragon.EnderDragonPart}.
      * <p>
      * NeoForge allows extending this, so we need this abstraction.
      *

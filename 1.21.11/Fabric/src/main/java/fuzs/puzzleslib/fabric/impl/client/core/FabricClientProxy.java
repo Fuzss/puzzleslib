@@ -38,7 +38,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.custom.BrandPayload;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -47,9 +47,12 @@ import net.minecraft.world.level.block.state.properties.WoodType;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.config.ModConfigs;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-import java.util.*;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.IntFunction;
 
 public class FabricClientProxy extends FabricCommonProxy implements ClientProxyImpl {
@@ -160,8 +163,14 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
 
     @Override
     public BakedQuad copyBakedQuad(BakedQuad bakedQuad) {
-        int[] vertices = bakedQuad.vertices();
-        return new BakedQuad(Arrays.copyOf(vertices, vertices.length),
+        return new BakedQuad(bakedQuad.position0(),
+                bakedQuad.position1(),
+                bakedQuad.position2(),
+                bakedQuad.position3(),
+                bakedQuad.packedUV0(),
+                bakedQuad.packedUV1(),
+                bakedQuad.packedUV2(),
+                bakedQuad.packedUV3(),
                 bakedQuad.tintIndex(),
                 bakedQuad.direction(),
                 bakedQuad.sprite(),
@@ -208,14 +217,14 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     }
 
     @Override
-    public int getLeftStatusBarHeight(ResourceLocation resourceLocation) {
-        ResourceLocation vanillaGuiLayer = GuiLayersContextFabricImpl.getVanillaGuiLayer(resourceLocation);
+    public int getLeftStatusBarHeight(Identifier identifier) {
+        Identifier vanillaGuiLayer = GuiLayersContextFabricImpl.getVanillaGuiLayer(identifier);
         return HudStatusBarHeightRegistry.getHeight(vanillaGuiLayer);
     }
 
     @Override
-    public int getRightStatusBarHeight(ResourceLocation resourceLocation) {
-        ResourceLocation vanillaGuiLayer = GuiLayersContextFabricImpl.getVanillaGuiLayer(resourceLocation);
+    public int getRightStatusBarHeight(Identifier identifier) {
+        Identifier vanillaGuiLayer = GuiLayersContextFabricImpl.getVanillaGuiLayer(identifier);
         return HudStatusBarHeightRegistry.getHeight(vanillaGuiLayer);
     }
 }

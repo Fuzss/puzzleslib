@@ -6,8 +6,8 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -19,7 +19,7 @@ import java.util.List;
 abstract class GuiGraphicsFabricMixin {
 
     @Inject(method = "renderTooltip", at = @At("HEAD"), cancellable = true)
-    private void renderTooltip(Font font, List<ClientTooltipComponent> tooltipComponents, int mouseX, int mouseY, ClientTooltipPositioner clientTooltipPositioner, @Nullable ResourceLocation resourceLocation, CallbackInfo callback) {
+    private void renderTooltip(Font font, List<ClientTooltipComponent> tooltipComponents, int mouseX, int mouseY, ClientTooltipPositioner clientTooltipPositioner, @Nullable Identifier identifier, CallbackInfo callback) {
         if (!tooltipComponents.isEmpty()) {
             EventResult result = FabricGuiEvents.RENDER_TOOLTIP.invoker()
                     .onRenderTooltip(GuiGraphics.class.cast(this),

@@ -34,8 +34,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
@@ -86,7 +86,7 @@ import net.neoforged.neoforge.registries.ModifyRegistriesEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import net.neoforged.neoforge.registries.callback.AddCallback;
 import net.neoforged.neoforge.registries.callback.BakeCallback;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -173,7 +173,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             if (!loadComplete[0]) {
                 try {
                     callback.onRegistryEntryAdded(callbackRegistry,
-                            key.location(),
+                            key.identifier(),
                             value,
                             onRegistryEntryAdded(registry));
                 } catch (Exception exception) {
@@ -189,11 +189,11 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         // store all event invocations for vanilla game content already registered before the registration event runs
         // the add callback above won't trigger for those as they are already registered when mods are constructed
         // we cannot run those directly as registries are frozen when this fires
-        Queue<Consumer<BiConsumer<ResourceLocation, Supplier<T>>>> callbacks = new LinkedList<>();
+        Queue<Consumer<BiConsumer<Identifier, Supplier<T>>>> callbacks = new LinkedList<>();
         for (Map.Entry<ResourceKey<T>, T> entry : registry.entrySet()) {
-            callbacks.offer((BiConsumer<ResourceLocation, Supplier<T>> consumer) -> {
+            callbacks.offer((BiConsumer<Identifier, Supplier<T>> consumer) -> {
                 try {
-                    callback.onRegistryEntryAdded(registry, entry.getKey().location(), entry.getValue(), consumer);
+                    callback.onRegistryEntryAdded(registry, entry.getKey().identifier(), entry.getValue(), consumer);
                 } catch (Exception exception) {
                     PuzzlesLib.LOGGER.error("Failed to run registry entry added callback", exception);
                 }
@@ -207,19 +207,19 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 return;
             }
 
-            Consumer<BiConsumer<ResourceLocation, Supplier<T>>> consumer;
+            Consumer<BiConsumer<Identifier, Supplier<T>>> consumer;
             while ((consumer = callbacks.poll()) != null) {
                 consumer.accept(onRegistryEntryAdded((Registry<T>) eventX.getRegistry()));
             }
         });
     }
 
-    private static <T> BiConsumer<ResourceLocation, Supplier<T>> onRegistryEntryAdded(Registry<T> registry) {
-        return (ResourceLocation resourceLocation, Supplier<T> supplier) -> {
+    private static <T> BiConsumer<Identifier, Supplier<T>> onRegistryEntryAdded(Registry<T> registry) {
+        return (Identifier identifier, Supplier<T> supplier) -> {
             try {
                 T t = supplier.get();
                 Objects.requireNonNull(t, "entry is null");
-                Registry.register(registry, resourceLocation, t);
+                Registry.register(registry, identifier, t);
             } catch (Exception exception) {
                 PuzzlesLib.LOGGER.error("Failed to register new entry", exception);
             }

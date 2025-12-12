@@ -1,12 +1,12 @@
 package fuzs.puzzleslib.fabric.impl.client.core.context;
 
 import fuzs.puzzleslib.api.client.core.v1.context.SkullRenderersContext;
-import net.minecraft.client.model.SkullModelBase;
 import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.model.object.skull.SkullModelBase;
 import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.SkullBlock;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -17,7 +17,7 @@ public final class SkullRenderersContextFabricImpl implements SkullRenderersCont
     private static final Map<SkullBlock.Type, Function<EntityModelSet, SkullModelBase>> SKULL_MODEL_FACTORIES = new IdentityHashMap<>();
 
     @Override
-    public void registerSkullRenderer(SkullBlock.Type skullBlockType, ResourceLocation textureLocation, Function<EntityModelSet, SkullModelBase> skullModelFactory) {
+    public void registerSkullRenderer(SkullBlock.Type skullBlockType, Identifier textureLocation, Function<EntityModelSet, SkullModelBase> skullModelFactory) {
         Objects.requireNonNull(skullBlockType, "skull block type is null");
         Objects.requireNonNull(textureLocation, "texture location is null");
         Objects.requireNonNull(skullModelFactory, "skull model factory is null");

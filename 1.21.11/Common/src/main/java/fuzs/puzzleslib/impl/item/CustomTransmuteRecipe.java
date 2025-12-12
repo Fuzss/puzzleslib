@@ -7,7 +7,7 @@ import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 
@@ -37,11 +37,11 @@ public interface CustomTransmuteRecipe {
      * @return the serializer
      */
     static RecipeSerializer<?> getModSerializer(String modId, String recipeSerializerId) {
-        RecipeSerializer<?> recipeSerializer = BuiltInRegistries.RECIPE_SERIALIZER.getValue(ResourceLocation.fromNamespaceAndPath(
+        RecipeSerializer<?> recipeSerializer = BuiltInRegistries.RECIPE_SERIALIZER.getValue(Identifier.fromNamespaceAndPath(
                 modId,
                 recipeSerializerId));
         Objects.requireNonNull(recipeSerializer,
-                "recipe serializer '" + ResourceLocation.fromNamespaceAndPath(modId, recipeSerializerId)
+                "recipe serializer '" + Identifier.fromNamespaceAndPath(modId, recipeSerializerId)
                         + "' not registered");
         return recipeSerializer;
     }

@@ -7,7 +7,7 @@ import net.minecraft.client.resources.model.AtlasManager;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -15,9 +15,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public abstract class AbstractAtlasProvider extends AtlasProvider {
-    private final Map<ResourceLocation, AtlasManager.AtlasConfig> atlasByTexture = AtlasManager.KNOWN_ATLASES.stream()
+    private final Map<Identifier, AtlasManager.AtlasConfig> atlasByTexture = AtlasManager.KNOWN_ATLASES.stream()
             .collect(Collectors.toMap(AtlasManager.AtlasConfig::textureId, Function.identity()));
-    private final Map<ResourceLocation, List<SpriteSource>> values = new LinkedHashMap<>();
+    private final Map<Identifier, List<SpriteSource>> values = new LinkedHashMap<>();
 
     public AbstractAtlasProvider(DataProviderContext context) {
         this(context.getPackOutput());
@@ -32,7 +32,7 @@ public abstract class AbstractAtlasProvider extends AtlasProvider {
         this.addAtlases();
         return CompletableFuture.allOf(this.values.entrySet()
                 .stream()
-                .map((Map.Entry<ResourceLocation, List<SpriteSource>> entry) -> {
+                .map((Map.Entry<Identifier, List<SpriteSource>> entry) -> {
                     return this.storeAtlas(output, entry.getKey(), entry.getValue());
                 })
                 .toArray(CompletableFuture[]::new));
@@ -44,12 +44,12 @@ public abstract class AbstractAtlasProvider extends AtlasProvider {
         this.add(this.atlasByTexture.get(material.atlasLocation()).definitionLocation(), forMaterial(material));
     }
 
-    protected void add(ResourceLocation resourceLocation, SpriteSource... spriteSources) {
-        this.add(resourceLocation, Arrays.asList(spriteSources));
+    protected void add(Identifier identifier, SpriteSource... spriteSources) {
+        this.add(identifier, Arrays.asList(spriteSources));
     }
 
-    protected void add(ResourceLocation resourceLocation, List<SpriteSource> spriteSources) {
-        this.values.computeIfAbsent(resourceLocation, (ResourceLocation resourceLocationX) -> new ArrayList<>())
+    protected void add(Identifier identifier, List<SpriteSource> spriteSources) {
+        this.values.computeIfAbsent(identifier, (Identifier identifierX) -> new ArrayList<>())
                 .addAll(spriteSources);
     }
 }

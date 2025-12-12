@@ -2,7 +2,7 @@ package fuzs.puzzleslib.fabric.impl.client.core.context;
 
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import fuzs.puzzleslib.api.client.core.v1.context.RenderBuffersContext;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

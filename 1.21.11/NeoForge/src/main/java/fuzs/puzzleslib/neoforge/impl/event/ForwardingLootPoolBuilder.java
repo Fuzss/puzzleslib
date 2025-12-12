@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.event;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
@@ -53,6 +53,7 @@ public final class ForwardingLootPoolBuilder extends LootPool.Builder {
         if (!(this.lootPool.functions instanceof ArrayList<LootItemFunction>)) {
             this.lootPool.functions = new ArrayList<>(this.lootPool.functions);
         }
+
         this.lootPool.functions.add(functionBuilder.build());
         this.lootPool.compositeFunction = LootItemFunctions.compose(this.lootPool.functions);
         return this;

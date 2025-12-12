@@ -3,8 +3,8 @@ package fuzs.puzzleslib.impl.config.serialization;
 import fuzs.puzzleslib.api.config.v3.serialization.KeyedValueProvider;
 import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 
 import java.util.Map;
 import java.util.Optional;
@@ -17,18 +17,18 @@ public record RegistryProvider<T>(Registry<T> registry) implements KeyedValuePro
     }
 
     @Override
-    public Optional<T> getValue(ResourceLocation name) {
+    public Optional<T> getValue(Identifier name) {
         return this.registry.getOptional(name);
     }
 
     @Override
-    public ResourceLocation getKey(T value) {
+    public Identifier getKey(T value) {
         return this.registry.getKey(value);
     }
 
     @Override
-    public Stream<Map.Entry<ResourceLocation, T>> stream() {
-        return this.registry.entrySet().stream().map(entry -> Map.entry(entry.getKey().location(), entry.getValue()));
+    public Stream<Map.Entry<Identifier, T>> stream() {
+        return this.registry.entrySet().stream().map(entry -> Map.entry(entry.getKey().identifier(), entry.getValue()));
     }
 
     @Override
@@ -38,6 +38,6 @@ public record RegistryProvider<T>(Registry<T> registry) implements KeyedValuePro
 
     @Override
     public String name() {
-        return this.registry.key().location().toString();
+        return this.registry.key().identifier().toString();
     }
 }

@@ -4,7 +4,7 @@ import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
 import fuzs.puzzleslib.fabric.impl.core.context.DataPackSourcesContextFabricImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.RepositorySource;
@@ -21,10 +21,10 @@ public final class ResourcePackSourcesContextFabricImpl implements PackRepositor
     }
 
     @Override
-    public void registerBuiltInPack(ResourceLocation resourceLocation, Component displayName, boolean shouldAddAutomatically) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
+    public void registerBuiltInPack(Identifier identifier, Component displayName, boolean shouldAddAutomatically) {
+        Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(displayName, "display name is null");
-        DataPackSourcesContextFabricImpl.registerBuiltInPack(resourceLocation,
+        DataPackSourcesContextFabricImpl.registerBuiltInPack(identifier,
                 displayName, shouldAddAutomatically,
                 PackType.CLIENT_RESOURCES);
     }

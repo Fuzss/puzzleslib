@@ -38,7 +38,7 @@ public interface MutableDouble extends DoubleConsumer, DoubleSupplier {
      *
      * @param operator operator to apply to contained value
      */
-    default void mapDouble(DoubleUnaryOperator operator) {
+    default void mapAsDouble(DoubleUnaryOperator operator) {
         this.accept(operator.applyAsDouble(this.getAsDouble()));
     }
 }

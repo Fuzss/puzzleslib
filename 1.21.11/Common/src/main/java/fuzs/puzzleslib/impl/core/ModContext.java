@@ -7,9 +7,9 @@ import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
 import net.minecraft.network.protocol.common.custom.BrandPayload;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Map;
@@ -28,7 +28,7 @@ public abstract class ModContext {
 
     public ModContext(String modId) {
         this.modId = modId;
-        this.payloadType = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(modId, "handshake"));
+        this.payloadType = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(modId, "handshake"));
     }
 
     public static void forEach(Consumer<ModContext> modContextConsumer) {

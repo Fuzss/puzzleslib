@@ -5,7 +5,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.RunAroundLikeCrazyGoal;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +22,7 @@ abstract class RunAroundLikeCrazyGoalFabricMixin extends Goal {
     @ModifyExpressionValue(method = "tick",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/util/RandomSource;nextInt(I)I"),
             slice = @Slice(from = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/animal/horse/AbstractHorse;getMaxTemper()I")))
+                    target = "Lnet/minecraft/world/entity/animal/equine/AbstractHorse;getMaxTemper()I")))
     public int tick(int intValue, @Local Player player) {
         int horseTemper = this.horse.getTemper();
         return FabricEventImplHelper.onAnimalTame(this.horse, player, intValue, horseTemper, intValue < horseTemper);

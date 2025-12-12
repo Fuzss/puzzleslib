@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.biome.v1;
 
 import net.minecraft.world.level.biome.Biome;
+import org.jspecify.annotations.NonNull;
 
 /**
  * The modification context for the biomes weather properties.
@@ -42,7 +43,7 @@ public interface ClimateSettingsContext {
     /**
      * @see Biome.BiomeBuilder#temperatureAdjustment(Biome.TemperatureModifier)
      */
-    void setTemperatureModifier(Biome.TemperatureModifier temperatureModifier);
+    void setTemperatureModifier(Biome.@NonNull TemperatureModifier temperatureModifier);
 
     /**
      * @see Biome.BiomeBuilder#downfall(float)

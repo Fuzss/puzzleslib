@@ -6,7 +6,7 @@ import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.PlayerChatMessage;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @FunctionalInterface
 public interface ChatMessageReceivedCallback {
@@ -33,5 +33,5 @@ public interface ChatMessageReceivedCallback {
      *         <li>{@link EventResult#PASS PASS} to allow the message to be added</li>
      *         </ul>
      */
-    EventResult onChatMessageReceived(MutableValue<Component> chatMessage, @Nullable ChatType.Bound chatTypeBound, @Nullable PlayerChatMessage playerChatMessage, boolean isOverlay);
+    EventResult onChatMessageReceived(MutableValue<Component> chatMessage, ChatType.@Nullable Bound chatTypeBound, @Nullable PlayerChatMessage playerChatMessage, boolean isOverlay);
 }

@@ -1,13 +1,13 @@
 package fuzs.puzzleslib.api.data.v2.core;
 
 import com.google.common.base.Suppliers;
-import net.minecraft.Util;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.server.packs.resources.ResourceManager;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.util.Util;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;

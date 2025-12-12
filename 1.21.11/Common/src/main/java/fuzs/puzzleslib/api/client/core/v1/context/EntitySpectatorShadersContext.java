@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 
 /**
@@ -12,7 +12,7 @@ public interface EntitySpectatorShadersContext {
      * Register the custom shader.
      *
      * @param entityType       the entity type being spectated
-     * @param resourceLocation the location to the shader file, usually at {@code shaders/post/<file>.json}
+     * @param identifier the location to the shader file, usually at {@code shaders/post/<file>.json}
      */
-    void registerSpectatorShader(EntityType<?> entityType, ResourceLocation resourceLocation);
+    void registerSpectatorShader(EntityType<?> entityType, Identifier identifier);
 }

@@ -9,7 +9,7 @@ import fuzs.puzzleslib.impl.attachment.builder.DataAttachmentBuilder;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
@@ -17,13 +17,13 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 public abstract class FabricDataAttachmentBuilder<T extends AttachmentTarget, V, B extends DataAttachmentRegistry.Builder<T, V, B>> extends DataAttachmentBuilder<T, V, B> {
 
     @Override
-    public DataAttachmentType<T, V> build(ResourceLocation resourceLocation) {
-        AttachmentType<V> attachmentType = AttachmentRegistry.create(resourceLocation,
+    public DataAttachmentType<T, V> build(Identifier identifier) {
+        AttachmentType<V> attachmentType = AttachmentRegistry.create(identifier,
                 (AttachmentRegistry.Builder<V> builder) -> {
                     builder.initializer(() -> {
                         // we handle this ourselves later as there is no appropriate context available here
                         throw new UnsupportedOperationException(
-                                "Attachment type " + resourceLocation + " does not support a default value!");
+                                "Attachment type " + identifier + " does not support a default value!");
                     });
                     this.configureBuilder(builder);
                 });

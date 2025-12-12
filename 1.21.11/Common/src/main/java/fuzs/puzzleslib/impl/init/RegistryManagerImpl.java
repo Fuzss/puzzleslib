@@ -9,8 +9,8 @@ import fuzs.puzzleslib.impl.item.CreativeModeTabHelper;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.StringUtils;
@@ -31,9 +31,9 @@ public abstract class RegistryManagerImpl implements RegistryManager, Freezable 
     }
 
     @Override
-    public ResourceLocation makeKey(String path) {
+    public Identifier makeKey(String path) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(path), "path is invalid");
-        return ResourceLocation.fromNamespaceAndPath(this.modId, path);
+        return Identifier.fromNamespaceAndPath(this.modId, path);
     }
 
     @Override
@@ -59,6 +59,7 @@ public abstract class RegistryManagerImpl implements RegistryManager, Freezable 
         } else {
             holder = this.getHolderReference(registryKey, path, supplier, skipRegistration);
         }
+
         this.allowedModLoaders = EnumSet.allOf(ModLoader.class);
         Objects.requireNonNull(holder, "holder is null");
         return holder;
@@ -70,8 +71,8 @@ public abstract class RegistryManagerImpl implements RegistryManager, Freezable 
     public Holder.Reference<CreativeModeTab> registerCreativeModeTab(String path, Supplier<ItemStack> iconSupplier, CreativeModeTab.DisplayItemsGenerator displayItems, boolean withSearchBar) {
         return this.register(Registries.CREATIVE_MODE_TAB, path, () -> {
             CreativeModeTab.Builder builder = this.getCreativeModeTabBuilder(withSearchBar);
-            ResourceLocation resourceLocation = this.makeKey(path);
-            builder.title(CreativeModeTabHelper.getTitle(resourceLocation));
+            Identifier identifier = this.makeKey(path);
+            builder.title(CreativeModeTabHelper.getTitle(identifier));
             builder.icon(iconSupplier);
             builder.displayItems(displayItems);
             return builder.build();

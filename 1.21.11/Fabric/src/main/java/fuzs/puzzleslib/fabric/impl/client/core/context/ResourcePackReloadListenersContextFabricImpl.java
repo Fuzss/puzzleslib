@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import fuzs.puzzleslib.api.client.core.v1.context.ResourcePackReloadListenersContext;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.fabric.api.resource.v1.reloader.ResourceReloaderKeys;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public final class ResourcePackReloadListenersContextFabricImpl implements ResourcePackReloadListenersContext {
-    private static final Map<ResourceLocation, ResourceLocation> VANILLA_CLIENT_RELOAD_LISTENERS = ImmutableMap.<ResourceLocation, ResourceLocation>builder()
+    private static final Map<Identifier, Identifier> VANILLA_CLIENT_RELOAD_LISTENERS = ImmutableMap.<Identifier, Identifier>builder()
             .put(LANGUAGES, ResourceReloaderKeys.Client.LANGUAGES)
             .put(TEXTURES, ResourceReloaderKeys.Client.TEXTURES)
             .put(SHADERS, ResourceReloaderKeys.Client.SHADERS)
@@ -37,27 +37,27 @@ public final class ResourcePackReloadListenersContextFabricImpl implements Resou
             .build();
 
     @Override
-    public void registerReloadListener(ResourceLocation resourceLocation, PreparableReloadListener reloadListener) {
-        Objects.requireNonNull(resourceLocation, "id is null");
+    public void registerReloadListener(Identifier identifier, PreparableReloadListener reloadListener) {
+        Objects.requireNonNull(identifier, "id is null");
         Objects.requireNonNull(reloadListener, "reload listener is null");
-        ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(resourceLocation, reloadListener);
+        ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(identifier, reloadListener);
     }
 
     @Override
-    public void registerReloadListener(ResourceLocation resourceLocation, ResourceLocation otherResourceLocation, PreparableReloadListener reloadListener) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
-        Objects.requireNonNull(otherResourceLocation, "other resource location is null");
+    public void registerReloadListener(Identifier identifier, Identifier otherResourceLocation, PreparableReloadListener reloadListener) {
+        Objects.requireNonNull(identifier, "identifier is null");
+        Objects.requireNonNull(otherResourceLocation, "other identifier is null");
         Objects.requireNonNull(reloadListener, "reload listener is null");
-        if (VANILLA_CLIENT_RELOAD_LISTENERS.containsKey(resourceLocation)) {
+        if (VANILLA_CLIENT_RELOAD_LISTENERS.containsKey(identifier)) {
             ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(otherResourceLocation, reloadListener);
             ResourceLoader.get(PackType.CLIENT_RESOURCES)
-                    .addReloaderOrdering(VANILLA_CLIENT_RELOAD_LISTENERS.get(resourceLocation), otherResourceLocation);
+                    .addReloaderOrdering(VANILLA_CLIENT_RELOAD_LISTENERS.get(identifier), otherResourceLocation);
         } else if (VANILLA_CLIENT_RELOAD_LISTENERS.containsKey(otherResourceLocation)) {
-            ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(resourceLocation, reloadListener);
+            ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(identifier, reloadListener);
             ResourceLoader.get(PackType.CLIENT_RESOURCES)
-                    .addReloaderOrdering(resourceLocation, VANILLA_CLIENT_RELOAD_LISTENERS.get(otherResourceLocation));
+                    .addReloaderOrdering(identifier, VANILLA_CLIENT_RELOAD_LISTENERS.get(otherResourceLocation));
         } else {
-            throw new RuntimeException("Unknown reload listeners: " + resourceLocation + ", " + otherResourceLocation);
+            throw new RuntimeException("Unknown reload listeners: " + identifier + ", " + otherResourceLocation);
         }
     }
 }

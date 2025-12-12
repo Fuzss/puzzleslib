@@ -2,7 +2,7 @@ package fuzs.puzzleslib.impl.config.annotation;
 
 import fuzs.puzzleslib.api.config.v3.Config;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

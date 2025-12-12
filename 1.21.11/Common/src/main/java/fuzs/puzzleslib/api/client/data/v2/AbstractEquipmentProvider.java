@@ -6,8 +6,8 @@ import net.minecraft.client.resources.model.EquipmentClientInfo;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.equipment.EquipmentAsset;
 
 import java.util.LinkedHashMap;
@@ -42,24 +42,22 @@ public abstract class AbstractEquipmentProvider extends EquipmentAssetProvider {
     /**
      * @see EquipmentAssetProvider#onlyHumanoid(String)
      */
-    public static EquipmentClientInfo onlyHumanoid(ResourceLocation resourceLocation) {
-        return EquipmentClientInfo.builder().addHumanoidLayers(resourceLocation).build();
+    public static EquipmentClientInfo onlyHumanoid(Identifier identifier) {
+        return EquipmentClientInfo.builder().addHumanoidLayers(identifier).build();
     }
 
     /**
-     * @see EquipmentAssetProvider#humanoidAndHorse(String)
+     * @see EquipmentAssetProvider#humanoidAndMountArmor(String)
      */
-    public static EquipmentClientInfo humanoidAndHorse(ResourceLocation resourceLocation) {
+    public static EquipmentClientInfo humanoidAndHorse(Identifier identifier) {
         return EquipmentClientInfo.builder()
-                .addHumanoidLayers(resourceLocation)
+                .addHumanoidLayers(identifier)
                 .addLayers(EquipmentClientInfo.LayerType.HORSE_BODY,
-                        EquipmentClientInfo.Layer.leatherDyeable(resourceLocation, false))
+                        EquipmentClientInfo.Layer.leatherDyeable(identifier, false))
                 .build();
     }
 
-    public static EquipmentClientInfo simple(EquipmentClientInfo.LayerType layerType, ResourceLocation resourceLocation) {
-        return EquipmentClientInfo.builder()
-                .addLayers(layerType, new EquipmentClientInfo.Layer(resourceLocation))
-                .build();
+    public static EquipmentClientInfo simple(EquipmentClientInfo.LayerType layerType, Identifier identifier) {
+        return EquipmentClientInfo.builder().addLayers(layerType, new EquipmentClientInfo.Layer(identifier)).build();
     }
 }

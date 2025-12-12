@@ -2,14 +2,15 @@ package fuzs.puzzleslib.api.client.renderer.v1;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.model.ChestModel;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.model.object.chest.ChestModel;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.ChestRenderer;
 import net.minecraft.client.renderer.blockentity.state.ChestRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -18,7 +19,7 @@ import net.minecraft.client.resources.model.MaterialSet;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.LidBlockEntity;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An extension of {@link ChestRenderer} that allows specifying custom chest texture materials for single chests (e.g.
@@ -53,7 +54,7 @@ public abstract class SingleChestRenderer<T extends BlockEntity & LidBlockEntity
     }
 
     @Override
-    public void extractRenderState(T blockEntity, ChestRenderState chestRenderState, float partialTick, Vec3 cameraPosition, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+    public void extractRenderState(T blockEntity, ChestRenderState chestRenderState, float partialTick, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay) {
         super.extractRenderState(blockEntity, chestRenderState, partialTick, cameraPosition, crumblingOverlay);
         ((S) chestRenderState).chestMaterial = this.getChestMaterial(blockEntity, this.xmasTextures);
     }
@@ -77,7 +78,7 @@ public abstract class SingleChestRenderer<T extends BlockEntity & LidBlockEntity
      */
     protected void submitChestModel(S chestRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector) {
         Material material = chestRenderState.chestMaterial;
-        RenderType renderType = material.renderType(RenderType::entityCutout);
+        RenderType renderType = material.renderType(RenderTypes::entityCutout);
         TextureAtlasSprite textureAtlasSprite = this.materials.get(material);
         submitNodeCollector.submitModel(this.chestModel,
                 chestRenderState.getOpenness(),

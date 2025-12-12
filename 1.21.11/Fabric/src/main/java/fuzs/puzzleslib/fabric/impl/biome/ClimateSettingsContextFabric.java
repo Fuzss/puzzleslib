@@ -3,9 +3,10 @@ package fuzs.puzzleslib.fabric.impl.biome;
 import fuzs.puzzleslib.api.biome.v1.ClimateSettingsContext;
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
 import net.minecraft.world.level.biome.Biome;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
-public record ClimateSettingsContextFabric(Biome biome, BiomeModificationContext.WeatherContext context) implements ClimateSettingsContext {
+public record ClimateSettingsContextFabric(Biome biome,
+                                           BiomeModificationContext.WeatherContext context) implements ClimateSettingsContext {
 
     @Override
     public void hasPrecipitation(boolean hasPrecipitation) {
@@ -28,7 +29,7 @@ public record ClimateSettingsContextFabric(Biome biome, BiomeModificationContext
     }
 
     @Override
-    public void setTemperatureModifier(@NotNull Biome.TemperatureModifier temperatureModifier) {
+    public void setTemperatureModifier(Biome.@NonNull TemperatureModifier temperatureModifier) {
         this.context.setTemperatureModifier(temperatureModifier);
     }
 

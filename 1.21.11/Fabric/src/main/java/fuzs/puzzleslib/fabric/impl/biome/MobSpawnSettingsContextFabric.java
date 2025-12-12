@@ -8,7 +8,7 @@ import net.minecraft.util.random.Weighted;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Set;
@@ -60,7 +60,7 @@ public record MobSpawnSettingsContextFabric(MobSpawnSettings mobSpawnSettings,
     }
 
     @Override
-    public @Nullable MobSpawnSettings.MobSpawnCost getSpawnCost(EntityType<?> entityType) {
+    public MobSpawnSettings.@Nullable MobSpawnCost getSpawnCost(EntityType<?> entityType) {
         return this.mobSpawnSettings.getMobSpawnCost(entityType);
     }
 

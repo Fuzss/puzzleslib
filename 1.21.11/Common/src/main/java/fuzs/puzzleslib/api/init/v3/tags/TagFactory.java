@@ -2,8 +2,8 @@ package fuzs.puzzleslib.api.init.v3.tags;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
@@ -60,7 +60,7 @@ public interface TagFactory {
      * @return new tag key
      */
     default <T> TagKey<T> registerTagKey(ResourceKey<? extends Registry<T>> registryKey, String path) {
-        return TagKey.create(registryKey, ResourceLocation.fromNamespaceAndPath(this.modId(), path));
+        return TagKey.create(registryKey, Identifier.fromNamespaceAndPath(this.modId(), path));
     }
 
     /**

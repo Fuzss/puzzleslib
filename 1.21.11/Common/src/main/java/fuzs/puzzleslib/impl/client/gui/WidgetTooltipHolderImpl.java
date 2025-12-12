@@ -12,8 +12,8 @@ import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -76,7 +76,7 @@ public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
         holder.set(tooltip);
     }
 
-    @NotNull
+    @NonNull
     @Override
     public Tooltip get() {
         Tooltip tooltip = super.get();

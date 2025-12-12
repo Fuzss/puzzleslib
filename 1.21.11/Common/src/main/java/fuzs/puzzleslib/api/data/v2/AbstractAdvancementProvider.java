@@ -13,9 +13,9 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.advancements.AdvancementSubProvider;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -37,20 +37,20 @@ public abstract class AbstractAdvancementProvider implements DataProvider, Advan
         this.registries = registries;
     }
 
-    protected static DisplayInfo display(ItemStack itemStack, ResourceLocation resourceLocation) {
-        return display(itemStack, resourceLocation, AdvancementType.TASK);
+    protected static DisplayInfo display(ItemStack itemStack, Identifier identifier) {
+        return display(itemStack, identifier, AdvancementType.TASK);
     }
 
-    protected static DisplayInfo display(ItemStack itemStack, ResourceLocation resourceLocation, AdvancementType advancementType) {
-        return display(itemStack, resourceLocation, null, advancementType, false);
+    protected static DisplayInfo display(ItemStack itemStack, Identifier identifier, AdvancementType advancementType) {
+        return display(itemStack, identifier, null, advancementType, false);
     }
 
-    protected static DisplayInfo display(ItemStack itemStack, ResourceLocation resourceLocation, @Nullable ResourceLocation background, AdvancementType advancementType, boolean hidden) {
-        return display(itemStack, resourceLocation, background, advancementType, true, true, hidden);
+    protected static DisplayInfo display(ItemStack itemStack, Identifier identifier, @Nullable Identifier background, AdvancementType advancementType, boolean hidden) {
+        return display(itemStack, identifier, background, advancementType, true, true, hidden);
     }
 
-    protected static DisplayInfo display(ItemStack itemStack, ResourceLocation resourceLocation, @Nullable ResourceLocation background, AdvancementType advancementType, boolean showToast, boolean announceChat, boolean hidden) {
-        AdvancementToken advancementToken = new AdvancementToken(resourceLocation);
+    protected static DisplayInfo display(ItemStack itemStack, Identifier identifier, @Nullable Identifier background, AdvancementType advancementType, boolean showToast, boolean announceChat, boolean hidden) {
+        AdvancementToken advancementToken = new AdvancementToken(identifier);
         return new DisplayInfo(itemStack,
                 advancementToken.title(),
                 advancementToken.description(),
@@ -64,15 +64,14 @@ public abstract class AbstractAdvancementProvider implements DataProvider, Advan
     @Override
     public final CompletableFuture<?> run(CachedOutput output) {
         return this.registries.thenCompose((HolderLookup.Provider registries) -> {
-            Set<ResourceLocation> set = new HashSet<>();
+            Set<Identifier> set = new HashSet<>();
             List<CompletableFuture<?>> list = new ArrayList<>();
             Consumer<AdvancementHolder> consumer = (AdvancementHolder holder) -> {
-                ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(this.modId,
-                        holder.id().getPath());
-                if (!set.add(resourceLocation)) {
-                    throw new IllegalStateException("Duplicate advancement " + resourceLocation);
+                Identifier identifier = Identifier.fromNamespaceAndPath(this.modId, holder.id().getPath());
+                if (!set.add(identifier)) {
+                    throw new IllegalStateException("Duplicate advancement " + identifier);
                 } else {
-                    Path path = this.pathProvider.json(resourceLocation);
+                    Path path = this.pathProvider.json(identifier);
                     list.add(DataProvider.saveStable(output, registries, Advancement.CODEC, holder.value(), path));
                 }
             };
@@ -94,7 +93,7 @@ public abstract class AbstractAdvancementProvider implements DataProvider, Advan
         return "Advancements";
     }
 
-    public record AdvancementToken(ResourceLocation id) {
+    public record AdvancementToken(Identifier id) {
 
         public Component title() {
             return Component.translatable(this.id.toLanguageKey("advancements", "title"));

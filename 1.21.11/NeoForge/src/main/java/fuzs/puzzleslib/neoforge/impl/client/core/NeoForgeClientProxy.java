@@ -23,7 +23,7 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -38,9 +38,8 @@ import net.neoforged.neoforge.client.extensions.common.IClientMobEffectExtension
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientProxyImpl {
@@ -107,13 +106,21 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
 
     @Override
     public BakedQuad copyBakedQuad(BakedQuad bakedQuad) {
-        int[] vertices = bakedQuad.vertices();
-        return new BakedQuad(Arrays.copyOf(vertices, vertices.length),
+        return new BakedQuad(bakedQuad.position0(),
+                bakedQuad.position1(),
+                bakedQuad.position2(),
+                bakedQuad.position3(),
+                bakedQuad.packedUV0(),
+                bakedQuad.packedUV1(),
+                bakedQuad.packedUV2(),
+                bakedQuad.packedUV3(),
                 bakedQuad.tintIndex(),
                 bakedQuad.direction(),
                 bakedQuad.sprite(),
                 bakedQuad.shade(),
                 bakedQuad.lightEmission(),
+                bakedQuad.bakedNormals(),
+                bakedQuad.bakedColors(),
                 bakedQuad.hasAmbientOcclusion());
     }
 
@@ -159,12 +166,12 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
     }
 
     @Override
-    public int getLeftStatusBarHeight(ResourceLocation resourceLocation) {
+    public int getLeftStatusBarHeight(Identifier identifier) {
         return Minecraft.getInstance().gui.leftHeight;
     }
 
     @Override
-    public int getRightStatusBarHeight(ResourceLocation resourceLocation) {
+    public int getRightStatusBarHeight(Identifier identifier) {
         return Minecraft.getInstance().gui.rightHeight;
     }
 }

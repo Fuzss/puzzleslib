@@ -11,7 +11,6 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import java.time.Instant;
 import java.util.BitSet;
-import java.util.Date;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
@@ -26,11 +25,6 @@ public final class ExtraStreamCodecs {
     public static final StreamCodec<ByteBuf, Character> CHAR = StreamCodec.of((ByteBuf buf, Character character) -> {
         buf.writeChar(character);
     }, ByteBuf::readChar);
-    /**
-     * {@link Date} stream codec
-     */
-    public static final StreamCodec<FriendlyByteBuf, Date> DATE = StreamCodec.of(FriendlyByteBuf::writeDate,
-            FriendlyByteBuf::readDate);
     /**
      * {@link Instant} stream codec
      */

@@ -2,12 +2,12 @@ package fuzs.puzzleslib.neoforge.impl.data;
 
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagBuilder;
 import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ExtraCodecs;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,26 +26,26 @@ public final class NeoForgeTagAppender<T> extends AbstractTagAppender<T> {
     }
 
     @Override
-    public AbstractTagAppender<T> remove(ResourceLocation resourceLocation) {
-        this.tagBuilder.remove(TagEntry.element(resourceLocation));
+    public AbstractTagAppender<T> remove(Identifier identifier) {
+        this.tagBuilder.remove(TagEntry.element(identifier));
         return this;
     }
 
     @Override
-    public AbstractTagAppender<T> removeOptional(ResourceLocation resourceLocation) {
-        this.tagBuilder.remove(TagEntry.optionalElement(resourceLocation));
+    public AbstractTagAppender<T> removeOptional(Identifier identifier) {
+        this.tagBuilder.remove(TagEntry.optionalElement(identifier));
         return this;
     }
 
     @Override
-    public AbstractTagAppender<T> removeTag(ResourceLocation resourceLocation) {
-        this.tagBuilder.remove(TagEntry.tag(resourceLocation));
+    public AbstractTagAppender<T> removeTag(Identifier identifier) {
+        this.tagBuilder.remove(TagEntry.tag(identifier));
         return this;
     }
 
     @Override
-    public AbstractTagAppender<T> removeOptionalTag(ResourceLocation resourceLocation) {
-        this.tagBuilder.remove(TagEntry.optionalTag(resourceLocation));
+    public AbstractTagAppender<T> removeOptionalTag(Identifier identifier) {
+        this.tagBuilder.remove(TagEntry.optionalTag(identifier));
         return this;
     }
 

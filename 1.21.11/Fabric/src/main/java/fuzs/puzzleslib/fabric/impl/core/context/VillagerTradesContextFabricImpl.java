@@ -3,10 +3,10 @@ package fuzs.puzzleslib.fabric.impl.core.context;
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.context.VillagerTradesContext;
 import net.fabricmc.fabric.api.object.builder.v1.trade.TradeOfferHelper;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.npc.VillagerProfession;
-import net.minecraft.world.entity.npc.VillagerTrades;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
+import net.minecraft.world.entity.npc.villager.VillagerTrades;
 
 import java.util.List;
 import java.util.Objects;
@@ -28,12 +28,12 @@ public final class VillagerTradesContextFabricImpl implements VillagerTradesCont
         Objects.requireNonNull(itemListings, "item listings is null");
         Preconditions.checkArgument(itemListings.length > 0, "item listings is empty");
         TradeOfferHelper.registerWanderingTraderOffers((TradeOfferHelper.WanderingTraderOffersBuilder builder) -> {
-            ResourceLocation resourceLocation = this.getTradesPool(pool);
-            builder.addOffersToPool(resourceLocation, itemListings);
+            Identifier identifier = this.getTradesPool(pool);
+            builder.addOffersToPool(identifier, itemListings);
         });
     }
 
-    private ResourceLocation getTradesPool(WanderingTradesPool pool) {
+    private Identifier getTradesPool(WanderingTradesPool pool) {
         return switch (pool) {
             case PURCHASES -> TradeOfferHelper.WanderingTraderOffersBuilder.BUY_ITEMS_POOL;
             case COMMON_SALES -> TradeOfferHelper.WanderingTraderOffersBuilder.SELL_COMMON_ITEMS_POOL;

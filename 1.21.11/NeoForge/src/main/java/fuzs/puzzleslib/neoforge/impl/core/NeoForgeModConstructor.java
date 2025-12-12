@@ -7,6 +7,7 @@ import fuzs.puzzleslib.neoforge.impl.core.context.*;
 import net.minecraft.server.packs.PackType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
@@ -60,7 +61,7 @@ public final class NeoForgeModConstructor implements ModConstructorImpl<ModConst
             eventBus.addListener((final DataPackRegistryEvent.NewRegistry event) -> {
                 modConstructor.onRegisterDataPackRegistries(new DataPackRegistriesContextNeoForgeImpl(event));
             });
-            eventBus.addListener((final AddServerReloadListenersEvent event) -> {
+            NeoForge.EVENT_BUS.addListener((final AddServerReloadListenersEvent event) -> {
                 modConstructor.onAddDataPackReloadListeners(new DataPackReloadListenersContextNeoForgeImpl(event));
             });
         });

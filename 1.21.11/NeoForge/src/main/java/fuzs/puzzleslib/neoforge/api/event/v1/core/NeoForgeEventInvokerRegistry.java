@@ -5,7 +5,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventInvokerRegistry;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.neoforge.impl.event.NeoForgeEventInvokerRegistryImpl;
 import net.neoforged.bus.api.Event;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 import java.util.function.UnaryOperator;
@@ -113,7 +113,7 @@ public interface NeoForgeEventInvokerRegistry extends EventInvokerRegistry {
          * @param callback our callback implementation to pass parameters from <code>event</code> to
          * @param event    the NeoForge event that is firing at this very moment
          * @param context  the context object, can be anything, but ideally an identifier such as a {@link Class} or
-         *                 {@link net.minecraft.resources.ResourceLocation}
+         *                 {@link net.minecraft.resources.Identifier}
          */
         void accept(T callback, E event, @Nullable Object context);
     }

@@ -5,7 +5,7 @@ import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.model.*;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SkullBlock;
@@ -14,15 +14,14 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 public final class ItemModelGenerationHelper {
-    public static final ModelTemplate HORN = ModelTemplateHelper.createItemModelTemplate(ResourceLocation.withDefaultNamespace(
+    public static final ModelTemplate HORN = ModelTemplateHelper.createItemModelTemplate(Identifier.withDefaultNamespace(
             "goat_horn"), TextureSlot.LAYER0);
-    public static final ModelTemplate TOOTING_HORN = ModelTemplateHelper.createItemModelTemplate(ResourceLocation.withDefaultNamespace(
+    public static final ModelTemplate TOOTING_HORN = ModelTemplateHelper.createItemModelTemplate(Identifier.withDefaultNamespace(
             "tooting_goat_horn"), TextureSlot.LAYER0);
-    public static final ModelTemplate SHIELD_MODEL_TEMPLATE = ModelTemplateHelper.createItemModelTemplate(
-            ResourceLocation.withDefaultNamespace("shield"),
-            TextureSlot.PARTICLE);
+    public static final ModelTemplate SHIELD_MODEL_TEMPLATE = ModelTemplateHelper.createItemModelTemplate(Identifier.withDefaultNamespace(
+            "shield"), TextureSlot.PARTICLE);
     public static final ModelTemplate SHIELD_BLOCKING_MODEL_TEMPLATE = ModelTemplateHelper.createItemModelTemplate(
-            ResourceLocation.withDefaultNamespace("shield_blocking"),
+            Identifier.withDefaultNamespace("shield_blocking"),
             TextureSlot.PARTICLE);
 
     private ItemModelGenerationHelper() {
@@ -34,7 +33,7 @@ public final class ItemModelGenerationHelper {
                 ItemModelUtils.plainModel(createFlatItemModel(item, modelTemplate, itemModelGenerators.modelOutput)));
     }
 
-    public static ResourceLocation createFlatItemModel(Item item, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
+    public static Identifier createFlatItemModel(Item item, ModelTemplate modelTemplate, BiConsumer<Identifier, ModelInstance> modelOutput) {
         return createFlatItemModel(item, item, modelTemplate, modelOutput);
     }
 
@@ -46,11 +45,11 @@ public final class ItemModelGenerationHelper {
                         itemModelGenerators.modelOutput)));
     }
 
-    public static ResourceLocation createFlatItemModel(Item item, Item layerItem, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
+    public static Identifier createFlatItemModel(Item item, Item layerItem, ModelTemplate modelTemplate, BiConsumer<Identifier, ModelInstance> modelOutput) {
         return createFlatItemModel(item, ModelLocationHelper.getItemModel(layerItem), modelTemplate, modelOutput);
     }
 
-    public static void generateFlatItem(Item item, ResourceLocation layer0Location, ModelTemplate modelTemplate, ItemModelGenerators itemModelGenerators) {
+    public static void generateFlatItem(Item item, Identifier layer0Location, ModelTemplate modelTemplate, ItemModelGenerators itemModelGenerators) {
         itemModelGenerators.itemModelOutput.accept(item,
                 ItemModelUtils.plainModel(createFlatItemModel(item,
                         layer0Location,
@@ -58,19 +57,19 @@ public final class ItemModelGenerationHelper {
                         itemModelGenerators.modelOutput)));
     }
 
-    public static ResourceLocation createFlatItemModel(Item item, ResourceLocation layer0Location, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
+    public static Identifier createFlatItemModel(Item item, Identifier layer0Location, ModelTemplate modelTemplate, BiConsumer<Identifier, ModelInstance> modelOutput) {
         return createFlatItemModel(ModelLocationHelper.getItemModel(item), layer0Location, modelTemplate, modelOutput);
     }
 
-    public static ResourceLocation createFlatItemModel(ResourceLocation resourceLocation, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
-        return createFlatItemModel(resourceLocation, resourceLocation, modelTemplate, modelOutput);
+    public static Identifier createFlatItemModel(Identifier identifier, ModelTemplate modelTemplate, BiConsumer<Identifier, ModelInstance> modelOutput) {
+        return createFlatItemModel(identifier, identifier, modelTemplate, modelOutput);
     }
 
-    public static ResourceLocation createFlatItemModel(ResourceLocation resourceLocation, ResourceLocation layer0Location, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
-        return modelTemplate.create(resourceLocation, TextureMapping.layer0(layer0Location), modelOutput);
+    public static Identifier createFlatItemModel(Identifier identifier, Identifier layer0Location, ModelTemplate modelTemplate, BiConsumer<Identifier, ModelInstance> modelOutput) {
+        return modelTemplate.create(identifier, TextureMapping.layer0(layer0Location), modelOutput);
     }
 
-    public static void generateLayeredItem(Item item, ResourceLocation layer0Location, ResourceLocation layer1Location, ModelTemplate modelTemplate, ItemModelGenerators itemModelGenerators) {
+    public static void generateLayeredItem(Item item, Identifier layer0Location, Identifier layer1Location, ModelTemplate modelTemplate, ItemModelGenerators itemModelGenerators) {
         itemModelGenerators.itemModelOutput.accept(item,
                 ItemModelUtils.plainModel(createLayeredItemModel(item,
                         layer0Location,
@@ -79,7 +78,7 @@ public final class ItemModelGenerationHelper {
                         itemModelGenerators.modelOutput)));
     }
 
-    public static ResourceLocation createLayeredItemModel(Item item, ResourceLocation layer0Location, ResourceLocation layer1Location, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
+    public static Identifier createLayeredItemModel(Item item, Identifier layer0Location, Identifier layer1Location, ModelTemplate modelTemplate, BiConsumer<Identifier, ModelInstance> modelOutput) {
         return createLayeredItemModel(ModelLocationHelper.getItemModel(item),
                 layer0Location,
                 layer1Location,
@@ -87,8 +86,8 @@ public final class ItemModelGenerationHelper {
                 modelOutput);
     }
 
-    public static ResourceLocation createLayeredItemModel(ResourceLocation resourceLocation, ResourceLocation layer0Location, ResourceLocation layer1Location, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
-        return modelTemplate.create(resourceLocation,
+    public static Identifier createLayeredItemModel(Identifier identifier, Identifier layer0Location, Identifier layer1Location, ModelTemplate modelTemplate, BiConsumer<Identifier, ModelInstance> modelOutput) {
+        return modelTemplate.create(identifier,
                 TextureMapping.layered(layer0Location, layer1Location),
                 modelOutput);
     }
@@ -113,7 +112,7 @@ public final class ItemModelGenerationHelper {
     }
 
     /**
-     * @see BlockModelGenerators#createHead(Block, Block, SkullBlock.Type, ResourceLocation)
+     * @see BlockModelGenerators#createHead(Block, Block, SkullBlock.Type, Identifier)
      */
     public static void generateHead(Block headBlock, Block wallHeadBlock, SkullBlock.Type type, BlockModelGenerators blockModelGenerators) {
         blockModelGenerators.createHead(headBlock,
@@ -126,13 +125,13 @@ public final class ItemModelGenerationHelper {
      * @see ItemModelGenerators#generateShield(Item)
      */
     public static void generateShield(Item item, Block particleBlock, Supplier<SpecialModelRenderer.Unbaked> specialModelSupplier, ItemModelGenerators itemModelGenerators) {
-        ResourceLocation resourceLocation = SHIELD_MODEL_TEMPLATE.create(ModelLocationHelper.getItemModel(item),
+        Identifier identifier = SHIELD_MODEL_TEMPLATE.create(ModelLocationHelper.getItemModel(item),
                 TextureMapping.particle(particleBlock),
                 itemModelGenerators.modelOutput);
-        ResourceLocation resourceLocation2 = SHIELD_BLOCKING_MODEL_TEMPLATE.create(ModelLocationHelper.getItemModel(item,
+        Identifier identifier2 = SHIELD_BLOCKING_MODEL_TEMPLATE.create(ModelLocationHelper.getItemModel(item,
                 "_blocking"), TextureMapping.particle(particleBlock), itemModelGenerators.modelOutput);
-        ItemModel.Unbaked unbaked = ItemModelUtils.specialModel(resourceLocation, specialModelSupplier.get());
-        ItemModel.Unbaked unbaked2 = ItemModelUtils.specialModel(resourceLocation2, specialModelSupplier.get());
+        ItemModel.Unbaked unbaked = ItemModelUtils.specialModel(identifier, specialModelSupplier.get());
+        ItemModel.Unbaked unbaked2 = ItemModelUtils.specialModel(identifier2, specialModelSupplier.get());
         itemModelGenerators.generateBooleanDispatch(item, ItemModelUtils.isUsingItem(), unbaked2, unbaked);
     }
 }

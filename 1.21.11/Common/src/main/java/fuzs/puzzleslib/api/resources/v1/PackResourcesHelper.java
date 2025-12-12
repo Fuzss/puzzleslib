@@ -6,7 +6,7 @@ import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.context.DataPackReloadListenersContext;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackCompatibility;
@@ -59,12 +59,12 @@ public final class PackResourcesHelper {
      *     <li>Resource pack path: {@code assets/<modId>/resourcepacks/<path>}</li>
      * </ul>
      *
-     * @param resourceLocation the resource location for the pack
+     * @param identifier the identifier for the pack
      * @param packType         the pack type
      * @return the pack location inside {@code resources}
      */
-    public static ResourceLocation getBuiltInPack(ResourceLocation resourceLocation, PackType packType) {
-        return resourceLocation.withPrefix(packType.getDirectory() + "/" + resourceLocation.getNamespace() + "/" + (
+    public static Identifier getBuiltInPack(Identifier identifier, PackType packType) {
+        return identifier.withPrefix(packType.getDirectory() + "/" + identifier.getNamespace() + "/" + (
                 packType == PackType.CLIENT_RESOURCES ? "resourcepacks" : "datapacks") + "/");
     }
 
@@ -82,7 +82,7 @@ public final class PackResourcesHelper {
      * @return the {@link RepositorySource} to be added to the
      *         {@link net.minecraft.server.packs.repository.PackRepository}
      */
-    public static RepositorySource buildClientPack(ResourceLocation id, Supplier<AbstractModPackResources> factory, boolean hidden) {
+    public static RepositorySource buildClientPack(Identifier id, Supplier<AbstractModPackResources> factory, boolean hidden) {
         return buildClientPack(id, factory, true, Pack.Position.TOP, hidden, hidden);
     }
 
@@ -104,7 +104,7 @@ public final class PackResourcesHelper {
      * @return the {@link RepositorySource} to be added to the
      *         {@link net.minecraft.server.packs.repository.PackRepository}
      */
-    public static RepositorySource buildClientPack(ResourceLocation id, Supplier<AbstractModPackResources> factory, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden) {
+    public static RepositorySource buildClientPack(Identifier id, Supplier<AbstractModPackResources> factory, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden) {
         return (Consumer<Pack> consumer) -> {
             consumer.accept(AbstractModPackResources.buildPack(PackType.CLIENT_RESOURCES,
                     id,
@@ -139,7 +139,7 @@ public final class PackResourcesHelper {
      * @return the {@link RepositorySource} to be added to the
      *         {@link net.minecraft.server.packs.repository.PackRepository}
      */
-    public static RepositorySource buildClientPack(ResourceLocation id, Supplier<AbstractModPackResources> factory, Component title, Component description, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden) {
+    public static RepositorySource buildClientPack(Identifier id, Supplier<AbstractModPackResources> factory, Component title, Component description, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden) {
         return (Consumer<Pack> consumer) -> {
             consumer.accept(AbstractModPackResources.buildPack(PackType.CLIENT_RESOURCES,
                     id,
@@ -167,7 +167,7 @@ public final class PackResourcesHelper {
      * @return the {@link RepositorySource} to be added to the
      *         {@link net.minecraft.server.packs.repository.PackRepository}
      */
-    public static RepositorySource buildServerPack(ResourceLocation id, Supplier<AbstractModPackResources> factory, boolean hidden) {
+    public static RepositorySource buildServerPack(Identifier id, Supplier<AbstractModPackResources> factory, boolean hidden) {
         return buildServerPack(id, factory, true, Pack.Position.TOP, hidden, hidden);
     }
 
@@ -188,7 +188,7 @@ public final class PackResourcesHelper {
      * @return the {@link RepositorySource} to be added to the
      *         {@link net.minecraft.server.packs.repository.PackRepository}
      */
-    public static RepositorySource buildServerPack(ResourceLocation id, Supplier<AbstractModPackResources> factory, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden) {
+    public static RepositorySource buildServerPack(Identifier id, Supplier<AbstractModPackResources> factory, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden) {
         return (Consumer<Pack> consumer) -> {
             consumer.accept(AbstractModPackResources.buildPack(PackType.SERVER_DATA,
                     id,
@@ -222,7 +222,7 @@ public final class PackResourcesHelper {
      * @return the {@link RepositorySource} to be added to the
      *         {@link net.minecraft.server.packs.repository.PackRepository}
      */
-    public static RepositorySource buildServerPack(ResourceLocation id, Supplier<AbstractModPackResources> factory, Component title, Component description, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden) {
+    public static RepositorySource buildServerPack(Identifier id, Supplier<AbstractModPackResources> factory, Component title, Component description, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden) {
         return (Consumer<Pack> consumer) -> {
             consumer.accept(AbstractModPackResources.buildPack(PackType.SERVER_DATA,
                     id,
@@ -240,7 +240,7 @@ public final class PackResourcesHelper {
     /**
      * Creates a new {@link Pack.Metadata} instance with additional parameters only supported on NeoForge.
      *
-     * @param resourceLocation     the pack identifier
+     * @param identifier     the pack identifier
      * @param descriptionComponent the pack description component
      * @param packCompatibility    the pack version, ideally retrieved from
      *                             {@link net.minecraft.WorldVersion#packVersion(PackType)}
@@ -249,8 +249,8 @@ public final class PackResourcesHelper {
      *                             and data pack selection screens
      * @return the created pack info instance
      */
-    public static Pack.Metadata createPackInfo(ResourceLocation resourceLocation, Component descriptionComponent, PackCompatibility packCompatibility, FeatureFlagSet featureFlagSet, boolean hidden) {
+    public static Pack.Metadata createPackInfo(Identifier identifier, Component descriptionComponent, PackCompatibility packCompatibility, FeatureFlagSet featureFlagSet, boolean hidden) {
         return ProxyImpl.get()
-                .createPackInfo(resourceLocation, descriptionComponent, packCompatibility, featureFlagSet, hidden);
+                .createPackInfo(identifier, descriptionComponent, packCompatibility, featureFlagSet, hidden);
     }
 }

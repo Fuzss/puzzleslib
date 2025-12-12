@@ -1,10 +1,10 @@
 package fuzs.puzzleslib.api.client.util.v1;
 
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.SessionSearchTrees;
 import net.minecraft.client.searchtree.SearchTree;
+import net.minecraft.util.Util;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;

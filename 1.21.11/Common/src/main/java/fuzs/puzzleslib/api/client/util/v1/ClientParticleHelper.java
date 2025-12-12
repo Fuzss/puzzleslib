@@ -11,7 +11,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ParticleStatus;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A helper class for particle-related methods found in {@link net.minecraft.client.multiplayer.ClientLevel} returning
@@ -105,7 +105,7 @@ public final class ClientParticleHelper {
                         xSpeed,
                         ySpeed,
                         zSpeed);
-            } else if (!(camera.getPosition().distanceToSqr(x, y, z) > 1024.0)) {
+            } else if (!(camera.position().distanceToSqr(x, y, z) > 1024.0)) {
                 if (particleStatus != ParticleStatus.MINIMAL) {
                     return clientLevel.minecraft.particleEngine.createParticle(particleOptions,
                             x,

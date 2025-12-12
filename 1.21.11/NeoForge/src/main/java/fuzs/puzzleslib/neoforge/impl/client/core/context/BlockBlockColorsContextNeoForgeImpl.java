@@ -5,7 +5,7 @@ import fuzs.puzzleslib.neoforge.mixin.client.accessor.BlockColorsNeoForgeAccesso
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 

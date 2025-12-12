@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.event.v1.core;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.NoSuchElementException;
 

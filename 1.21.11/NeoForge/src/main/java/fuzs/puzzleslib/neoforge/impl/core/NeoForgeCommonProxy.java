@@ -2,8 +2,9 @@ package fuzs.puzzleslib.neoforge.impl.core;
 
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
+import fuzs.puzzleslib.api.data.v2.AbstractRecipeProvider;
+import fuzs.puzzleslib.api.data.v2.recipes.TransformingRecipeOutput;
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
-import fuzs.puzzleslib.api.init.v3.GameRulesFactory;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryFactory;
 import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
 import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
@@ -17,12 +18,17 @@ import fuzs.puzzleslib.neoforge.impl.event.ForwardingLootPoolBuilder;
 import fuzs.puzzleslib.neoforge.impl.event.ForwardingLootTableBuilder;
 import fuzs.puzzleslib.neoforge.impl.event.NeoForgeEventInvokerRegistryImpl;
 import fuzs.puzzleslib.neoforge.impl.init.MenuTypeWithData;
-import fuzs.puzzleslib.neoforge.impl.init.NeoForgeGameRulesFactory;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgeRegistryFactory;
 import fuzs.puzzleslib.neoforge.impl.item.NeoForgeToolTypeHelper;
 import fuzs.puzzleslib.neoforge.impl.item.crafting.NeoForgeCombinedIngredients;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.CachedOutput;
+import net.minecraft.data.PackOutput;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -33,8 +39,8 @@ import net.minecraft.network.protocol.common.ClientCommonPacketListener;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.configuration.ServerConfigurationPacketListener;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -51,22 +57,26 @@ import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.neoforged.neoforge.common.conditions.ICondition;
 import net.neoforged.neoforge.common.extensions.ICommonPacketListener;
 import net.neoforged.neoforge.entity.PartEntity;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 public class NeoForgeCommonProxy implements NeoForgeProxy {
 
@@ -97,7 +107,7 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     }
 
     @Override
-    public Pack.Metadata createPackInfo(ResourceLocation resourceLocation, Component descriptionComponent, PackCompatibility packCompatibility, FeatureFlagSet featureFlagSet, boolean hidden) {
+    public Pack.Metadata createPackInfo(Identifier identifier, Component descriptionComponent, PackCompatibility packCompatibility, FeatureFlagSet featureFlagSet, boolean hidden) {
         return new Pack.Metadata(descriptionComponent,
                 packCompatibility,
                 featureFlagSet,
@@ -196,11 +206,6 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     }
 
     @Override
-    public GameRulesFactory getGameRulesFactory() {
-        return new NeoForgeGameRulesFactory();
-    }
-
-    @Override
     public ToolTypeHelper getToolTypeHelper() {
         return new NeoForgeToolTypeHelper();
     }
@@ -218,6 +223,56 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     @Override
     public DataAttachmentRegistryImpl getDataAttachmentRegistry() {
         return new NeoForgeDataAttachmentRegistryImpl();
+    }
+
+    @Override
+    public RecipeOutput getTransformingRecipeOutput(RecipeOutput recipeOutput, UnaryOperator<Recipe<?>> operator) {
+        return new TransformingRecipeOutput() {
+            @Override
+            public RecipeOutput recipeOutput() {
+                return recipeOutput;
+            }
+
+            @Override
+            public UnaryOperator<Recipe<?>> operator() {
+                return operator;
+            }
+
+            @Override
+            public void accept(ResourceKey<Recipe<?>> key, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions) {
+                this.accept(key, recipe, advancement);
+            }
+        };
+    }
+
+    @Override
+    public RecipeOutput getRecipeProviderOutput(CachedOutput output, String modId, PackOutput packOutput, HolderLookup.Provider registries, Consumer<CompletableFuture<?>> consumer) {
+        return new AbstractRecipeProvider.RecipeOutputImpl(output, modId, packOutput, registries, consumer) {
+            @Override
+            public void accept(ResourceKey<Recipe<?>> key, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions) {
+                this.accept(key, recipe, advancement);
+            }
+        };
+    }
+
+    @Override
+    public RecipeOutput getThrowingRecipeOutput() {
+        return new RecipeOutput() {
+            @Override
+            public void accept(ResourceKey<Recipe<?>> resourceKey, Recipe<?> recipe, @Nullable AdvancementHolder advancementHolder, ICondition... conditions) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public Advancement.Builder advancement() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void includeRootAdvancement() {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 
     @Override

@@ -2,7 +2,7 @@ package fuzs.puzzleslib.api.client.core.v1.context;
 
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.function.ToIntFunction;
@@ -15,121 +15,121 @@ public interface GuiLayersContext {
     /**
      * The layer for rendering camera-related overlays like pumpkin blur.
      */
-    ResourceLocation CAMERA_OVERLAYS = ResourceLocation.withDefaultNamespace("camera_overlays");
+    Identifier CAMERA_OVERLAYS = Identifier.withDefaultNamespace("camera_overlays");
     /**
      * The layer for rendering the crosshair.
      */
-    ResourceLocation CROSSHAIR = ResourceLocation.withDefaultNamespace("crosshair");
+    Identifier CROSSHAIR = Identifier.withDefaultNamespace("crosshair");
     /**
      * The layer for rendering the hotbar.
      */
-    ResourceLocation HOTBAR = ResourceLocation.withDefaultNamespace("hotbar");
+    Identifier HOTBAR = Identifier.withDefaultNamespace("hotbar");
     /**
      * The layer for rendering the info bars, like the experience bar, the locator bar, or the jump meter (e.g. for
      * horses).
      */
-    ResourceLocation INFO_BAR = ResourceLocation.withDefaultNamespace("info_bar");
+    Identifier INFO_BAR = Identifier.withDefaultNamespace("info_bar");
     /**
      * The layer for rendering the player's health hearts.
      */
-    ResourceLocation PLAYER_HEALTH = ResourceLocation.withDefaultNamespace("player_health");
+    Identifier PLAYER_HEALTH = Identifier.withDefaultNamespace("player_health");
     /**
      * The layer for rendering the player's armor level.
      */
-    ResourceLocation ARMOR_LEVEL = ResourceLocation.withDefaultNamespace("armor_level");
+    Identifier ARMOR_LEVEL = Identifier.withDefaultNamespace("armor_level");
     /**
      * The layer for rendering the player's food level.
      */
-    ResourceLocation FOOD_LEVEL = ResourceLocation.withDefaultNamespace("food_level");
+    Identifier FOOD_LEVEL = Identifier.withDefaultNamespace("food_level");
     /**
      * The layer for rendering the health of the player's vehicle.
      */
-    ResourceLocation VEHICLE_HEALTH = ResourceLocation.withDefaultNamespace("vehicle_health");
+    Identifier VEHICLE_HEALTH = Identifier.withDefaultNamespace("vehicle_health");
     /**
      * The layer for rendering the player's air level when submerged.
      */
-    ResourceLocation AIR_LEVEL = ResourceLocation.withDefaultNamespace("air_level");
+    Identifier AIR_LEVEL = Identifier.withDefaultNamespace("air_level");
     /**
      * The layer for rendering the name of the selected item.
      */
-    ResourceLocation HELD_ITEM_TOOLTIP = ResourceLocation.withDefaultNamespace("held_item_tooltip");
+    Identifier HELD_ITEM_TOOLTIP = Identifier.withDefaultNamespace("held_item_tooltip");
     /**
      * The layer for rendering the player's experience level number.
      */
-    ResourceLocation EXPERIENCE_LEVEL = ResourceLocation.withDefaultNamespace("experience_level");
+    Identifier EXPERIENCE_LEVEL = Identifier.withDefaultNamespace("experience_level");
     /**
      * The layer for rendering the selected spectator menu action.
      */
-    ResourceLocation SPECTATOR_TOOLTIP = ResourceLocation.withDefaultNamespace("spectator_tooltip");
+    Identifier SPECTATOR_TOOLTIP = Identifier.withDefaultNamespace("spectator_tooltip");
     /**
      * The layer for rendering status effect icons.
      */
-    ResourceLocation STATUS_EFFECTS = ResourceLocation.withDefaultNamespace("status_effects");
+    Identifier STATUS_EFFECTS = Identifier.withDefaultNamespace("status_effects");
     /**
      * The layer for rendering boss bars.
      */
-    ResourceLocation BOSS_BAR = ResourceLocation.withDefaultNamespace("boss_bar");
+    Identifier BOSS_BAR = Identifier.withDefaultNamespace("boss_bar");
     /**
      * The layer for rendering the sleep overlay.
      */
-    ResourceLocation SLEEP_OVERLAY = ResourceLocation.withDefaultNamespace("sleep_overlay");
+    Identifier SLEEP_OVERLAY = Identifier.withDefaultNamespace("sleep_overlay");
     /**
      * The layer for rendering the demo mode timer.
      */
-    ResourceLocation DEMO_TIMER = ResourceLocation.withDefaultNamespace("demo_timer");
+    Identifier DEMO_TIMER = Identifier.withDefaultNamespace("demo_timer");
     /**
      * The layer for rendering the scoreboard.
      */
-    ResourceLocation SCOREBOARD = ResourceLocation.withDefaultNamespace("scoreboard");
+    Identifier SCOREBOARD = Identifier.withDefaultNamespace("scoreboard");
     /**
      * The layer for rendering overlay messages (e.g., action bar text).
      */
-    ResourceLocation OVERLAY_MESSAGE = ResourceLocation.withDefaultNamespace("overlay_message");
+    Identifier OVERLAY_MESSAGE = Identifier.withDefaultNamespace("overlay_message");
     /**
      * The layer for rendering titles and subtitles.
      */
-    ResourceLocation TITLE = ResourceLocation.withDefaultNamespace("title");
+    Identifier TITLE = Identifier.withDefaultNamespace("title");
     /**
      * The layer for rendering the chat interface.
      */
-    ResourceLocation CHAT = ResourceLocation.withDefaultNamespace("chat");
+    Identifier CHAT = Identifier.withDefaultNamespace("chat");
     /**
      * The layer for rendering the player list (tab menu).
      */
-    ResourceLocation PLAYER_LIST = ResourceLocation.withDefaultNamespace("player_list");
+    Identifier PLAYER_LIST = Identifier.withDefaultNamespace("player_list");
     /**
      * The layer for rendering subtitles.
      */
-    ResourceLocation SUBTITLES = ResourceLocation.withDefaultNamespace("subtitles");
+    Identifier SUBTITLES = Identifier.withDefaultNamespace("subtitles");
 
     /**
      * Register a new gui layer rendered after all existing layers.
      *
-     * @param resourceLocation the gui layer resource location
+     * @param identifier the gui layer identifier
      * @param guiLayer         the gui layer
      */
-    void registerGuiLayer(ResourceLocation resourceLocation, Layer guiLayer);
+    void registerGuiLayer(Identifier identifier, Layer guiLayer);
 
     /**
      * Register a new gui layer rendered before or after an existing vanilla gui layer.
      * <p>
-     * The ordering depends on the order in which both resource location arguments are passed.
+     * The ordering depends on the order in which both identifier arguments are passed.
      *
-     * @param resourceLocation      the gui layer resource location, either for the new layer or for the existing
-     *                              vanilla layer
-     * @param otherResourceLocation the other gui layer resource location, either for the new layer or for the existing
-     *                              vanilla layer
-     * @param guiLayer              the gui layer
+     * @param identifier the gui layer identifier, either for the new layer or for the existing vanilla
+     *                         layer
+     * @param otherIdentifier  the other gui layer identifier, either for the new layer or for the existing
+     *                         vanilla layer
+     * @param guiLayer         the gui layer
      */
-    void registerGuiLayer(ResourceLocation resourceLocation, ResourceLocation otherResourceLocation, Layer guiLayer);
+    void registerGuiLayer(Identifier identifier, Identifier otherIdentifier, Layer guiLayer);
 
     /**
      * Replace an existing vanilla gui layer. Replacing custom layers is not supported.
      *
-     * @param resourceLocation the vanilla gui layer resource location
+     * @param identifier the vanilla gui layer identifier
      * @param guiLayerFactory  the gui layer factory, receiving the existing layer
      */
-    void replaceGuiLayer(ResourceLocation resourceLocation, UnaryOperator<Layer> guiLayerFactory);
+    void replaceGuiLayer(Identifier identifier, UnaryOperator<Layer> guiLayerFactory);
 
     /**
      * Register an additional height provider for a status bar layer rendered on the left side above the hotbar.
@@ -137,12 +137,12 @@ public interface GuiLayersContext {
      * This is required for proper vertical positioning of the layer together with all other registered status bars.
      * <p>
      * To retrieve the render height for a status bar during rendering of the layer use
-     * {@link fuzs.puzzleslib.api.client.gui.v2.ScreenHelper#getLeftStatusBarHeight(ResourceLocation)}.
+     * {@link fuzs.puzzleslib.api.client.gui.v2.ScreenHelper#getLeftStatusBarHeight(Identifier)}.
      *
-     * @param resourceLocation the gui layer resource location
+     * @param identifier the gui layer identifier
      * @param heightProvider   the status bar height provider
      */
-    void addLeftStatusBarHeightProvider(ResourceLocation resourceLocation, ToIntFunction<Player> heightProvider);
+    void addLeftStatusBarHeightProvider(Identifier identifier, ToIntFunction<Player> heightProvider);
 
     /**
      * Register an additional height provider for a status bar layer rendered on the right side above the hotbar.
@@ -150,12 +150,12 @@ public interface GuiLayersContext {
      * This is required for proper vertical positioning of the layer together with all other registered status bars.
      * <p>
      * To retrieve the render height for a status bar during rendering of the layer use
-     * {@link fuzs.puzzleslib.api.client.gui.v2.ScreenHelper#getRightStatusBarHeight(ResourceLocation)}.
+     * {@link fuzs.puzzleslib.api.client.gui.v2.ScreenHelper#getRightStatusBarHeight(Identifier)}.
      *
-     * @param resourceLocation the gui layer resource location
+     * @param identifier the gui layer identifier
      * @param heightProvider   the status bar height provider
      */
-    void addRightStatusBarHeightProvider(ResourceLocation resourceLocation, ToIntFunction<Player> heightProvider);
+    void addRightStatusBarHeightProvider(Identifier identifier, ToIntFunction<Player> heightProvider);
 
     @FunctionalInterface
     interface Layer {

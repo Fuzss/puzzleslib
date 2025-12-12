@@ -6,9 +6,9 @@ import fuzs.puzzleslib.fabric.impl.client.core.context.EntitySpectatorShadersCon
 import fuzs.puzzleslib.impl.event.data.DefaultedFloat;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -23,7 +23,7 @@ abstract class GameRendererFabricMixin {
     private Camera mainCamera;
     @Shadow
     @Nullable
-    private ResourceLocation postEffectId;
+    private Identifier postEffectId;
 
     @Inject(method = "checkEntityPostEffect", at = @At("TAIL"))
     public void checkEntityPostEffect(@Nullable Entity entity, CallbackInfo callback) {
@@ -34,7 +34,7 @@ abstract class GameRendererFabricMixin {
     }
 
     @Shadow
-    protected abstract void setPostEffect(ResourceLocation resourceLocation);
+    protected abstract void setPostEffect(Identifier identifier);
 
     @ModifyReturnValue(method = "getFov", at = @At("TAIL"))
     private float getFov(float fieldOfViewValue, Camera camera, float partialTicks, boolean useFOVSetting) {

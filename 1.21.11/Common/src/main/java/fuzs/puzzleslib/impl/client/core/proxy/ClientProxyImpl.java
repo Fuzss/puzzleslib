@@ -16,7 +16,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.TickTask;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.util.thread.BlockableEventLoop;
@@ -25,7 +25,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -58,9 +58,9 @@ public interface ClientProxyImpl extends ProxyImpl {
 
     void registerWoodType(WoodType woodType);
 
-    int getLeftStatusBarHeight(ResourceLocation resourceLocation);
+    int getLeftStatusBarHeight(Identifier identifier);
 
-    int getRightStatusBarHeight(ResourceLocation resourceLocation);
+    int getRightStatusBarHeight(Identifier identifier);
 
     @Override
     default BlockableEventLoop<? super TickTask> getBlockableEventLoop(Level level) {

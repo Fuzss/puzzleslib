@@ -6,7 +6,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventInvokerRegistryImpl;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.client.gui.screens.Screen;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -223,7 +223,7 @@ public interface FabricEventInvokerRegistry extends EventInvokerRegistry {
          *
          * @param callback our callback implementation used in the returned Fabric event implementation
          * @param context  the context object, can be anything, but ideally an identifier such as a {@link Class} or
-         *                 {@link net.minecraft.resources.ResourceLocation}
+         *                 {@link net.minecraft.resources.Identifier}
          * @return the Fabric event implementation
          */
         E apply(T callback, @Nullable Object context);
@@ -241,7 +241,7 @@ public interface FabricEventInvokerRegistry extends EventInvokerRegistry {
          * Runs the consumer.
          *
          * @param context        the context object, can be anything, but ideally an identifier such as a {@link Class}
-         *                       or {@link net.minecraft.resources.ResourceLocation}
+         *                       or {@link net.minecraft.resources.Identifier}
          * @param applyToInvoker a consumer that runs immediately upon event invoker creation, responsible for
          *                       registering the actual event to run whenever it is triggered
          * @param removeInvoker  an action for internally discarding the {@link EventInvoker} created in
