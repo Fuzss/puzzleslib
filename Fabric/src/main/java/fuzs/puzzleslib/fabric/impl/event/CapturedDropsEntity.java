@@ -7,9 +7,7 @@ import java.util.Collection;
 
 public interface CapturedDropsEntity {
 
-    @Nullable
-    Collection<ItemEntity> puzzleslib$acceptCapturedDrops(@Nullable Collection<ItemEntity> capturedDrops);
+    @Nullable Collection<ItemEntity> puzzleslib$acceptCapturedDrops(@Nullable Collection<ItemEntity> capturedDrops);
 
-    @Nullable
-    Collection<ItemEntity> puzzleslib$getCapturedDrops();
+    @Nullable Collection<ItemEntity> puzzleslib$getCapturedDrops();
 }

@@ -89,8 +89,7 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
         this.registries = registries;
     }
 
-    @Nullable
-    protected static <T> JsonElement searchAndReplaceValue(@Nullable JsonElement jsonElement, T searchFor, T replaceWith) {
+    @Nullable protected static <T> JsonElement searchAndReplaceValue(@Nullable JsonElement jsonElement, T searchFor, T replaceWith) {
         Objects.requireNonNull(searchFor, "search for is null");
         Objects.requireNonNull(replaceWith, "replace with is null");
         if (jsonElement != null && !jsonElement.isJsonNull()) {

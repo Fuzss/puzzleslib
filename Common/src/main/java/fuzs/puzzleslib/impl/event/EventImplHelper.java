@@ -39,8 +39,7 @@ public final class EventImplHelper {
         }
     }
 
-    @Nullable
-    public static Player getPlayerFromContainerMenu(AbstractContainerMenu abstractContainerMenu) {
+    @Nullable public static Player getPlayerFromContainerMenu(AbstractContainerMenu abstractContainerMenu) {
         for (Slot slot : abstractContainerMenu.slots) {
             if (slot.container instanceof Inventory inventory) {
                 return inventory.player;

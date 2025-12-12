@@ -16,8 +16,7 @@ public final class FabricModContainer implements ModContainer {
     private final net.fabricmc.loader.api.ModContainer container;
     private final ModMetadata metadata;
     private final List<ModContainer> children;
-    @Nullable
-    private ModContainer parent;
+    @Nullable private ModContainer parent;
 
     public FabricModContainer(net.fabricmc.loader.api.ModContainer container) {
         this.container = container;
@@ -75,8 +74,7 @@ public final class FabricModContainer implements ModContainer {
         return Collections.unmodifiableList(this.children);
     }
 
-    @Nullable
-    @Override
+    @Nullable @Override
     public ModContainer getParent() {
         return this.parent;
     }

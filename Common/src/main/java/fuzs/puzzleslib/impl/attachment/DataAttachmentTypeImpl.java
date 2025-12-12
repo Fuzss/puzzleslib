@@ -22,8 +22,7 @@ public final class DataAttachmentTypeImpl<T, V> implements DataAttachmentType<T,
         this.defaultValues = ImmutableMap.copyOf(defaultValues);
     }
 
-    @Nullable
-    private V getDefaultValue(T holder) {
+    @Nullable private V getDefaultValue(T holder) {
         for (Map.Entry<Predicate<T>, Function<RegistryAccess, V>> entry : this.defaultValues.entrySet()) {
             if (entry.getKey().test(holder)) {
                 return entry.getValue().apply(this.registryAccessExtractor.apply(holder));

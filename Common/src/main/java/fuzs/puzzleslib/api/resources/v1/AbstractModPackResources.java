@@ -38,18 +38,15 @@ public class AbstractModPackResources implements PackResources {
     /**
      * The pack type for this pack, set internally during construction.
      */
-    @Nullable
-    private PackType packType;
+    @Nullable private PackType packType;
     /**
      * Location info of this pack, set internally during construction.
      */
-    @Nullable
-    private PackLocationInfo info;
+    @Nullable private PackLocationInfo info;
     /**
      * The metadata for the <code>pack.mcmeta</code> section, set internally during construction.
      */
-    @Nullable
-    private BuiltInMetadata metadata;
+    @Nullable private BuiltInMetadata metadata;
 
     /**
      * Simple constructor with default file path parameter for the pack icon.
@@ -66,8 +63,7 @@ public class AbstractModPackResources implements PackResources {
         this.modLogoPath = modLogoPath;
     }
 
-    @Nullable
-    @Override
+    @Nullable @Override
     public IoSupplier<InputStream> getRootResource(String... elements) {
         String path = String.join("/", elements);
         if ("pack.png".equals(path)) {
@@ -82,8 +78,7 @@ public class AbstractModPackResources implements PackResources {
         return null;
     }
 
-    @Nullable
-    @Override
+    @Nullable @Override
     public IoSupplier<InputStream> getResource(PackType packType, Identifier location) {
         return null;
     }

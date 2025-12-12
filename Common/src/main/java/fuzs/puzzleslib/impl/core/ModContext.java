@@ -21,10 +21,8 @@ public abstract class ModContext {
 
     private final String modId;
     protected final CustomPacketPayload.Type<BrandPayload> payloadType;
-    @Nullable
-    private ConfigHolderImpl configHolder;
-    @Nullable
-    private RegistryManagerImpl registryManager;
+    @Nullable private ConfigHolderImpl configHolder;
+    @Nullable private RegistryManagerImpl registryManager;
 
     public ModContext(String modId) {
         this.modId = modId;

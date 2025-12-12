@@ -29,17 +29,14 @@ import java.util.Collection;
 @Mixin(Entity.class)
 abstract class EntityFabricMixin implements CapturedDropsEntity {
     @Shadow
-    @Nullable
-    private Entity vehicle;
+    @Nullable private Entity vehicle;
     @Shadow
     private Level level;
     @Shadow
     private EntityDimensions dimensions;
     @Shadow
     private float eyeHeight;
-    @Unique
-    @Nullable
-    private Collection<ItemEntity> puzzleslib$capturedDrops;
+    @Unique @Nullable private Collection<ItemEntity> puzzleslib$capturedDrops;
 
     @WrapWithCondition(method = "rideTick",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V"))

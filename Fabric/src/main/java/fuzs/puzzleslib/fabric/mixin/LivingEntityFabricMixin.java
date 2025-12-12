@@ -316,8 +316,7 @@ abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEn
     }
 
     @Shadow
-    @Nullable
-    public abstract MobEffectInstance getEffect(Holder<MobEffect> effect);
+    @Nullable public abstract MobEffectInstance getEffect(Holder<MobEffect> effect);
 
     @Inject(method = "removeAllEffects", at = @At("HEAD"), cancellable = true)
     public void removeAllEffects(CallbackInfoReturnable<Boolean> callback) {

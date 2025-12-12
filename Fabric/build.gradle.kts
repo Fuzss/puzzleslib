@@ -85,8 +85,3 @@ multiloader {
         serverMixin("ServerMainFabricMixin")
     }
 }
-
-tasks.withType<JavaCompile>().configureEach {
-    options.isDeprecation = false
-    options.compilerArgs.clear()
-}

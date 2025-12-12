@@ -26,8 +26,7 @@ abstract class ItemEntityFabricMixin extends Entity {
     @Shadow
     private int pickupDelay;
     @Shadow
-    @Nullable
-    private UUID target;
+    @Nullable private UUID target;
 
     public ItemEntityFabricMixin(EntityType<?> entityType, Level level) {
         super(entityType, level);

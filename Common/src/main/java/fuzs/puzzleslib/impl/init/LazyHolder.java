@@ -19,8 +19,7 @@ import java.util.stream.Stream;
  * Also supports lazy initialization on Fabric &amp; Forge.
  */
 public final class LazyHolder<T> extends Holder.Reference<T> {
-    @Nullable
-    private Supplier<Holder<T>> supplier;
+    @Nullable private Supplier<Holder<T>> supplier;
     private Holder<T> holder;
 
     public LazyHolder(ResourceKey<? extends Registry<? super T>> registryKey, Holder<T> holder) {

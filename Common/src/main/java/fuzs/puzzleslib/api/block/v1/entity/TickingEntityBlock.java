@@ -31,8 +31,7 @@ public interface TickingEntityBlock<T extends BlockEntity & TickingBlockEntity> 
         return this.getBlockEntityType().create(pos, state);
     }
 
-    @Nullable
-    @Override
+    @Nullable @Override
     default <BE extends BlockEntity> BlockEntityTicker<BE> getTicker(Level level, BlockState state, BlockEntityType<BE> blockEntityType) {
         // due to the type bounds in TickingEntityBlock this guarantees we have a TickingBlockEntity instance
         if (this.getBlockEntityType() == blockEntityType) {

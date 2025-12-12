@@ -20,8 +20,7 @@ abstract class ServerExplosionFabricMixin {
     @Shadow
     @Final
     private ServerLevel level;
-    @Unique
-    private List<BlockPos> puzzleslib$explodedPositions;
+    @Unique private List<BlockPos> puzzleslib$explodedPositions;
 
     @ModifyVariable(method = "explode", at = @At("STORE"), ordinal = 0)
     public List<BlockPos> explode(List<BlockPos> explodedPositions) {

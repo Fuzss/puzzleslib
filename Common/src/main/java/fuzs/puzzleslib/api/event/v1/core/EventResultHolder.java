@@ -22,10 +22,8 @@ import java.util.function.Predicate;
 public final class EventResultHolder<T> {
     private static final EventResultHolder<?> PASS = new EventResultHolder<>();
 
-    @NonNull
-    private final EventResult result;
-    @Nullable
-    private final T value;
+    @NonNull private final EventResult result;
+    @Nullable private final T value;
 
     /**
      * internal constructor

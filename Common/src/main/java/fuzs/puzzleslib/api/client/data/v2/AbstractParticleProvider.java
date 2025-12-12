@@ -25,8 +25,7 @@ public abstract class AbstractParticleProvider implements DataProvider {
 
     private final Map<Identifier, ParticleDescription> values = new LinkedHashMap<>();
     private final PackOutput.PathProvider pathProvider;
-    @Nullable
-    private final ResourceManager clientResourceManager;
+    @Nullable private final ResourceManager clientResourceManager;
 
     public AbstractParticleProvider(DataProviderContext context) {
         this(context.getPackOutput(), context.getClientResourceManager());

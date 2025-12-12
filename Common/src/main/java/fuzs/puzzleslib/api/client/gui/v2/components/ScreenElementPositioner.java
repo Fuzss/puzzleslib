@@ -147,8 +147,7 @@ public final class ScreenElementPositioner {
         return true;
     }
 
-    @Nullable
-    private static LayoutElement findElement(List<? extends GuiEventListener> widgets, String translationKey) {
+    @Nullable private static LayoutElement findElement(List<? extends GuiEventListener> widgets, String translationKey) {
         for (GuiEventListener listener : widgets) {
             if (listener instanceof AbstractWidget widget) {
                 if (matchesTranslationKey(widget, translationKey)) {

@@ -135,8 +135,7 @@ public abstract class LimitedEntry<T> extends ValueEntry<T> {
             super(field);
         }
 
-        @Nullable
-        public Type getListType() {
+        @Nullable public Type getListType() {
             if (this.field.getGenericType() instanceof ParameterizedType type
                     && type.getActualTypeArguments().length > 0) {
                 return type.getActualTypeArguments()[0];
