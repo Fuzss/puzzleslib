@@ -12,6 +12,9 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
+/**
+ * TODO enable implementation again when available in Fabric Api
+ */
 public final class BlockStateResolverContextFabricImpl implements BlockStateResolverContext {
 
     @Override

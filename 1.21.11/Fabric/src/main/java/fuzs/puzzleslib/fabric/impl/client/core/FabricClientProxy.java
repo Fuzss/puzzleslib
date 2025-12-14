@@ -3,6 +3,7 @@ package fuzs.puzzleslib.fabric.impl.client.core;
 import fuzs.forgeconfigapiport.fabric.api.v5.client.ConfigScreenFactoryRegistry;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
+import fuzs.puzzleslib.api.client.renderer.v1.model.MutableBakedQuad;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import fuzs.puzzleslib.fabric.impl.client.config.MultiConfigurationScreen;
@@ -162,20 +163,10 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     }
 
     @Override
-    public BakedQuad copyBakedQuad(BakedQuad bakedQuad) {
-        return new BakedQuad(bakedQuad.position0(),
-                bakedQuad.position1(),
-                bakedQuad.position2(),
-                bakedQuad.position3(),
-                bakedQuad.packedUV0(),
-                bakedQuad.packedUV1(),
-                bakedQuad.packedUV2(),
-                bakedQuad.packedUV3(),
-                bakedQuad.tintIndex(),
-                bakedQuad.direction(),
-                bakedQuad.sprite(),
-                bakedQuad.shade(),
-                bakedQuad.lightEmission());
+    public MutableBakedQuad getMutableBakedQuad(BakedQuad bakedQuad) {
+        return new MutableBakedQuad(bakedQuad) {
+            // NO-OP
+        };
     }
 
     @Override

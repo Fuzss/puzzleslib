@@ -73,6 +73,7 @@ public final class FabricClientEventInvokers {
 
     public static void registerLoadingHandlers() {
         INSTANCE.register(ScreenOpeningCallback.class, FabricGuiEvents.SCREEN_OPENING);
+        // TODO enable implementation again when available in Fabric Api
         INSTANCE.register(ModelLoadingEvents.LoadModel.class,
                 (ModelLoadingEvents.LoadModel callback, @Nullable Object o) -> {
 //                    ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {

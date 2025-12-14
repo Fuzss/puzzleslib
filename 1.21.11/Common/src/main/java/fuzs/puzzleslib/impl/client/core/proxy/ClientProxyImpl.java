@@ -2,6 +2,7 @@ package fuzs.puzzleslib.impl.client.core.proxy;
 
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
+import fuzs.puzzleslib.api.client.renderer.v1.model.MutableBakedQuad;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.client.KeyMapping;
@@ -50,7 +51,7 @@ public interface ClientProxyImpl extends ProxyImpl {
 
     boolean onRenderTooltip(GuiGraphics guiGraphics, Font font, int mouseX, int mouseY, List<ClientTooltipComponent> components, ClientTooltipPositioner positioner);
 
-    BakedQuad copyBakedQuad(BakedQuad bakedQuad);
+    MutableBakedQuad getMutableBakedQuad(BakedQuad bakedQuad);
 
     boolean isEffectVisibleInInventory(MobEffectInstance mobEffect);
 
