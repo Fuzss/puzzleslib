@@ -3,6 +3,7 @@ package fuzs.puzzleslib.neoforge.impl.client.core;
 import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
+import fuzs.puzzleslib.api.client.renderer.v1.model.MutableBakedQuad;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.impl.client.config.ConfigTranslationsManager;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
@@ -11,6 +12,7 @@ import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.impl.client.config.MultiConfigurationScreen;
 import fuzs.puzzleslib.neoforge.impl.client.event.NeoForgeClientEventInvokers;
 import fuzs.puzzleslib.neoforge.impl.client.key.NeoForgeKeyMappingHelper;
+import fuzs.puzzleslib.neoforge.impl.client.renderer.NeoForgeMutableBakedQuad;
 import fuzs.puzzleslib.neoforge.impl.core.NeoForgeCommonProxy;
 import fuzs.puzzleslib.neoforge.impl.core.context.PayloadTypesContextNeoForgeImpl;
 import net.minecraft.client.KeyMapping;
@@ -105,23 +107,8 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
     }
 
     @Override
-    public BakedQuad copyBakedQuad(BakedQuad bakedQuad) {
-        return new BakedQuad(bakedQuad.position0(),
-                bakedQuad.position1(),
-                bakedQuad.position2(),
-                bakedQuad.position3(),
-                bakedQuad.packedUV0(),
-                bakedQuad.packedUV1(),
-                bakedQuad.packedUV2(),
-                bakedQuad.packedUV3(),
-                bakedQuad.tintIndex(),
-                bakedQuad.direction(),
-                bakedQuad.sprite(),
-                bakedQuad.shade(),
-                bakedQuad.lightEmission(),
-                bakedQuad.bakedNormals(),
-                bakedQuad.bakedColors(),
-                bakedQuad.hasAmbientOcclusion());
+    public MutableBakedQuad getMutableBakedQuad(BakedQuad bakedQuad) {
+        return new NeoForgeMutableBakedQuad(bakedQuad);
     }
 
     @Override
