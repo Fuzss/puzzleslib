@@ -21,6 +21,7 @@ import fuzs.puzzleslib.neoforge.impl.init.MenuTypeWithData;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgeRegistryFactory;
 import fuzs.puzzleslib.neoforge.impl.item.NeoForgeToolTypeHelper;
 import fuzs.puzzleslib.neoforge.impl.item.crafting.NeoForgeCombinedIngredients;
+import fuzs.puzzleslib.neoforge.mixin.accessor.PackNeoForgeAccessor;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
@@ -98,7 +99,8 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
                 return menuProvider.getDisplayName();
             }
 
-            @Nullable @Override
+            @Nullable
+            @Override
             public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
                 return menuProvider.createMenu(containerId, inventory, player);
             }
@@ -106,12 +108,23 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     }
 
     @Override
-    public Pack.Metadata createPackInfo(Identifier identifier, Component descriptionComponent, PackCompatibility packCompatibility, FeatureFlagSet featureFlagSet, boolean hidden) {
+    public Pack.Metadata createPackInfo(Identifier identifier, Component descriptionComponent, PackCompatibility packCompatibility, FeatureFlagSet featureFlagSet, boolean isHidden) {
         return new Pack.Metadata(descriptionComponent,
                 packCompatibility,
                 featureFlagSet,
                 Collections.emptyList(),
-                hidden);
+                isHidden);
+    }
+
+    @Override
+    public boolean isPackHidden(Pack pack) {
+        return pack.isHidden();
+    }
+
+    @Override
+    public void setPackHidden(Pack pack, boolean isHidden) {
+        // NeoForge copies the hidden property from the metadata section, so only changing the metadata is not enough.
+        ((PackNeoForgeAccessor) pack).puzzleslib$setHidden(isHidden);
     }
 
     @Override

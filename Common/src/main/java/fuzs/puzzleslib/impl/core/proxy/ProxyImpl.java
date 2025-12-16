@@ -56,7 +56,11 @@ public interface ProxyImpl extends SidedProxy, FactoriesProxy, NetworkingProxy, 
 
     <T> void openMenu(Player player, MenuProvider menuProvider, T data);
 
-    Pack.Metadata createPackInfo(Identifier identifier, Component descriptionComponent, PackCompatibility packCompatibility, FeatureFlagSet featureFlagSet, boolean hidden);
+    Pack.Metadata createPackInfo(Identifier identifier, Component descriptionComponent, PackCompatibility packCompatibility, FeatureFlagSet featureFlagSet, boolean isHidden);
+
+    boolean isPackHidden(Pack pack);
+
+    void setPackHidden(Pack pack, boolean isHidden);
 
     Style getRarityStyle(Rarity rarity);
 

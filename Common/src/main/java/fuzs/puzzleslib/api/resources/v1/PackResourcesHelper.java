@@ -60,7 +60,7 @@ public final class PackResourcesHelper {
      * </ul>
      *
      * @param identifier the identifier for the pack
-     * @param packType         the pack type
+     * @param packType   the pack type
      * @return the pack location inside {@code resources}
      */
     public static Identifier getBuiltInPack(Identifier identifier, PackType packType) {
@@ -240,17 +240,38 @@ public final class PackResourcesHelper {
     /**
      * Creates a new {@link Pack.Metadata} instance with additional parameters only supported on NeoForge.
      *
-     * @param identifier     the pack identifier
+     * @param identifier           the pack identifier
      * @param descriptionComponent the pack description component
      * @param packCompatibility    the pack version, ideally retrieved from
      *                             {@link net.minecraft.WorldVersion#packVersion(PackType)}
      * @param featureFlagSet       the feature flags provided by this pack
-     * @param hidden               controls whether the pack is hidden from user-facing screens like the resource pack
+     * @param isHidden             controls whether the pack is hidden from user-facing screens like the resource pack
      *                             and data pack selection screens
      * @return the created pack info instance
      */
-    public static Pack.Metadata createPackInfo(Identifier identifier, Component descriptionComponent, PackCompatibility packCompatibility, FeatureFlagSet featureFlagSet, boolean hidden) {
+    public static Pack.Metadata createPackInfo(Identifier identifier, Component descriptionComponent, PackCompatibility packCompatibility, FeatureFlagSet featureFlagSet, boolean isHidden) {
         return ProxyImpl.get()
-                .createPackInfo(identifier, descriptionComponent, packCompatibility, featureFlagSet, hidden);
+                .createPackInfo(identifier, descriptionComponent, packCompatibility, featureFlagSet, isHidden);
+    }
+
+    /**
+     * Is the pack hidden from the user e.g., in {@link net.minecraft.client.gui.screens.packs.PackSelectionScreen} and
+     * in {@link net.minecraft.server.commands.DataPackCommand}.
+     *
+     * @param pack the pack
+     * @return is the pack hidden
+     */
+    public static boolean isPackHidden(Pack pack) {
+        return ProxyImpl.get().isPackHidden(pack);
+    }
+
+    /**
+     * Set the pack hidden from the user e.g., in {@link net.minecraft.client.gui.screens.packs.PackSelectionScreen} and
+     * in {@link net.minecraft.server.commands.DataPackCommand}.
+     *
+     * @param pack the pack
+     */
+    public static void setPackHidden(Pack pack) {
+        ProxyImpl.get().setPackHidden(pack, true);
     }
 }
