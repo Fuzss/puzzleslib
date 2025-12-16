@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 abstract class ReloadableServerResourcesFabricMixin {
 
     @ModifyVariable(method = "lambda$loadResources$1(Lnet/minecraft/world/flag/FeatureFlagSet;Lnet/minecraft/commands/Commands$CommandSelection;Ljava/util/List;Lnet/minecraft/server/permissions/PermissionSet;Lnet/minecraft/server/packs/resources/ResourceManager;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Lnet/minecraft/server/ReloadableServerRegistries$LoadResult;)Ljava/util/concurrent/CompletionStage;",
-            at = @At("STORE"))
+                    at = @At(value = "STORE", ordinal = 0))
     private static ReloadableServerResources loadResources(ReloadableServerResources reloadableServerResources) {
         DataPackReloadListenersContextFabricImpl.setReloadableServerResources(reloadableServerResources);
         return reloadableServerResources;

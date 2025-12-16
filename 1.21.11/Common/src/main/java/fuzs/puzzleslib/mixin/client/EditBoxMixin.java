@@ -23,20 +23,24 @@ abstract class EditBoxMixin extends AbstractWidget {
     private int cursorPos;
     @Shadow
     private int highlightPos;
-    @Unique private long puzzleslib$lastClickTime;
-    @Unique private boolean puzzleslib$doubleClick;
-    @Unique private int puzzleslib$doubleClickHighlightPos;
-    @Unique private int puzzleslib$doubleClickCursorPos;
+    @Unique
+    private long puzzleslib$lastClickTime;
+    @Unique
+    private boolean puzzleslib$doubleClick;
+    @Unique
+    private int puzzleslib$doubleClickHighlightPos;
+    @Unique
+    private int puzzleslib$doubleClickCursorPos;
 
     public EditBoxMixin(int x, int y, int width, int height, Component message) {
         super(x, y, width, height, message);
     }
 
     @Inject(method = "deleteText(IZ)V", at = @At("HEAD"), cancellable = true)
-    protected void deleteText(int charCount, boolean hasControlDown, CallbackInfo callback) {
+    protected void deleteText(int charCount, boolean selectWords, CallbackInfo callback) {
         // delete entire words or everything until the edit box beginning or end, based on the held modifier key
         // the modifier keys match the behaviour on Mac
-        if (hasControlDown) {
+        if (selectWords) {
             if (charCount < 0) {
                 this.deleteChars(-this.cursorPos);
             }
@@ -93,7 +97,8 @@ abstract class EditBoxMixin extends AbstractWidget {
         callback.setReturnValue(i);
     }
 
-    @Unique private static boolean puzzleslib$isWordChar(char charAt) {
+    @Unique
+    private static boolean puzzleslib$isWordChar(char charAt) {
         // break skipping on more than just spaces, from Owo Lib, thanks!
         return charAt == '_' || Character.isAlphabetic(charAt) || Character.isDigit(charAt);
     }
@@ -110,8 +115,9 @@ abstract class EditBoxMixin extends AbstractWidget {
                     this.setHighlightPos(this.getCursorPosition());
                     allowedToMoveRight = false;
                 }
+
                 // select entire words or everything until the edit box beginning or end, based on the held modifier key
-                if (keyEvent.hasControlDown()) {
+                if (keyEvent.hasControlDownWithQuirk()) {
                     this.moveCursorToEnd(keyEvent.hasShiftDown());
                 } else if (keyEvent.hasAltDown()) {
                     this.moveCursorTo(this.getWordPosition(1), keyEvent.hasShiftDown());
@@ -129,8 +135,9 @@ abstract class EditBoxMixin extends AbstractWidget {
                     this.setHighlightPos(this.getCursorPosition());
                     allowedToMoveLeft = false;
                 }
+
                 // select entire words or everything until edit box beginning / end based on held modifier key
-                if (keyEvent.hasControlDown()) {
+                if (keyEvent.hasControlDownWithQuirk()) {
                     this.moveCursorToStart(keyEvent.hasShiftDown());
                 } else if (keyEvent.hasAltDown()) {
                     this.moveCursorTo(this.getWordPosition(-1), keyEvent.hasShiftDown());

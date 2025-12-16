@@ -28,13 +28,13 @@
     ],
     "links": [
         {
+            "name": "github",
+            "slug": "puzzleslib"
+        },
+        {
             "name": "curseforge",
             "slug": "puzzles-lib",
             "id": "495476"
-        },
-        {
-            "name": "github",
-            "slug": "puzzleslib"
         },
         {
             "name": "modrinth",
