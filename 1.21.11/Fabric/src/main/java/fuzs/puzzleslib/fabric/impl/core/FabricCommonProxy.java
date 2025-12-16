@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.core;
 
+import com.google.common.base.Predicates;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.api.data.v2.AbstractRecipeProvider;
@@ -27,6 +28,7 @@ import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.fabricmc.fabric.impl.resource.pack.FabricPack;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
@@ -80,15 +82,12 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 public class FabricCommonProxy implements FabricProxy {
-    private final Set<String> hiddenPacks = new HashSet<>();
     private MinecraftServer minecraftServer;
 
     @Override
@@ -118,17 +117,33 @@ public class FabricCommonProxy implements FabricProxy {
     }
 
     @Override
-    public Pack.Metadata createPackInfo(Identifier identifier, Component descriptionComponent, PackCompatibility packCompatibility, FeatureFlagSet featureFlagSet, boolean hidden) {
-        if (hidden) {
-            this.hiddenPacks.add(identifier.toString());
-        }
-
+    public Pack.Metadata createPackInfo(Identifier identifier, Component descriptionComponent, PackCompatibility packCompatibility, FeatureFlagSet featureFlagSet, boolean isHidden) {
         return new Pack.Metadata(descriptionComponent, packCompatibility, featureFlagSet, Collections.emptyList());
     }
 
     @Override
-    public boolean notHidden(String id) {
-        return !this.hiddenPacks.contains(id);
+    public boolean isPackHidden(Pack pack) {
+        try {
+            // Fabric already has all the infrastructure for this flag implemented (which is quite a lot!), so we use it despite it being internal.
+            return ((FabricPack) pack).fabric$isHidden();
+        } catch (Throwable throwable) {
+            return false;
+        }
+    }
+
+    @Override
+    public void setPackHidden(Pack pack, boolean isHidden) {
+        if (isHidden) {
+            try {
+                // Fabric Api checks this using reference equality against an internally stored field when a pack is not supposed to be hidden.
+                // We do not have access to that field, so we only support making the pack hidden, which is fine.
+                ((FabricPack) pack).fabric$setParentsPredicate(Predicates.alwaysTrue());
+            } catch (Throwable throwable) {
+                // NO-OP
+            }
+        } else {
+            throw new IllegalArgumentException("unable to reveal pack");
+        }
     }
 
     @Override

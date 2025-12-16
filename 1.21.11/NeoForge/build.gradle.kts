@@ -6,7 +6,7 @@ multiloader {
     mixins {
         plugin.set("${project.group}.neoforge.mixin.MixinConfigPluginNeoForgeImpl")
         mixin("MenuProviderWithDataNeoForgeMixin")
-        accessor("BiomeSpecialEffectsBuilderNeoForgeAccessor")
+        accessor("BiomeSpecialEffectsBuilderNeoForgeAccessor", "PackNeoForgeAccessor")
         clientAccessor("BlockColorsNeoForgeAccessor", "RegisterKeyMappingsEventNeoForgeAccessor")
     }
 }

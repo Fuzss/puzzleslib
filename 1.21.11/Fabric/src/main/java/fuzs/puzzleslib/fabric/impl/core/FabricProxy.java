@@ -17,8 +17,6 @@ public interface FabricProxy extends ProxyImpl {
         return (FabricProxy) ProxyImpl.INSTANCE;
     }
 
-    boolean notHidden(String id);
-
     PayloadTypesContext createPayloadTypesContext(String modId);
 
     void setupHandshakePayload(CustomPacketPayload.Type<BrandPayload> payloadType);
