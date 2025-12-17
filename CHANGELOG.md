@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `PackResourcesHelper::isPackHidden` and `PackResourcesHelper::setPackHidden`
 
+### Changed
+
+- Enable all model-related events again on Fabric
+
 ## [v21.11.2-1.21.11] - 2025-12-14
 
 ### Added
