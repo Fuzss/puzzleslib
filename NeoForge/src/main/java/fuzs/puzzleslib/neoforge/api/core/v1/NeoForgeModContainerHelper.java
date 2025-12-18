@@ -34,8 +34,8 @@ public final class NeoForgeModContainerHelper {
     public static Optional<IEventBus> getOptionalActiveModEventBus() {
         return Optional.of(ModLoadingContext.get().getActiveContainer())
                 // filter out minecraft, which is the default mod container returned when none is currently set as active
-                .filter(modContainer -> !modContainer.getNamespace().equals("minecraft")).map(
-                        ModContainer::getEventBus);
+                .filter(modContainer -> !modContainer.getNamespace().equals("minecraft"))
+                .map(ModContainer::getEventBus);
     }
 
     /**
@@ -48,8 +48,8 @@ public final class NeoForgeModContainerHelper {
      * @return the mod event bus
      */
     public static IEventBus getModEventBus(String modId) {
-        return getOptionalModEventBus(modId).orElseThrow(
-                () -> new NullPointerException("mod event bus for %s is null".formatted(modId)));
+        return getOptionalModEventBus(modId).orElseThrow(() -> new NullPointerException("mod event bus for %s is null".formatted(
+                modId)));
     }
 
     /**
@@ -72,8 +72,8 @@ public final class NeoForgeModContainerHelper {
      * @return the mod container
      */
     public static ModContainer getModContainer(String modId) {
-        return getOptionalModContainer(modId).orElseThrow(
-                () -> new NullPointerException("mod container for %s is null".formatted(modId)));
+        return getOptionalModContainer(modId).orElseThrow(() -> new NullPointerException("mod container for %s is null".formatted(
+                modId)));
     }
 
     /**
