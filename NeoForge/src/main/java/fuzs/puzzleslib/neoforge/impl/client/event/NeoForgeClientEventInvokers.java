@@ -775,6 +775,13 @@ public final class NeoForgeClientEventInvokers {
                         event.setCanceled(true);
                     }
                 });
+        INSTANCE.register(GatherEffectScreenTooltipCallback.class,
+                GatherEffectScreenTooltipsEvent.class,
+                (GatherEffectScreenTooltipCallback callback, GatherEffectScreenTooltipsEvent event) -> {
+                    callback.onGatherEffectScreenTooltip(event.getScreen(),
+                            event.getEffectInstance(),
+                            event.getTooltip());
+                });
     }
 
     private static <T, E extends ScreenEvent> void registerScreenEvent(Class<T> clazz, Class<E> eventClazz, BiConsumer<T, E> converter) {

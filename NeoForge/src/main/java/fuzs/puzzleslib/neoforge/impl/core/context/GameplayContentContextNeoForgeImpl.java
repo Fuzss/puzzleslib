@@ -97,6 +97,7 @@ public final class GameplayContentContextNeoForgeImpl implements GameplayContent
                 });
             });
         }
+
         this.flammables.put(flammableBlock, new Flammable(encouragement, flammability));
     }
 
