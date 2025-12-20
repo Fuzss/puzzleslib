@@ -319,6 +319,8 @@ transitive-accessible   method  net/minecraft/client/renderer/rendertype/RenderT
 transitive-accessible   field   net/minecraft/client/gui/components/AbstractWidget$WithInactiveMessage  inactiveMessage Lnet/minecraft/network/chat/Component;
 transitive-accessible   field   net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  SLOT_HIGHLIGHT_BACK_SPRITE  Lnet/minecraft/resources/Identifier;
 transitive-accessible   field   net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  SLOT_HIGHLIGHT_FRONT_SPRITE Lnet/minecraft/resources/Identifier;
+transitive-accessible   method  net/minecraft/world/entity/Entity   getEncodeId ()Ljava/lang/String;
+transitive-accessible   field   net/minecraft/world/entity/Mob  EQUIPMENT_POPULATION_ORDER  Ljava/util/List;
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;
