@@ -31,6 +31,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.*;
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleEvents;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -72,6 +73,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gamerules.GameRule;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -514,6 +516,23 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                     Objects.requireNonNull(context, "context is null");
                     ResourceKey<CreativeModeTab> resourceKey = (ResourceKey<CreativeModeTab>) context;
                     applyToInvoker.accept(ItemGroupEvents.modifyEntriesEvent(resourceKey));
+                },
+                UnaryOperator.identity(),
+                false);
+        INSTANCE.register(GameRuleUpdatedCallback.class,
+                GameRuleEvents.ValueUpdate.class,
+                (GameRuleUpdatedCallback callback, @Nullable Object context) -> {
+                    return (GameRuleEvents.ValueUpdate<?>) (Object value, MinecraftServer server) -> {
+                        Objects.requireNonNull(context, "context is null");
+                        GameRule<?> gameRule = (GameRule<?>) context;
+                        callback.onGameRuleUpdated(server, gameRule, value);
+                    };
+                },
+                (Object context, Consumer<Event<GameRuleEvents.ValueUpdate>> applyToInvoker, Consumer<Event<GameRuleEvents.ValueUpdate>> removeInvoker) -> {
+                    Objects.requireNonNull(context, "context is null");
+                    GameRule<?> gameRule = (GameRule<?>) context;
+                    applyToInvoker.accept((Event<GameRuleEvents.ValueUpdate>) (Event<?>) GameRuleEvents.changeCallback(
+                            gameRule));
                 },
                 UnaryOperator.identity(),
                 false);
