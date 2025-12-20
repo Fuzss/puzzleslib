@@ -222,7 +222,7 @@ public interface FabricEventInvokerRegistry extends EventInvokerRegistry {
          * Runs the converter.
          *
          * @param callback our callback implementation used in the returned Fabric event implementation
-         * @param context  the context object, can be anything, but ideally an identifier such as a {@link Class} or
+         * @param context  the context object can be anything, but ideally an identifier such as a {@link Class} or
          *                 {@link net.minecraft.resources.Identifier}
          * @return the Fabric event implementation
          */

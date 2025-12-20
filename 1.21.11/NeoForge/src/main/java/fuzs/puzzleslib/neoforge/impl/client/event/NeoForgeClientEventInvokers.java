@@ -790,6 +790,7 @@ public final class NeoForgeClientEventInvokers {
             if (!((Class<?>) context).isInstance(event.getScreen())) {
                 return;
             }
+
             converter.accept(callback, event);
         });
     }

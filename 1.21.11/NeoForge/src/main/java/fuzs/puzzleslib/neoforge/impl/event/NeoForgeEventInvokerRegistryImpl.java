@@ -59,6 +59,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.block.GameMasterBlock;
+import net.minecraft.world.level.gamerules.GameRule;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
@@ -1081,6 +1082,15 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                             event.getHitResult());
                     if (eventResult.isInterrupt()) {
                         event.setCanceled(true);
+                    }
+                });
+        INSTANCE.register(GameRuleUpdatedCallback.class,
+                GameRuleChangedEvent.class,
+                (GameRuleUpdatedCallback callback, GameRuleChangedEvent event, @Nullable Object context) -> {
+                    Objects.requireNonNull(context, "context is null");
+                    GameRule<?> gameRule = (GameRule<?>) context;
+                    if (gameRule == event.getGameRule()) {
+                        callback.onGameRuleUpdated(event.getServer(), event.getGameRule(), event.getNewValue());
                     }
                 });
     }
