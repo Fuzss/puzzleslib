@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.block.v1.entity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -8,8 +9,6 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
-
-import java.util.function.Consumer;
 
 /**
  * A simple extension to {@link EntityBlock} for a default implementation of
@@ -27,22 +26,25 @@ public interface TickingEntityBlock<T extends BlockEntity & TickingBlockEntity> 
     BlockEntityType<? extends T> getBlockEntityType();
 
     @Override
-    default BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return this.getBlockEntityType().create(pos, state);
+    default BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+        return this.getBlockEntityType().create(blockPos, blockState);
     }
 
-    @Nullable @Override
-    default <BE extends BlockEntity> BlockEntityTicker<BE> getTicker(Level level, BlockState state, BlockEntityType<BE> blockEntityType) {
+    @Nullable
+    @Override
+    default <BE extends BlockEntity> BlockEntityTicker<BE> getTicker(Level level, BlockState blockState, BlockEntityType<BE> blockEntityType) {
         // due to the type bounds in TickingEntityBlock this guarantees we have a TickingBlockEntity instance
-        if (this.getBlockEntityType() == blockEntityType) {
-            Consumer<TickingBlockEntity> ticker =
-                    level.isClientSide() ? TickingBlockEntity::clientTick : TickingBlockEntity::serverTick;
-            return (Level $, BlockPos blockPos, BlockState blockState, BE blockEntity) -> {
-                // no need to pass on anything, the block entity instance already has all those parameters
-                ticker.accept((TickingBlockEntity) blockEntity);
-            };
-        }
+        return this.getBlockEntityType() == blockEntityType ? this.getBlockEntityTicker() : null;
 
-        return null;
+    }
+
+    private <BE extends BlockEntity> BlockEntityTicker<BE> getBlockEntityTicker() {
+        return (Level level, BlockPos blockPos, BlockState blockState, BE blockEntity) -> {
+            if (level instanceof ServerLevel serverLevel) {
+                ((TickingBlockEntity) blockEntity).serverTick(serverLevel, blockPos, blockState);
+            } else {
+                ((TickingBlockEntity) blockEntity).clientTick(level, blockPos, blockState);
+            }
+        };
     }
 }
