@@ -25,7 +25,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack is a sword.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack a sword
      */
     @MustBeInvokedByOverriders
@@ -36,7 +36,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack is an axe.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack an axe
      */
     @MustBeInvokedByOverriders
@@ -47,7 +47,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack is a hoe.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack a hoe
      */
     @MustBeInvokedByOverriders
@@ -58,7 +58,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack is a pickaxe.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack a pickaxe
      */
     @MustBeInvokedByOverriders
@@ -69,7 +69,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack is a shovel.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack a shovel
      */
     @MustBeInvokedByOverriders
@@ -80,7 +80,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack is a shears item.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack a shears item
      */
     @MustBeInvokedByOverriders
@@ -91,7 +91,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack is a shield.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack a shield
      */
     @MustBeInvokedByOverriders
@@ -102,7 +102,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack is a bow.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack a bow
      */
     @MustBeInvokedByOverriders
@@ -113,7 +113,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack is a crossbow.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack a crossbow
      */
     @MustBeInvokedByOverriders
@@ -124,7 +124,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack is a fishing rod.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack a fishing rod
      */
     @MustBeInvokedByOverriders
@@ -135,7 +135,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack is similar to a trident, like a spear.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack a trident
      */
     @MustBeInvokedByOverriders
@@ -146,7 +146,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack is similar to a brush.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack a brush
      */
     @MustBeInvokedByOverriders
@@ -157,8 +157,8 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack is similar to a mace, like a club.
      *
-     * @param itemStack the stack to test
-     * @return is this stack a brush
+     * @param itemStack the item stack to test
+     * @return is this stack a mace
      */
     @MustBeInvokedByOverriders
     default boolean isMace(ItemStack itemStack) {
@@ -166,21 +166,32 @@ public interface ToolTypeHelper {
     }
 
     /**
+     * Tests if an item stack is similar to a mace, like a club.
+     *
+     * @param itemStack the item stack to test
+     * @return is this stack a spear
+     */
+    @MustBeInvokedByOverriders
+    default boolean isSpear(ItemStack itemStack) {
+        return itemStack.is(ItemTags.SPEARS);
+    }
+
+    /**
      * Tests if an item stack is a weapon used for melee combat.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack a melee weapon
      */
     @MustBeInvokedByOverriders
     default boolean isMeleeWeapon(ItemStack itemStack) {
         return this.isSword(itemStack) || this.isAxe(itemStack) || this.isTridentLike(itemStack) ||
-                this.isMace(itemStack);
+                this.isMace(itemStack) || this.isSpear(itemStack);
     }
 
     /**
      * Tests if an item stack is a weapon used for ranged combat.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack a ranged weapon
      */
     @MustBeInvokedByOverriders
@@ -191,7 +202,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack is a weapon.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack a weapon
      */
     @MustBeInvokedByOverriders
@@ -202,7 +213,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack is a tool used for mining blocks.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack a mining tool
      */
     @MustBeInvokedByOverriders
@@ -213,7 +224,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack is any sort of tool.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack a tool
      */
     @MustBeInvokedByOverriders
@@ -225,7 +236,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack can be equipped as head armor.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack head armor
      */
     @MustBeInvokedByOverriders
@@ -236,7 +247,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack can be equipped as chest armor.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack chest armor
      */
     @MustBeInvokedByOverriders
@@ -247,7 +258,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack can be equipped as leg armor.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack leg armor
      */
     @MustBeInvokedByOverriders
@@ -258,7 +269,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack can be equipped as foot armor.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack foot armor
      */
     @MustBeInvokedByOverriders
@@ -269,7 +280,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack can be equipped as body armor.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack body armor
      */
     @MustBeInvokedByOverriders
@@ -280,7 +291,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack can be equipped as a type of armor.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @param armorType the type of armor
      * @return is this stack that type of armor
      */
@@ -293,7 +304,7 @@ public interface ToolTypeHelper {
     /**
      * Tests if an item stack can be equipped as armor.
      *
-     * @param itemStack the stack to test
+     * @param itemStack the item stack to test
      * @return is this stack armor
      */
     @MustBeInvokedByOverriders
