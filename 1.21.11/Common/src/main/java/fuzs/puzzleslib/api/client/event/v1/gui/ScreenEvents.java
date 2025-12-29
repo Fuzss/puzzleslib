@@ -57,6 +57,8 @@ public final class ScreenEvents {
          * <p>
          * As opposed to Forge, this callback cannot be cancelled, and therefore also does not allow for manipulating
          * widgets, as those will be cleared anyway.
+         * <p>
+         * TODO remove Minecraft argument, the field on the screen is now final
          *
          * @param minecraft    the minecraft singleton instance
          * @param screen       the screen that is rebuilding widgets
@@ -76,6 +78,8 @@ public final class ScreenEvents {
          * <p>
          * This callback allows for manipulating widgets on the screen, allowing for both additions and removals, as
          * well as modifications to existing widgets.
+         * <p>
+         * TODO remove Minecraft argument, the field on the screen is now final
          *
          * @param minecraft    the minecraft singleton instance
          * @param screen       the screen that is rebuilding widgets
