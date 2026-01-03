@@ -24,31 +24,28 @@ public enum EventResult {
      * Allows the event to continue processing. It will be passed to both other event implementations and will not
      * prevent vanilla behavior from running.
      */
-    PASS(false),
+    PASS(false, null),
     /**
      * Prevents the event from processing any further and disrupts vanilla behavior, similar to cancelling an event on
      * Forge.
      * <p>
      * Unprocessed callbacks will be skipped if cancelled.
      */
-    INTERRUPT(true),
+    INTERRUPT(true, Boolean.FALSE),
     /**
      * Interrupts the event just like {@link #INTERRUPT}. Useful for event implementations that require three states for
      * their cancellation result.
      */
-    ALLOW(true, true),
+    ALLOW(true, Boolean.TRUE),
     /**
      * Interrupts the event just like {@link #INTERRUPT}. Useful for event implementations that require three states for
      * their cancellation result.
      */
-    DENY(true, false);
+    DENY(true, Boolean.FALSE);
 
     private final boolean interrupt;
-    @Nullable private final Boolean value;
-
-    EventResult(boolean interrupt) {
-        this(interrupt, null);
-    }
+    @Nullable
+    private final Boolean value;
 
     EventResult(boolean interrupt, @Nullable Boolean value) {
         this.interrupt = interrupt;

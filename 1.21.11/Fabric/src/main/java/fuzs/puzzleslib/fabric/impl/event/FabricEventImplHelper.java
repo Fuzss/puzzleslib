@@ -38,13 +38,13 @@ public final class FabricEventImplHelper {
         }
     }
 
-    public static float onLivingHurt(LivingEntity livingEntity, ServerLevel serverLevel, DamageSource damageSource, float damageAmount, MutableBoolean cancelInjection) {
+    public static float onLivingHurt(LivingEntity livingEntity, ServerLevel serverLevel, DamageSource damageSource, float damageAmount, MutableBoolean preventHurting) {
         if (!livingEntity.isInvulnerableTo(serverLevel, damageSource)) {
             DefaultedFloat damageAmountValue = DefaultedFloat.fromValue(damageAmount);
             EventResult eventResult = FabricLivingEvents.LIVING_HURT.invoker()
                     .onLivingHurt(livingEntity, damageSource, damageAmountValue);
             if (eventResult.isInterrupt()) {
-                cancelInjection.setTrue();
+                preventHurting.setTrue();
             }
             return damageAmountValue.getAsOptionalFloat().orElse(damageAmount);
         } else {
