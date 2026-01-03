@@ -899,6 +899,10 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(MobEffectEvents.Remove.class,
                 MobEffectEvent.Remove.class,
                 (MobEffectEvents.Remove callback, MobEffectEvent.Remove event) -> {
+                    if (event.getEffectInstance() == null) {
+                        return;
+                    }
+
                     if (callback.onMobEffectRemove(event.getEntity(), event.getEffectInstance()).isInterrupt()) {
                         event.setCanceled(true);
                     }
@@ -906,7 +910,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(MobEffectEvents.Expire.class,
                 MobEffectEvent.Expired.class,
                 (MobEffectEvents.Expire callback, MobEffectEvent.Expired event) -> {
-                    callback.onMobEffectExpire(event.getEntity(), event.getEffectInstance());
+                    if (callback.onMobEffectExpire(event.getEntity(), event.getEffectInstance()).isInterrupt()) {
+                        event.setCanceled(true);
+                    }
                 });
         INSTANCE.register(LivingJumpCallback.class,
                 LivingEvent.LivingJumpEvent.class,
