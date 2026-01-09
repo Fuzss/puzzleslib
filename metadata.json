@@ -3,7 +3,7 @@
         "id": "puzzleslib",
         "group": "fuzs.puzzleslib",
         "name": "Puzzles Lib",
-        "version": "21.11.5",
+        "version": "21.11.6",
         "authors": [
             "Fuzs"
         ],
@@ -28,13 +28,13 @@
     ],
     "links": [
         {
-            "name": "github",
-            "slug": "puzzleslib"
-        },
-        {
             "name": "curseforge",
             "slug": "puzzles-lib",
             "id": "495476"
+        },
+        {
+            "name": "github",
+            "slug": "puzzleslib"
         },
         {
             "name": "modrinth",
