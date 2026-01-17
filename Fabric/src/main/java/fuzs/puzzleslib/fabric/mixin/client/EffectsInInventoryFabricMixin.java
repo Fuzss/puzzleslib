@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Collection;
@@ -71,7 +72,11 @@ abstract class EffectsInInventoryFabricMixin {
         return mobEffect;
     }
 
-    @ModifyVariable(method = "renderText", at = @At(value = "LOAD", ordinal = 2))
+    @ModifyVariable(method = "renderText",
+                    at = @At("STORE"),
+                    ordinal = 0,
+                    slice = @Slice(from = @At(value = "INVOKE",
+                                              target = "Lnet/minecraft/client/gui/components/StringWidget;clipText(Lnet/minecraft/network/chat/Component;Lnet/minecraft/client/gui/Font;I)Lnet/minecraft/util/FormattedCharSequence;")))
     private boolean renderText(boolean mustClipText, @Share("mustClipText") LocalBooleanRef originalMustClipText) {
         if (this.puzzleslib$hoveredEffect != null) {
             originalMustClipText.set(mustClipText);

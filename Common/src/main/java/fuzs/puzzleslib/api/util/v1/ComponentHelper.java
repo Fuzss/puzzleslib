@@ -1,12 +1,10 @@
 package fuzs.puzzleslib.api.util.v1;
 
-import fuzs.puzzleslib.impl.chat.StyleCombiningCharSink;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.util.StringDecomposer;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -29,12 +27,11 @@ public final class ComponentHelper {
     /**
      * Converts a string to a {@link Component}.
      *
-     * @param string the string to convert
+     * @param text the string to convert
      * @return the new component
      */
-    public static Component getAsComponent(String string) {
-        Objects.requireNonNull(string, "string is null");
-        return getAsComponent(FormattedText.of(string));
+    public static Component getAsComponent(String text) {
+        return StyleCombiningCharSink.of(text, Style.EMPTY).getAsComponent();
     }
 
     /**
@@ -44,7 +41,7 @@ public final class ComponentHelper {
      * @return the new component
      */
     public static Component getAsComponent(FormattedText formattedText) {
-        return iterate(formattedText, StyleCombiningCharSink::getAsComponent);
+        return StyleCombiningCharSink.of(formattedText, Style.EMPTY).getAsComponent();
     }
 
     /**
@@ -59,7 +56,7 @@ public final class ComponentHelper {
      * @return the string
      */
     public static String getAsString(FormattedText formattedText) {
-        return iterate(formattedText, StyleCombiningCharSink::getAsString);
+        return StyleCombiningCharSink.of(formattedText, Style.EMPTY).getAsString();
     }
 
     /**
@@ -69,7 +66,7 @@ public final class ComponentHelper {
      * @return the new component
      */
     public static Component getAsComponent(FormattedCharSequence formattedCharSequence) {
-        return iterate(formattedCharSequence, StyleCombiningCharSink::getAsComponent);
+        return StyleCombiningCharSink.of(formattedCharSequence, Style.EMPTY).getAsComponent();
     }
 
     /**
@@ -84,23 +81,40 @@ public final class ComponentHelper {
      * @return the string
      */
     public static String getAsString(FormattedCharSequence formattedCharSequence) {
-        return iterate(formattedCharSequence, StyleCombiningCharSink::getAsString);
+        return StyleCombiningCharSink.of(formattedCharSequence, Style.EMPTY).getAsString();
     }
 
-    private static <T> T iterate(FormattedText formattedText, StyleCombiningCharSink.FormattedContentComposer<T> formattedContentComposer) {
-        Objects.requireNonNull(formattedText, "formatted text is null");
-        StyleCombiningCharSink styleCombiningCharSink = new StyleCombiningCharSink();
-        // use this to properly convert legacy formatting codes that are part of the string value
-        StringDecomposer.iterateFormatted(formattedText, Style.EMPTY, styleCombiningCharSink);
-        return formattedContentComposer.apply(styleCombiningCharSink);
+    /**
+     * Converts a string to a {@link Component} with the specified {@link Style}.
+     *
+     * @param text  the string to convert
+     * @param style the style to apply to the component
+     * @return the new component with the applied style
+     */
+    public static Component getAsComponent(String text, Style style) {
+        return Component.literal(text).withStyle(style);
     }
 
-    private static <T> T iterate(FormattedCharSequence formattedCharSequence, StyleCombiningCharSink.FormattedContentComposer<T> formattedContentComposer) {
-        Objects.requireNonNull(formattedCharSequence, "formatted char sequence is null");
-        StyleCombiningCharSink styleCombiningCharSink = new StyleCombiningCharSink();
-        formattedCharSequence.accept(styleCombiningCharSink);
-        // we have to convert to a component to be able to iterate using StringDecomposer::iterateFormatted
-        return iterate(styleCombiningCharSink.getAsComponent(), formattedContentComposer);
+    /**
+     * Converts the given string into a formatted string by applying the specified {@link Style}.
+     * <p>
+     * If the provided style is not empty, the method appends the style's formatting codes and resets formatting after
+     * the original string.
+     *
+     * @param text  the original string to format
+     * @param style the {@link Style} to apply to the string
+     * @return the formatted string if the style is not empty; otherwise, the original string
+     */
+    public static String getAsString(String text, Style style) {
+        if (!style.isEmpty()) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(ComponentHelper.getAsString(style));
+            stringBuilder.append(text);
+            stringBuilder.append(ChatFormatting.RESET);
+            return stringBuilder.toString();
+        } else {
+            return text;
+        }
     }
 
     /**
@@ -108,23 +122,22 @@ public final class ComponentHelper {
      * <p>
      * Useful for formatting code config options together with {@link #getAsString(Style)}.
      *
-     * @param string the string
+     * @param text the string
      * @return the style
      */
-    public static Style getDefaultStyle(String string) {
-        Objects.requireNonNull(string, "string is null");
-        Component component = getAsComponent(string);
-
+    public static Style getDefaultStyle(String text) {
+        Objects.requireNonNull(text, "text is null");
+        Component component = getAsComponent(text);
         // No style will have been passed when the component is empty.
         // We could also strip formatting codes from the string and check if it is empty,
         // but that might return false negatives with surrogates, maybe.
-        if (!string.isEmpty() && component.getString().isEmpty()) {
+        if (!text.isEmpty() && component.getString().isEmpty()) {
+            StringBuilder stringBuilder = new StringBuilder(text);
             // A hack to get raw formatting without any non-formatting characters to apply.
             // We basically check if only formatting is present (when the component is empty),
             // then insert a temporary space and create a new component from that, which we only use the style from.
-            int index = string.indexOf(ChatFormatting.RESET.toString());
-            StringBuilder stringBuilder = new StringBuilder(string);
-            stringBuilder.insert(index != -1 ? index : string.length(), " ");
+            int index = text.indexOf(ChatFormatting.RESET.toString());
+            stringBuilder.insert(index != -1 ? index : text.length(), " ");
             return getAsComponent(stringBuilder.toString()).getStyle();
         } else {
             return component.getStyle();
@@ -161,7 +174,6 @@ public final class ComponentHelper {
      */
     public static String getAsString(Style style) {
         Objects.requireNonNull(style, "style is null");
-
         if (style.isEmpty()) {
             return "";
         }
@@ -170,7 +182,6 @@ public final class ComponentHelper {
         getLegacyFormat(style, (ChatFormatting chatFormatting) -> {
             stringBuilder.append(chatFormatting.toString());
         });
-
         return stringBuilder.toString();
     }
 
@@ -182,7 +193,6 @@ public final class ComponentHelper {
      */
     public static void getLegacyFormat(Style style, Consumer<ChatFormatting> chatFormattingConsumer) {
         Objects.requireNonNull(style, "style is null");
-
         if (style.isEmpty()) {
             return;
         }
@@ -227,7 +237,6 @@ public final class ComponentHelper {
      */
     public static Style sanitizeLegacyFormat(Style style) {
         Objects.requireNonNull(style, "style is null");
-
         if (style.isEmpty()) {
             return style;
         }
