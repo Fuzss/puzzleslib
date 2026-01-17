@@ -11,6 +11,7 @@ import java.util.List;
  * dynamically added data pack registry entries.
  */
 public class SortingTagBuilder extends TagBuilder {
+
     @Override
     public List<TagEntry> build() {
         // sorting by id only is enough, there are no duplicates allowed
