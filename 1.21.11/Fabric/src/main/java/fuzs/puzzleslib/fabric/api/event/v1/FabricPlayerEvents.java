@@ -71,6 +71,12 @@ public final class FabricPlayerEvents {
      * Called when the player is closing an open container.
      */
     public static final Event<ContainerEvents.Close> CONTAINER_CLOSE = FabricEventFactory.create(ContainerEvents.Close.class);
+    /**
+     * Called when the player stops sleeping in a bed in
+     * {@link net.minecraft.world.entity.player.Player#stopSleepInBed(boolean, boolean)}.
+     */
+    public static final Event<StopSleepInBedCallback> STOP_SLEEP_IN_BED = FabricEventFactory.create(
+            StopSleepInBedCallback.class);
 
     private FabricPlayerEvents() {
         // NO-OP

@@ -70,7 +70,6 @@ multiloader {
             "ItemInHandRendererFabricMixin",
             "KeyboardHandlerFabricMixin",
             "KeyMappingFabricMixin",
-            "LevelRendererMixin",
             "LivingEntityRendererFabricMixin",
             "LocalPlayerFabricMixin",
             "MinecraftFabricMixin",

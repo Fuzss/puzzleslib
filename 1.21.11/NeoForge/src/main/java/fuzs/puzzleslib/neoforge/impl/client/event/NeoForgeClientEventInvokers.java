@@ -782,6 +782,16 @@ public final class NeoForgeClientEventInvokers {
                             event.getEffectInstance(),
                             event.getTooltip());
                 });
+        INSTANCE.register(ExtractLevelRenderStateCallback.class,
+                ExtractLevelRenderStateEvent.class,
+                (ExtractLevelRenderStateCallback callback, ExtractLevelRenderStateEvent event) -> {
+                    callback.onExtractLevelRenderState(event.getLevelRenderer(),
+                            event.getRenderState(),
+                            event.getLevel(),
+                            event.getCamera(),
+                            event.getFrustum(),
+                            event.getDeltaTracker());
+                });
     }
 
     private static <T, E extends ScreenEvent> void registerScreenEvent(Class<T> clazz, Class<E> eventClazz, BiConsumer<T, E> converter) {

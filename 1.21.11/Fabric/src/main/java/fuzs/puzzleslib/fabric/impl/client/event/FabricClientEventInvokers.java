@@ -27,6 +27,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRe
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldExtractionContext;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.client.player.ClientPreAttackCallback;
@@ -47,7 +49,9 @@ import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.item.ItemModel;
+import net.minecraft.client.renderer.state.BlockOutlineRenderState;
 import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -62,6 +66,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
@@ -586,7 +592,40 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(FogEvents.Setup.class, FabricRendererEvents.SETUP_FOG);
         INSTANCE.register(FogEvents.Color.class, FabricRendererEvents.FOG_COLOR);
         INSTANCE.register(RenderTooltipCallback.class, FabricGuiEvents.RENDER_TOOLTIP);
-        INSTANCE.register(ExtractBlockOutlineCallback.class, FabricRendererEvents.EXTRACT_BLOCK_OUTLINE);
+        INSTANCE.register(ExtractBlockOutlineCallback.class,
+                WorldRenderEvents.AFTER_BLOCK_OUTLINE_EXTRACTION,
+                (ExtractBlockOutlineCallback callback) -> {
+                    return (WorldExtractionContext context, @Nullable HitResult hitResult) -> {
+                        if (hitResult == null || hitResult.getType() != HitResult.Type.BLOCK) {
+                            return;
+                        }
+
+                        BlockOutlineRenderState renderState = context.worldState().blockOutlineRenderState;
+                        if (renderState == null) {
+                            return;
+                        }
+
+                        BlockPos blockPos = ((BlockHitResult) hitResult).getBlockPos();
+                        EventResultHolder<@Nullable VoxelShape> eventResult = callback.onExtractBlockOutline(context.world(),
+                                blockPos,
+                                context.world().getBlockState(blockPos),
+                                (BlockHitResult) hitResult,
+                                CollisionContext.of(context.camera().entity()));
+                        eventResult.ifInterrupt((@Nullable VoxelShape voxelShape) -> {
+                            if (voxelShape != null) {
+                                context.worldState().blockOutlineRenderState = new BlockOutlineRenderState(renderState.pos(),
+                                        renderState.isTranslucent(),
+                                        renderState.highContrast(),
+                                        voxelShape,
+                                        renderState.collisionShape(),
+                                        renderState.occlusionShape(),
+                                        renderState.interactionShape());
+                            } else {
+                                context.worldState().blockOutlineRenderState = null;
+                            }
+                        });
+                    };
+                });
         INSTANCE.register(GameRenderEvents.Before.class, FabricRendererEvents.BEFORE_GAME_RENDER);
         INSTANCE.register(GameRenderEvents.After.class, FabricRendererEvents.AFTER_GAME_RENDER);
         INSTANCE.register(AddToastCallback.class, FabricGuiEvents.ADD_TOAST);
@@ -594,6 +633,18 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ChatMessageReceivedCallback.class, FabricClientEvents.CHAT_MESSAGE_RECEIVED);
         INSTANCE.register(GatherEffectScreenTooltipCallback.class, FabricGuiEvents.GATHER_EFFECT_SCREEN_TOOLTIP);
         INSTANCE.register(ExtractRenderStateCallback.class, FabricRendererEvents.EXTRACT_RENDER_STATE);
+        INSTANCE.register(ExtractLevelRenderStateCallback.class,
+                WorldRenderEvents.END_EXTRACTION,
+                (ExtractLevelRenderStateCallback callback) -> {
+                    return (WorldExtractionContext context) -> {
+                        callback.onExtractLevelRenderState(context.worldRenderer(),
+                                context.worldState(),
+                                context.world(),
+                                context.camera(),
+                                context.frustum(),
+                                context.tickCounter());
+                    };
+                });
     }
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {
