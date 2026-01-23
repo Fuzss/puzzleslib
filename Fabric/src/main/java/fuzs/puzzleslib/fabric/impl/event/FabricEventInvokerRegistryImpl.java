@@ -536,6 +536,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 },
                 UnaryOperator.identity(),
                 false);
+        INSTANCE.register(StopSleepInBedCallback.class, FabricPlayerEvents.STOP_SLEEP_IN_BED);
     }
 
     @Override

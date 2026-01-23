@@ -1099,6 +1099,13 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                         callback.onGameRuleUpdated(event.getServer(), event.getGameRule(), event.getNewValue());
                     }
                 });
+        INSTANCE.register(StopSleepInBedCallback.class,
+                PlayerWakeUpEvent.class,
+                (StopSleepInBedCallback callback, PlayerWakeUpEvent event) -> {
+                    if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+                        callback.onStopSleepInBed(serverPlayer, !event.wakeImmediately() && !event.updateLevel());
+                    }
+                });
     }
 
     @Override
