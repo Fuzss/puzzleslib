@@ -323,6 +323,10 @@ transitive-accessible   method  net/minecraft/world/entity/Entity   getEncodeId 
 transitive-accessible   field   net/minecraft/world/entity/Mob  EQUIPMENT_POPULATION_ORDER  Ljava/util/List;
 transitive-accessible   method  net/minecraft/world/effect/MobEffect    <init>  (Lnet/minecraft/world/effect/MobEffectCategory;I)V
 transitive-accessible   method  net/minecraft/world/effect/MobEffect    <init>  (Lnet/minecraft/world/effect/MobEffectCategory;ILnet/minecraft/core/particles/ParticleOptions;)V
+transitive-accessible   field   net/minecraft/client/gui/components/AbstractScrollArea  scrolling   Z
+transitive-extendable   method  net/minecraft/client/gui/components/AbstractSelectionList   getFirstEntryY  ()I
+transitive-mutable  field   net/minecraft/world/inventory/Slot  x   I
+transitive-mutable  field   net/minecraft/world/inventory/Slot  y   I
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;
