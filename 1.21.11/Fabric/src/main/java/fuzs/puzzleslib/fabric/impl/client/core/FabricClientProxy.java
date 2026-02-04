@@ -181,8 +181,8 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
 
     @Override
     public void registerWoodType(WoodType woodType) {
-        // this might register fine, but if another mod loads the Sheets class too early it will be missing
-        // also wrap this in the event, so we ourselves do not load the Sheets class too early
+        // This might register fine, but if another mod loads the Sheets class too early, it will be missing.
+        // Also, wrap this in the event, so we ourselves do not load the Sheets class too early.
         ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft minecraft) -> {
             Sheets.SIGN_MATERIALS.put(woodType, Sheets.createSignMaterial(woodType));
             Sheets.HANGING_SIGN_MATERIALS.put(woodType, Sheets.createHangingSignMaterial(woodType));
