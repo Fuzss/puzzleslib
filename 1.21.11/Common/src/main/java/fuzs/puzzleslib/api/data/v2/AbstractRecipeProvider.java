@@ -121,7 +121,7 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
                         (RecipeProvider recipeProvider, ItemLike result, ItemLike input, Optional<String> recipeGroupPrefix, Optional<String> recipeUnlockedBy) -> {
                             recipeProvider.hangingSign(result, strippedBlock);
                         })
-                .put(BlockSetVariant.HANGING_SIGN,
+                .put(BlockSetVariant.SHELF,
                         (RecipeProvider recipeProvider, ItemLike result, ItemLike input, Optional<String> recipeGroupPrefix, Optional<String> recipeUnlockedBy) -> {
                             recipeProvider.shelf(result, strippedBlock);
                         })
@@ -133,7 +133,7 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
                         (RecipeProvider recipeProvider, ItemLike result, ItemLike input, Optional<String> recipeGroupPrefix, Optional<String> recipeUnlockedBy) -> {
                             Holder.Reference<Item> boatItem = blockSetFamily.getItem(BlockSetVariant.BOAT);
                             Objects.requireNonNull(boatItem, "boat item is null");
-                            recipeProvider.woodenBoat(result, boatItem.value());
+                            recipeProvider.chestBoat(result, boatItem.value());
                         })
                 .build();
     }

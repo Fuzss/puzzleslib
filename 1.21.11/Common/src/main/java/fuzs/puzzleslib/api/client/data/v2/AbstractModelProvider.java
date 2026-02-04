@@ -35,10 +35,10 @@ public abstract class AbstractModelProvider implements DataProvider {
      */
     public static final Map<BlockSetVariant, BiConsumer<ItemModelGenerators, Item>> VARIANT_WOOD_ITEM_PROVIDERS = ImmutableMap.<BlockSetVariant, BiConsumer<ItemModelGenerators, Item>>builder()
             .put(BlockSetVariant.BOAT, (ItemModelGenerators itemModelGenerators, Item item) -> {
-                itemModelGenerators.createFlatItemModel(item, ModelTemplates.FLAT_ITEM);
+                itemModelGenerators.generateFlatItem(item, ModelTemplates.FLAT_ITEM);
             })
             .put(BlockSetVariant.CHEST_BOAT, (ItemModelGenerators itemModelGenerators, Item item) -> {
-                itemModelGenerators.createFlatItemModel(item, ModelTemplates.FLAT_ITEM);
+                itemModelGenerators.generateFlatItem(item, ModelTemplates.FLAT_ITEM);
             })
             .build();
 
