@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.client.data.v2;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
+import fuzs.puzzleslib.api.init.v3.family.BlockSetFamily;
 import fuzs.puzzleslib.api.init.v3.family.BlockSetVariant;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.core.Holder;
@@ -100,6 +101,12 @@ public abstract class AbstractLanguageProvider implements DataProvider {
     }
 
     public abstract void addTranslations(TranslationBuilder translationBuilder);
+
+    public void generateFor(TranslationBuilder translationBuilder, BlockSetFamily blockSetFamily, String baseName) {
+        this.generateFor(translationBuilder::add, blockSetFamily.getBlockVariants(), VARIANT_BLOCK_NAMES, baseName);
+        this.generateFor(translationBuilder::add, blockSetFamily.getItemVariants(), VARIANT_ITEM_NAMES, baseName);
+        this.generateFor(translationBuilder::add, blockSetFamily.getEntityVariants(), VARIANT_ENTITY_NAMES, baseName);
+    }
 
     public <T> void generateFor(BiConsumer<T, String> translationConsumer, Map<BlockSetVariant, Holder.Reference<T>> variants, Map<BlockSetVariant, UnaryOperator<String>> variantNames, String baseName) {
         variants.forEach((BlockSetVariant variant, Holder.Reference<T> holder) -> {
