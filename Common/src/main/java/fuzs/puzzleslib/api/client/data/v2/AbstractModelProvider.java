@@ -1,16 +1,21 @@
 package fuzs.puzzleslib.api.client.data.v2;
 
+import com.google.common.collect.ImmutableMap;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
+import fuzs.puzzleslib.api.init.v3.family.BlockSetFamily;
+import fuzs.puzzleslib.api.init.v3.family.BlockSetVariant;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ItemModelOutput;
 import net.minecraft.client.data.models.ModelProvider;
 import net.minecraft.client.data.models.model.ItemModelUtils;
 import net.minecraft.client.data.models.model.ModelLocationUtils;
+import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.BlockFamily;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -21,9 +26,22 @@ import net.minecraft.world.level.block.Block;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 public abstract class AbstractModelProvider implements DataProvider {
+    /**
+     * @see #generateForItems(ItemModelGenerators, BlockSetFamily, Map)
+     */
+    public static final Map<BlockSetVariant, BiConsumer<ItemModelGenerators, Item>> VARIANT_WOOD_ITEM_PROVIDERS = ImmutableMap.<BlockSetVariant, BiConsumer<ItemModelGenerators, Item>>builder()
+            .put(BlockSetVariant.BOAT, (ItemModelGenerators itemModelGenerators, Item item) -> {
+                itemModelGenerators.createFlatItemModel(item, ModelTemplates.FLAT_ITEM);
+            })
+            .put(BlockSetVariant.CHEST_BOAT, (ItemModelGenerators itemModelGenerators, Item item) -> {
+                itemModelGenerators.createFlatItemModel(item, ModelTemplates.FLAT_ITEM);
+            })
+            .build();
+
     private final String modId;
     private final PackOutput.PathProvider blockStatePathProvider;
     private final PackOutput.PathProvider itemInfoPathProvider;
@@ -39,6 +57,22 @@ public abstract class AbstractModelProvider implements DataProvider {
         this.blockStatePathProvider = packOutput.createPathProvider(PackOutput.Target.RESOURCE_PACK, "blockstates");
         this.itemInfoPathProvider = packOutput.createPathProvider(PackOutput.Target.RESOURCE_PACK, "items");
         this.modelPathProvider = packOutput.createPathProvider(PackOutput.Target.RESOURCE_PACK, "models");
+    }
+
+    /**
+     * @see #generateForBlocks(BlockModelGenerators, BlockSetFamily, Map)
+     */
+    public static Map<BlockSetVariant, BiConsumer<BlockModelGenerators, Block>> createVariantWoodBlockProviders(BlockSetFamily blockSetFamily, Block strippedBlock) {
+        return ImmutableMap.<BlockSetVariant, BiConsumer<BlockModelGenerators, Block>>builder()
+                .put(BlockSetVariant.HANGING_SIGN, (BlockModelGenerators blockModelGenerators, Block block) -> {
+                    Holder.Reference<Block> wallHangingSign = blockSetFamily.getBlock(BlockSetVariant.WALL_HANGING_SIGN);
+                    Objects.requireNonNull(wallHangingSign, "wall hanging sign is null");
+                    blockModelGenerators.createHangingSign(strippedBlock, block, wallHangingSign.value());
+                })
+                .put(BlockSetVariant.SHELF, (BlockModelGenerators blockModelGenerators, Block block) -> {
+                    blockModelGenerators.createShelf(block, strippedBlock);
+                })
+                .build();
     }
 
     @Override
@@ -58,7 +92,7 @@ public abstract class AbstractModelProvider implements DataProvider {
     }
 
     private BlockModelGenerators setupBlockModelGenerators(BlockModelGenerators blockModelGenerators) {
-        // make all these mutable, so it is possibly to add our own entries
+        // Make all these mutable, so it is possible to add our own entries.
         BlockModelGenerators.NON_ORIENTABLE_TRAPDOOR = new ArrayList<>(BlockModelGenerators.NON_ORIENTABLE_TRAPDOOR);
         BlockModelGenerators.FULL_BLOCK_MODEL_CUSTOM_GENERATORS = new HashMap<>(BlockModelGenerators.FULL_BLOCK_MODEL_CUSTOM_GENERATORS);
         BlockModelGenerators.TEXTURED_MODELS = new HashMap<>(BlockModelGenerators.TEXTURED_MODELS);
@@ -83,6 +117,31 @@ public abstract class AbstractModelProvider implements DataProvider {
 
     public void addItemModels(ItemModelGenerators itemModelGenerators) {
         // NO-OP
+    }
+
+    public void generateForBlocks(BlockModelGenerators blockModelGenerators, BlockSetFamily blockSetFamily, Map<BlockSetVariant, BiConsumer<BlockModelGenerators, Block>> variants) {
+        BlockFamily blockFamily = blockSetFamily.getBlockFamily();
+        if (blockFamily.shouldGenerateModel()) {
+            blockModelGenerators.family(blockFamily.getBaseBlock()).generateFor(blockFamily);
+            blockSetFamily.getBlockVariants().forEach((BlockSetVariant variant, Holder.Reference<Block> holder) -> {
+                BiConsumer<BlockModelGenerators, Block> modelProvider = variants.get(variant);
+                if (modelProvider != null) {
+                    modelProvider.accept(blockModelGenerators, holder.value());
+                }
+            });
+        }
+    }
+
+    public void generateForItems(ItemModelGenerators itemModelGenerators, BlockSetFamily blockSetFamily, Map<BlockSetVariant, BiConsumer<ItemModelGenerators, Item>> variants) {
+        BlockFamily blockFamily = blockSetFamily.getBlockFamily();
+        if (blockFamily.shouldGenerateModel()) {
+            blockSetFamily.getItemVariants().forEach((BlockSetVariant variant, Holder.Reference<Item> holder) -> {
+                BiConsumer<ItemModelGenerators, Item> modelProvider = variants.get(variant);
+                if (modelProvider != null) {
+                    modelProvider.accept(itemModelGenerators, holder.value());
+                }
+            });
+        }
     }
 
     protected boolean skipAllValidation() {
@@ -134,7 +193,7 @@ public abstract class AbstractModelProvider implements DataProvider {
         }
     }
 
-    static class ItemModelOutputImpl extends ModelProvider.ItemInfoCollector implements CustomItemModelOutput {
+    private static class ItemModelOutputImpl extends ModelProvider.ItemInfoCollector implements CustomItemModelOutput {
         private final Map<Identifier, ClientItem> additionalItemInfos = new HashMap<>();
         private final Predicate<Holder.Reference<Item>> filter;
 
