@@ -11,6 +11,7 @@ import net.minecraft.client.data.models.ModelProvider;
 import net.minecraft.client.data.models.model.ItemModelUtils;
 import net.minecraft.client.data.models.model.ModelLocationUtils;
 import net.minecraft.client.data.models.model.ModelTemplates;
+import net.minecraft.client.data.models.model.TexturedModel;
 import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.core.Holder;
@@ -119,10 +120,27 @@ public abstract class AbstractModelProvider implements DataProvider {
         // NO-OP
     }
 
+    /**
+     * @see BlockModelGenerators#family(Block)
+     */
     public void generateForBlocks(BlockModelGenerators blockModelGenerators, BlockSetFamily blockSetFamily, Map<BlockSetVariant, BiConsumer<BlockModelGenerators, Block>> variants) {
+        this.generateForBlocks(blockModelGenerators,
+                blockSetFamily,
+                variants,
+                TexturedModel.CUBE.get(blockSetFamily.getBaseBlock().value()));
+    }
+
+    /**
+     * @see BlockModelGenerators#family(Block)
+     */
+    public void generateForBlocks(BlockModelGenerators blockModelGenerators, BlockSetFamily blockSetFamily, Map<BlockSetVariant, BiConsumer<BlockModelGenerators, Block>> variants, TexturedModel texturedModel) {
         BlockFamily blockFamily = blockSetFamily.getBlockFamily();
         if (blockFamily.shouldGenerateModel()) {
-            blockModelGenerators.family(blockFamily.getBaseBlock()).generateFor(blockFamily);
+            BlockModelGenerators.BlockFamilyProvider familyProvider = blockModelGenerators.new BlockFamilyProvider(
+                    texturedModel.getMapping());
+            familyProvider.fullBlock = BlockModelGenerators.plainModel(texturedModel.getTemplate()
+                    .getDefaultModelLocation(blockFamily.getBaseBlock()));
+            familyProvider.generateFor(blockFamily);
             blockSetFamily.getBlockVariants().forEach((BlockSetVariant variant, Holder.Reference<Block> holder) -> {
                 BiConsumer<BlockModelGenerators, Block> modelProvider = variants.get(variant);
                 if (modelProvider != null) {
