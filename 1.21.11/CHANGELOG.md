@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.11.9-1.21.11] - 2026-02-05
+
+### Added
+
+- Add `ItemModelGenerationHelper::generateChest`
+
+### Changed
+
+- `AbstractModelProvider::generateForBlocks` no longer creates the base block model
+
 ## [v21.11.8-1.21.11] - 2026-02-04
 
 ### Fixed
