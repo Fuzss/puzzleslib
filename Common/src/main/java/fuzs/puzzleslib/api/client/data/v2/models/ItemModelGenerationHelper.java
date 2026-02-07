@@ -148,7 +148,7 @@ public final class ItemModelGenerationHelper {
                 unbakedRendererFactory.apply(itemTexture));
         if (useGiftTexture) {
             ItemModel.Unbaked unbaked2 = ItemModelUtils.specialModel(identifier,
-                    unbakedRendererFactory.apply(ChestSpecialRenderer.GIFT_CHEST_TEXTURE));
+                    new ChestSpecialRenderer.Unbaked(ChestSpecialRenderer.GIFT_CHEST_TEXTURE));
             blockModelGenerators.itemModelOutput.accept(item, ItemModelUtils.isXmas(unbaked2, itemModel));
         } else {
             blockModelGenerators.itemModelOutput.accept(item, itemModel);
