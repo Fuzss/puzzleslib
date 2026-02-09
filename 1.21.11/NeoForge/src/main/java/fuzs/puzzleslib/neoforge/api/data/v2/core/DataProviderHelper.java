@@ -17,6 +17,7 @@ import net.neoforged.neoforge.data.event.GatherDataEvent;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.nio.file.Path;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -102,7 +103,10 @@ public final class DataProviderHelper {
     }
 
     private static <T> void registerDataProviders(String modId, RegistrySetBuilder registrySetBuilder, T[] dataProviderFactories, Function<T, Factory> factoryConverter) {
-        if (!ModLoaderEnvironment.INSTANCE.isDataGeneration()) return;
+        if (!ModLoaderEnvironment.INSTANCE.isDataGeneration()) {
+            return;
+        }
+
         NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent((IEventBus eventBus) -> {
             eventBus.addListener((final GatherDataEvent.Client event) -> {
                 addDataProviders(event,
@@ -116,7 +120,10 @@ public final class DataProviderHelper {
     }
 
     private static <T> void registerDataProviders(Identifier identifier, PackType packType, RegistrySetBuilder registrySetBuilder, T[] dataProviderFactories, Function<T, Factory> factoryConverter) {
-        if (!ModLoaderEnvironment.INSTANCE.isDataGeneration()) return;
+        if (!ModLoaderEnvironment.INSTANCE.isDataGeneration()) {
+            return;
+        }
+
         NeoForgeModContainerHelper.getOptionalModEventBus(identifier.getNamespace()).ifPresent((IEventBus eventBus) -> {
             eventBus.addListener((final GatherDataEvent.Client event) -> {
                 Path path = event.getGenerator().getPackOutput().getOutputFolder();
@@ -145,8 +152,10 @@ public final class DataProviderHelper {
 
     private static <T> void addDataProviders(GatherDataEvent event, RegistrySetBuilder registrySetBuilder, T[] dataProviderFactories, Function<T, Factory> factoryConverter, PackOutput packOutput, Consumer<DataProvider> dataProviderConsumer) {
         if (!registrySetBuilder.getEntryKeys().isEmpty()) {
-            event.createDatapackRegistryObjects(registrySetBuilder);
+            // This generates for all namespaces.
+            event.createDatapackRegistryObjects(registrySetBuilder, (Set<String>) null);
         }
+
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
         for (T dataProviderFactory : dataProviderFactories) {
             DataProvider dataProvider = factoryConverter.apply(dataProviderFactory)
@@ -154,13 +163,13 @@ public final class DataProviderHelper {
             if (dataProvider instanceof RegistriesDataProvider registriesDataProvider) {
                 lookupProvider = registriesDataProvider.getRegistries();
             }
+
             dataProviderConsumer.accept(dataProvider);
         }
     }
 
     @FunctionalInterface
     private interface Factory {
-
         DataProvider apply(GatherDataEvent event, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider);
     }
 }
