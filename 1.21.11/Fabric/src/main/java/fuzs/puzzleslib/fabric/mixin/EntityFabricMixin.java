@@ -1,13 +1,16 @@
 package fuzs.puzzleslib.fabric.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
+import fuzs.puzzleslib.api.event.v1.data.MutableBoolean;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricEntityEvents;
 import fuzs.puzzleslib.fabric.impl.event.CapturedDropsEntity;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
@@ -29,22 +32,25 @@ import java.util.Collection;
 @Mixin(Entity.class)
 abstract class EntityFabricMixin implements CapturedDropsEntity {
     @Shadow
-    @Nullable private Entity vehicle;
+    @Nullable
+    private Entity vehicle;
     @Shadow
     private Level level;
     @Shadow
     private EntityDimensions dimensions;
     @Shadow
     private float eyeHeight;
-    @Unique @Nullable private Collection<ItemEntity> puzzleslib$capturedDrops;
+    @Unique
+    @Nullable
+    private Collection<ItemEntity> puzzleslib$capturedDrops;
 
     @WrapWithCondition(method = "rideTick",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V"))
+                       at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V"))
     public boolean rideTick(Entity entity, @Share("isEntityTickCancelled") LocalBooleanRef isEntityTickCancelled) {
         // avoid using @WrapOperation, so we are not blamed for any overhead from running the entity tick
-        EventResult result = FabricEntityEvents.ENTITY_TICK_START.invoker().onStartEntityTick(entity);
-        isEntityTickCancelled.set(result.isInterrupt());
-        return result.isPass();
+        EventResult eventResult = FabricEntityEvents.ENTITY_TICK_START.invoker().onStartEntityTick(entity);
+        isEntityTickCancelled.set(eventResult.isInterrupt());
+        return eventResult.isPass();
     }
 
     @Inject(method = "rideTick",
@@ -69,7 +75,7 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
 
     @Inject(method = "spawnAtLocation(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/entity/item/ItemEntity;",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"),
+                     target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"),
             cancellable = true)
     public void spawnAtLocation(CallbackInfoReturnable<ItemEntity> callback, @Local ItemEntity itemEntity) {
         Collection<ItemEntity> capturedDrops = this.puzzleslib$getCapturedDrops();
@@ -84,25 +90,29 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
             cancellable = true)
     public void startRiding(Entity vehicle, boolean force, boolean emitEvents, CallbackInfoReturnable<Boolean> callback) {
         // runs a little later than Forge when it is actually guaranteed for the rider to start riding
-        EventResult result = FabricEntityEvents.ENTITY_START_RIDING.invoker()
+        EventResult eventResult = FabricEntityEvents.ENTITY_START_RIDING.invoker()
                 .onStartRiding(this.level, Entity.class.cast(this), vehicle);
-        if (result.isInterrupt()) callback.setReturnValue(false);
+        if (eventResult.isInterrupt()) {
+            callback.setReturnValue(false);
+        }
     }
 
     @Inject(method = "removeVehicle", at = @At("HEAD"), cancellable = true)
     public void removeVehicle(CallbackInfo callback) {
         if (this.vehicle != null) {
-            EventResult result = FabricEntityEvents.ENTITY_STOP_RIDING.invoker()
+            EventResult eventResult = FabricEntityEvents.ENTITY_STOP_RIDING.invoker()
                     .onStopRiding(this.level, Entity.class.cast(this), this.vehicle);
-            if (result.isInterrupt()) callback.cancel();
+            if (eventResult.isInterrupt()) {
+                callback.cancel();
+            }
         }
     }
 
     @Inject(method = "<init>", at = @At("TAIL"))
     public void init(EntityType<?> entityType, Level level, CallbackInfo callback) {
-        EventResultHolder<EntityDimensions> result = FabricEntityEvents.REFRESH_ENTITY_DIMENSIONS.invoker()
+        EventResultHolder<EntityDimensions> eventResult = FabricEntityEvents.REFRESH_ENTITY_DIMENSIONS.invoker()
                 .onRefreshEntityDimensions(Entity.class.cast(this), Pose.STANDING, entityType.getDimensions());
-        result.ifInterrupt((EntityDimensions entityDimensions) -> {
+        eventResult.ifInterrupt((EntityDimensions entityDimensions) -> {
             this.dimensions = entityDimensions;
             this.eyeHeight = entityDimensions.eyeHeight();
         });
@@ -110,11 +120,19 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
 
     @ModifyVariable(method = "refreshDimensions", at = @At("STORE"), ordinal = 1)
     public EntityDimensions refreshDimensions(EntityDimensions entityDimensions) {
-        EventResultHolder<EntityDimensions> result = FabricEntityEvents.REFRESH_ENTITY_DIMENSIONS.invoker()
+        EventResultHolder<EntityDimensions> eventResult = FabricEntityEvents.REFRESH_ENTITY_DIMENSIONS.invoker()
                 .onRefreshEntityDimensions(Entity.class.cast(this), this.getPose(), entityDimensions);
-        return result.getInterrupt().orElse(entityDimensions);
+        return eventResult.getInterrupt().orElse(entityDimensions);
     }
 
     @Shadow
     public abstract Pose getPose();
+
+    @ModifyReturnValue(method = "isInvulnerableToBase", at = @At("RETURN"))
+    protected boolean isInvulnerableToBase(boolean isInvulnerableToBase, DamageSource damageSource) {
+        MutableBoolean isInvulnerable = MutableBoolean.fromValue(isInvulnerableToBase);
+        FabricEntityEvents.ENTITY_DAMAGE_IMMUNITY.invoker()
+                .onEntityDamageImmunity(Entity.class.cast(this), damageSource, isInvulnerable);
+        return isInvulnerable.getAsBoolean();
+    }
 }

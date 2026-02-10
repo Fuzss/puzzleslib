@@ -3,6 +3,7 @@ package fuzs.puzzleslib.fabric.api.event.v1;
 import fuzs.puzzleslib.api.event.v1.entity.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
 
@@ -53,6 +54,12 @@ public final class FabricEntityEvents {
      */
     public static final Event<EnderPearlTeleportCallback> ENDER_PEARL_TELEPORT = FabricEventFactory.createResult(
             EnderPearlTeleportCallback.class);
+    /**
+     * Runs in {@link Entity#isInvulnerableToBase(DamageSource)} when an entity is attacked to determine if said entity
+     * is invulnerable to the specific damage source.
+     */
+    public static final Event<EntityDamageImmunityCallback> ENTITY_DAMAGE_IMMUNITY = FabricEventFactory.create(
+            EntityDamageImmunityCallback.class);
 
     private FabricEntityEvents() {
         // NO-OP

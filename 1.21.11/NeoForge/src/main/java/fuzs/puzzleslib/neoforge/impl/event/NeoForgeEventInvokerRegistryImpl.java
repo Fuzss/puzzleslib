@@ -8,10 +8,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
-import fuzs.puzzleslib.api.event.v1.data.MutableDouble;
-import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
-import fuzs.puzzleslib.api.event.v1.data.MutableInt;
-import fuzs.puzzleslib.api.event.v1.data.MutableValue;
+import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.api.event.v1.entity.*;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
@@ -1105,6 +1102,13 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                     if (event.getEntity() instanceof ServerPlayer serverPlayer) {
                         callback.onStopSleepInBed(serverPlayer, !event.wakeImmediately() && !event.updateLevel());
                     }
+                });
+        INSTANCE.register(EntityDamageImmunityCallback.class,
+                EntityInvulnerabilityCheckEvent.class,
+                (EntityDamageImmunityCallback callback, EntityInvulnerabilityCheckEvent event) -> {
+                    MutableBoolean isInvulnerable = MutableBoolean.fromEvent(event::setInvulnerable,
+                            event::isInvulnerable);
+                    callback.onEntityDamageImmunity(event.getEntity(), event.getSource(), isInvulnerable);
                 });
     }
 
