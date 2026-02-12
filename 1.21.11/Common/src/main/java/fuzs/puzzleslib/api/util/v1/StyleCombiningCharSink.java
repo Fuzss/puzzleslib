@@ -76,11 +76,11 @@ public class StyleCombiningCharSink implements FormattedCharSink {
     }
 
     public String getAsString() {
-        StringBuilder mainStringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         this.iterateForwards((String string, Style style) -> {
-            mainStringBuilder.append(ComponentHelper.getAsString(string, style));
+            stringBuilder.append(ComponentHelper.getAsString(string, style));
         });
-        return ComponentHelper.getAsString(mainStringBuilder.toString(), this.defaultStyle);
+        return ComponentHelper.getAsString(stringBuilder.toString(), this.defaultStyle);
     }
 
     public void iterateForwards(FormattedCharSink formattedCharSink) {
