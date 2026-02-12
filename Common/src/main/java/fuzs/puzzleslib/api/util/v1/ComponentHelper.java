@@ -6,7 +6,9 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -118,7 +120,29 @@ public final class ComponentHelper {
     }
 
     /**
-     * Gets the primary (i.e. the very first) {@link Style} used by a {@link String}.
+     * Gets the primary i.e., the very first non-empty {@link Style} used by a {@link Component}.
+     * <p>
+     * Useful for formatting code config options together with {@link #getAsString(Style)}.
+     *
+     * @param component the component
+     * @return the style
+     */
+    public static Style getDefaultStyle(Component component) {
+        Set<Component> visitedComponents = new HashSet<>();
+        while (true) {
+            if (component.getSiblings().isEmpty() || !component.getStyle().isEmpty()) {
+                return component.getStyle();
+            } else if (visitedComponents.contains(component)) {
+                return Style.EMPTY;
+            } else {
+                visitedComponents.add(component);
+                component = component.getSiblings().getFirst();
+            }
+        }
+    }
+
+    /**
+     * Gets the primary i.e., the very first non-empty {@link Style} used by a {@link String}.
      * <p>
      * Useful for formatting code config options together with {@link #getAsString(Style)}.
      *
@@ -138,32 +162,32 @@ public final class ComponentHelper {
             // then insert a temporary space and create a new component from that, which we only use the style from.
             int index = text.indexOf(ChatFormatting.RESET.toString());
             stringBuilder.insert(index != -1 ? index : text.length(), " ");
-            return getAsComponent(stringBuilder.toString()).getStyle();
+            return getDefaultStyle(getAsComponent(stringBuilder.toString()));
         } else {
-            return component.getStyle();
+            return getDefaultStyle(component);
         }
     }
 
     /**
-     * Gets the primary (i.e. the very first) {@link Style} used by a {@link FormattedText}.
+     * Gets the primary i.e., the very first non-empty {@link Style} used by a {@link FormattedText}.
      *
      * @param formattedText the text
      * @return the style
      */
     public static Style getDefaultStyle(FormattedText formattedText) {
-        // pass this through our component conversion to make sure all formatting codes included in the string itself are properly applied
-        return getAsComponent(formattedText).getStyle();
+        // Pass this through our component conversion to make sure all formatting codes included in the string itself are properly applied.
+        return getDefaultStyle(getAsComponent(formattedText));
     }
 
     /**
-     * Gets the primary (i.e. the very first) {@link Style} used by a {@link FormattedCharSequence}.
+     * Gets the primary i.e., the very first non-empty {@link Style} used by a {@link FormattedCharSequence}.
      *
      * @param formattedCharSequence the text
      * @return the style
      */
     public static Style getDefaultStyle(FormattedCharSequence formattedCharSequence) {
-        // pass this through our component conversion to make sure all formatting codes included in the string itself are properly applied
-        return getAsComponent(formattedCharSequence).getStyle();
+        // Pass this through our component conversion to make sure all formatting codes included in the string itself are properly applied.
+        return getDefaultStyle(getAsComponent(formattedCharSequence));
     }
 
     /**
