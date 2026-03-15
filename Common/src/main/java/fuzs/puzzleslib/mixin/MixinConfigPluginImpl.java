@@ -16,6 +16,7 @@ public class MixinConfigPluginImpl implements IMixinConfigPlugin {
             "EnchantCommandMixin",
             "client.ClientSuggestionProviderMixin",
             "client.EditBoxMixin",
+            "client.MinecraftMixin",
             "server.DedicatedServerSettingsMixin",
             "server.EulaMixin");
 
