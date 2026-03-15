@@ -37,7 +37,6 @@ import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.Identifier;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.scores.DisplaySlot;
 import net.minecraft.world.scores.Objective;
@@ -201,7 +200,6 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
             options.onboardAccessibility = false;
             options.skipMultiplayerWarning = true;
             options.damageTiltStrength().set(0.0);
-            options.getSoundSourceOptionInstance(SoundSource.MUSIC).set(0.0);
             options.lastMpIp = ServerPropertiesHelper.getHostAddress()
                     .map((String string) -> string + ":25565")
                     .orElse("");

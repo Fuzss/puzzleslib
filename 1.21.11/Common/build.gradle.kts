@@ -15,7 +15,8 @@ multiloader {
         )
         clientMixin(
             "ClientSuggestionProviderMixin",
-            "EditBoxMixin"
+            "EditBoxMixin",
+            "MinecraftMixin"
         )
         serverMixin(
             "DedicatedServerSettingsMixin",
