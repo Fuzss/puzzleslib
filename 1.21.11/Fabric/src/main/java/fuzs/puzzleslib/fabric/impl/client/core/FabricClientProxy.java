@@ -6,13 +6,12 @@ import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.api.client.renderer.v1.model.MutableBakedQuad;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
-import fuzs.puzzleslib.fabric.impl.client.config.MultiConfigurationScreen;
+import fuzs.puzzleslib.fabric.impl.client.config.CustomConfigurationScreen;
 import fuzs.puzzleslib.fabric.impl.client.core.context.GuiLayersContextFabricImpl;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.fabric.impl.client.key.FabricKeyMappingHelper;
 import fuzs.puzzleslib.fabric.impl.core.FabricCommonProxy;
 import fuzs.puzzleslib.fabric.impl.core.context.PayloadTypesContextFabricImpl;
-import fuzs.puzzleslib.impl.client.config.ConfigTranslationsManager;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -25,6 +24,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.input.KeyEvent;
@@ -45,9 +45,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.config.ModConfigs;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jspecify.annotations.Nullable;
 
 import java.util.IdentityHashMap;
@@ -191,19 +188,8 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
 
     @Override
     public void registerConfigurationScreen(String modId, String... otherModIds) {
-        ConfigScreenFactoryRegistry.INSTANCE.register(modId, MultiConfigurationScreen.getScreenFactory(otherModIds));
-    }
-
-    @Override
-    public void registerConfigurationScreenForHolder(String modId) {
-        super.registerConfigurationScreenForHolder(modId);
-        ModConfigs.getModConfigs(modId).forEach((ModConfig modConfig) -> {
-            if (modConfig.getSpec() instanceof ModConfigSpec modConfigSpec) {
-                ConfigTranslationsManager.INSTANCE.addModConfig(modConfig.getModId(),
-                        modConfig.getType().extension(),
-                        modConfig.getFileName(),
-                        modConfigSpec);
-            }
+        ConfigScreenFactoryRegistry.INSTANCE.register(modId, (String string, Screen screen) -> {
+            return new CustomConfigurationScreen(string, screen, otherModIds);
         });
     }
 

@@ -7,7 +7,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 public interface SidedProxy {
 
@@ -49,10 +48,5 @@ public interface SidedProxy {
 
     default void registerConfigurationScreen(String modId, String... otherModIds) {
         // NO-OP
-    }
-
-    @MustBeInvokedByOverriders
-    default void registerConfigurationScreenForHolder(String modId) {
-        this.registerConfigurationScreen(modId);
     }
 }
