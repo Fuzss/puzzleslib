@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.api.client.event.v1.gui;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
@@ -57,16 +56,13 @@ public final class ScreenEvents {
          * <p>
          * As opposed to Forge, this callback cannot be cancelled, and therefore also does not allow for manipulating
          * widgets, as those will be cleared anyway.
-         * <p>
-         * TODO remove Minecraft argument, the field on the screen is now final
          *
-         * @param minecraft    the minecraft singleton instance
          * @param screen       the screen that is rebuilding widgets
          * @param screenWidth  width of the window
          * @param screenHeight height of the window
          * @param widgets      all old widgets on the screen provided as a read-only list, those will be cleared
          */
-        void onBeforeInit(Minecraft minecraft, T screen, int screenWidth, int screenHeight, List<AbstractWidget> widgets);
+        void onBeforeInit(T screen, int screenWidth, int screenHeight, List<AbstractWidget> widgets);
     }
 
     @FunctionalInterface
@@ -78,10 +74,7 @@ public final class ScreenEvents {
          * <p>
          * This callback allows for manipulating widgets on the screen, allowing for both additions and removals, as
          * well as modifications to existing widgets.
-         * <p>
-         * TODO remove Minecraft argument, the field on the screen is now final
          *
-         * @param minecraft    the minecraft singleton instance
          * @param screen       the screen that is rebuilding widgets
          * @param screenWidth  width of the window
          * @param screenHeight height of the window
@@ -89,7 +82,7 @@ public final class ScreenEvents {
          * @param addWidget    a consumer for adding a new widget
          * @param removeWidget a consumer for removing an existing widget
          */
-        void onAfterInit(Minecraft minecraft, T screen, int screenWidth, int screenHeight, List<AbstractWidget> widgets, UnaryOperator<AbstractWidget> addWidget, Consumer<AbstractWidget> removeWidget);
+        void onAfterInit(T screen, int screenWidth, int screenHeight, List<AbstractWidget> widgets, UnaryOperator<AbstractWidget> addWidget, Consumer<AbstractWidget> removeWidget);
     }
 
     @FunctionalInterface

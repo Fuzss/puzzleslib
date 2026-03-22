@@ -92,8 +92,8 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
             return EventResultHolder.pass();
         });
         ScreenEvents.beforeInit(TitleScreen.class)
-                .register((Minecraft minecraft, TitleScreen screen, int screenWidth, int screenHeight, List<AbstractWidget> widgets) -> {
-                    if (minecraft.getOverlay() instanceof LoadingOverlay loadingOverlay
+                .register((TitleScreen screen, int screenWidth, int screenHeight, List<AbstractWidget> widgets) -> {
+                    if (screen.minecraft.getOverlay() instanceof LoadingOverlay loadingOverlay
                             && loadingOverlay.fadeOutStart != 0L) {
                         loadingOverlay.fadeOutStart = 0L;
                     }

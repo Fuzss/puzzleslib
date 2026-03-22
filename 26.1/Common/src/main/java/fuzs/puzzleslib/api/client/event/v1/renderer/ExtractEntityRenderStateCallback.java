@@ -6,12 +6,9 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.world.entity.Entity;
 
-/**
- * TODO rename to ExtractEntityRenderStateCallback
- */
 @FunctionalInterface
-public interface ExtractRenderStateCallback {
-    EventInvoker<ExtractRenderStateCallback> EVENT = EventInvoker.lookup(ExtractRenderStateCallback.class);
+public interface ExtractEntityRenderStateCallback {
+    EventInvoker<ExtractEntityRenderStateCallback> EVENT = EventInvoker.lookup(ExtractEntityRenderStateCallback.class);
 
     /**
      * Called during {@link EntityRenderer#extractRenderState(Entity, EntityRenderState, float)}, for setting up the
@@ -23,5 +20,5 @@ public interface ExtractRenderStateCallback {
      * @param renderState the entity render state
      * @param partialTick the partial tick
      */
-    void onExtractRenderState(Entity entity, EntityRenderState renderState, float partialTick);
+    void onExtractEntityRenderState(Entity entity, EntityRenderState renderState, float partialTick);
 }

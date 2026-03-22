@@ -42,7 +42,6 @@ import org.jspecify.annotations.Nullable;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 public abstract class AbstractRecipeProvider extends RecipeProvider implements DataProvider {
     private static final RegistryAccess REGISTRY_ACCESS = RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY);
@@ -136,12 +135,6 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
                             recipeProvider.chestBoat(result, boatItem.value());
                         })
                 .build();
-    }
-
-    @Deprecated(forRemoval = true)
-    public void generateForBlockFamilies(Stream<BlockFamily> blockFamilies) {
-        blockFamilies.filter(BlockFamily::shouldGenerateRecipe)
-                .forEach((BlockFamily blockFamily) -> this.generateRecipes(blockFamily, FeatureFlags.DEFAULT_FLAGS));
     }
 
     public void generateFor(BlockSetFamily blockSetFamily, Map<BlockSetVariant, FamilyRecipeProvider> variants) {

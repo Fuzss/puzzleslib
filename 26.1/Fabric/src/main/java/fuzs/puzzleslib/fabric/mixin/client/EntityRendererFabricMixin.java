@@ -28,7 +28,7 @@ abstract class EntityRendererFabricMixin<T extends Entity, S extends EntityRende
     @Inject(method = "createRenderState(Lnet/minecraft/world/entity/Entity;F)Lnet/minecraft/client/renderer/entity/state/EntityRenderState;",
             at = @At("RETURN"))
     public void createRenderState(T entity, float partialTick, CallbackInfoReturnable<S> callback) {
-        FabricRendererEvents.EXTRACT_RENDER_STATE.invoker()
-                .onExtractRenderState(entity, callback.getReturnValue(), partialTick);
+        FabricRendererEvents.EXTRACT_ENTITY_RENDER_STATE.invoker()
+                .onExtractEntityRenderState(entity, callback.getReturnValue(), partialTick);
     }
 }
