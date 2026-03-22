@@ -93,12 +93,12 @@ public final class NeoForgeClientEventInvokers {
                         }
                     });
                 });
-        INSTANCE.register(ExtractRenderStateCallback.class,
+        INSTANCE.register(ExtractEntityRenderStateCallback.class,
                 RegisterRenderStateModifiersEvent.class,
-                (ExtractRenderStateCallback callback, RegisterRenderStateModifiersEvent event) -> {
+                (ExtractEntityRenderStateCallback callback, RegisterRenderStateModifiersEvent event) -> {
                     event.registerEntityModifier((Class<? extends EntityRenderer<? extends Entity, ? extends EntityRenderState>>) (Class<?>) EntityRenderer.class,
                             (Entity entity, EntityRenderState entityRenderState) -> {
-                                callback.onExtractRenderState(entity, entityRenderState, entityRenderState.partialTick);
+                                callback.onExtractEntityRenderState(entity, entityRenderState, entityRenderState.partialTick);
                             });
                 });
         INSTANCE.register(ClientLifecycleEvents.Started.class,
@@ -226,15 +226,13 @@ public final class NeoForgeClientEventInvokers {
                             DefaultedFloat.fromEvent(consumer, supplier, event::getFovModifier));
                 });
         registerScreenEvent(ScreenEvents.BeforeInit.class, ScreenEvent.Init.Pre.class, (callback, event) -> {
-            callback.onBeforeInit(Minecraft.getInstance(),
-                    event.getScreen(),
+            callback.onBeforeInit(event.getScreen(),
                     event.getScreen().width,
                     event.getScreen().height,
                     new ScreenButtonList(event.getScreen().renderables));
         });
         registerScreenEvent(ScreenEvents.AfterInit.class, ScreenEvent.Init.Post.class, (callback, event) -> {
-            callback.onAfterInit(Minecraft.getInstance(),
-                    event.getScreen(),
+            callback.onAfterInit(event.getScreen(),
                     event.getScreen().width,
                     event.getScreen().height,
                     new ScreenButtonList(event.getScreen().renderables),

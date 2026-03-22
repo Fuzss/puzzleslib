@@ -277,8 +277,7 @@ public final class FabricClientEventInvokers {
                             return;
                         }
 
-                        callback.onBeforeInit(minecraft,
-                                screen,
+                        callback.onBeforeInit(screen,
                                 scaledWidth,
                                 scaledHeight,
                                 Collections.unmodifiableList(Screens.getButtons(screen)));
@@ -294,8 +293,7 @@ public final class FabricClientEventInvokers {
                         }
 
                         List<AbstractWidget> widgets = Screens.getButtons(screen);
-                        callback.onAfterInit(minecraft,
-                                screen,
+                        callback.onAfterInit(screen,
                                 scaledWidth,
                                 scaledHeight,
                                 Collections.unmodifiableList(widgets),
@@ -632,7 +630,7 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ComputeFieldOfViewCallback.class, FabricRendererEvents.COMPUTE_FIELD_OF_VIEW);
         INSTANCE.register(ChatMessageReceivedCallback.class, FabricClientEvents.CHAT_MESSAGE_RECEIVED);
         INSTANCE.register(GatherEffectScreenTooltipCallback.class, FabricGuiEvents.GATHER_EFFECT_SCREEN_TOOLTIP);
-        INSTANCE.register(ExtractRenderStateCallback.class, FabricRendererEvents.EXTRACT_RENDER_STATE);
+        INSTANCE.register(ExtractEntityRenderStateCallback.class, FabricRendererEvents.EXTRACT_ENTITY_RENDER_STATE);
         INSTANCE.register(ExtractLevelRenderStateCallback.class,
                 WorldRenderEvents.END_EXTRACTION,
                 (ExtractLevelRenderStateCallback callback) -> {

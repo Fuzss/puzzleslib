@@ -10,7 +10,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.BlockFamily;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -40,7 +39,10 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 public abstract class AbstractLanguageProvider implements DataProvider {
     /**
@@ -245,16 +247,6 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add("tag." + tagKey.location().toLanguageKey(registry), value);
         }
 
-        @Deprecated(forRemoval = true)
-        default BlockFamilyBuilder blockFamily(String blockValue) {
-            return new BlockFamilyBuilder(this::add, blockValue);
-        }
-
-        @Deprecated(forRemoval = true)
-        default BlockFamilyBuilder blockFamily(String blockValue, String baseBlockValue) {
-            return new BlockFamilyBuilder(this::add, blockValue, baseBlockValue);
-        }
-
         default void addBlock(Holder<Block> block, String value) {
             Objects.requireNonNull(block, "block is null");
             this.add(block.value(), value);
@@ -431,138 +423,6 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         default void add(GameRule<?> gameRule, String additionalKey, String value) {
             Objects.requireNonNull(gameRule, "game rule is null");
             this.add(gameRule.getDescriptionId(), additionalKey, value);
-        }
-    }
-
-    @Deprecated(forRemoval = true)
-    public static class BlockFamilyBuilder {
-        static final Map<BlockFamily.Variant, BiFunction<BlockFamilyBuilder, Block, BlockFamilyBuilder>> VARIANT_FUNCTIONS = ImmutableMap.<BlockFamily.Variant, BiFunction<BlockFamilyBuilder, Block, BlockFamilyBuilder>>builder()
-                .put(BlockFamily.Variant.BUTTON, BlockFamilyBuilder::button)
-                .put(BlockFamily.Variant.CHISELED, BlockFamilyBuilder::chiseled)
-                .put(BlockFamily.Variant.CRACKED, BlockFamilyBuilder::cracked)
-                .put(BlockFamily.Variant.CUT, BlockFamilyBuilder::cut)
-                .put(BlockFamily.Variant.DOOR, BlockFamilyBuilder::door)
-                .put(BlockFamily.Variant.CUSTOM_FENCE, BlockFamilyBuilder::fence)
-                .put(BlockFamily.Variant.FENCE, BlockFamilyBuilder::fence)
-                .put(BlockFamily.Variant.CUSTOM_FENCE_GATE, BlockFamilyBuilder::fenceGate)
-                .put(BlockFamily.Variant.FENCE_GATE, BlockFamilyBuilder::fenceGate)
-                .put(BlockFamily.Variant.MOSAIC, BlockFamilyBuilder::mosaic)
-                .put(BlockFamily.Variant.SIGN, BlockFamilyBuilder::sign)
-                .put(BlockFamily.Variant.SLAB, BlockFamilyBuilder::slab)
-                .put(BlockFamily.Variant.STAIRS, BlockFamilyBuilder::stairs)
-                .put(BlockFamily.Variant.PRESSURE_PLATE, BlockFamilyBuilder::pressurePlate)
-                .put(BlockFamily.Variant.POLISHED, BlockFamilyBuilder::polished)
-                .put(BlockFamily.Variant.TRAPDOOR, BlockFamilyBuilder::trapdoor)
-                .put(BlockFamily.Variant.WALL, BlockFamilyBuilder::wall)
-                .build();
-        private final BiConsumer<Block, String> valueConsumer;
-        private final String blockValue;
-        private final String baseBlockValue;
-
-        private BlockFamilyBuilder(BiConsumer<Block, String> valueConsumer, String blockValue) {
-            this(valueConsumer, blockValue, blockValue);
-        }
-
-        private BlockFamilyBuilder(BiConsumer<Block, String> valueConsumer, String blockValue, String baseBlockValue) {
-            this.valueConsumer = valueConsumer;
-            this.blockValue = blockValue;
-            this.baseBlockValue = baseBlockValue;
-        }
-
-        public void generateFor(BlockFamily blockFamily) {
-            this.baseBlock(blockFamily.getBaseBlock());
-            blockFamily.getVariants().forEach((BlockFamily.Variant variant, Block block) -> {
-                BiFunction<BlockFamilyBuilder, Block, BlockFamilyBuilder> variantFunction = VARIANT_FUNCTIONS.get(
-                        variant);
-                if (variantFunction != null) {
-                    variantFunction.apply(this, block);
-                }
-            });
-        }
-
-        public BlockFamilyBuilder baseBlock(Block block) {
-            this.valueConsumer.accept(block, this.baseBlockValue);
-            return this;
-        }
-
-        public BlockFamilyBuilder button(Block block) {
-            this.valueConsumer.accept(block, this.blockValue + " Button");
-            return this;
-        }
-
-        public BlockFamilyBuilder chiseled(Block block) {
-            this.valueConsumer.accept(block, "Chiseled " + this.blockValue);
-            return this;
-        }
-
-        public BlockFamilyBuilder cracked(Block block) {
-            this.valueConsumer.accept(block, "Cracked " + this.blockValue);
-            return this;
-        }
-
-        public BlockFamilyBuilder cut(Block block) {
-            this.valueConsumer.accept(block, "Cut " + this.blockValue);
-            return this;
-        }
-
-        public BlockFamilyBuilder door(Block block) {
-            this.valueConsumer.accept(block, this.blockValue + " Door");
-            return this;
-        }
-
-        public BlockFamilyBuilder fence(Block block) {
-            this.valueConsumer.accept(block, this.blockValue + " Fence");
-            return this;
-        }
-
-        public BlockFamilyBuilder fenceGate(Block block) {
-            this.valueConsumer.accept(block, this.blockValue + " Fence Gate");
-            return this;
-        }
-
-        public BlockFamilyBuilder mosaic(Block block) {
-            this.valueConsumer.accept(block, "Mosaic " + this.blockValue);
-            return this;
-        }
-
-        public BlockFamilyBuilder sign(Block block) {
-            this.valueConsumer.accept(block, this.blockValue + " Sign");
-            return this;
-        }
-
-        public BlockFamilyBuilder slab(Block block) {
-            this.valueConsumer.accept(block, this.blockValue + " Slab");
-            return this;
-        }
-
-        public BlockFamilyBuilder hangingSign(Block block) {
-            this.valueConsumer.accept(block, this.blockValue + " Hanging Sign");
-            return this;
-        }
-
-        public BlockFamilyBuilder stairs(Block block) {
-            this.valueConsumer.accept(block, this.blockValue + " Stairs");
-            return this;
-        }
-
-        public BlockFamilyBuilder pressurePlate(Block block) {
-            this.valueConsumer.accept(block, this.blockValue + " Pressure Plate");
-            return this;
-        }
-
-        public BlockFamilyBuilder polished(Block block) {
-            this.valueConsumer.accept(block, "Polished " + this.blockValue);
-            return this;
-        }
-
-        public BlockFamilyBuilder trapdoor(Block block) {
-            this.valueConsumer.accept(block, this.blockValue + " Trapdoor");
-            return this;
-        }
-
-        public BlockFamilyBuilder wall(Block block) {
-            this.valueConsumer.accept(block, this.blockValue + " Wall");
-            return this;
         }
     }
 

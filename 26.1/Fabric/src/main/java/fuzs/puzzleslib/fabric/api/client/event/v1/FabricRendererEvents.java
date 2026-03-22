@@ -19,8 +19,8 @@ public final class FabricRendererEvents {
      * Called during {@link EntityRenderer#extractRenderState(Entity, EntityRenderState, float)}, for setting up the
      * render state of an entity for future rendering.
      */
-    public static final Event<ExtractRenderStateCallback> EXTRACT_RENDER_STATE = FabricEventFactory.create(
-            ExtractRenderStateCallback.class);
+    public static final Event<ExtractEntityRenderStateCallback> EXTRACT_ENTITY_RENDER_STATE = FabricEventFactory.create(
+            ExtractEntityRenderStateCallback.class);
     /**
      * Called before a living entity model is submitted for rendering.
      */
