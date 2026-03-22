@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.core.v1;
 
 import com.google.common.collect.ImmutableMap;
 import fuzs.puzzleslib.impl.PuzzlesLib;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 
@@ -93,7 +94,26 @@ public interface ModContainer {
      * @return the mod name, possibly the mod id if not present
      */
     static String getDisplayName(String modId) {
-        return ModLoaderEnvironment.INSTANCE.getModContainer(modId).map(ModContainer::getDisplayName).orElse(modId);
+        return ModLoaderEnvironment.INSTANCE.getModContainer(modId)
+                .map(ModContainer::getDisplayName)
+                .orElseGet(() -> getCapitalizedString(modId));
+    }
+
+    /**
+     * Splits a string into individual words and capitalizes all of them.
+     *
+     * @param string the string
+     * @return the capitalized words
+     */
+    @ApiStatus.Internal
+    static String getCapitalizedString(String string) {
+        String[] strings = string.toLowerCase().split("[\\s_]+");
+        StringJoiner joiner = new StringJoiner(" ");
+        for (String value : strings) {
+            joiner.add(StringUtils.capitalize(value));
+        }
+
+        return joiner.toString();
     }
 
     @ApiStatus.Internal
@@ -102,8 +122,7 @@ public interface ModContainer {
             return modContainers.get()
                     .sorted(Comparator.comparing(ModContainer::getModId))
                     .collect(ImmutableMap.<ModContainer, String, ModContainer>toImmutableMap(ModContainer::getModId,
-                            Function.identity()
-                    ));
+                            Function.identity()));
         } catch (Throwable throwable) {
             PuzzlesLib.LOGGER.warn("Failed to generate mod list", throwable);
             return Collections.emptyMap();

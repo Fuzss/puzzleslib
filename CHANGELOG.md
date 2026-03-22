@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.11.12-1.21.11] - 2026-03-22
+
+### Changed
+
+- Replace internal `MultiConfigurationScreen` with updated `CustomConfigurationScreen` version which also handles
+  translations among other things
+
+### Removed
+
+- Remove `ConfigTranslationsManager`, translations are now handled directly on the config screen
+
+### Fixed
+
+- Fix config lists not being allowed empty in some cases
+
 ## [v21.11.11-1.21.11] - 2026-02-12
 
 ### Added

@@ -161,7 +161,7 @@ public abstract class LimitedEntry<T> extends ValueEntry<T> {
         @Override
         public ModConfigSpec.ConfigValue<List<?>> getConfigValue(ModConfigSpec.Builder builder, @Nullable Object o) {
             Supplier<?> elementSupplier = this.getElementSupplier(this.getListType());
-            return builder.defineList(this.getName(),
+            return builder.defineListAllowEmpty(this.getName(),
                     this.getDefaultValue(o),
                     (Supplier<Object>) elementSupplier,
                     this.getValidator());

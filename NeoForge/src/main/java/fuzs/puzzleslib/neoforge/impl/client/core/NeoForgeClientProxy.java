@@ -5,11 +5,10 @@ import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.api.client.renderer.v1.model.MutableBakedQuad;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
-import fuzs.puzzleslib.impl.client.config.ConfigTranslationsManager;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
-import fuzs.puzzleslib.neoforge.impl.client.config.MultiConfigurationScreen;
+import fuzs.puzzleslib.neoforge.impl.client.config.CustomConfigurationScreen;
 import fuzs.puzzleslib.neoforge.impl.client.event.NeoForgeClientEventInvokers;
 import fuzs.puzzleslib.neoforge.impl.client.key.NeoForgeKeyMappingHelper;
 import fuzs.puzzleslib.neoforge.impl.client.renderer.NeoForgeMutableBakedQuad;
@@ -19,6 +18,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.input.KeyEvent;
@@ -31,14 +31,10 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.config.ModConfigs;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.neoforge.client.ClientHooks;
 import net.neoforged.neoforge.client.extensions.common.IClientMobEffectExtensions;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import org.jspecify.annotations.Nullable;
 
@@ -129,27 +125,9 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
     @Override
     public void registerConfigurationScreen(String modId, String... otherModIds) {
         NeoForgeModContainerHelper.getModContainer(modId)
-                .registerExtensionPoint(IConfigScreenFactory.class,
-                        MultiConfigurationScreen.getScreenFactory(otherModIds)::apply);
-    }
-
-    @Override
-    public void registerConfigurationScreenForHolder(String modId) {
-        NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent((IEventBus eventBus) -> {
-            eventBus.addListener((final FMLClientSetupEvent event) -> {
-                event.enqueueWork(() -> {
-                    super.registerConfigurationScreenForHolder(modId);
-                    ModConfigs.getModConfigs(modId).forEach((ModConfig modConfig) -> {
-                        if (modConfig.getSpec() instanceof ModConfigSpec modConfigSpec) {
-                            ConfigTranslationsManager.INSTANCE.addModConfig(modConfig.getModId(),
-                                    modConfig.getType().extension(),
-                                    modConfig.getFileName(),
-                                    modConfigSpec);
-                        }
-                    });
+                .registerExtensionPoint(IConfigScreenFactory.class, (ModContainer modContainer, Screen screen) -> {
+                    return new CustomConfigurationScreen(modContainer.getModId(), screen, otherModIds);
                 });
-            });
-        });
     }
 
     @Override
