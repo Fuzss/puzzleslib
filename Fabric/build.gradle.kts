@@ -3,8 +3,8 @@ plugins {
 }
 
 dependencies {
-    modApi(libs.fabricapi.fabric)
-    modApi(libs.forgeconfigapiport.fabric)
+    modApi(sharedLibs.fabricapi.fabric)
+    modApi(sharedLibs.forgeconfigapiport.fabric)
 }
 
 multiloader {

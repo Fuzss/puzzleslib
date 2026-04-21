@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    modCompileOnlyApi(libs.forgeconfigapiport.common)
+    modCompileOnlyApi(sharedLibs.forgeconfigapiport.common)
 }
 
 multiloader {
