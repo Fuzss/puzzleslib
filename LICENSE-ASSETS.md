@@ -1,1 +1,1 @@
-Copyright (c) 2023 @heyitsfuzs. All Rights Reserved.
+Copyright (c) 2023-2026 @heyitsfuzs. All Rights Reserved.
