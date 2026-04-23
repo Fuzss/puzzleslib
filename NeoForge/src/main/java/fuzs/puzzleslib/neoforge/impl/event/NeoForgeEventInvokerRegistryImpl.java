@@ -782,7 +782,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                         return;
                     }
 
-                    callback.onChunkLoad(serverLevel, event.getChunk());
+                    callback.onChunkLoad(serverLevel, event.getChunk(), event.isNewChunk());
                 });
         INSTANCE.register(ServerChunkEvents.Unload.class,
                 ChunkEvent.Unload.class,
