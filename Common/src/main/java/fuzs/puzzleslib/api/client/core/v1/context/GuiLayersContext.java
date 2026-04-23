@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 
@@ -166,6 +166,6 @@ public interface GuiLayersContext {
          * @param guiGraphics  the gui graphics
          * @param deltaTracker the delta tracker
          */
-        void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker);
+        void render(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker);
     }
 }

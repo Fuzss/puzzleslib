@@ -2,8 +2,8 @@ package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
 import fuzs.puzzleslib.api.client.core.v1.context.PictureInPictureRenderersContext;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 import net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent;
 
 import java.util.Objects;

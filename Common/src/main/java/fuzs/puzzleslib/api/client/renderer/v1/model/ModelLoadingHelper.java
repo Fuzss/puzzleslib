@@ -5,10 +5,11 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.renderer.block.model.BlockModelDefinition;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelDispatcher;
 import net.minecraft.client.resources.model.*;
+import net.minecraft.client.resources.model.cuboid.CuboidModel;
+import net.minecraft.client.resources.model.cuboid.MissingCuboidModel;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
@@ -58,7 +59,7 @@ public final class ModelLoadingHelper {
     public static CompletableFuture<BlockStateModelLoader.LoadedModels> loadBlockState(ResourceManager resourceManager, Identifier oldIdentifier, Identifier newIdentifier, StateDefinition<Block, BlockState> stateDefinition, Executor executor) {
         return loadBlockState(resourceManager,
                 oldIdentifier,
-                executor).thenCompose((List<BlockStateModelLoader.LoadedBlockModelDefinition> loadedBlockModelDefinitions) -> {
+                executor).thenCompose((List<BlockStateModelLoader.LoadedBlockStateModelDispatcher> loadedBlockModelDefinitions) -> {
             return loadBlockState(loadedBlockModelDefinitions, newIdentifier, stateDefinition, executor);
         });
     }
@@ -66,17 +67,18 @@ public final class ModelLoadingHelper {
     /**
      * Similar to {@link BlockStateModelLoader#loadBlockStates(ResourceManager, Executor)}.
      */
-    public static CompletableFuture<List<BlockStateModelLoader.LoadedBlockModelDefinition>> loadBlockState(ResourceManager resourceManager, Identifier identifier, Executor executor) {
+    public static CompletableFuture<List<BlockStateModelLoader.LoadedBlockStateModelDispatcher>> loadBlockState(ResourceManager resourceManager, Identifier identifier, Executor executor) {
         return CompletableFuture.supplyAsync(() -> resourceManager.getResourceStack(BlockStateModelLoader.BLOCKSTATE_LISTER.idToFile(
                 identifier)), executor).thenApply((List<Resource> resourceStack) -> {
-            List<BlockStateModelLoader.LoadedBlockModelDefinition> blockModelDefinitions = new ArrayList<>(resourceStack.size());
+            List<BlockStateModelLoader.LoadedBlockStateModelDispatcher> blockModelDefinitions = new ArrayList<>(
+                    resourceStack.size());
 
             for (Resource resource : resourceStack) {
                 try (Reader reader = resource.openAsReader()) {
                     JsonElement jsonElement = JsonParser.parseReader(reader);
-                    BlockModelDefinition blockModelDefinition = BlockModelDefinition.CODEC.parse(JsonOps.INSTANCE,
+                    BlockStateModelDispatcher blockModelDefinition = BlockStateModelDispatcher.CODEC.parse(JsonOps.INSTANCE,
                             jsonElement).getOrThrow(JsonParseException::new);
-                    blockModelDefinitions.add(new BlockStateModelLoader.LoadedBlockModelDefinition(resource.sourcePackId(),
+                    blockModelDefinitions.add(new BlockStateModelLoader.LoadedBlockStateModelDispatcher(resource.sourcePackId(),
                             blockModelDefinition));
                 } catch (Exception exception) {
                     PuzzlesLib.LOGGER.error("Failed to load blockstate definition {} from pack {}",
@@ -93,7 +95,7 @@ public final class ModelLoadingHelper {
     /**
      * Similar to {@link BlockStateModelLoader#loadBlockStates(ResourceManager, Executor)}.
      */
-    public static CompletableFuture<BlockStateModelLoader.LoadedModels> loadBlockState(List<BlockStateModelLoader.LoadedBlockModelDefinition> loadedBlockModelDefinitions, Identifier identifier, StateDefinition<Block, BlockState> stateDefinition, Executor executor) {
+    public static CompletableFuture<BlockStateModelLoader.LoadedModels> loadBlockState(List<BlockStateModelLoader.LoadedBlockStateModelDispatcher> loadedBlockModelDefinitions, Identifier identifier, StateDefinition<Block, BlockState> stateDefinition, Executor executor) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 return BlockStateModelLoader.loadBlockStateDefinitionStack(identifier,
@@ -119,7 +121,7 @@ public final class ModelLoadingHelper {
                 identifier)), executor).thenApply((Optional<Resource> optional) -> {
             return optional.<UnbakedModel>map((Resource resource) -> {
                 try (Reader reader = resource.openAsReader()) {
-                    return BlockModel.fromStream(reader);
+                    return CuboidModel.fromStream(reader);
                 } catch (Exception exception) {
                     PuzzlesLib.LOGGER.error("Failed to load model {}", identifier, exception);
                     return null;
@@ -132,10 +134,11 @@ public final class ModelLoadingHelper {
         return new BlockStateModel.UnbakedRoot() {
             @Override
             public BlockStateModel bake(BlockState blockState, ModelBaker modelBaker) {
-                UnbakedModel unbakedModel = MissingBlockModel.missingModel();
+                UnbakedModel unbakedModel = MissingCuboidModel.missingModel();
                 // just use this, so we do not have to deal with the internal resolved model implementation
                 ResolvedModel resolvedModel = new ModelDiscovery(Collections.emptyMap(), unbakedModel).missingModel();
-                return ModelBakery.MissingModels.bake(resolvedModel, modelBaker.sprites(), modelBaker.parts()).block();
+                return ModelBakery.MissingModels.bake(resolvedModel, modelBaker.materials(), modelBaker.interner())
+                        .block();
             }
 
             @Override

@@ -3,7 +3,6 @@ package fuzs.puzzleslib.api.container.v1;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.Container;
-import net.minecraft.world.ContainerListener;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -15,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * Small helper class related to working with implementations of {@link AbstractContainerMenu}.
@@ -97,14 +97,17 @@ public final class ContainerMenuHelper {
      * @param listener listener for changes to the item list
      * @return the created container
      */
-    public static SimpleContainer createListBackedContainer(NonNullList<ItemStack> items, @Nullable ContainerListener listener) {
-        SimpleContainer simpleContainer = new SimpleContainer();
+    public static SimpleContainer createListBackedContainer(NonNullList<ItemStack> items, @Nullable Consumer<Container> listener) {
+        SimpleContainer simpleContainer = new SimpleContainer() {
+            @Override
+            public void setChanged() {
+                if (listener != null) {
+                    listener.accept(this);
+                }
+            }
+        };
         simpleContainer.size = items.size();
         simpleContainer.items = items;
-        if (listener != null) {
-            simpleContainer.addListener(listener);
-        }
-
         return simpleContainer;
     }
 

@@ -14,7 +14,6 @@ import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(MenuProviderWithData.class)
 public interface MenuProviderWithDataNeoForgeMixin<T> extends MenuProvider {
-
     @Shadow(remap = false)
     T getMenuData(@Nullable ServerPlayer serverPlayer);
 

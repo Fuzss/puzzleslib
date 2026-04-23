@@ -16,7 +16,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.debug.DebugScreenEntries;
@@ -59,9 +59,9 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
                     DebugScreenEntries.GAME_VERSION,
                     DebugScreenEntries.LIGHT_LEVELS,
                     DebugScreenEntries.LOCAL_DIFFICULTY,
-                    DebugScreenEntries.LOOKING_AT_BLOCK,
+                    DebugScreenEntries.LOOKING_AT_BLOCK_STATE,
                     DebugScreenEntries.LOOKING_AT_ENTITY,
-                    DebugScreenEntries.LOOKING_AT_FLUID,
+                    DebugScreenEntries.LOOKING_AT_FLUID_STATE,
                     DebugScreenEntries.MEMORY,
                     DebugScreenEntries.PARTICLE_RENDER_STATS,
                     DebugScreenEntries.PLAYER_POSITION,
@@ -216,14 +216,14 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
     @Override
     public void onRegisterGuiLayers(GuiLayersContext context) {
         context.replaceGuiLayer(GuiLayersContext.PLAYER_LIST, (GuiLayersContext.Layer layer) -> {
-            return (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+            return (GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker) -> {
                 Minecraft minecraft = Minecraft.getInstance();
                 Scoreboard scoreboard = minecraft.level.getScoreboard();
                 Objective objective = scoreboard.getDisplayObjective(DisplaySlot.LIST);
                 if (minecraft.options.keyPlayerList.isDown() && minecraft.isLocalServer()
                         && minecraft.player.connection.getListedOnlinePlayers().size() <= 1 && objective == null) {
                     minecraft.gui.tabList.setVisible(true);
-                    minecraft.gui.tabList.render(guiGraphics, guiGraphics.guiWidth(), scoreboard, null);
+                    minecraft.gui.tabList.extractRenderState(guiGraphics, guiGraphics.guiWidth(), scoreboard, null);
                 } else {
                     layer.render(guiGraphics, deltaTracker);
                 }

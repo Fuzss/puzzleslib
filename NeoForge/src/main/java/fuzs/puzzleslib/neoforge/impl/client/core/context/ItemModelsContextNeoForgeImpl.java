@@ -26,7 +26,7 @@ public final class ItemModelsContextNeoForgeImpl extends AbstractNeoForgeContext
     }
 
     @Override
-    public void registerSpecialModelRenderer(Identifier identifier, MapCodec<? extends SpecialModelRenderer.Unbaked> codec) {
+    public void registerSpecialModelRenderer(Identifier identifier, MapCodec<? extends SpecialModelRenderer.Unbaked<?>> codec) {
         Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(codec, "codec is null");
         this.registerForEvent(RegisterSpecialModelRendererEvent.class, (RegisterSpecialModelRendererEvent event) -> {

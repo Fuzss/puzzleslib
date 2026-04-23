@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(RegisterKeyMappingsEvent.class)
 public interface RegisterKeyMappingsEventNeoForgeAccessor {
-
     @Accessor(value = "options", remap = false)
     Options puzzleslib$getOptions();
 }

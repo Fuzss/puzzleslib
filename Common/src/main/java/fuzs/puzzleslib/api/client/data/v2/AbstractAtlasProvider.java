@@ -3,8 +3,8 @@ package fuzs.puzzleslib.api.client.data.v2;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.client.data.AtlasProvider;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
-import net.minecraft.client.resources.model.AtlasManager;
-import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.sprite.AtlasManager;
+import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.Identifier;
@@ -40,8 +40,8 @@ public abstract class AbstractAtlasProvider extends AtlasProvider {
 
     public abstract void addAtlases();
 
-    protected void addMaterial(Material material) {
-        this.add(this.atlasByTexture.get(material.atlasLocation()).definitionLocation(), forMaterial(material));
+    protected void addMaterial(SpriteId spriteId) {
+        this.add(this.atlasByTexture.get(spriteId.atlasLocation()).definitionLocation(), forMaterial(spriteId));
     }
 
     protected void add(Identifier identifier, SpriteSource... spriteSources) {
@@ -49,7 +49,6 @@ public abstract class AbstractAtlasProvider extends AtlasProvider {
     }
 
     protected void add(Identifier identifier, List<SpriteSource> spriteSources) {
-        this.values.computeIfAbsent(identifier, (Identifier identifierX) -> new ArrayList<>())
-                .addAll(spriteSources);
+        this.values.computeIfAbsent(identifier, (Identifier identifierX) -> new ArrayList<>()).addAll(spriteSources);
     }
 }

@@ -6,6 +6,10 @@ dependencies {
     modCompileOnlyApi(sharedLibs.forgeconfigapiport.common)
 }
 
+neoForge {
+    validateAccessTransformers = false
+}
+
 multiloader {
     mixins {
         plugin.set("${project.group}.mixin.MixinConfigPluginImpl")

@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.api.client.renderer.v1;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import net.minecraft.client.model.object.chest.ChestModel;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -9,13 +8,10 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.ChestRenderer;
 import net.minecraft.client.renderer.blockentity.state.ChestRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.MaterialSet;
+import net.minecraft.client.resources.model.sprite.SpriteGetter;
+import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.LidBlockEntity;
 import net.minecraft.world.phys.Vec3;
@@ -30,9 +26,9 @@ import org.jspecify.annotations.Nullable;
  */
 public abstract class SingleChestRenderer<T extends BlockEntity & LidBlockEntity, M extends ChestModel, S extends SingleChestRenderer.SingleChestRenderState> extends ChestRenderer<T> {
     /**
-     * The material set.
+     * The sprite set.
      */
-    protected final MaterialSet materials;
+    protected final SpriteGetter sprites;
     /**
      * The chest model.
      */
@@ -44,7 +40,7 @@ public abstract class SingleChestRenderer<T extends BlockEntity & LidBlockEntity
      */
     public SingleChestRenderer(BlockEntityRendererProvider.Context context, M chestModel) {
         super(context);
-        this.materials = context.materials();
+        this.sprites = context.sprites();
         this.chestModel = chestModel;
     }
 
@@ -62,9 +58,7 @@ public abstract class SingleChestRenderer<T extends BlockEntity & LidBlockEntity
     @Override
     public void submit(ChestRenderState chestRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState) {
         poseStack.pushPose();
-        poseStack.translate(0.5F, 0.5F, 0.5F);
-        poseStack.mulPose(Axis.YP.rotationDegrees(-chestRenderState.angle));
-        poseStack.translate(-0.5F, -0.5F, -0.5F);
+        poseStack.mulPose(modelTransformation(chestRenderState.facing));
         this.submitChestModel((S) chestRenderState, poseStack, submitNodeCollector);
         poseStack.popPose();
     }
@@ -77,17 +71,15 @@ public abstract class SingleChestRenderer<T extends BlockEntity & LidBlockEntity
      * @param submitNodeCollector the submit node collector
      */
     protected void submitChestModel(S chestRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector) {
-        Material material = chestRenderState.chestMaterial;
-        RenderType renderType = material.renderType(RenderTypes::entityCutout);
-        TextureAtlasSprite textureAtlasSprite = this.materials.get(material);
+        SpriteId spriteId = chestRenderState.chestMaterial;
         submitNodeCollector.submitModel(this.chestModel,
                 chestRenderState.getOpenness(),
                 poseStack,
-                renderType,
                 chestRenderState.lightCoords,
                 OverlayTexture.NO_OVERLAY,
                 -1,
-                textureAtlasSprite,
+                spriteId,
+                this.sprites,
                 0,
                 chestRenderState.breakProgress);
     }
@@ -99,7 +91,7 @@ public abstract class SingleChestRenderer<T extends BlockEntity & LidBlockEntity
      * @param xmasTextures should use holiday textures
      * @return the single chest texture material
      */
-    protected abstract Material getChestMaterial(T blockEntity, boolean xmasTextures);
+    protected abstract SpriteId getChestMaterial(T blockEntity, boolean xmasTextures);
 
     /**
      * A custom chest render state that stores the {@link Material} directly, to allow for working around vanilla's
@@ -109,7 +101,7 @@ public abstract class SingleChestRenderer<T extends BlockEntity & LidBlockEntity
         /**
          * The chest material.
          */
-        public Material chestMaterial = Sheets.CHEST_LOCATION;
+        public SpriteId chestMaterial = Sheets.CHEST_REGULAR.single();
 
         /**
          * @return the chest lid openness

@@ -31,9 +31,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.ApiStatus;
@@ -140,13 +138,14 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
     public void generateFor(BlockSetFamily blockSetFamily, Map<BlockSetVariant, FamilyRecipeProvider> variants) {
         BlockFamily blockFamily = blockSetFamily.getBlockFamily();
         this.generateRecipes(blockFamily, FeatureFlags.DEFAULT_FLAGS);
-        if (blockFamily.shouldGenerateRecipe()) {
+        if (blockFamily.shouldGenerateCraftingRecipe()) {
             blockSetFamily.getItemVariants().forEach((BlockSetVariant variant, Holder.Reference<Item> holder) -> {
                 FamilyRecipeProvider recipeProvider = variants.get(variant);
                 if (recipeProvider != null) {
                     ItemLike baseBlock;
-                    if (variant.toVanilla() != null) {
-                        baseBlock = this.getBaseBlock(blockFamily, variant.toVanilla());
+                    BlockFamily.Variant vanillaVariant = variant.toVanilla();
+                    if (vanillaVariant != null) {
+                        baseBlock = this.getBaseBlockForCrafting(blockFamily, vanillaVariant);
                     } else {
                         baseBlock = blockSetFamily.getBaseBlock().value();
                     }
@@ -182,11 +181,13 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
     public void metalCooking(ItemLike resultItem, ItemLike ingredientItem, float experience, int baseCookingTime) {
         SimpleCookingRecipeBuilder.smelting(Ingredient.of(ingredientItem),
                 RecipeCategory.MISC,
+                CookingBookCategory.MISC,
                 resultItem,
                 experience,
                 baseCookingTime).unlockedBy(getHasName(ingredientItem), this.has(ingredientItem)).save(this.output);
         SimpleCookingRecipeBuilder.blasting(Ingredient.of(ingredientItem),
                         RecipeCategory.MISC,
+                        CookingBookCategory.MISC,
                         resultItem,
                         experience,
                         baseCookingTime / 2)
@@ -201,6 +202,7 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
     public void foodCooking(ItemLike resultItem, ItemLike ingredientItem, float experienceReward, int baseCookingTime) {
         SimpleCookingRecipeBuilder.smelting(Ingredient.of(ingredientItem),
                 RecipeCategory.FOOD,
+                CookingBookCategory.FOOD,
                 resultItem,
                 experienceReward,
                 baseCookingTime).unlockedBy(getHasName(ingredientItem), this.has(ingredientItem)).save(this.output);
@@ -210,14 +212,14 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
                         experienceReward,
                         baseCookingTime / 2)
                 .unlockedBy(getHasName(ingredientItem), this.has(ingredientItem))
-                .save(this.output, getCraftingMethodRecipeName(resultItem, RecipeSerializer.SMOKING_RECIPE));
+                .save(this.output, getCraftingMethodRecipeName(resultItem, SmokingRecipe.SERIALIZER));
         SimpleCookingRecipeBuilder.campfireCooking(Ingredient.of(ingredientItem),
                         RecipeCategory.FOOD,
                         resultItem,
                         experienceReward,
                         baseCookingTime * 3)
                 .unlockedBy(getHasName(ingredientItem), this.has(ingredientItem))
-                .save(this.output, getCraftingMethodRecipeName(resultItem, RecipeSerializer.CAMPFIRE_COOKING_RECIPE));
+                .save(this.output, getCraftingMethodRecipeName(resultItem, CampfireCookingRecipe.SERIALIZER));
     }
 
     public RecipeBuilder stonecutterResultFromBaseBuilder(RecipeCategory recipeCategory, ItemLike resultItem, Ingredient ingredient) {

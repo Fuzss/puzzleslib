@@ -1,37 +1,40 @@
 package fuzs.puzzleslib.impl.item;
 
-import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 
+import java.util.Objects;
+
 public final class TransmuteShapelessRecipe extends ShapelessRecipe implements CustomTransmuteRecipe {
-    private final RecipeSerializer<?> recipeSerializer;
+    private final ResourceKey<RecipeSerializer<?>> serializerKey;
     private final Ingredient input;
 
-    public TransmuteShapelessRecipe(String modId, ShapelessRecipe shapelessRecipe, Ingredient input) {
-        this(CustomTransmuteRecipe.getModSerializer(modId,
-                CustomTransmuteRecipe.TRANSMUTE_SHAPELESS_RECIPE_SERIALIZER_ID), shapelessRecipe, input);
-    }
-
-    public TransmuteShapelessRecipe(RecipeSerializer<?> recipeSerializer, ShapelessRecipe shapelessRecipe, Ingredient input) {
-        super(shapelessRecipe.group(), shapelessRecipe.category(), shapelessRecipe.result, shapelessRecipe.ingredients);
-        this.recipeSerializer = recipeSerializer;
+    public TransmuteShapelessRecipe(ResourceKey<RecipeSerializer<?>> serializerKey, ShapelessRecipe shapelessRecipe, Ingredient input) {
+        super(shapelessRecipe.commonInfo,
+                shapelessRecipe.bookInfo,
+                shapelessRecipe.result,
+                shapelessRecipe.ingredients);
+        this.serializerKey = serializerKey;
         this.input = input;
     }
 
     @Override
-    public ItemStack assemble(CraftingInput craftingInput, HolderLookup.Provider registries) {
-        ItemStack itemStack = super.assemble(craftingInput, registries);
+    public ItemStack assemble(CraftingInput craftingInput) {
+        ItemStack itemStack = super.assemble(craftingInput);
         CustomTransmuteRecipe.super.transmuteInput(itemStack, craftingInput);
         return itemStack;
     }
 
     @Override
     public RecipeSerializer<ShapelessRecipe> getSerializer() {
-        return (RecipeSerializer<ShapelessRecipe>) this.recipeSerializer;
+        RecipeSerializer<?> recipeSerializer = BuiltInRegistries.RECIPE_SERIALIZER.getValue(this.serializerKey);
+        Objects.requireNonNull(recipeSerializer, () -> "recipe serializer '" + this.serializerKey + "' not registered");
+        return (RecipeSerializer<ShapelessRecipe>) recipeSerializer;
     }
 
     @Override

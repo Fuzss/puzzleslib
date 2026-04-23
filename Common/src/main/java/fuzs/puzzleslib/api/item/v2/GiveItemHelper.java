@@ -51,7 +51,7 @@ public final class GiveItemHelper {
 
     private static void giveItem(CommandSourceStack commandSourceStack, ItemStack itemStack, Collection<ServerPlayer> serverPlayers) {
         try {
-            ItemInput itemInput = new ItemInput(itemStack.getItemHolder(), itemStack.getComponentsPatch());
+            ItemInput itemInput = new ItemInput(itemStack.typeHolder(), itemStack.getComponentsPatch());
             GiveCommand.giveItem(commandSourceStack, itemInput, serverPlayers, itemStack.getCount());
         } catch (CommandSyntaxException exception) {
             PuzzlesLib.LOGGER.warn("Failed to give {} to players {}", itemStack, serverPlayers, exception);

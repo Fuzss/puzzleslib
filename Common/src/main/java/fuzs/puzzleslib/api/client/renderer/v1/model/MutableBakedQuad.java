@@ -1,10 +1,13 @@
 package fuzs.puzzleslib.api.client.renderer.v1.model;
 
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.Direction;
 import org.joml.Vector3fc;
+import org.jspecify.annotations.Nullable;
 
 public abstract class MutableBakedQuad {
     protected Vector3fc position0;
@@ -17,9 +20,12 @@ public abstract class MutableBakedQuad {
     protected long packedUV2;
     protected long packedUV3;
 
-    protected int tintIndex;
     protected Direction direction;
+    protected BakedQuad.@Nullable MaterialInfo materialInfo;
     protected TextureAtlasSprite sprite;
+    protected ChunkSectionLayer layer;
+    protected RenderType itemRenderType;
+    protected int tintIndex;
     protected boolean shade;
     protected int lightEmission;
 
@@ -34,11 +40,14 @@ public abstract class MutableBakedQuad {
         this.packedUV2 = bakedQuad.packedUV2();
         this.packedUV3 = bakedQuad.packedUV3();
 
-        this.tintIndex = bakedQuad.tintIndex();
         this.direction = bakedQuad.direction();
-        this.sprite = bakedQuad.sprite();
-        this.shade = bakedQuad.shade();
-        this.lightEmission = bakedQuad.lightEmission();
+        this.materialInfo = bakedQuad.materialInfo();
+        this.sprite = bakedQuad.materialInfo().sprite();
+        this.layer = bakedQuad.materialInfo().layer();
+        this.itemRenderType = bakedQuad.materialInfo().itemRenderType();
+        this.tintIndex = bakedQuad.materialInfo().tintIndex();
+        this.shade = bakedQuad.materialInfo().shade();
+        this.lightEmission = bakedQuad.materialInfo().lightEmission();
     }
 
     public static MutableBakedQuad toMutable(BakedQuad bakedQuad) {
@@ -97,16 +106,33 @@ public abstract class MutableBakedQuad {
         };
     }
 
-    public int tintIndex() {
-        return this.tintIndex;
-    }
-
     public Direction direction() {
         return this.direction;
     }
 
+    public BakedQuad.MaterialInfo materialInfo() {
+        return this.materialInfo != null ? this.materialInfo : new BakedQuad.MaterialInfo(this.sprite(),
+                this.layer(),
+                this.itemRenderType(),
+                this.tintIndex(),
+                this.shade(),
+                this.lightEmission());
+    }
+
     public TextureAtlasSprite sprite() {
         return this.sprite;
+    }
+
+    public ChunkSectionLayer layer() {
+        return this.layer;
+    }
+
+    public RenderType itemRenderType() {
+        return this.itemRenderType;
+    }
+
+    public int tintIndex() {
+        return this.tintIndex;
     }
 
     public boolean shade() {
@@ -177,27 +203,41 @@ public abstract class MutableBakedQuad {
         };
     }
 
-    public MutableBakedQuad tintIndex(int tintIndex) {
-        this.tintIndex = tintIndex;
-        return this;
-    }
-
     public MutableBakedQuad direction(Direction direction) {
         this.direction = direction;
         return this;
     }
 
     public MutableBakedQuad sprite(TextureAtlasSprite sprite) {
+        this.materialInfo = null;
         this.sprite = sprite;
         return this;
     }
 
+    public void layer(ChunkSectionLayer layer) {
+        this.materialInfo = null;
+        this.layer = layer;
+    }
+
+    public void itemRenderType(RenderType itemRenderType) {
+        this.materialInfo = null;
+        this.itemRenderType = itemRenderType;
+    }
+
+    public MutableBakedQuad tintIndex(int tintIndex) {
+        this.materialInfo = null;
+        this.tintIndex = tintIndex;
+        return this;
+    }
+
     public MutableBakedQuad shade(boolean shade) {
+        this.materialInfo = null;
         this.shade = shade;
         return this;
     }
 
     public MutableBakedQuad lightEmission(int lightEmission) {
+        this.materialInfo = null;
         this.lightEmission = lightEmission;
         return this;
     }
@@ -272,10 +312,6 @@ public abstract class MutableBakedQuad {
                 .packedColor3(packedColor);
     }
 
-    public MutableBakedQuad hasAmbientOcclusion(boolean hasAmbientOcclusion) {
-        return this;
-    }
-
     public BakedQuad toImmutable() {
         return new BakedQuad(this.position0(),
                 this.position1(),
@@ -285,10 +321,7 @@ public abstract class MutableBakedQuad {
                 this.packedUV1(),
                 this.packedUV2(),
                 this.packedUV3(),
-                this.tintIndex(),
                 this.direction(),
-                this.sprite(),
-                this.shade(),
-                this.lightEmission());
+                this.materialInfo());
     }
 }

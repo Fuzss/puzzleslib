@@ -6,11 +6,8 @@ import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.model.geom.ModelLayerLocation;
-import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
 
 import java.util.function.Supplier;
 
@@ -33,7 +30,7 @@ public interface ClientModConstructor {
     /**
      * Construct the {@link ClientModConstructor} instance to begin client-side initialization of a mod.
      *
-     * @param identifier       the identifier for the provided mod instance
+     * @param identifier             the identifier for the provided mod instance
      * @param modConstructorSupplier the mod instance for the setup
      */
     static void construct(Identifier identifier, Supplier<ClientModConstructor> modConstructorSupplier) {
@@ -126,7 +123,7 @@ public interface ClientModConstructor {
      * @param context register a custom unbaked special model renderer implementation to be used for statically rendered
      *                blocks, such as blocks visually appearing in minecarts and held by enderman
      */
-    default void onRegisterSpecialBlockModelRenderers(SpecialBlockModelRenderersContext context) {
+    default void onRegisterBuiltInBlockModels(BuiltInBlockModelsContext context) {
         // NO-OP
     }
 
@@ -142,20 +139,6 @@ public interface ClientModConstructor {
      * @param context register a {@link KeyMapping} so it can be saved to and loaded from game options
      */
     default void onRegisterKeyMappings(KeyMappingsContext context) {
-        // NO-OP
-    }
-
-    /**
-     * @param context register custom {@link ChunkSectionLayer ChunkSectionLayers} for blocks
-     */
-    default void onRegisterBlockRenderTypes(RenderTypesContext<Block> context) {
-        // NO-OP
-    }
-
-    /**
-     * @param context register custom {@link ChunkSectionLayer ChunkSectionLayers} for fluids
-     */
-    default void onRegisterFluidRenderTypes(RenderTypesContext<Fluid> context) {
         // NO-OP
     }
 

@@ -2,24 +2,45 @@ package fuzs.puzzleslib.api.init.v3.registry;
 
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.CommonSetupCallback;
-import fuzs.puzzleslib.impl.item.CustomTransmuteRecipe;
+import fuzs.puzzleslib.impl.item.TransmuteShapedRecipe;
+import fuzs.puzzleslib.impl.item.TransmuteShapelessRecipe;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.block.SkullBlock;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * Contains methods for registering various gameplay content.
  */
 public final class ContentRegistrationHelper {
+    /**
+     * The shaped transmute recipe serializer id that is used during registration.
+     */
+    public static final String TRANSMUTE_SHAPED_RECIPE_SERIALIZER_ID = "crafting_transmute_shaped";
+    /**
+     * The shapeless transmute recipe serializer id that is used during registration.
+     */
+    public static final String TRANSMUTE_SHAPELESS_RECIPE_SERIALIZER_ID = "crafting_transmute_shapeless";
 
     private ContentRegistrationHelper() {
         // NO-OP
+    }
+
+    public static ResourceKey<RecipeSerializer<?>> getTransmuteShapedRecipeSerializer(String modId) {
+        return ResourceKey.create(Registries.RECIPE_SERIALIZER,
+                Identifier.fromNamespaceAndPath(modId, TRANSMUTE_SHAPED_RECIPE_SERIALIZER_ID));
+    }
+
+    public static ResourceKey<RecipeSerializer<?>> getTransmuteShapelessRecipeSerializer(String modId) {
+        return ResourceKey.create(Registries.RECIPE_SERIALIZER,
+                Identifier.fromNamespaceAndPath(modId, TRANSMUTE_SHAPELESS_RECIPE_SERIALIZER_ID));
     }
 
     /**
@@ -28,9 +49,14 @@ public final class ContentRegistrationHelper {
      * @param registryManager the registry manager instance
      */
     public static void registerTransmuteRecipeSerializers(RegistryManager registryManager) {
-        CustomTransmuteRecipe.registerSerializers((String string, Supplier<RecipeSerializer<?>> recipeSerializerSupplier) -> {
-            registryManager.register(Registries.RECIPE_SERIALIZER, string, recipeSerializerSupplier);
-        });
+        TransmuteRecipeFactory.register(registryManager,
+                TRANSMUTE_SHAPED_RECIPE_SERIALIZER_ID,
+                ShapedRecipe.SERIALIZER,
+                TransmuteShapedRecipe::new);
+        TransmuteRecipeFactory.register(registryManager,
+                TRANSMUTE_SHAPELESS_RECIPE_SERIALIZER_ID,
+                ShapelessRecipe.SERIALIZER,
+                TransmuteShapelessRecipe::new);
     }
 
     /**
@@ -51,8 +77,8 @@ public final class ContentRegistrationHelper {
     /**
      * Creates and registers a new {@link ContextKeySet}.
      *
-     * @param identifier the identifier for the registry
-     * @param builderConsumer  the consumer for configuring the builder
+     * @param identifier      the identifier for the registry
+     * @param builderConsumer the consumer for configuring the builder
      * @return the created context key set
      */
     public static ContextKeySet registerContextKeySet(Identifier identifier, Consumer<ContextKeySet.Builder> builderConsumer) {

@@ -6,6 +6,7 @@ import net.minecraft.client.data.models.model.*;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.special.ChestSpecialRenderer;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -48,10 +49,10 @@ public final class ItemModelGenerationHelper {
     }
 
     public static Identifier createFlatItemModel(Item item, Item layerItem, ModelTemplate modelTemplate, BiConsumer<Identifier, ModelInstance> modelOutput) {
-        return createFlatItemModel(item, ModelLocationHelper.getItemModel(layerItem), modelTemplate, modelOutput);
+        return createFlatItemModel(item, ModelLocationHelper.getItemTexture(layerItem), modelTemplate, modelOutput);
     }
 
-    public static void generateFlatItem(Item item, Identifier layer0Location, ModelTemplate modelTemplate, ItemModelGenerators itemModelGenerators) {
+    public static void generateFlatItem(Item item, Material layer0Location, ModelTemplate modelTemplate, ItemModelGenerators itemModelGenerators) {
         itemModelGenerators.itemModelOutput.accept(item,
                 ItemModelUtils.plainModel(createFlatItemModel(item,
                         layer0Location,
@@ -59,19 +60,19 @@ public final class ItemModelGenerationHelper {
                         itemModelGenerators.modelOutput)));
     }
 
-    public static Identifier createFlatItemModel(Item item, Identifier layer0Location, ModelTemplate modelTemplate, BiConsumer<Identifier, ModelInstance> modelOutput) {
+    public static Identifier createFlatItemModel(Item item, Material layer0Location, ModelTemplate modelTemplate, BiConsumer<Identifier, ModelInstance> modelOutput) {
         return createFlatItemModel(ModelLocationHelper.getItemModel(item), layer0Location, modelTemplate, modelOutput);
     }
 
     public static Identifier createFlatItemModel(Identifier identifier, ModelTemplate modelTemplate, BiConsumer<Identifier, ModelInstance> modelOutput) {
-        return createFlatItemModel(identifier, identifier, modelTemplate, modelOutput);
+        return createFlatItemModel(identifier, new Material(identifier), modelTemplate, modelOutput);
     }
 
-    public static Identifier createFlatItemModel(Identifier identifier, Identifier layer0Location, ModelTemplate modelTemplate, BiConsumer<Identifier, ModelInstance> modelOutput) {
+    public static Identifier createFlatItemModel(Identifier identifier, Material layer0Location, ModelTemplate modelTemplate, BiConsumer<Identifier, ModelInstance> modelOutput) {
         return modelTemplate.create(identifier, TextureMapping.layer0(layer0Location), modelOutput);
     }
 
-    public static void generateLayeredItem(Item item, Identifier layer0Location, Identifier layer1Location, ModelTemplate modelTemplate, ItemModelGenerators itemModelGenerators) {
+    public static void generateLayeredItem(Item item, Material layer0Location, Material layer1Location, ModelTemplate modelTemplate, ItemModelGenerators itemModelGenerators) {
         itemModelGenerators.itemModelOutput.accept(item,
                 ItemModelUtils.plainModel(createLayeredItemModel(item,
                         layer0Location,
@@ -80,7 +81,7 @@ public final class ItemModelGenerationHelper {
                         itemModelGenerators.modelOutput)));
     }
 
-    public static Identifier createLayeredItemModel(Item item, Identifier layer0Location, Identifier layer1Location, ModelTemplate modelTemplate, BiConsumer<Identifier, ModelInstance> modelOutput) {
+    public static Identifier createLayeredItemModel(Item item, Material layer0Location, Material layer1Location, ModelTemplate modelTemplate, BiConsumer<Identifier, ModelInstance> modelOutput) {
         return createLayeredItemModel(ModelLocationHelper.getItemModel(item),
                 layer0Location,
                 layer1Location,
@@ -88,7 +89,7 @@ public final class ItemModelGenerationHelper {
                 modelOutput);
     }
 
-    public static Identifier createLayeredItemModel(Identifier identifier, Identifier layer0Location, Identifier layer1Location, ModelTemplate modelTemplate, BiConsumer<Identifier, ModelInstance> modelOutput) {
+    public static Identifier createLayeredItemModel(Identifier identifier, Material layer0Location, Material layer1Location, ModelTemplate modelTemplate, BiConsumer<Identifier, ModelInstance> modelOutput) {
         return modelTemplate.create(identifier, TextureMapping.layered(layer0Location, layer1Location), modelOutput);
     }
 
@@ -107,7 +108,7 @@ public final class ItemModelGenerationHelper {
         ItemModel.Unbaked baseModel = ItemModelUtils.plainModel(itemModelGenerators.createFlatItemModel(item, HORN));
         ItemModel.Unbaked tootingModel = ItemModelUtils.plainModel(createFlatItemModel(ModelLocationHelper.getItemModel(
                 item,
-                "_tooting"), ModelLocationHelper.getItemModel(item), TOOTING_HORN, itemModelGenerators.modelOutput));
+                "_tooting"), ModelLocationHelper.getItemTexture(item), TOOTING_HORN, itemModelGenerators.modelOutput));
         itemModelGenerators.generateBooleanDispatch(item, ItemModelUtils.isUsingItem(), tootingModel, baseModel);
     }
 
@@ -148,7 +149,7 @@ public final class ItemModelGenerationHelper {
                 unbakedRendererFactory.apply(itemTexture));
         if (useGiftTexture) {
             ItemModel.Unbaked unbaked2 = ItemModelUtils.specialModel(identifier,
-                    new ChestSpecialRenderer.Unbaked(ChestSpecialRenderer.GIFT_CHEST_TEXTURE));
+                    new ChestSpecialRenderer.Unbaked(ChestSpecialRenderer.CHRISTMAS.single()));
             blockModelGenerators.itemModelOutput.accept(item, ItemModelUtils.isXmas(unbaked2, itemModel));
         } else {
             blockModelGenerators.itemModelOutput.accept(item, itemModel);

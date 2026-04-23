@@ -5,7 +5,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.resources.model.MaterialSet;
+import net.minecraft.client.resources.model.sprite.SpriteGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -26,11 +26,11 @@ public interface RenderBlockOverlayCallback {
      * @param bufferSource the buffer source
      * @param blockState   the block state the overlay originates from, will be {@link Block#defaultBlockState()} for
      *                     fire and water overlays
-     * @param materialSet  the material set
+     * @param sprites      the sprite set
      * @return <ul>
-     *              <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the overlay from rendering</li>
-     *              <li>{@link EventResult#PASS PASS} to allow the overlay to render</li>
-     *         </ul>
+     *                      <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the overlay from rendering</li>
+     *                      <li>{@link EventResult#PASS PASS} to allow the overlay to render</li>
+     *                 </ul>
      */
-    EventResult onRenderBlockOverlay(LocalPlayer player, PoseStack poseStack, MultiBufferSource bufferSource, BlockState blockState, MaterialSet materialSet);
+    EventResult onRenderBlockOverlay(LocalPlayer player, PoseStack poseStack, MultiBufferSource bufferSource, BlockState blockState, SpriteGetter sprites);
 }

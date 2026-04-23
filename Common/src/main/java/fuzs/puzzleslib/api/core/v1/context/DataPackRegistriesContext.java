@@ -10,19 +10,19 @@ import net.minecraft.resources.ResourceKey;
 public interface DataPackRegistriesContext {
 
     /**
-     * Registers an unsynchronised dynamic registry.
+     * Registers an un-synchronized dynamic registry.
      *
      * @param registryKey the registry resource key
-     * @param codec       the codec for serialising registry values
+     * @param codec       the codec for serializing registry values
      * @param <T>         the registry value type
      */
     <T> void registerRegistry(ResourceKey<Registry<T>> registryKey, Codec<T> codec);
 
     /**
-     * Registers a synchronised dynamic registry.
+     * Registers a synchronized dynamic registry.
      *
      * @param registryKey the registry resource key
-     * @param codec       the codec for serialising registry values
+     * @param codec       the codec for serializing registry values
      * @param <T>         the registry value type
      */
     default <T> void registerSyncedRegistry(ResourceKey<Registry<T>> registryKey, Codec<T> codec) {
@@ -30,11 +30,11 @@ public interface DataPackRegistriesContext {
     }
 
     /**
-     * Registers a synchronised dynamic registry.
+     * Registers a synchronized dynamic registry.
      *
      * @param registryKey  the registry resource key
-     * @param codec        the codec for serialising registry values
-     * @param networkCodec an optional more compressed network codec for serialising registry values for synchronisation
+     * @param codec        the codec for serializing registry values
+     * @param networkCodec an optional more compressed network codec for serializing registry values for synchronization
      *                     across networks
      * @param <T>          the registry value type
      */

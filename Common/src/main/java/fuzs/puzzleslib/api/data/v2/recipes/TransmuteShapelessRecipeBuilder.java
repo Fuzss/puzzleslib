@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.api.data.v2.recipes;
 
-import fuzs.puzzleslib.impl.item.CustomTransmuteRecipe;
 import fuzs.puzzleslib.impl.item.TransmuteShapelessRecipe;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.core.HolderGetter;
@@ -10,7 +9,7 @@ import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -21,28 +20,23 @@ import org.jspecify.annotations.Nullable;
 import java.util.Objects;
 
 public class TransmuteShapelessRecipeBuilder extends ShapelessRecipeBuilder {
-    private final RecipeSerializer<?> recipeSerializer;
+    private final ResourceKey<RecipeSerializer<?>> serializerKey;
     private Ingredient input;
 
-    public TransmuteShapelessRecipeBuilder(RecipeSerializer<?> recipeSerializer, HolderGetter<Item> holderGetter, RecipeCategory recipeCategory, ItemStack result) {
+    public TransmuteShapelessRecipeBuilder(ResourceKey<RecipeSerializer<?>> serializerKey, HolderGetter<Item> holderGetter, RecipeCategory recipeCategory, ItemStackTemplate result) {
         super(holderGetter, recipeCategory, result);
-        this.recipeSerializer = recipeSerializer;
+        this.serializerKey = serializerKey;
     }
 
-    public static TransmuteShapelessRecipeBuilder shapeless(RecipeSerializer<?> recipeSerializer, HolderGetter<Item> holderGetter, RecipeCategory category, ItemLike result) {
+    public static TransmuteShapelessRecipeBuilder shapeless(ResourceKey<RecipeSerializer<?>> recipeSerializer, HolderGetter<Item> holderGetter, RecipeCategory category, ItemLike result) {
         return shapeless(recipeSerializer, holderGetter, category, result, 1);
     }
 
-    public static TransmuteShapelessRecipeBuilder shapeless(RecipeSerializer<?> recipeSerializer, HolderGetter<Item> holderGetter, RecipeCategory category, ItemLike result, int count) {
+    public static TransmuteShapelessRecipeBuilder shapeless(ResourceKey<RecipeSerializer<?>> recipeSerializer, HolderGetter<Item> holderGetter, RecipeCategory category, ItemLike result, int count) {
         return new TransmuteShapelessRecipeBuilder(recipeSerializer,
                 holderGetter,
                 category,
-                result.asItem().getDefaultInstance().copyWithCount(count));
-    }
-
-    public static RecipeSerializer<?> getRecipeSerializer(String modId) {
-        return CustomTransmuteRecipe.getModSerializer(modId,
-                CustomTransmuteRecipe.TRANSMUTE_SHAPELESS_RECIPE_SERIALIZER_ID);
+                new ItemStackTemplate(result.asItem(), count));
     }
 
     @Override
@@ -101,7 +95,7 @@ public class TransmuteShapelessRecipeBuilder extends ShapelessRecipeBuilder {
     public void save(RecipeOutput recipeOutput, ResourceKey<Recipe<?>> resourceKey) {
         Objects.requireNonNull(this.input, "input is null");
         super.save(TransformingRecipeOutput.transformed(recipeOutput, (Recipe<?> recipe) -> {
-            return new TransmuteShapelessRecipe(TransmuteShapelessRecipeBuilder.this.recipeSerializer,
+            return new TransmuteShapelessRecipe(TransmuteShapelessRecipeBuilder.this.serializerKey,
                     (ShapelessRecipe) recipe,
                     TransmuteShapelessRecipeBuilder.this.input);
         }), resourceKey);

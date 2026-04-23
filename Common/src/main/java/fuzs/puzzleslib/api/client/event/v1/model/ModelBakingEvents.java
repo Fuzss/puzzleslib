@@ -2,7 +2,7 @@ package fuzs.puzzleslib.api.client.event.v1.model;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.resources.Identifier;
@@ -59,9 +59,9 @@ public final class ModelBakingEvents {
         /**
          * An event that runs for every unbaked item model. Allows for replacing the model.
          *
-         * @param identifier the identifier for the item
-         * @param unbakedModel     the unbaked item model
-         * @param context          the item baking context instance
+         * @param identifier   the identifier for the item
+         * @param unbakedModel the unbaked item model
+         * @param context      the item baking context instance
          * @return <ul>
          *         <li>{@link EventResultHolder#interrupt(Object)} to replace the model</li>
          *         <li>{@link EventResultHolder#pass()} to allow the original model to be used</li>
@@ -76,10 +76,10 @@ public final class ModelBakingEvents {
         /**
          * An event that runs for every baked item model. Allows for replacing the model.
          *
-         * @param identifier the identifier for the item
-         * @param bakedModel       the baked item model
-         * @param unbakedModel     the original unbaked item model
-         * @param context          the item baking context instance
+         * @param identifier   the identifier for the item
+         * @param bakedModel   the baked item model
+         * @param unbakedModel the original unbaked item model
+         * @param context      the item baking context instance
          * @return <ul>
          *         <li>{@link EventResultHolder#interrupt(Object)} to replace the model</li>
          *         <li>{@link EventResultHolder#pass()} to allow the original model to be used</li>

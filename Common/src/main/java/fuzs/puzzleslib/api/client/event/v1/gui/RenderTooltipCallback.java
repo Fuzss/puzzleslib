@@ -3,7 +3,7 @@ package fuzs.puzzleslib.api.client.event.v1.gui;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 
@@ -27,5 +27,5 @@ public interface RenderTooltipCallback {
      *         <li>{@link EventResult#PASS PASS} to allow the vanilla tooltip to render as usual</li>
      *         </ul>
      */
-    EventResult onRenderTooltip(GuiGraphics guiGraphics, Font font, int mouseX, int mouseY, List<ClientTooltipComponent> components, ClientTooltipPositioner tooltipPositioner);
+    EventResult onRenderTooltip(GuiGraphicsExtractor guiGraphics, Font font, int mouseX, int mouseY, List<ClientTooltipComponent> components, ClientTooltipPositioner tooltipPositioner);
 }

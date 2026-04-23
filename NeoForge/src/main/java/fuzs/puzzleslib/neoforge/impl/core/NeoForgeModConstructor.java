@@ -10,6 +10,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
+import net.neoforged.neoforge.event.ModifyDefaultComponentsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
@@ -29,10 +30,7 @@ public final class NeoForgeModConstructor implements ModConstructorImpl<ModConst
             modConstructor.onRegisterGameplayContent(new GameplayContentContextNeoForgeImpl(modId, eventBus));
             modConstructor.onRegisterBiomeModifications(new BiomeModificationsContextNeoForgeImpl(modId, eventBus));
             eventBus.addListener((final FMLCommonSetupEvent event) -> {
-                event.enqueueWork(() -> {
-                    modConstructor.onCommonSetup();
-                    modConstructor.onRegisterVillagerTrades(new VillagerTradesContextNeoForgeImpl());
-                });
+                event.enqueueWork(modConstructor::onCommonSetup);
             });
             eventBus.addListener((final RegisterPayloadHandlersEvent event) -> {
                 modConstructor.onRegisterPayloadTypes(NeoForgeProxy.get().createPayloadTypesContext(modId, event));
@@ -60,6 +58,9 @@ public final class NeoForgeModConstructor implements ModConstructorImpl<ModConst
             });
             eventBus.addListener((final DataPackRegistryEvent.NewRegistry event) -> {
                 modConstructor.onRegisterDataPackRegistries(new DataPackRegistriesContextNeoForgeImpl(event));
+            });
+            eventBus.addListener((final ModifyDefaultComponentsEvent event) -> {
+                modConstructor.onRegisterItemComponentPatches(new ItemComponentsContextNeoForgeImpl(event));
             });
             NeoForge.EVENT_BUS.addListener((final AddServerReloadListenersEvent event) -> {
                 modConstructor.onAddDataPackReloadListeners(new DataPackReloadListenersContextNeoForgeImpl(event));

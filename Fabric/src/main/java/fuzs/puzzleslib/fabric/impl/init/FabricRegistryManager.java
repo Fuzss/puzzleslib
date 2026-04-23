@@ -7,11 +7,11 @@ import fuzs.puzzleslib.impl.init.DirectReferenceHolder;
 import fuzs.puzzleslib.impl.init.LazyHolder;
 import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
 import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
+import net.fabricmc.fabric.api.menu.v1.ExtendedMenuType;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricTrackedDataRegistry;
-import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityDataRegistry;
+import net.fabricmc.fabric.api.object.builder.v1.world.poi.PoiHelper;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -88,7 +88,7 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
 
     @Override
     protected CreativeModeTab.Builder getCreativeModeTabBuilder(boolean withSearchBar) {
-        return FabricItemGroup.builder();
+        return FabricCreativeModeTab.builder();
     }
 
     @Override
@@ -105,17 +105,14 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
     public <T extends AbstractContainerMenu, S> Holder.Reference<MenuType<T>> registerMenuType(String path, MenuSupplierWithData<T, S> menuSupplier, StreamCodec<? super RegistryFriendlyByteBuf, S> streamCodec) {
         return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU,
                 path,
-                () -> new ExtendedScreenHandlerType<>(menuSupplier::create, streamCodec));
+                () -> new ExtendedMenuType<>(menuSupplier::create, streamCodec));
     }
 
     @Override
     public Holder.Reference<PoiType> registerPoiType(String path, int maxTickets, int validRange, Supplier<Set<BlockState>> matchingBlockStates) {
         return this.register(Registries.POINT_OF_INTEREST_TYPE,
                 path,
-                () -> PointOfInterestHelper.register(this.makeKey(path),
-                        maxTickets,
-                        validRange,
-                        matchingBlockStates.get()),
+                () -> PoiHelper.register(this.makeKey(path), maxTickets, validRange, matchingBlockStates.get()),
                 true);
     }
 
@@ -133,7 +130,7 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
                 path);
         Holder.Reference<EntityDataSerializer<T>> holder = new DirectReferenceHolder<>(resourceKey,
                 entityDataSerializerSupplier.get());
-        FabricTrackedDataRegistry.register(holder.key().identifier(), holder.value());
+        FabricEntityDataRegistry.register(holder.key().identifier(), holder.value());
         return holder;
     }
 

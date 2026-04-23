@@ -30,7 +30,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.RandomSupport;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.ValidationContext;
+import net.minecraft.world.level.storage.loot.ValidationContextSource;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.CopyComponentsFunction;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -475,14 +475,10 @@ public final class AbstractLootProvider {
         default void validate(Registry<LootTable> registry) {
             ProblemReporter.Collector collector = new ProblemReporter.Collector();
             HolderGetter.Provider registries = new RegistryAccess.ImmutableRegistryAccess(List.of(registry)).freeze();
-            ValidationContext validationContext = new ValidationContext(collector,
-                    LootContextParamSets.ALL_PARAMS,
-                    registries);
-
+            ValidationContextSource validationContext = new ValidationContextSource(collector, registries);
             registry.listElements().forEach((Holder.Reference<LootTable> holder) -> {
                 this.validate(holder, validationContext);
             });
-
             if (!collector.isEmpty()) {
                 collector.forEach((string, problem) -> LOGGER.warn("Found validation problem in {}: {}",
                         string,
@@ -491,10 +487,10 @@ public final class AbstractLootProvider {
             }
         }
 
-        default void validate(Holder.Reference<LootTable> holder, ValidationContext validationContext) {
+        default void validate(Holder.Reference<LootTable> holder, ValidationContextSource validationContext) {
             if (!this.skipValidationFor(holder.key())) {
                 holder.value()
-                        .validate(validationContext.setContextKeySet(holder.value().getParamSet())
+                        .validate(validationContext.context(holder.value().getParamSet())
                                 .enterElement(new ProblemReporter.RootElementPathElement(holder.key()), holder.key()));
             }
         }

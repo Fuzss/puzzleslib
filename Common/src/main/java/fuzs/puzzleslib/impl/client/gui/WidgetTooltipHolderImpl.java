@@ -2,7 +2,7 @@ package fuzs.puzzleslib.impl.client.gui;
 
 import com.google.common.base.Preconditions;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetTooltipHolder;
@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -26,9 +27,11 @@ import java.util.function.Supplier;
 public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
     private final AbstractWidget abstractWidget;
     private List<? extends FormattedText> tooltipLines;
-    @Nullable private final BiFunction<ClientTooltipPositioner, AbstractWidget, ClientTooltipPositioner> tooltipPositionerFactory;
+    @Nullable
+    private final BiFunction<ClientTooltipPositioner, AbstractWidget, ClientTooltipPositioner> tooltipPositionerFactory;
     private final Function<List<? extends FormattedText>, List<FormattedCharSequence>> tooltipLineProcessor;
-    @Nullable private final Supplier<List<? extends FormattedText>> tooltipLinesSupplier;
+    @Nullable
+    private final Supplier<List<? extends FormattedText>> tooltipLinesSupplier;
 
     public WidgetTooltipHolderImpl(AbstractWidget abstractWidget, TooltipBuilderImpl builder) {
         this.abstractWidget = abstractWidget;
@@ -38,8 +41,7 @@ public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
         this.tooltipPositionerFactory = builder.tooltipPositionerFactory;
         this.tooltipLinesSupplier = builder.tooltipLinesSupplier;
         super.setDelay(builder.tooltipDelay);
-        super.set(new Tooltip(CommonComponents.EMPTY, null) {
-
+        super.set(new Tooltip(CommonComponents.EMPTY, null, Optional.empty(), null) {
             @Override
             public List<FormattedCharSequence> toCharSequence(Minecraft minecraft) {
                 Language language = Language.getInstance();
@@ -74,7 +76,8 @@ public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
         holder.set(tooltip);
     }
 
-    @NonNull @Override
+    @NonNull
+    @Override
     public Tooltip get() {
         Tooltip tooltip = super.get();
         Objects.requireNonNull(tooltip, "tooltip is null");
@@ -82,14 +85,15 @@ public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
     }
 
     @Override
-    public void refreshTooltipForNextRenderPass(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovering, boolean focused, ScreenRectangle screenRectangle) {
+    public void refreshTooltipForNextRenderPass(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean hovering, boolean focused, ScreenRectangle screenRectangle) {
         this.refreshLines(this.getLinesForNextRenderPass());
         if (!this.tooltipLines.isEmpty()) {
             super.refreshTooltipForNextRenderPass(guiGraphics, mouseX, mouseY, hovering, focused, screenRectangle);
         }
     }
 
-    @Nullable private List<? extends FormattedText> getLinesForNextRenderPass() {
+    @Nullable
+    private List<? extends FormattedText> getLinesForNextRenderPass() {
         return this.tooltipLinesSupplier != null ? this.tooltipLinesSupplier.get() : null;
     }
 
@@ -101,7 +105,7 @@ public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
     }
 
     @Override
-    protected ClientTooltipPositioner createTooltipPositioner(ScreenRectangle screenRectangle, boolean hovering, boolean focused) {
+    public ClientTooltipPositioner createTooltipPositioner(ScreenRectangle screenRectangle, boolean hovering, boolean focused) {
         ClientTooltipPositioner tooltipPositioner = super.createTooltipPositioner(screenRectangle, hovering, focused);
         if (this.tooltipPositionerFactory != null) {
             return this.tooltipPositionerFactory.apply(tooltipPositioner, this.abstractWidget);

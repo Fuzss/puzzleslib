@@ -22,7 +22,7 @@ import fuzs.puzzleslib.impl.client.event.ScreenButtonList;
 import fuzs.puzzleslib.impl.event.data.DefaultedFloat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -32,7 +32,7 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.state.BlockOutlineRenderState;
+import net.minecraft.client.renderer.state.level.BlockOutlineRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.util.Mth;
@@ -98,7 +98,9 @@ public final class NeoForgeClientEventInvokers {
                 (ExtractEntityRenderStateCallback callback, RegisterRenderStateModifiersEvent event) -> {
                     event.registerEntityModifier((Class<? extends EntityRenderer<? extends Entity, ? extends EntityRenderState>>) (Class<?>) EntityRenderer.class,
                             (Entity entity, EntityRenderState entityRenderState) -> {
-                                callback.onExtractEntityRenderState(entity, entityRenderState, entityRenderState.partialTick);
+                                callback.onExtractEntityRenderState(entity,
+                                        entityRenderState,
+                                        entityRenderState.partialTick);
                             });
                 });
         INSTANCE.register(ClientLifecycleEvents.Started.class,
@@ -117,7 +119,7 @@ public final class NeoForgeClientEventInvokers {
                     Objects.requireNonNull(context, "context is null");
                     Item item = (Item) context;
                     event.register(item,
-                            (GuiGraphics guiGraphics, Font font, ItemStack itemStack, int posX, int posY) -> {
+                            (GuiGraphicsExtractor guiGraphics, Font font, ItemStack itemStack, int posX, int posY) -> {
                                 callback.onDrawItemStackOverlay(guiGraphics, font, itemStack, posX, posY);
                                 return false;
                             });
@@ -673,7 +675,7 @@ public final class NeoForgeClientEventInvokers {
                             event.getPoseStack(),
                             event.getBufferSource(),
                             event.getBlockState(),
-                            event.getMaterials());
+                            event.getSprites());
                     if (eventResult.isInterrupt()) {
                         event.setCanceled(true);
                     }

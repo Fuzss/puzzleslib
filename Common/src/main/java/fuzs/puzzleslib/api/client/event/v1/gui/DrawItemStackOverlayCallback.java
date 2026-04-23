@@ -2,7 +2,7 @@ package fuzs.puzzleslib.api.client.event.v1.gui;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
@@ -17,7 +17,7 @@ public interface DrawItemStackOverlayCallback {
     }
 
     /**
-     * /** Fires at the end of {@link GuiGraphics#renderItemDecorations(Font, ItemStack, int, int, String)} and allows
+     * /** Fires at the end of {@link GuiGraphicsExtractor#renderItemDecorations(Font, ItemStack, int, int, String)} and allows
      * for drawing custom item stack decorations.
      * <p>
      * In vanilla these are: durability bar, cooldown overlay and stack count.
@@ -28,5 +28,5 @@ public interface DrawItemStackOverlayCallback {
      * @param posX        the x-position of the item stack
      * @param posY        the y-position of the item stack
      */
-    void onDrawItemStackOverlay(GuiGraphics guiGraphics, Font font, ItemStack itemStack, int posX, int posY);
+    void onDrawItemStackOverlay(GuiGraphicsExtractor guiGraphics, Font font, ItemStack itemStack, int posX, int posY);
 }

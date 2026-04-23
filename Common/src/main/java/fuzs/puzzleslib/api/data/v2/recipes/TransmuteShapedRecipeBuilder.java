@@ -4,9 +4,11 @@ import fuzs.puzzleslib.impl.item.CustomTransmuteRecipe;
 import fuzs.puzzleslib.impl.item.TransmuteShapedRecipe;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.core.HolderGetter;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -21,28 +23,23 @@ import org.jspecify.annotations.Nullable;
 import java.util.Objects;
 
 public class TransmuteShapedRecipeBuilder extends ShapedRecipeBuilder {
-    private final RecipeSerializer<?> recipeSerializer;
+    private final ResourceKey<RecipeSerializer<?>> serializerKey;
     private Ingredient input;
 
-    public TransmuteShapedRecipeBuilder(RecipeSerializer<?> recipeSerializer, HolderGetter<Item> holderGetter, RecipeCategory recipeCategory, ItemStack result) {
+    public TransmuteShapedRecipeBuilder(ResourceKey<RecipeSerializer<?>> serializerKey, HolderGetter<Item> holderGetter, RecipeCategory recipeCategory, ItemStack result) {
         super(holderGetter, recipeCategory, result.getItem(), result.getCount());
-        this.recipeSerializer = recipeSerializer;
+        this.serializerKey = serializerKey;
     }
 
-    public static TransmuteShapedRecipeBuilder shaped(RecipeSerializer<?> recipeSerializer, HolderGetter<Item> holderGetter, RecipeCategory category, ItemLike result) {
+    public static TransmuteShapedRecipeBuilder shaped(ResourceKey<RecipeSerializer<?>> recipeSerializer, HolderGetter<Item> holderGetter, RecipeCategory category, ItemLike result) {
         return shaped(recipeSerializer, holderGetter, category, result, 1);
     }
 
-    public static TransmuteShapedRecipeBuilder shaped(RecipeSerializer<?> recipeSerializer, HolderGetter<Item> holderGetter, RecipeCategory category, ItemLike result, int count) {
+    public static TransmuteShapedRecipeBuilder shaped(ResourceKey<RecipeSerializer<?>> recipeSerializer, HolderGetter<Item> holderGetter, RecipeCategory category, ItemLike result, int count) {
         return new TransmuteShapedRecipeBuilder(recipeSerializer,
                 holderGetter,
                 category,
                 result.asItem().getDefaultInstance().copyWithCount(count));
-    }
-
-    public static RecipeSerializer<?> getRecipeSerializer(String modId) {
-        return CustomTransmuteRecipe.getModSerializer(modId,
-                CustomTransmuteRecipe.TRANSMUTE_SHAPED_RECIPE_SERIALIZER_ID);
     }
 
     @Override
@@ -101,7 +98,7 @@ public class TransmuteShapedRecipeBuilder extends ShapedRecipeBuilder {
     public void save(RecipeOutput recipeOutput, ResourceKey<Recipe<?>> resourceKey) {
         Objects.requireNonNull(this.input, "input is null");
         super.save(TransformingRecipeOutput.transformed(recipeOutput, (Recipe<?> recipe) -> {
-            return new TransmuteShapedRecipe(TransmuteShapedRecipeBuilder.this.recipeSerializer,
+            return new TransmuteShapedRecipe(TransmuteShapedRecipeBuilder.this.serializerKey,
                     (ShapedRecipe) recipe,
                     TransmuteShapedRecipeBuilder.this.input);
         }), resourceKey);

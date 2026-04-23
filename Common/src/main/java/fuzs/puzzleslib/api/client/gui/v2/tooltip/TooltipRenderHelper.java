@@ -6,7 +6,7 @@ import fuzs.puzzleslib.api.client.core.v1.context.ClientTooltipComponentsContext
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
@@ -106,7 +106,7 @@ public final class TooltipRenderHelper {
      * @param posY        position on y-axis, would be mouse cursor y for vanilla
      * @param itemStack   the item stack to retrieve the tooltip from
      */
-    public static void renderTooltip(GuiGraphics guiGraphics, int posX, int posY, ItemStack itemStack) {
+    public static void renderTooltip(GuiGraphicsExtractor guiGraphics, int posX, int posY, ItemStack itemStack) {
         Objects.requireNonNull(itemStack, "item stack is null");
         renderTooltipComponents(guiGraphics, posX, posY, getTooltip(itemStack));
     }
@@ -120,7 +120,7 @@ public final class TooltipRenderHelper {
      * @param component      component to render in the tooltip
      * @param imageComponent image component to render in the tooltip
      */
-    public static void renderTooltip(GuiGraphics guiGraphics, int posX, int posY, Component component, TooltipComponent imageComponent) {
+    public static void renderTooltip(GuiGraphicsExtractor guiGraphics, int posX, int posY, Component component, TooltipComponent imageComponent) {
         Objects.requireNonNull(component, "component is null");
         Objects.requireNonNull(imageComponent, "image component is null");
         renderTooltip(guiGraphics, posX, posY, List.of(component), imageComponent);
@@ -135,7 +135,7 @@ public final class TooltipRenderHelper {
      * @param components     components to render in the tooltip
      * @param imageComponent image component to render in the tooltip
      */
-    public static void renderTooltip(GuiGraphics guiGraphics, int posX, int posY, List<Component> components, TooltipComponent imageComponent) {
+    public static void renderTooltip(GuiGraphicsExtractor guiGraphics, int posX, int posY, List<Component> components, TooltipComponent imageComponent) {
         Objects.requireNonNull(imageComponent, "image component is null");
         renderTooltip(guiGraphics, posX, posY, components, List.of(imageComponent));
     }
@@ -148,7 +148,7 @@ public final class TooltipRenderHelper {
      * @param posY        position on y-axis, would be mouse cursor y for vanilla
      * @param components  components to render in the tooltip
      */
-    public static void renderTooltip(GuiGraphics guiGraphics, int posX, int posY, List<Component> components) {
+    public static void renderTooltip(GuiGraphicsExtractor guiGraphics, int posX, int posY, List<Component> components) {
         renderTooltip(guiGraphics, posX, posY, components, List.of());
     }
 
@@ -161,7 +161,7 @@ public final class TooltipRenderHelper {
      * @param components      components to render in the tooltip
      * @param imageComponents image components to render in the tooltip
      */
-    public static void renderTooltip(GuiGraphics guiGraphics, int posX, int posY, List<Component> components, List<TooltipComponent> imageComponents) {
+    public static void renderTooltip(GuiGraphicsExtractor guiGraphics, int posX, int posY, List<Component> components, List<TooltipComponent> imageComponents) {
         renderTooltipComponents(guiGraphics, posX, posY, createClientComponents(components, imageComponents));
     }
 
@@ -236,9 +236,9 @@ public final class TooltipRenderHelper {
      * @param posX              the position on x-axis; would be mouse cursor x for vanilla
      * @param posY              the position on y-axis; would be mouse cursor y for vanilla
      * @param tooltipComponents components to render in the tooltip
-     * @see GuiGraphics#renderTooltip(Font, List, int, int, ClientTooltipPositioner, Identifier)
+     * @see GuiGraphicsExtractor#renderTooltip(Font, List, int, int, ClientTooltipPositioner, Identifier)
      */
-    public static void renderTooltipComponents(GuiGraphics guiGraphics, int posX, int posY, List<? extends ClientTooltipComponent> tooltipComponents) {
+    public static void renderTooltipComponents(GuiGraphicsExtractor guiGraphics, int posX, int posY, List<? extends ClientTooltipComponent> tooltipComponents) {
         renderTooltipComponents(guiGraphics, posX, posY, tooltipComponents, null);
     }
 
@@ -257,9 +257,9 @@ public final class TooltipRenderHelper {
      * @param posY              the position on y-axis; would be mouse cursor y for vanilla
      * @param tooltipComponents the components to render in the tooltip
      * @param tooltipStyle      the optional identifier for overriding the background and frame sprites of the tooltip
-     * @see GuiGraphics#renderTooltip(Font, List, int, int, ClientTooltipPositioner, Identifier)
+     * @see GuiGraphicsExtractor#renderTooltip(Font, List, int, int, ClientTooltipPositioner, Identifier)
      */
-    public static void renderTooltipComponents(GuiGraphics guiGraphics, int posX, int posY, List<? extends ClientTooltipComponent> tooltipComponents, @Nullable Identifier tooltipStyle) {
+    public static void renderTooltipComponents(GuiGraphicsExtractor guiGraphics, int posX, int posY, List<? extends ClientTooltipComponent> tooltipComponents, @Nullable Identifier tooltipStyle) {
 
         Font font = Minecraft.getInstance().font;
 
@@ -287,7 +287,7 @@ public final class TooltipRenderHelper {
         int originPosY = posY - 12;
 
         guiGraphics.pose().pushMatrix();
-        TooltipRenderUtil.renderTooltipBackground(guiGraphics,
+        TooltipRenderUtil.extractTooltipBackground(guiGraphics,
                 originPosX,
                 originPosY,
                 lineWidth,
@@ -297,14 +297,14 @@ public final class TooltipRenderHelper {
         MutableInt currentPosY = new MutableInt(originPosY);
         for (int i = 0; i < tooltipComponents.size(); ++i) {
             ClientTooltipComponent component = tooltipComponents.get(i);
-            component.renderText(guiGraphics, font, originPosX, currentPosY.intValue());
+            component.extractText(guiGraphics, font, originPosX, currentPosY.intValue());
             currentPosY.add(component.getHeight(font) + (i == 0 ? 2 : 0));
         }
 
         currentPosY.setValue(originPosY);
         for (int i = 0; i < tooltipComponents.size(); ++i) {
             ClientTooltipComponent component = tooltipComponents.get(i);
-            component.renderImage(font, originPosX, currentPosY.intValue(), lineWidth, lineHeight, guiGraphics);
+            component.extractImage(font, originPosX, currentPosY.intValue(), lineWidth, lineHeight, guiGraphics);
             currentPosY.add(component.getHeight(font) + (i == 0 ? 2 : 0));
         }
 
@@ -322,7 +322,7 @@ public final class TooltipRenderHelper {
      * @param positioner  the positioner for placing the tooltip in relation to provided mouse coordinates
      * @return <code>true</code> to prevent the tooltip from rendering, allows for fully taking over rendering
      */
-    public static boolean onRenderTooltip(GuiGraphics guiGraphics, Font font, int mouseX, int mouseY, List<ClientTooltipComponent> components, ClientTooltipPositioner positioner) {
+    public static boolean onRenderTooltip(GuiGraphicsExtractor guiGraphics, Font font, int mouseX, int mouseY, List<ClientTooltipComponent> components, ClientTooltipPositioner positioner) {
         return ClientProxyImpl.get().onRenderTooltip(guiGraphics, font, mouseX, mouseY, components, positioner);
     }
 }

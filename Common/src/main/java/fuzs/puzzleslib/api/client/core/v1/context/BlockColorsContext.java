@@ -1,8 +1,11 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
-import net.minecraft.client.color.block.BlockColor;
+import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.world.level.block.Block;
-import org.jspecify.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Register block color providers, like tint getters for leaves or grass.
@@ -10,19 +13,21 @@ import org.jspecify.annotations.Nullable;
 public interface BlockColorsContext {
 
     /**
-     * Register a new block color provider.
+     * Register a new block tint source.
      *
      * @param block      the block
-     * @param blockColor the {@link BlockColor}
+     * @param blockColor the {@link BlockTintSource}
      */
-    void registerBlockColor(Block block, BlockColor blockColor);
+    default void registerBlockColor(Block block, BlockTintSource blockColor) {
+        Objects.requireNonNull(blockColor, "block color is null");
+        this.registerBlockColor(block, Collections.singletonList(blockColor));
+    }
 
     /**
-     * Provides access to already registered block color providers.
-     * <p>
-     * Might be incomplete during registration, but is good to use as long as it doesn't try to retrieve itself.
+     * Register a new block tint source.
      *
-     * @return the registered {@link BlockColor}
+     * @param block       the block
+     * @param blockColors the {@link BlockTintSource BlockTintSources}
      */
-    @Nullable BlockColor getBlockColor(Block block);
+    void registerBlockColor(Block block, List<BlockTintSource> blockColors);
 }

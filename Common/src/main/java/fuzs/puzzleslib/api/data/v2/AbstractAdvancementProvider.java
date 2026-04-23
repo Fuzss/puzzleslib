@@ -14,7 +14,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.advancements.AdvancementSubProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
@@ -37,19 +37,19 @@ public abstract class AbstractAdvancementProvider implements DataProvider, Advan
         this.registries = registries;
     }
 
-    protected static DisplayInfo display(ItemStack itemStack, Identifier identifier) {
+    protected static DisplayInfo display(ItemStackTemplate itemStack, Identifier identifier) {
         return display(itemStack, identifier, AdvancementType.TASK);
     }
 
-    protected static DisplayInfo display(ItemStack itemStack, Identifier identifier, AdvancementType advancementType) {
+    protected static DisplayInfo display(ItemStackTemplate itemStack, Identifier identifier, AdvancementType advancementType) {
         return display(itemStack, identifier, null, advancementType, false);
     }
 
-    protected static DisplayInfo display(ItemStack itemStack, Identifier identifier, @Nullable Identifier background, AdvancementType advancementType, boolean hidden) {
+    protected static DisplayInfo display(ItemStackTemplate itemStack, Identifier identifier, @Nullable Identifier background, AdvancementType advancementType, boolean hidden) {
         return display(itemStack, identifier, background, advancementType, true, true, hidden);
     }
 
-    protected static DisplayInfo display(ItemStack itemStack, Identifier identifier, @Nullable Identifier background, AdvancementType advancementType, boolean showToast, boolean announceChat, boolean hidden) {
+    protected static DisplayInfo display(ItemStackTemplate itemStack, Identifier identifier, @Nullable Identifier background, AdvancementType advancementType, boolean showToast, boolean announceChat, boolean hidden) {
         AdvancementToken advancementToken = new AdvancementToken(identifier);
         return new DisplayInfo(itemStack,
                 advancementToken.title(),

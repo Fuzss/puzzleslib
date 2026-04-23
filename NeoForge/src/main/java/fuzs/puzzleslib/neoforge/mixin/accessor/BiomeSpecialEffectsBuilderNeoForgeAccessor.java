@@ -9,7 +9,6 @@ import java.util.Optional;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 @Mixin(BiomeSpecialEffects.Builder.class)
 public interface BiomeSpecialEffectsBuilderNeoForgeAccessor {
-
     @Accessor("foliageColorOverride")
     void puzzleslib$setFoliageColorOverride(Optional<Integer> foliageColorOverride);
 

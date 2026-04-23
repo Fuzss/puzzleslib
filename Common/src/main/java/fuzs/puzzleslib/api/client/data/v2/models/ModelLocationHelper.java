@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.client.data.v2.models;
 
 import net.minecraft.client.data.models.model.ModelLocationUtils;
 import net.minecraft.client.data.models.model.TextureMapping;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
@@ -51,7 +52,7 @@ public final class ModelLocationHelper {
 
     /**
      * @param identifier the block location
-     * @param suffix           the block model suffix
+     * @param suffix     the block model suffix
      * @return the block model location, prefixed with {@link #BLOCK_PATH}
      */
     public static Identifier getBlockModel(Identifier identifier, String suffix) {
@@ -62,7 +63,7 @@ public final class ModelLocationHelper {
      * @param block the block
      * @return the default block texture location, prefixed with {@link #BLOCK_PATH}
      */
-    public static Identifier getBlockTexture(Block block) {
+    public static Material getBlockTexture(Block block) {
         return TextureMapping.getBlockTexture(block);
     }
 
@@ -71,7 +72,7 @@ public final class ModelLocationHelper {
      * @param suffix the block texture suffix
      * @return the block texture location, prefixed with {@link #BLOCK_PATH}
      */
-    public static Identifier getBlockTexture(Block block, String suffix) {
+    public static Material getBlockTexture(Block block, String suffix) {
         return TextureMapping.getBlockTexture(block, suffix);
     }
 
@@ -85,7 +86,7 @@ public final class ModelLocationHelper {
 
     /**
      * @param identifier the block location
-     * @param suffix           the block texture suffix
+     * @param suffix     the block texture suffix
      * @return the block texture location, prefixed with {@link #BLOCK_PATH}
      */
     public static Identifier getBlockTexture(Identifier identifier, String suffix) {
@@ -144,7 +145,7 @@ public final class ModelLocationHelper {
 
     /**
      * @param identifier the item location
-     * @param suffix           the item model suffix
+     * @param suffix     the item model suffix
      * @return the item model location, prefixed with {@link #ITEM_PATH}
      */
     public static Identifier getItemModel(Identifier identifier, String suffix) {
@@ -155,7 +156,7 @@ public final class ModelLocationHelper {
      * @param item the item
      * @return the default item texture location, prefixed with {@link #ITEM_PATH}
      */
-    public static Identifier getItemTexture(Item item) {
+    public static Material getItemTexture(Item item) {
         return TextureMapping.getItemTexture(item);
     }
 
@@ -164,7 +165,7 @@ public final class ModelLocationHelper {
      * @param suffix the item texture suffix
      * @return the item texture location, prefixed with {@link #ITEM_PATH}
      */
-    public static Identifier getItemTexture(Item item, String suffix) {
+    public static Material getItemTexture(Item item, String suffix) {
         return TextureMapping.getItemTexture(item, suffix);
     }
 
@@ -178,7 +179,7 @@ public final class ModelLocationHelper {
 
     /**
      * @param identifier the item location
-     * @param suffix           the item texture suffix
+     * @param suffix     the item texture suffix
      * @return the item texture location, prefixed with {@link #ITEM_PATH}
      */
     public static Identifier getItemTexture(Identifier identifier, String suffix) {

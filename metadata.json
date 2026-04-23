@@ -1,9 +1,10 @@
 {
+    "minecraft": "26.1.2",
     "mod": {
         "id": "puzzleslib",
         "group": "fuzs.puzzleslib",
         "name": "Puzzles Lib",
-        "version": "21.11.12",
+        "version": "26.1.0",
         "authors": [
             "Fuzs"
         ],
@@ -34,7 +35,7 @@
         },
         {
             "name": "github",
-            "slug": "puzzleslib"
+            "slug": "puzzles-lib"
         },
         {
             "name": "modrinth",

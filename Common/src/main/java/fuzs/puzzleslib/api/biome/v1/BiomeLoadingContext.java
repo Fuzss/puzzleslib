@@ -16,8 +16,10 @@ import java.util.Optional;
 /**
  * Context given to a biome selector for deciding whether it applies to a biome or not.
  *
- * <p>Mostly copied from Fabric API's Biome API, specifically <code>net.fabricmc.fabric.api.biome.v1.BiomeModificationContext</code>
- * to allow for use in common project and to allow reimplementation on Forge using Forge's native biome modification system.
+ * <p>Mostly copied from Fabric API's Biome API, specifically
+ * <code>net.fabricmc.fabric.api.biome.v1.BiomeModificationContext</code>
+ * to allow for use in common project and to allow reimplementation on Forge using Forge's native biome modification
+ * system.
  *
  * <p>Copyright (c) FabricMC
  * <p>SPDX-License-Identifier: Apache-2.0
@@ -44,10 +46,11 @@ public interface BiomeLoadingContext {
      */
     default boolean hasFeature(ResourceKey<ConfiguredFeature<?, ?>> key) {
         List<HolderSet<PlacedFeature>> featureSteps = this.getBiome().getGenerationSettings().features();
-
         for (HolderSet<PlacedFeature> featureSuppliers : featureSteps) {
             for (Holder<PlacedFeature> featureSupplier : featureSuppliers) {
-                if (featureSupplier.value().getFeatures().anyMatch(cf -> this.getFeatureKey(cf).orElse(null) == key)) {
+                if (featureSupplier.value().getFeatures().anyMatch((Holder<ConfiguredFeature<?, ?>> holder) -> {
+                    return holder.is(key);
+                })) {
                     return true;
                 }
             }
@@ -74,35 +77,34 @@ public interface BiomeLoadingContext {
     }
 
     /**
-     * Tries to retrieve the registry key for the given configured feature, which should be from this biomes
-     * current feature list. May be empty if the configured feature is not registered, or does not come
-     * from this biomes feature list.
+     * Tries to retrieve the registry key for the given configured feature, which should be from this biomes current
+     * feature list. May be empty if the configured feature is not registered, or does not come from this biomes feature
+     * list.
      */
     Optional<ResourceKey<ConfiguredFeature<?, ?>>> getFeatureKey(ConfiguredFeature<?, ?> configuredFeature);
 
     /**
-     * Tries to retrieve the registry key for the given placed feature, which should be from this biomes
-     * current feature list. May be empty if the placed feature is not registered, or does not come
-     * from this biomes feature list.
+     * Tries to retrieve the registry key for the given placed feature, which should be from this biomes current feature
+     * list. May be empty if the placed feature is not registered, or does not come from this biomes feature list.
      */
     Optional<ResourceKey<PlacedFeature>> getPlacedFeatureKey(PlacedFeature placedFeature);
 
     /**
-     * Returns true if the configured structure with the given key can start in this biome in any chunk generator
-     * used by the current world-save.
+     * Returns true if the configured structure with the given key can start in this biome in any chunk generator used
+     * by the current world-save.
      */
     boolean validForStructure(ResourceKey<Structure> key);
 
     /**
-     * Tries to retrieve the registry key for the given configured feature, which should be from this biomes
-     * current structure list. May be empty if the configured feature is not registered, or does not come
-     * from this biomes feature list.
+     * Tries to retrieve the registry key for the given configured feature, which should be from this biomes current
+     * structure list. May be empty if the configured feature is not registered, or does not come from this biomes
+     * feature list.
      */
     Optional<ResourceKey<Structure>> getStructureKey(Structure structureFeature);
 
     /**
-     * Tries to determine whether this biome generates in a specific dimension, based on the {@link net.minecraft.world.level.levelgen.WorldGenSettings}
-     * used by the current world-save.
+     * Tries to determine whether this biome generates in a specific dimension, based on the
+     * {@link net.minecraft.world.level.levelgen.WorldGenSettings} used by the current world-save.
      *
      * <p>If no dimension options exist for the given dimension key, <code>false</code> is returned.
      */

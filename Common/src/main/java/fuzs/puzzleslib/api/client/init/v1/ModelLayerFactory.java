@@ -2,9 +2,9 @@ package fuzs.puzzleslib.api.client.init.v1;
 
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.renderer.blockentity.HangingSignRenderer;
 import net.minecraft.client.renderer.entity.ArmorModelSet;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.HangingSignBlock;
 import net.minecraft.world.level.block.state.properties.WoodType;
 
 /**
@@ -37,6 +37,8 @@ public interface ModelLayerFactory {
      * @param path  the entity name
      * @param layer the layer name
      * @return the new model layer location
+     *
+     * @see ModelLayers#register(String, String)
      */
     default ModelLayerLocation registerModelLayer(String path, String layer) {
         ModelLayerLocation modelLayerLocation = new ModelLayerLocation(Identifier.fromNamespaceAndPath(this.modId(),
@@ -53,6 +55,8 @@ public interface ModelLayerFactory {
      *
      * @param path the entity name
      * @return the new model layer location
+     *
+     * @see ModelLayers#register(String)
      */
     default ModelLayerLocation registerModelLayer(String path) {
         return this.registerModelLayer(path, "main");
@@ -63,6 +67,8 @@ public interface ModelLayerFactory {
      *
      * @param path the entity name
      * @return the new model layer location
+     *
+     * @see ModelLayers#registerArmorSet(String)
      */
     default ArmorModelSet<ModelLayerLocation> registerArmorSet(String path) {
         return new ArmorModelSet<>(this.registerModelLayer(path, "helmet"),
@@ -76,6 +82,8 @@ public interface ModelLayerFactory {
      *
      * @param woodType the wood type
      * @return the new model layer location
+     *
+     * @see ModelLayers#createStandingSignModelName(WoodType)
      */
     default ModelLayerLocation createStandingSignModelName(WoodType woodType) {
         return this.registerModelLayer("sign/standing/" + woodType.name());
@@ -86,6 +94,8 @@ public interface ModelLayerFactory {
      *
      * @param woodType the wood type
      * @return the new model layer location
+     *
+     * @see ModelLayers#createWallSignModelName(WoodType)
      */
     default ModelLayerLocation createWallSignModelName(WoodType woodType) {
         return this.registerModelLayer("sign/wall/" + woodType.name());
@@ -97,8 +107,10 @@ public interface ModelLayerFactory {
      * @param woodType       the wood type
      * @param attachmentType the attachment type
      * @return the new model layer location
+     *
+     * @see ModelLayers#createHangingSignModelName(WoodType, HangingSignBlock.Attachment)
      */
-    default ModelLayerLocation createHangingSignModelName(WoodType woodType, HangingSignRenderer.AttachmentType attachmentType) {
+    default ModelLayerLocation createHangingSignModelName(WoodType woodType, HangingSignBlock.Attachment attachmentType) {
         return this.registerModelLayer("hanging_sign/" + woodType.name() + "/" + attachmentType.getSerializedName());
     }
 }

@@ -20,18 +20,17 @@ public final class ResourcePackReloadListenersContextFabricImpl implements Resou
             .put(SPLASH_TEXTS, ResourceReloaderKeys.Client.SPLASH_TEXTS)
             .put(ATLASES, ResourceReloaderKeys.Client.ATLAS)
             .put(FONTS, ResourceReloaderKeys.Client.FONTS)
-            .put(GRASS_COLORMAP, ResourceReloaderKeys.Client.GRASS_COLORMAP)
-            .put(FOLIAGE_COLORMAP, ResourceReloaderKeys.Client.FOLIAGE_COLORMAP)
-            .put(DRY_FOLIAGE_COLORMAP, ResourceReloaderKeys.Client.DRY_FOLIAGE_COLORMAP)
+            .put(GRASS_COLOR, ResourceReloaderKeys.Client.GRASS_COLOR)
+            .put(FOLIAGE_COLOR, ResourceReloaderKeys.Client.FOLIAGE_COLOR)
+            .put(DRY_FOLIAGE_COLOR, ResourceReloaderKeys.Client.DRY_FOLIAGE_COLOR)
             .put(MODELS, ResourceReloaderKeys.Client.MODELS)
-            .put(EQUIPMENT_ASSETS, ResourceReloaderKeys.Client.EQUIPMENT_MODELS)
-            .put(BLOCK_RENDERER, ResourceReloaderKeys.Client.BLOCK_RENDER_MANAGER)
-            .put(ENTITY_RENDERER, ResourceReloaderKeys.Client.ENTITY_RENDERERS)
-            .put(BLOCK_ENTITY_RENDERER, ResourceReloaderKeys.Client.BLOCK_ENTITY_RENDERERS)
+            .put(EQUIPMENT_ASSETS, ResourceReloaderKeys.Client.EQUIPMENT_ASSETS)
+            .put(ENTITY_RENDERER, ResourceReloaderKeys.Client.ENTITY_RENDER_DISPATCHER)
+            .put(BLOCK_ENTITY_RENDERER, ResourceReloaderKeys.Client.BLOCK_ENTITY_RENDER_DISPATCHER)
             .put(PARTICLE_RESOURCES, ResourceReloaderKeys.Client.PARTICLES)
-            .put(WAYPOINT_STYLES, ResourceReloaderKeys.Client.WAYPOINT_STYLE_ASSETS)
+            .put(WAYPOINT_STYLES, ResourceReloaderKeys.Client.WAYPOINT_STYLE)
             .put(LEVEL_RENDERER, ResourceReloaderKeys.BEFORE_VANILLA)
-            .put(CLOUD_RENDERER, ResourceReloaderKeys.Client.CLOUD_CELLS)
+            .put(CLOUD_RENDERER, ResourceReloaderKeys.Client.CLOUD_RENDERER)
             .put(GPU_WARNLIST, ResourceReloaderKeys.BEFORE_VANILLA)
             .put(REGIONAL_COMPLIANCES, ResourceReloaderKeys.BEFORE_VANILLA)
             .build();
@@ -40,7 +39,7 @@ public final class ResourcePackReloadListenersContextFabricImpl implements Resou
     public void registerReloadListener(Identifier identifier, PreparableReloadListener reloadListener) {
         Objects.requireNonNull(identifier, "id is null");
         Objects.requireNonNull(reloadListener, "reload listener is null");
-        ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(identifier, reloadListener);
+        ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(identifier, reloadListener);
     }
 
     @Override
@@ -49,13 +48,13 @@ public final class ResourcePackReloadListenersContextFabricImpl implements Resou
         Objects.requireNonNull(otherResourceLocation, "other identifier is null");
         Objects.requireNonNull(reloadListener, "reload listener is null");
         if (VANILLA_CLIENT_RELOAD_LISTENERS.containsKey(identifier)) {
-            ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(otherResourceLocation, reloadListener);
+            ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(otherResourceLocation, reloadListener);
             ResourceLoader.get(PackType.CLIENT_RESOURCES)
-                    .addReloaderOrdering(VANILLA_CLIENT_RELOAD_LISTENERS.get(identifier), otherResourceLocation);
+                    .addListenerOrdering(VANILLA_CLIENT_RELOAD_LISTENERS.get(identifier), otherResourceLocation);
         } else if (VANILLA_CLIENT_RELOAD_LISTENERS.containsKey(otherResourceLocation)) {
-            ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(identifier, reloadListener);
+            ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(identifier, reloadListener);
             ResourceLoader.get(PackType.CLIENT_RESOURCES)
-                    .addReloaderOrdering(identifier, VANILLA_CLIENT_RELOAD_LISTENERS.get(otherResourceLocation));
+                    .addListenerOrdering(identifier, VANILLA_CLIENT_RELOAD_LISTENERS.get(otherResourceLocation));
         } else {
             throw new RuntimeException("Unknown reload listeners: " + identifier + ", " + otherResourceLocation);
         }

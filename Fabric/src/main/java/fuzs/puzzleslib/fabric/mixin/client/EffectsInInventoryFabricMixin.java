@@ -10,7 +10,7 @@ import fuzs.puzzleslib.api.event.v1.data.MutableBoolean;
 import fuzs.puzzleslib.api.event.v1.data.MutableInt;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import fuzs.puzzleslib.impl.event.CopyOnWriteForwardingList;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.EffectsInInventory;
 import net.minecraft.network.chat.Component;
@@ -41,8 +41,8 @@ abstract class EffectsInInventoryFabricMixin {
 
     @WrapOperation(method = "render",
                    at = @At(value = "INVOKE",
-                            target = "Lnet/minecraft/client/gui/screens/inventory/EffectsInInventory;renderEffects(Lnet/minecraft/client/gui/GuiGraphics;Ljava/util/Collection;IIIII)V"))
-    public void render(EffectsInInventory effectsInInventory, GuiGraphics guiGraphics, Collection<MobEffectInstance> collection, int posX, int posY, int mouseX, int mouseY, int maxWidgetWidth, Operation<Void> operation) {
+                            target = "Lnet/minecraft/client/gui/screens/inventory/EffectsInInventory;renderEffects(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Ljava/util/Collection;IIIII)V"))
+    public void render(EffectsInInventory effectsInInventory, GuiGraphicsExtractor guiGraphics, Collection<MobEffectInstance> collection, int posX, int posY, int mouseX, int mouseY, int maxWidgetWidth, Operation<Void> operation) {
         int maxWidth = this.screen.width - posX;
         boolean smallWidgets = maxWidgetWidth == 32;
         MutableBoolean smallWidgetsValue = MutableBoolean.fromValue(smallWidgets);
@@ -89,7 +89,7 @@ abstract class EffectsInInventoryFabricMixin {
 
     @ModifyArg(method = "renderText",
                at = @At(value = "INVOKE",
-                        target = "Lnet/minecraft/client/gui/GuiGraphics;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;II)V"))
+                        target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;II)V"))
     private List<Component> renderText(List<Component> tooltipLines, @Cancellable CallbackInfo callback, @Share(
             "mustClipText") LocalBooleanRef originalMustClipText) {
         if (this.puzzleslib$hoveredEffect != null) {

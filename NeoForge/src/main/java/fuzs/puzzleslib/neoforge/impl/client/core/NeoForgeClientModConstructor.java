@@ -6,7 +6,6 @@ import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.impl.client.core.context.*;
 import fuzs.puzzleslib.neoforge.impl.core.context.AbstractNeoForgeContext;
 import net.minecraft.server.packs.PackType;
-import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
@@ -22,13 +21,6 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
             modConstructor.onConstructMod();
             eventBus.addListener((final FMLClientSetupEvent event) -> {
                 event.enqueueWork(modConstructor::onClientSetup);
-            });
-            // let this run after other mods, some of our mods are likely going to reference what other mods have registered
-            eventBus.addListener(EventPriority.LOW, (final FMLClientSetupEvent event) -> {
-                event.enqueueWork(() -> {
-                    modConstructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextNeoForgeImpl());
-                    modConstructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextNeoForgeImpl());
-                });
             });
             eventBus.addListener((final RegisterItemModelsEvent event) -> {
                 AbstractNeoForgeContext.computeIfAbsent(itemModelsContext,
@@ -89,8 +81,8 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
             eventBus.addListener((final RegisterEntitySpectatorShadersEvent event) -> {
                 modConstructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShadersContextNeoForgeImpl(event));
             });
-            eventBus.addListener((final RegisterSpecialBlockModelRendererEvent event) -> {
-                modConstructor.onRegisterSpecialBlockModelRenderers(new SpecialBlockModelRenderersContextNeoForgeImpl(
+            eventBus.addListener((final RegisterBlockModelsEvent event) -> {
+                modConstructor.onRegisterBuiltInBlockModels(new BuiltInBlockModelsContextNeoForgeImpl(
                         event));
             });
             eventBus.addListener((final EntityRenderersEvent.CreateSkullModels event) -> {
@@ -99,8 +91,8 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
             eventBus.addListener((final RegisterKeyMappingsEvent event) -> {
                 modConstructor.onRegisterKeyMappings(new KeyMappingsContextNeoForgeImpl(event));
             });
-            eventBus.addListener((final RegisterColorHandlersEvent.Block event) -> {
-                modConstructor.onRegisterBlockColorProviders(new BlockBlockColorsContextNeoForgeImpl(event));
+            eventBus.addListener((final RegisterColorHandlersEvent.BlockTintSources event) -> {
+                modConstructor.onRegisterBlockColorProviders(new BlockColorsContextNeoForgeImpl(event));
             });
             eventBus.addListener((final AddPackFindersEvent event) -> {
                 if (event.getPackType() == PackType.CLIENT_RESOURCES) {

@@ -87,7 +87,7 @@ public final class CommandOverrides {
         });
         ServerEntityLevelEvents.LOAD.register((Entity entity, ServerLevel serverLevel, boolean isFreshEntity) -> {
             // idea from Serilum's Starter Kit mod
-            if (isFreshEntity && entity instanceof ServerPlayer serverPlayer && !serverPlayer.getTags()
+            if (isFreshEntity && entity instanceof ServerPlayer serverPlayer && !serverPlayer.entityTags()
                     .contains(KEY_PLAYER_JOINED_WORLD)) {
                 serverPlayer.addTag(KEY_PLAYER_JOINED_WORLD);
                 // do not check if commands are enabled for the world, the option is always off on dedicated servers

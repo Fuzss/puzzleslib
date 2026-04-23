@@ -28,7 +28,7 @@ public final class ItemModelsContextFabricImpl implements ItemModelsContext {
     }
 
     @Override
-    public void registerSpecialModelRenderer(Identifier identifier, MapCodec<? extends SpecialModelRenderer.Unbaked> codec) {
+    public void registerSpecialModelRenderer(Identifier identifier, MapCodec<? extends SpecialModelRenderer.Unbaked<?>> codec) {
         Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(codec, "codec is null");
         SpecialModelRenderers.ID_MAPPER.put(identifier, codec);

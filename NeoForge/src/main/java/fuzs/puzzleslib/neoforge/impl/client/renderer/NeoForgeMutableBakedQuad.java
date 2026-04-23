@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.client.renderer;
 
 import fuzs.puzzleslib.api.client.renderer.v1.model.MutableBakedQuad;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.neoforged.neoforge.client.model.quad.BakedColors;
 import net.neoforged.neoforge.client.model.quad.BakedNormals;
 import org.joml.Vector3fc;
@@ -30,13 +30,11 @@ public class NeoForgeMutableBakedQuad extends MutableBakedQuad {
     protected Integer packedColor2;
     @Nullable
     protected Integer packedColor3;
-    protected boolean hasAmbientOcclusion;
 
     public NeoForgeMutableBakedQuad(BakedQuad bakedQuad) {
         super(bakedQuad);
         this.bakedNormals = bakedQuad.bakedNormals();
         this.bakedColors = bakedQuad.bakedColors();
-        this.hasAmbientOcclusion = bakedQuad.hasAmbientOcclusion();
     }
 
     public BakedNormals bakedNormals() {
@@ -63,10 +61,6 @@ public class NeoForgeMutableBakedQuad extends MutableBakedQuad {
         } else {
             return this.bakedColors;
         }
-    }
-
-    public boolean hasAmbientOcclusion() {
-        return this.hasAmbientOcclusion;
     }
 
     @Override
@@ -160,12 +154,6 @@ public class NeoForgeMutableBakedQuad extends MutableBakedQuad {
     }
 
     @Override
-    public MutableBakedQuad hasAmbientOcclusion(boolean hasAmbientOcclusion) {
-        this.hasAmbientOcclusion = hasAmbientOcclusion;
-        return super.hasAmbientOcclusion(hasAmbientOcclusion);
-    }
-
-    @Override
     public BakedQuad toImmutable() {
         return new BakedQuad(this.position0(),
                 this.position1(),
@@ -175,13 +163,9 @@ public class NeoForgeMutableBakedQuad extends MutableBakedQuad {
                 this.packedUV1(),
                 this.packedUV2(),
                 this.packedUV3(),
-                this.tintIndex(),
                 this.direction(),
-                this.sprite(),
-                this.shade(),
-                this.lightEmission(),
+                this.materialInfo(),
                 this.bakedNormals(),
-                this.bakedColors(),
-                this.hasAmbientOcclusion());
+                this.bakedColors());
     }
 }

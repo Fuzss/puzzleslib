@@ -3,7 +3,7 @@ package fuzs.puzzleslib.fabric.api.client.event.v1;
 import fuzs.puzzleslib.api.client.event.v1.gui.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 
@@ -11,7 +11,7 @@ public final class FabricGuiEvents {
     /**
      * Called for {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen AbstractContainerScreens},
      * after the screen foreground is drawn (like text labels) via
-     * {@link AbstractContainerScreen#renderContents(GuiGraphics, int, int, float)}.
+     * {@link AbstractContainerScreen#renderContents(GuiGraphicsExtractor, int, int, float)}.
      */
     public static final Event<RenderContainerScreenContentsCallback> RENDER_CONTAINER_SCREEN_CONTENTS = FabricEventFactory.create(
             RenderContainerScreenContentsCallback.class);

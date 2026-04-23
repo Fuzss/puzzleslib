@@ -7,13 +7,11 @@ import net.minecraft.client.renderer.CloudRenderer;
 import net.minecraft.client.renderer.GpuWarnlistManager;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.ShaderManager;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.resources.*;
 import net.minecraft.client.resources.language.LanguageManager;
-import net.minecraft.client.resources.model.AtlasManager;
 import net.minecraft.client.resources.model.EquipmentAssetManager;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.sounds.SoundManager;
@@ -47,7 +45,7 @@ public interface ResourcePackReloadListenersContext {
      */
     Identifier SPLASH_TEXTS = Identifier.withDefaultNamespace("splash_texts");
     /**
-     * The {@link AtlasManager} reload listener.
+     * The {@link net.minecraft.client.resources.model.sprite.AtlasManager} reload listener.
      */
     Identifier ATLASES = Identifier.withDefaultNamespace("atlases");
     /**
@@ -57,15 +55,15 @@ public interface ResourcePackReloadListenersContext {
     /**
      * The {@link GrassColorReloadListener} reload listener.
      */
-    Identifier GRASS_COLORMAP = Identifier.withDefaultNamespace("grass_colormap");
+    Identifier GRASS_COLOR = Identifier.withDefaultNamespace("grass_color");
     /**
      * The {@link FoliageColorReloadListener} reload listener.
      */
-    Identifier FOLIAGE_COLORMAP = Identifier.withDefaultNamespace("foliage_colormap");
+    Identifier FOLIAGE_COLOR = Identifier.withDefaultNamespace("foliage_color");
     /**
      * The {@link DryFoliageColorReloadListener} reload listener.
      */
-    Identifier DRY_FOLIAGE_COLORMAP = Identifier.withDefaultNamespace("dry_foliage_colormap");
+    Identifier DRY_FOLIAGE_COLOR = Identifier.withDefaultNamespace("dry_foliage_color");
     /**
      * The {@link ModelManager} reload listener.
      */
@@ -74,10 +72,6 @@ public interface ResourcePackReloadListenersContext {
      * The {@link EquipmentAssetManager} reload listener.
      */
     Identifier EQUIPMENT_ASSETS = Identifier.withDefaultNamespace("equipment_assets");
-    /**
-     * The {@link BlockRenderDispatcher} reload listener.
-     */
-    Identifier BLOCK_RENDERER = Identifier.withDefaultNamespace("block_renderer");
     /**
      * The {@link EntityRenderDispatcher} reload listener.
      */
@@ -114,26 +108,26 @@ public interface ResourcePackReloadListenersContext {
     /**
      * Register a {@link PreparableReloadListener}.
      *
-     * @param identifier the reload listener identifier
-     * @param reloadListener   the reload listener to add
+     * @param identifier     the reload listener identifier
+     * @param reloadListener the reload listener to add
      */
     void registerReloadListener(Identifier identifier, PreparableReloadListener reloadListener);
 
     /**
      * Register a {@link PreparableReloadListener}.
      *
-     * @param identifier the reload listener identifier
-     * @param otherIdentifier  the other reload listener identifier, either for the new listener or for the
-     *                         existing vanilla listener
-     * @param reloadListener   the reload listener to add
+     * @param identifier      the reload listener identifier
+     * @param otherIdentifier the other reload listener identifier, either for the new listener or for the existing
+     *                        vanilla listener
+     * @param reloadListener  the reload listener to add
      */
     void registerReloadListener(Identifier identifier, Identifier otherIdentifier, PreparableReloadListener reloadListener);
 
     /**
      * Register a {@link ResourceManagerReloadListener}.
      *
-     * @param identifier the reload listener identifier
-     * @param reloadListener   the reload listener to add
+     * @param identifier     the reload listener identifier
+     * @param reloadListener the reload listener to add
      */
     default void registerReloadListener(Identifier identifier, ResourceManagerReloadListener reloadListener) {
         this.registerReloadListener(identifier, (PreparableReloadListener) reloadListener);
@@ -142,11 +136,11 @@ public interface ResourcePackReloadListenersContext {
     /**
      * Register a {@link ResourceManagerReloadListener}.
      *
-     * @param identifier the reload listener identifier, either for the new listener or for the existing
-     *                         vanilla listener
-     * @param otherIdentifier  the other reload listener identifier, either for the new listener or for the
-     *                         existing vanilla listener
-     * @param reloadListener   the reload listener to add
+     * @param identifier      the reload listener identifier, either for the new listener or for the existing vanilla
+     *                        listener
+     * @param otherIdentifier the other reload listener identifier, either for the new listener or for the existing
+     *                        vanilla listener
+     * @param reloadListener  the reload listener to add
      */
     default void registerReloadListener(Identifier identifier, Identifier otherIdentifier, ResourceManagerReloadListener reloadListener) {
         this.registerReloadListener(identifier, otherIdentifier, (PreparableReloadListener) reloadListener);
@@ -155,9 +149,9 @@ public interface ResourcePackReloadListenersContext {
     /**
      * Register a {@link SimplePreparableReloadListener}.
      *
-     * @param identifier the reload listener identifier, either for the new listener or for the existing
-     *                         vanilla listener
-     * @param reloadListener   the reload listener to add
+     * @param identifier     the reload listener identifier, either for the new listener or for the existing vanilla
+     *                       listener
+     * @param reloadListener the reload listener to add
      */
     default <T> void registerReloadListener(Identifier identifier, SimplePreparableReloadListener<T> reloadListener) {
         this.registerReloadListener(identifier, (PreparableReloadListener) reloadListener);
@@ -166,11 +160,11 @@ public interface ResourcePackReloadListenersContext {
     /**
      * Register a {@link SimplePreparableReloadListener}.
      *
-     * @param identifier the reload listener identifier, either for the new listener or for the existing
-     *                         vanilla listener
-     * @param otherIdentifier  the other reload listener identifier, either for the new listener or for the
-     *                         existing vanilla listener
-     * @param reloadListener   the reload listener to add
+     * @param identifier      the reload listener identifier, either for the new listener or for the existing vanilla
+     *                        listener
+     * @param otherIdentifier the other reload listener identifier, either for the new listener or for the existing
+     *                        vanilla listener
+     * @param reloadListener  the reload listener to add
      */
     default <T> void registerReloadListener(Identifier identifier, Identifier otherIdentifier, SimplePreparableReloadListener<T> reloadListener) {
         this.registerReloadListener(identifier, otherIdentifier, (PreparableReloadListener) reloadListener);

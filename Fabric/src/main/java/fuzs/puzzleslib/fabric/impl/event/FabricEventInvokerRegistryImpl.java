@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.fabric.impl.event;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -20,36 +19,27 @@ import fuzs.puzzleslib.fabric.api.event.v1.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventInvokerRegistry;
 import fuzs.puzzleslib.fabric.impl.core.FabricProxy;
 import fuzs.puzzleslib.fabric.impl.init.FabricPotionBrewingBuilder;
-import fuzs.puzzleslib.impl.event.CopyOnWriteForwardingList;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
+import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTabOutput;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.*;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleEvents;
-import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableSource;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents;
-import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
-import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.core.component.DataComponentPatch;
-import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -66,9 +56,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.alchemy.PotionBrewing;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -85,54 +73,15 @@ import java.util.function.*;
 
 public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistry {
 
-    @SuppressWarnings("unchecked")
     public static void registerLoadingHandlers() {
         INSTANCE.register(LoadCompleteCallback.class, FabricLifecycleEvents.LOAD_COMPLETE);
         INSTANCE.register(RegistryEntryAddedCallback.class, FabricEventInvokerRegistryImpl::onRegistryEntryAdded);
-        INSTANCE.register(FinalizeItemComponentsCallback.class,
-                DefaultItemComponentEvents.MODIFY,
-                (FinalizeItemComponentsCallback callback) -> {
-                    return (DefaultItemComponentEvents.ModifyContext context) -> {
-                        for (Item item : BuiltInRegistries.ITEM) {
-                            callback.onFinalizeItemComponents(item,
-                                    (Function<DataComponentMap, DataComponentPatch> function) -> {
-                                        context.modify(item, (DataComponentMap.Builder builder) -> {
-                                            function.apply(builder.build())
-                                                    .entrySet()
-                                                    .forEach((Map.Entry<DataComponentType<?>, Optional<?>> entry) -> {
-                                                        builder.set((DataComponentType<Object>) entry.getKey(),
-                                                                entry.getValue().orElse(null));
-                                                    });
-                                        });
-                                    });
-                        }
-                    };
-                });
-        INSTANCE.register(ComputeItemAttributeModifiersCallback.class,
-                DefaultItemComponentEvents.MODIFY,
-                (ComputeItemAttributeModifiersCallback callback) -> {
-                    return (DefaultItemComponentEvents.ModifyContext context) -> {
-                        for (Item item : BuiltInRegistries.ITEM) {
-                            ItemAttributeModifiers itemAttributeModifiers = item.components()
-                                    .getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
-                            CopyOnWriteForwardingList<ItemAttributeModifiers.Entry> entries = new CopyOnWriteForwardingList<>(
-                                    itemAttributeModifiers.modifiers());
-                            callback.onComputeItemAttributeModifiers(item, entries);
-                            if (entries.delegate() != itemAttributeModifiers.modifiers()) {
-                                context.modify(item, (DataComponentMap.Builder builder) -> {
-                                    builder.set(DataComponents.ATTRIBUTE_MODIFIERS,
-                                            new ItemAttributeModifiers(ImmutableList.copyOf(entries)));
-                                });
-                            }
-                        }
-                    };
-                });
         INSTANCE.register(AddBlockEntityTypeBlocksCallback.class,
                 FabricLifecycleEvents.LOAD_COMPLETE,
                 (AddBlockEntityTypeBlocksCallback callback) -> {
                     return () -> {
                         callback.onAddBlockEntityTypeBlocks((BlockEntityType<?> blockEntityType, Block block) -> {
-                            blockEntityType.addSupportedBlock(block);
+                            blockEntityType.addValidBlock(block);
                         });
                     };
                 });
@@ -390,7 +339,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                     return callback::onPlayerLeave;
                 });
         INSTANCE.register(AfterChangeDimensionCallback.class,
-                ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD,
+                ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL,
                 (AfterChangeDimensionCallback callback) -> {
                     return callback::onAfterChangeDimension;
                 });
@@ -426,24 +375,26 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                     return callback::onEndServerTick;
                 });
         INSTANCE.register(ServerLevelTickEvents.Start.class,
-                net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.START_WORLD_TICK,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.START_LEVEL_TICK,
                 (ServerLevelTickEvents.Start callback) -> {
                     return (ServerLevel serverLevel) -> {
                         callback.onStartLevelTick(serverLevel.getServer(), serverLevel);
                     };
                 });
         INSTANCE.register(ServerLevelTickEvents.End.class,
-                net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_WORLD_TICK,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_LEVEL_TICK,
                 (ServerLevelTickEvents.End callback) -> {
                     return (ServerLevel serverLevel) -> {
                         callback.onEndLevelTick(serverLevel.getServer(), serverLevel);
                     };
                 });
-        INSTANCE.register(ServerLevelEvents.Load.class, ServerWorldEvents.LOAD, (ServerLevelEvents.Load callback) -> {
-            return callback::onLevelLoad;
-        });
+        INSTANCE.register(ServerLevelEvents.Load.class,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents.LOAD,
+                (ServerLevelEvents.Load callback) -> {
+                    return callback::onLevelLoad;
+                });
         INSTANCE.register(ServerLevelEvents.Unload.class,
-                ServerWorldEvents.UNLOAD,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents.UNLOAD,
                 (ServerLevelEvents.Unload callback) -> {
                     return callback::onLevelUnload;
                 });
@@ -490,7 +441,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(ContainerEvents.Close.class, FabricPlayerEvents.CONTAINER_CLOSE);
         INSTANCE.register(LookingAtEndermanCallback.class, FabricLivingEvents.LOOKING_AT_ENDERMAN);
         INSTANCE.register(RegisterPotionBrewingMixesCallback.class,
-                FabricBrewingRecipeRegistryBuilder.BUILD,
+                net.fabricmc.fabric.api.registry.FabricPotionBrewingBuilder.BUILD,
                 (RegisterPotionBrewingMixesCallback callback) -> {
                     return (PotionBrewing.Builder builder) -> {
                         callback.onRegisterPotionBrewingMixes(new FabricPotionBrewingBuilder(builder));
@@ -500,23 +451,23 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PickProjectileCallback.class, FabricLivingEvents.PICK_PROJECTILE);
         INSTANCE.register(EnderPearlTeleportCallback.class, FabricEntityEvents.ENDER_PEARL_TELEPORT);
         INSTANCE.register(BuildCreativeModeTabContentsCallback.class,
-                ItemGroupEvents.ModifyEntries.class,
+                CreativeModeTabEvents.ModifyOutput.class,
                 (BuildCreativeModeTabContentsCallback callback, @Nullable Object context) -> {
-                    return (FabricItemGroupEntries entries) -> {
+                    return (FabricCreativeModeTabOutput output) -> {
                         Objects.requireNonNull(context, "context is null");
                         ResourceKey<CreativeModeTab> resourceKey = (ResourceKey<CreativeModeTab>) context;
-                        CreativeModeTab creativeModeTab = entries.getContext()
+                        CreativeModeTab creativeModeTab = output.getContext()
                                 .holders()
                                 .lookupOrThrow(Registries.CREATIVE_MODE_TAB)
                                 .getOrThrow(resourceKey)
                                 .value();
-                        callback.onBuildCreativeModeTabContents(creativeModeTab, entries.getContext(), entries);
+                        callback.onBuildCreativeModeTabContents(creativeModeTab, output.getContext(), output);
                     };
                 },
-                (Object context, Consumer<Event<ItemGroupEvents.ModifyEntries>> applyToInvoker, Consumer<Event<ItemGroupEvents.ModifyEntries>> removeInvoker) -> {
+                (Object context, Consumer<Event<CreativeModeTabEvents.ModifyOutput>> applyToInvoker, Consumer<Event<CreativeModeTabEvents.ModifyOutput>> removeInvoker) -> {
                     Objects.requireNonNull(context, "context is null");
                     ResourceKey<CreativeModeTab> resourceKey = (ResourceKey<CreativeModeTab>) context;
-                    applyToInvoker.accept(ItemGroupEvents.modifyEntriesEvent(resourceKey));
+                    applyToInvoker.accept(CreativeModeTabEvents.modifyOutputEvent(resourceKey));
                 },
                 UnaryOperator.identity(),
                 false);

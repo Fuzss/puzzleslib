@@ -27,7 +27,7 @@ public record BiomeLoadingContextFabric(BiomeSelectionContext context) implement
 
     @Override
     public Holder<Biome> holder() {
-        return this.context.getBiomeRegistryEntry();
+        return this.context.getBiomeHolder();
     }
 
     @Override

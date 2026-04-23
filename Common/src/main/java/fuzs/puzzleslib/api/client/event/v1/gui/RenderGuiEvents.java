@@ -3,7 +3,7 @@ package fuzs.puzzleslib.api.client.event.v1.gui;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public final class RenderGuiEvents {
     public static final EventInvoker<Before> BEFORE = EventInvoker.lookup(Before.class);
@@ -17,7 +17,7 @@ public final class RenderGuiEvents {
     public interface Before {
 
         /**
-         * Called at the beginning of {@link Gui#render(GuiGraphics, DeltaTracker)}, before vanilla has drawn any gui
+         * Called at the beginning of {@link Gui#render(GuiGraphicsExtractor, DeltaTracker)}, before vanilla has drawn any gui
          * elements.
          * <p>
          * For rendering additional elements on the screen use
@@ -27,14 +27,14 @@ public final class RenderGuiEvents {
          * @param deltaTracker the delta tracker, get the partial tick via
          *                     {@link DeltaTracker#getGameTimeDeltaPartialTick(boolean)} by passing {@code false}
          */
-        void onBeforeRenderGui(GuiGraphics guiGraphics, DeltaTracker deltaTracker);
+        void onBeforeRenderGui(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker);
     }
 
     @FunctionalInterface
     public interface After {
 
         /**
-         * Called at the end of {@link Gui#render(GuiGraphics, DeltaTracker)}, after vanilla has drawn all gui
+         * Called at the end of {@link Gui#render(GuiGraphicsExtractor, DeltaTracker)}, after vanilla has drawn all gui
          * elements.
          * <p>
          * For rendering additional elements on the screen use
@@ -44,6 +44,6 @@ public final class RenderGuiEvents {
          * @param deltaTracker the delta tracker, get the partial tick via
          *                     {@link DeltaTracker#getGameTimeDeltaPartialTick(boolean)} by passing {@code false}
          */
-        void onAfterRenderGui(GuiGraphics guiGraphics, DeltaTracker deltaTracker);
+        void onAfterRenderGui(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker);
     }
 }

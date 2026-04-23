@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.client.event.v1.gui;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 
@@ -100,7 +100,7 @@ public final class ScreenEvents {
     public interface BeforeRender<T extends Screen> {
 
         /**
-         * Runs before a screen is rendered in {@link Screen#render(GuiGraphics, int, int, float)}.
+         * Runs before a screen is rendered in {@link Screen#render(GuiGraphicsExtractor, int, int, float)}.
          *
          * @param screen      the currently displayed screen
          * @param guiGraphics the gui graphics component
@@ -108,14 +108,14 @@ public final class ScreenEvents {
          * @param mouseY      the y-position of the mouse
          * @param partialTick the partial tick time
          */
-        void onBeforeRender(T screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick);
+        void onBeforeRender(T screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick);
     }
 
     @FunctionalInterface
     public interface AfterBackground<T extends Screen> {
 
         /**
-         * Runs after a screen background is rendered in {@link Screen#renderBackground(GuiGraphics, int, int, float)}.
+         * Runs after a screen background is rendered in {@link Screen#renderBackground(GuiGraphicsExtractor, int, int, float)}.
          *
          * @param screen      the currently displayed screen
          * @param guiGraphics the gui graphics component
@@ -123,14 +123,14 @@ public final class ScreenEvents {
          * @param mouseY      the y-position of the mouse
          * @param partialTick the partial tick time
          */
-        void onAfterBackground(T screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick);
+        void onAfterBackground(T screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick);
     }
 
     @FunctionalInterface
     public interface AfterRender<T extends Screen> {
 
         /**
-         * Runs after a screen is rendered in {@link Screen#render(GuiGraphics, int, int, float)}.
+         * Runs after a screen is rendered in {@link Screen#render(GuiGraphicsExtractor, int, int, float)}.
          *
          * @param screen      the currently displayed screen
          * @param guiGraphics the gui graphics component
@@ -138,6 +138,6 @@ public final class ScreenEvents {
          * @param mouseY      the y-position of the mouse
          * @param partialTick the partial tick time
          */
-        void onAfterRender(T screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick);
+        void onAfterRender(T screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick);
     }
 }

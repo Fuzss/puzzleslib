@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.api.event.v1.entity;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
-import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.MutableBoolean;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;

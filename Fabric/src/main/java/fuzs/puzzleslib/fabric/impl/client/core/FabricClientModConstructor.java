@@ -21,7 +21,7 @@ public final class FabricClientModConstructor implements ModConstructorImpl<Clie
         modConstructor.onRegisterLayerDefinitions(new LayerDefinitionsContextFabricImpl());
         modConstructor.onRegisterBlockStateResolver(new BlockStateResolverContextFabricImpl());
         modConstructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShadersContextFabricImpl());
-        modConstructor.onRegisterSpecialBlockModelRenderers(new SpecialBlockModelRenderersContextFabricImpl());
+        modConstructor.onRegisterBuiltInBlockModels(new BuiltInBlockModelsContextFabricImpl());
         modConstructor.onRegisterSkullRenderers(new SkullRenderersContextFabricImpl());
         modConstructor.onRegisterKeyMappings(new KeyMappingsContextFabricImpl());
         modConstructor.onAddResourcePackFinders(new ResourcePackSourcesContextFabricImpl());
@@ -31,10 +31,7 @@ public final class FabricClientModConstructor implements ModConstructorImpl<Clie
         modConstructor.onRegisterPictureInPictureRenderers(new PictureInPictureRenderersContextFabricImpl());
         modConstructor.onAddResourcePackReloadListeners(new ResourcePackReloadListenersContextFabricImpl());
         ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft minecraft) -> {
-            // run this as late as possible and not during client init, so that maps are already fully populated with vanilla and modded content
-            modConstructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextFabricImpl());
-            modConstructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextFabricImpl());
-            modConstructor.onRegisterBlockColorProviders(new BlockBlockColorsContextFabricImpl());
+            modConstructor.onRegisterBlockColorProviders(new BlockColorsContextFabricImpl());
         });
     }
 }

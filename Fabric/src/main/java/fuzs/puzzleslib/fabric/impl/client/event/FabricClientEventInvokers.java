@@ -38,13 +38,14 @@ import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -183,7 +184,7 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(DrawItemStackOverlayCallback.class,
                 net.fabricmc.fabric.api.client.rendering.v1.DrawItemStackOverlayCallback.EVENT,
                 (DrawItemStackOverlayCallback callback, @Nullable Object context) -> {
-                    return (GuiGraphics guiGraphics, Font font, ItemStack itemStack, int posX, int posY) -> {
+                    return (GuiGraphicsExtractor guiGraphics, Font font, ItemStack itemStack, int posX, int posY) -> {
                         Objects.requireNonNull(context, "context is null");
                         Item item = (Item) context;
                         if (itemStack.is(item)) {
@@ -216,7 +217,7 @@ public final class FabricClientEventInvokers {
             // register as late as possible, so we capture as many hud layers as possible
             net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft minecraft) -> {
                 HudElementRegistry.addFirst(PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())),
-                        (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                        (GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker) -> {
                             if (!minecraft.options.hideGui) {
                                 callback.onBeforeRenderGui(guiGraphics, deltaTracker);
                             }
@@ -224,7 +225,7 @@ public final class FabricClientEventInvokers {
                 // the sleep layer is the only layer that renders when the gui is hidden
                 HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP,
                         PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())),
-                        (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                        (GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker) -> {
                             if (minecraft.options.hideGui) {
                                 callback.onBeforeRenderGui(guiGraphics, deltaTracker);
                             }
@@ -235,7 +236,7 @@ public final class FabricClientEventInvokers {
             // register as late as possible, so we capture as many hud layers as possible
             net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft minecraft) -> {
                 HudElementRegistry.addLast(PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())),
-                        (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                        (GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker) -> {
                             if (!minecraft.options.hideGui) {
                                 callback.onAfterRenderGui(guiGraphics, deltaTracker);
                             }
@@ -243,7 +244,7 @@ public final class FabricClientEventInvokers {
                 // the sleep layer is the only layer that renders when the gui is hidden
                 HudElementRegistry.attachElementAfter(VanillaHudElements.SLEEP,
                         PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())),
-                        (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                        (GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker) -> {
                             if (minecraft.options.hideGui) {
                                 callback.onAfterRenderGui(guiGraphics, deltaTracker);
                             }
@@ -437,7 +438,7 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(CustomizeChatPanelCallback.class,
                 (CustomizeChatPanelCallback callback, @Nullable Object context) -> {
                     HudElementRegistry.replaceElement(VanillaHudElements.CHAT, (HudElement hudElement) -> {
-                        return (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                        return (GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker) -> {
                             guiGraphics.pose().pushMatrix();
                             DefaultedInt posX = DefaultedInt.fromValue(0);
                             DefaultedInt posY = DefaultedInt.fromValue(guiGraphics.guiHeight() - 48);

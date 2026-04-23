@@ -3,18 +3,18 @@ package fuzs.puzzleslib.impl.resources;
 import fuzs.puzzleslib.api.resources.v1.AbstractModPackResources;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.packs.BuiltInMetadata;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.resources.ResourceMetadata;
 import net.minecraft.util.InclusiveRange;
 
 public record ModPackResourcesSupplier(PackType packType,
                                        PackLocationInfo info,
                                        PackResourcesSupplier<AbstractModPackResources> supplier,
-                                       BuiltInMetadata metadata) implements Pack.ResourcesSupplier {
+                                       ResourceMetadata metadata) implements Pack.ResourcesSupplier {
 
     public static ModPackResourcesSupplier create(PackType packType, PackLocationInfo info, PackResourcesSupplier<AbstractModPackResources> supplier, Component description) {
         PackMetadataSection metadataSection = new PackMetadataSection(description,
@@ -22,7 +22,7 @@ public record ModPackResourcesSupplier(PackType packType,
         return new ModPackResourcesSupplier(packType,
                 info,
                 supplier,
-                BuiltInMetadata.of(PackMetadataSection.forPackType(packType), metadataSection));
+                ResourceMetadata.of(PackMetadataSection.forPackType(packType), metadataSection));
     }
 
     @Override
@@ -41,7 +41,6 @@ public record ModPackResourcesSupplier(PackType packType,
 
     @FunctionalInterface
     public interface PackResourcesSupplier<T extends PackResources> {
-
-        T apply(PackType packType, PackLocationInfo info, BuiltInMetadata metadata);
+        T apply(PackType packType, PackLocationInfo info, ResourceMetadata metadata);
     }
 }

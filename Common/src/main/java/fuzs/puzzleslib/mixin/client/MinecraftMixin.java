@@ -11,8 +11,8 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 @Mixin(Minecraft.class)
 abstract class MinecraftMixin extends ReentrantBlockableEventLoop<Runnable> {
 
-    public MinecraftMixin(String string) {
-        super(string);
+    public MinecraftMixin(String name, boolean propagatesCrashes) {
+        super(name, propagatesCrashes);
     }
 
     @ModifyArg(method = "runTick",

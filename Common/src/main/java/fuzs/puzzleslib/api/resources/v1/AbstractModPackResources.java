@@ -4,13 +4,17 @@ import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.impl.resources.ModPackResourcesSupplier;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.*;
+import net.minecraft.server.packs.PackLocationInfo;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackSelectionConfig;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.resources.IoSupplier;
+import net.minecraft.server.packs.resources.ResourceMetadata;
 import net.minecraft.world.flag.FeatureFlagSet;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
@@ -38,15 +42,18 @@ public class AbstractModPackResources implements PackResources {
     /**
      * The pack type for this pack, set internally during construction.
      */
-    @Nullable private PackType packType;
+    @Nullable
+    private PackType packType;
     /**
      * Location info of this pack, set internally during construction.
      */
-    @Nullable private PackLocationInfo info;
+    @Nullable
+    private PackLocationInfo info;
     /**
      * The metadata for the <code>pack.mcmeta</code> section, set internally during construction.
      */
-    @Nullable private BuiltInMetadata metadata;
+    @Nullable
+    private ResourceMetadata metadata;
 
     /**
      * Simple constructor with default file path parameter for the pack icon.
@@ -63,7 +70,8 @@ public class AbstractModPackResources implements PackResources {
         this.modLogoPath = modLogoPath;
     }
 
-    @Nullable @Override
+    @Nullable
+    @Override
     public IoSupplier<InputStream> getRootResource(String... elements) {
         String path = String.join("/", elements);
         if ("pack.png".equals(path)) {
@@ -78,7 +86,8 @@ public class AbstractModPackResources implements PackResources {
         return null;
     }
 
-    @Nullable @Override
+    @Nullable
+    @Override
     public IoSupplier<InputStream> getResource(PackType packType, Identifier location) {
         return null;
     }
@@ -97,7 +106,7 @@ public class AbstractModPackResources implements PackResources {
     @Override
     public @Nullable <T> T getMetadataSection(MetadataSectionType<T> type) throws IOException {
         Objects.requireNonNull(this.metadata, "metadata is null");
-        return this.metadata.get(type);
+        return this.metadata.getSection(type).orElse(null);
     }
 
     @Override
@@ -132,7 +141,7 @@ public class AbstractModPackResources implements PackResources {
      * Creates a new pack for registering a repository source.
      *
      * @param packType             type marking this pack as containing data or resource pack resources
-     * @param identifier     id for the pack, used for internal references and is stored in
+     * @param identifier           id for the pack, used for internal references and is stored in
      *                             <code>options.txt</code>
      * @param factory              {@link net.minecraft.server.packs.PackResources} implementation supplier
      * @param titleComponent       the title of this pack shown in the pack selection screen
@@ -166,7 +175,7 @@ public class AbstractModPackResources implements PackResources {
     }
 
     private static ModPackResourcesSupplier.PackResourcesSupplier<AbstractModPackResources> createSupplier(Supplier<AbstractModPackResources> factory) {
-        return (PackType packType, PackLocationInfo info, BuiltInMetadata metadata) -> {
+        return (PackType packType, PackLocationInfo info, ResourceMetadata metadata) -> {
             AbstractModPackResources packResources = factory.get();
             packResources.info = info;
             packResources.metadata = metadata;

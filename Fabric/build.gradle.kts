@@ -58,6 +58,7 @@ multiloader {
         clientMixin(
             "AbstractClientPlayerFabricMixin",
             "AbstractContainerScreenFabricMixin",
+            "BuiltInBlockModelsFabricMixin",
             "CameraFabricMixin",
             "ChatListenerFabricMixin",
             "ClientLevelFabricMixin",

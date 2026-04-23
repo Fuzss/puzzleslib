@@ -27,7 +27,7 @@ public interface ModConstructor {
     /**
      * Construct the {@link ModConstructor} instance to begin initialization of a mod.
      *
-     * @param identifier       the identifier for the provided mod instance
+     * @param identifier             the identifier for the provided mod instance
      * @param modConstructorSupplier the mod instance for the setup
      */
     static void construct(Identifier identifier, Supplier<ModConstructor> modConstructorSupplier) {
@@ -113,16 +113,16 @@ public interface ModConstructor {
     }
 
     /**
-     * @param context register new villager trades
+     * @param context register server resource reload listeners
      */
-    default void onRegisterVillagerTrades(VillagerTradesContext context) {
+    default void onAddDataPackReloadListeners(DataPackReloadListenersContext context) {
         // NO-OP
     }
 
     /**
-     * @param context register server resource reload listeners
+     * @param context register patches for item data components
      */
-    default void onAddDataPackReloadListeners(DataPackReloadListenersContext context) {
+    default void onRegisterItemComponentPatches(ItemComponentsContext context) {
         // NO-OP
     }
 }

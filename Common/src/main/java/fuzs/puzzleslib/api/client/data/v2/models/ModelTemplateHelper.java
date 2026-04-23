@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.client.data.v2.models;
 import net.minecraft.client.data.models.model.ModelTemplate;
 import net.minecraft.client.data.models.model.TextureMapping;
 import net.minecraft.client.data.models.model.TextureSlot;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 
@@ -39,9 +40,8 @@ public final class ModelTemplateHelper {
     }
 
     public static TextureMapping createParticleTextureMapping(Block block, String suffix) {
-        Identifier identifier = TextureMapping.getBlockTexture(block, suffix);
-        return new TextureMapping().put(TextureSlot.TEXTURE, identifier)
-                .put(TextureSlot.PARTICLE, identifier);
+        Material material = TextureMapping.getBlockTexture(block, suffix);
+        return new TextureMapping().put(TextureSlot.TEXTURE, material).put(TextureSlot.PARTICLE, material);
     }
 
     public static TextureMapping createSingleSlotMapping(TextureSlot textureSlot, Block block) {

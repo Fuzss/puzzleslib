@@ -5,7 +5,7 @@ import fuzs.puzzleslib.api.client.core.v1.context.GuiLayersContext;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
@@ -77,7 +77,7 @@ public record GuiLayersContextNeoForgeImpl(RegisterGuiLayersEvent event) impleme
             identifier = VANILLA_GUI_LAYERS.get(identifier);
             boolean isSleepOverlay = identifier.equals(VanillaGuiLayers.SLEEP_OVERLAY);
             this.event.wrapLayer(identifier, (GuiLayer guiLayer) -> {
-                return (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                return (GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker) -> {
                     // render condition is not inherited from the parent, add it back manually,
                     // since all are known for vanilla layers
                     if (isSleepOverlay || !Minecraft.getInstance().options.hideGui) {

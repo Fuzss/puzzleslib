@@ -2,7 +2,6 @@ package fuzs.puzzleslib.neoforge.impl.event;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.ImmutableList;
 import fuzs.puzzleslib.api.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
@@ -15,7 +14,6 @@ import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.event.CopyOnWriteForwardingList;
 import fuzs.puzzleslib.impl.event.EventImplHelper;
 import fuzs.puzzleslib.impl.event.PotentialSpawnsList;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
@@ -26,11 +24,9 @@ import fuzs.puzzleslib.impl.event.data.DefaultedValue;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.api.event.v1.core.NeoForgeEventInvokerRegistry;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgePotionBrewingBuilder;
+import fuzs.puzzleslib.neoforge.mixin.accessor.EntityNeoForgeAccessor;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.core.component.DataComponentPatch;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -49,9 +45,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.GrindstoneMenu;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -107,38 +101,6 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(RegistryEntryAddedCallback.class,
                 ModifyRegistriesEvent.class,
                 NeoForgeEventInvokerRegistryImpl::onRegistryEntryAdded);
-        INSTANCE.register(FinalizeItemComponentsCallback.class,
-                ModifyDefaultComponentsEvent.class,
-                (FinalizeItemComponentsCallback callback, ModifyDefaultComponentsEvent event) -> {
-                    event.getAllItems().forEach((Item item) -> {
-                        callback.onFinalizeItemComponents(item,
-                                (Function<DataComponentMap, DataComponentPatch> function) -> {
-                                    event.modify(item, (DataComponentPatch.Builder builder) -> {
-                                        DataComponentPatch.SplitResult splitResult = function.apply(item.components())
-                                                .split();
-                                        splitResult.added().stream().forEach(builder::set);
-                                        splitResult.removed().forEach(builder::remove);
-                                    });
-                                });
-                    });
-                });
-        INSTANCE.register(ComputeItemAttributeModifiersCallback.class,
-                ModifyDefaultComponentsEvent.class,
-                (ComputeItemAttributeModifiersCallback callback, ModifyDefaultComponentsEvent event) -> {
-                    event.getAllItems().forEach((Item item) -> {
-                        ItemAttributeModifiers itemAttributeModifiers = item.components()
-                                .getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
-                        CopyOnWriteForwardingList<ItemAttributeModifiers.Entry> entries = new CopyOnWriteForwardingList<>(
-                                itemAttributeModifiers.modifiers());
-                        callback.onComputeItemAttributeModifiers(item, entries);
-                        if (entries.delegate() != itemAttributeModifiers.modifiers()) {
-                            event.modify(item, (DataComponentPatch.Builder builder) -> {
-                                builder.set(DataComponents.ATTRIBUTE_MODIFIERS,
-                                        new ItemAttributeModifiers(ImmutableList.copyOf(entries)));
-                            });
-                        }
-                    });
-                });
         INSTANCE.register(AddBlockEntityTypeBlocksCallback.class,
                 BlockEntityTypeAddBlocksEvent.class,
                 (AddBlockEntityTypeBlocksCallback callback, BlockEntityTypeAddBlocksEvent event) -> {
@@ -981,11 +943,11 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                     }
 
                     // same implementation as Fabric
-                    if (!event.getEntityMounting().canRide(event.getEntityBeingMounted())) {
+                    if (!((EntityNeoForgeAccessor) event.getEntityMounting()).puzzleslib$canRide(event.getEntityBeingMounted())) {
                         return;
                     }
 
-                    if (!event.getEntityBeingMounted().canAddPassenger(event.getEntityMounting())) {
+                    if (!((EntityNeoForgeAccessor) event.getEntityBeingMounted()).puzzleslib$canAddPassenger(event.getEntityMounting())) {
                         return;
                     }
 

@@ -14,8 +14,8 @@ public final class NeoForgeToolTypeHelper implements ToolTypeHelper {
 
     @Override
     public boolean isShears(ItemStack itemStack) {
-        return ToolTypeHelper.super.isShears(itemStack) || itemStack.is(Tags.Items.TOOLS_SHEAR) ||
-                itemStack.canPerformAction(ItemAbilities.SHEARS_DIG);
+        return ToolTypeHelper.super.isShears(itemStack) || itemStack.is(Tags.Items.TOOLS_SHEAR)
+                || itemStack.canPerformAction(ItemAbilities.SHEARS_DIG);
     }
 
     @Override
@@ -35,20 +35,20 @@ public final class NeoForgeToolTypeHelper implements ToolTypeHelper {
 
     @Override
     public boolean isFishingRod(ItemStack itemStack) {
-        return ToolTypeHelper.super.isFishingRod(itemStack) || itemStack.is(Tags.Items.TOOLS_FISHING_ROD) ||
-                itemStack.canPerformAction(ItemAbilities.FISHING_ROD_CAST);
+        return ToolTypeHelper.super.isFishingRod(itemStack) || itemStack.is(Tags.Items.TOOLS_FISHING_ROD)
+                || itemStack.canPerformAction(ItemAbilities.FISHING_ROD_CAST);
     }
 
     @Override
     public boolean isTridentLike(ItemStack itemStack) {
-        return ToolTypeHelper.super.isTridentLike(itemStack) || itemStack.is(Tags.Items.TOOLS_SPEAR) ||
-                itemStack.canPerformAction(ItemAbilities.TRIDENT_THROW);
+        return ToolTypeHelper.super.isTridentLike(itemStack) || itemStack.is(Tags.Items.TOOLS_TRIDENT)
+                || itemStack.canPerformAction(ItemAbilities.TRIDENT_THROW);
     }
 
     @Override
     public boolean isBrush(ItemStack itemStack) {
-        return ToolTypeHelper.super.isBrush(itemStack) || itemStack.is(Tags.Items.TOOLS_BRUSH) ||
-                itemStack.canPerformAction(ItemAbilities.BRUSH_BRUSH);
+        return ToolTypeHelper.super.isBrush(itemStack) || itemStack.is(Tags.Items.TOOLS_BRUSH)
+                || itemStack.canPerformAction(ItemAbilities.BRUSH_BRUSH);
     }
 
     @Override

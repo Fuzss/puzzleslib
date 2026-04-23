@@ -18,7 +18,7 @@ public interface ItemModelsContext {
      * Register a codec for a custom {@link ItemModel.Unbaked} type.
      *
      * @param identifier the identifier
-     * @param codec            the corresponding codec for the type
+     * @param codec      the corresponding codec for the type
      */
     void registerItemModel(Identifier identifier, MapCodec<? extends ItemModel.Unbaked> codec);
 
@@ -26,15 +26,15 @@ public interface ItemModelsContext {
      * Register a codec for a custom {@link SpecialModelRenderer.Unbaked} type.
      *
      * @param identifier the identifier
-     * @param codec            the corresponding codec for the type
+     * @param codec      the corresponding codec for the type
      */
-    void registerSpecialModelRenderer(Identifier identifier, MapCodec<? extends SpecialModelRenderer.Unbaked> codec);
+    void registerSpecialModelRenderer(Identifier identifier, MapCodec<? extends SpecialModelRenderer.Unbaked<?>> codec);
 
     /**
      * Register a codec for a custom {@link ItemTintSource} type.
      *
      * @param identifier the identifier
-     * @param codec            the corresponding codec for the type
+     * @param codec      the corresponding codec for the type
      */
     void registerItemTintSource(Identifier identifier, MapCodec<? extends ItemTintSource> codec);
 
@@ -42,7 +42,7 @@ public interface ItemModelsContext {
      * Register a type for a custom {@link SelectItemModelProperty} implementation.
      *
      * @param identifier the identifier
-     * @param type             the corresponding codec for the type
+     * @param type       the corresponding codec for the type
      */
     void registerSelectItemModelProperty(Identifier identifier, SelectItemModelProperty.Type<?, ?> type);
 
@@ -50,7 +50,7 @@ public interface ItemModelsContext {
      * Register a codec for a custom {@link ConditionalItemModelProperty} type.
      *
      * @param identifier the identifier
-     * @param codec            the corresponding codec for the type
+     * @param codec      the corresponding codec for the type
      */
     void registerConditionalItemModelProperty(Identifier identifier, MapCodec<? extends ConditionalItemModelProperty> codec);
 
@@ -58,7 +58,7 @@ public interface ItemModelsContext {
      * Register a codec for a custom {@link RangeSelectItemModelProperty} type.
      *
      * @param identifier the identifier
-     * @param codec            the corresponding codec for the type
+     * @param codec      the corresponding codec for the type
      */
     void registerRangeSelectItemModelProperty(Identifier identifier, MapCodec<? extends RangeSelectItemModelProperty> codec);
 }

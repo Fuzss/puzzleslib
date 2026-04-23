@@ -3,6 +3,7 @@ package fuzs.puzzleslib.neoforge.impl.client.core.context;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import fuzs.puzzleslib.api.client.core.v1.context.BlockStateResolverContext;
 import fuzs.puzzleslib.api.client.renderer.v1.model.ModelLoadingHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
@@ -10,13 +11,14 @@ import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
-import net.minecraft.client.renderer.SpecialBlockModelRenderer;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.LoadedBlockModels;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.SpriteLoader;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
+import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.client.resources.model.sprite.MaterialBaker;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Util;
@@ -36,7 +38,7 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
     private final ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
     private final Function<Identifier, TextureAtlasSprite> textureGetter;
     private final ResolvedModel missingModel;
-    private final Supplier<TextureAtlasSprite> missingSprite;
+    private final Supplier<Material.Baked> missingSprite;
     private final Map<Identifier, ResolvedModel> resolvedModels;
     private final BiConsumer<BlockState, BlockStateModel> blockStateModelOutput;
     private final Function<Map<BlockState, BlockStateModel.UnbakedRoot>, ModelBakery> modelBakeryFactory;
@@ -48,13 +50,14 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
             TextureAtlasSprite textureAtlasSprite = event.getTextureGetter()
                     .apply(MissingTextureAtlasSprite.getLocation());
             Objects.requireNonNull(textureAtlasSprite, "missing sprite is null");
-            return textureAtlasSprite;
+            return new Material.Baked(textureAtlasSprite, false);
         });
         this.resolvedModels = new HashMap<>(event.getModelBakery().resolvedModels);
         this.blockStateModelOutput = event.getBakingResult().blockStateModels()::put;
         this.modelBakeryFactory = (Map<BlockState, BlockStateModel.UnbakedRoot> unbakedBlockStateModels) -> {
+            // Use the vanilla constructor, as there are other mods which run some setup in it via Mixin which we shouldn't skip.
             return new ModelBakery(event.getModelBakery().entityModelSet,
-                    event.getModelBakery().materials,
+                    event.getModelBakery().sprites,
                     event.getModelBakery().playerSkinRenderCache,
                     unbakedBlockStateModels,
                     Collections.emptyMap(),
@@ -107,43 +110,43 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
 
     /**
      * Similar to
-     * {@link ModelManager#loadModels(SpriteLoader.Preparations, ModelBakery, Object2IntMap, EntityModelSet,
-     * SpecialBlockModelRenderer, Executor)}.
+     * {@link ModelManager#loadModels(SpriteLoader.Preparations, SpriteLoader.Preparations, ModelBakery,
+     * LoadedBlockModels, Object2IntMap, EntityModelSet, Executor)}.
      */
-    private static ModelBakery.BakingResult loadModels(ProfilerFiller profiler, Function<Identifier, TextureAtlasSprite> textureGetter, ModelBakery modelBakery, Supplier<TextureAtlasSprite> missingSprite) {
+    private static ModelBakery.BakingResult loadModels(ProfilerFiller profiler, Function<Identifier, TextureAtlasSprite> textureGetter, ModelBakery modelBakery, Supplier<Material.Baked> missingSprite) {
         profiler.push(PuzzlesLibMod.id("baking").toString());
-        final Multimap<String, Material> multimap = HashMultimap.create();
-        final Multimap<String, String> multimap1 = HashMultimap.create();
-        ModelBakery.BakingResult bakingResult = modelBakery.bakeModels(new SpriteGetter() {
+        final Multimap<String, Identifier> missingSprites = Multimaps.synchronizedMultimap(HashMultimap.create());
+        final Multimap<String, String> missingReferences = Multimaps.synchronizedMultimap(HashMultimap.create());
+        ModelBakery.BakingResult bakingResult = modelBakery.bakeModels(new MaterialBaker() {
             @Override
-            public TextureAtlasSprite get(Material material, ModelDebugName name) {
-                if (material.atlasLocation().equals(TextureAtlas.LOCATION_BLOCKS)) {
-                    TextureAtlasSprite textureAtlasSprite = textureGetter.apply(material.texture());
-                    if (textureAtlasSprite != null) {
-                        return textureAtlasSprite;
+            public Material.Baked get(Material material, ModelDebugName name) {
+                if (missingSprites.containsEntry(name.debugName(), material.sprite())) {
+                    return missingSprite.get();
+                } else {
+                    TextureAtlasSprite textureAtlasSprite = textureGetter.apply(material.sprite());
+                    if (Objects.equals(textureAtlasSprite.contents().name(), MissingTextureAtlasSprite.getLocation())) {
+                        missingSprites.put(name.debugName(), material.sprite());
+                        return missingSprite.get();
+                    } else {
+                        return new Material.Baked(textureAtlasSprite, material.forceTranslucent());
                     }
                 }
-
-                multimap.put(name.debugName(), material);
-                return missingSprite.get();
             }
 
             @Override
-            public TextureAtlasSprite reportMissingReference(String reference, ModelDebugName name) {
-                multimap1.put(name.debugName(), reference);
+            public Material.Baked reportMissingReference(String reference, ModelDebugName name) {
+                missingReferences.put(name.debugName(), reference);
                 return missingSprite.get();
             }
         }, Util.backgroundExecutor()).join();
-        multimap.asMap()
-                .forEach((String string, Collection<Material> collection) -> PuzzlesLib.LOGGER.warn(
+        missingSprites.asMap()
+                .forEach((String string, Collection<Identifier> collection) -> PuzzlesLib.LOGGER.warn(
                         "Missing textures in model {}:\n{}",
                         string,
                         collection.stream()
-                                .sorted(Material.COMPARATOR)
-                                .map((Material material) -> "    " + material.atlasLocation() + ":"
-                                        + material.texture())
+                                .map((Identifier sprite) -> "    " + sprite)
                                 .collect(Collectors.joining("\n"))));
-        multimap1.asMap()
+        missingReferences.asMap()
                 .forEach((String string, Collection<String> collection) -> PuzzlesLib.LOGGER.warn(
                         "Missing texture references in model {}:\n{}",
                         string,
