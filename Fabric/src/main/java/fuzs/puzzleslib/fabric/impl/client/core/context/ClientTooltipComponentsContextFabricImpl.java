@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.client.core.context;
 
-import fuzs.puzzleslib.api.client.core.v1.context.ClientTooltipComponentsContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.ClientTooltipComponentsContext;
 import net.fabricmc.fabric.api.client.rendering.v1.ClientTooltipComponentCallback;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;

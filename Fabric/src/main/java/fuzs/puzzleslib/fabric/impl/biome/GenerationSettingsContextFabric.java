@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.biome;
 
 import com.google.common.collect.Iterables;
-import fuzs.puzzleslib.api.biome.v1.GenerationSettingsContext;
+import fuzs.puzzleslib.common.api.biome.v1.GenerationSettingsContext;
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;

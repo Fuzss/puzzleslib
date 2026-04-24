@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import fuzs.puzzleslib.impl.event.data.DefaultedValue;
+import fuzs.puzzleslib.common.impl.event.data.DefaultedValue;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;

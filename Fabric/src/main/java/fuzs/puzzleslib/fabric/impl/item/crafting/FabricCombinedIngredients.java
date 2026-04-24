@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.item.crafting;
 
-import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
+import fuzs.puzzleslib.common.api.item.v2.crafting.CombinedIngredients;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;

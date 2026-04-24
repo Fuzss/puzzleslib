@@ -2,7 +2,7 @@ package fuzs.puzzleslib.fabric.impl.client.config;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.google.common.collect.ImmutableSet;
-import fuzs.puzzleslib.api.core.v1.ModContainer;
+import fuzs.puzzleslib.common.api.core.v1.ModContainer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;

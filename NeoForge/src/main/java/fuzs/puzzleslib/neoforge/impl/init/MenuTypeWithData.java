@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.init;
 
-import fuzs.puzzleslib.api.init.v3.registry.MenuSupplierWithData;
+import fuzs.puzzleslib.common.api.init.v3.registry.MenuSupplierWithData;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.player.Inventory;

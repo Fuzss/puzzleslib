@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.data;
 
-import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
+import fuzs.puzzleslib.common.api.data.v2.tags.AbstractTagAppender;
 import net.fabricmc.fabric.impl.datagen.FabricTagBuilder;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;

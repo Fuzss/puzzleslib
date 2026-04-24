@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.fabric.api.event.v1.core;
 
-import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
-import fuzs.puzzleslib.api.event.v1.core.EventInvokerRegistry;
-import fuzs.puzzleslib.api.event.v1.core.EventPhase;
+import fuzs.puzzleslib.common.api.event.v1.core.EventInvoker;
+import fuzs.puzzleslib.common.api.event.v1.core.EventInvokerRegistry;
+import fuzs.puzzleslib.common.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventInvokerRegistryImpl;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.client.gui.screens.Screen;

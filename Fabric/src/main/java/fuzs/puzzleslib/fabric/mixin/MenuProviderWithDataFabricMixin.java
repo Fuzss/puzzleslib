@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import fuzs.puzzleslib.api.container.v1.MenuProviderWithData;
+import fuzs.puzzleslib.common.api.container.v1.MenuProviderWithData;
 import net.fabricmc.fabric.api.menu.v1.ExtendedMenuProvider;
 import net.minecraft.server.level.ServerPlayer;
 import org.jspecify.annotations.Nullable;

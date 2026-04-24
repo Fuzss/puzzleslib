@@ -1,11 +1,11 @@
 package fuzs.puzzleslib.fabric.impl.init;
 
 import com.mojang.brigadier.arguments.ArgumentType;
-import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
-import fuzs.puzzleslib.api.init.v3.registry.MenuSupplierWithData;
-import fuzs.puzzleslib.impl.init.DirectReferenceHolder;
-import fuzs.puzzleslib.impl.init.LazyHolder;
-import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
+import fuzs.puzzleslib.common.api.init.v3.registry.LookupHelper;
+import fuzs.puzzleslib.common.api.init.v3.registry.MenuSupplierWithData;
+import fuzs.puzzleslib.common.impl.init.DirectReferenceHolder;
+import fuzs.puzzleslib.common.impl.init.LazyHolder;
+import fuzs.puzzleslib.common.impl.init.RegistryManagerImpl;
 import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.fabricmc.fabric.api.menu.v1.ExtendedMenuType;

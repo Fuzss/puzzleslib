@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.attachment;
 
-import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
-import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
+import fuzs.puzzleslib.common.api.attachment.v4.DataAttachmentRegistry;
+import fuzs.puzzleslib.common.impl.attachment.DataAttachmentRegistryImpl;
 import fuzs.puzzleslib.neoforge.impl.attachment.builder.NeoForgeBlockEntityDataAttachmentBuilder;
 import fuzs.puzzleslib.neoforge.impl.attachment.builder.NeoForgeEntityDataAttachmentBuilder;
 import fuzs.puzzleslib.neoforge.impl.attachment.builder.NeoForgeLevelChunkDataAttachmentBuilder;

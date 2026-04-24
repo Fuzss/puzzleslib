@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.core;
 
 import com.google.common.collect.ImmutableMap;
-import fuzs.puzzleslib.api.core.v1.ModContainer;
+import fuzs.puzzleslib.common.api.core.v1.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.i18n.MavenVersionTranslator;
 import net.neoforged.fml.loading.FMLLoader;

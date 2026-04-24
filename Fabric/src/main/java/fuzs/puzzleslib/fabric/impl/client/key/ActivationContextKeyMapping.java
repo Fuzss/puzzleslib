@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.client.key;
 
-import fuzs.puzzleslib.api.client.key.v1.KeyActivationContext;
+import fuzs.puzzleslib.common.api.client.key.v1.KeyActivationContext;
 
 public interface ActivationContextKeyMapping {
 

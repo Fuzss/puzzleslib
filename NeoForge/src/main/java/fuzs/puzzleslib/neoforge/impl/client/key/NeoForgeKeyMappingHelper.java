@@ -2,8 +2,8 @@ package fuzs.puzzleslib.neoforge.impl.client.key;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
-import fuzs.puzzleslib.api.client.key.v1.KeyActivationContext;
-import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
+import fuzs.puzzleslib.common.api.client.key.v1.KeyActivationContext;
+import fuzs.puzzleslib.common.api.client.key.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import net.neoforged.neoforge.client.settings.IKeyConflictContext;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;

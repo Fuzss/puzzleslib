@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
-import fuzs.puzzleslib.api.client.core.v1.context.BlockEntityRenderersContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.BlockEntityRenderersContext;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.world.level.block.entity.BlockEntity;

@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
-import fuzs.puzzleslib.api.client.core.v1.context.MenuScreensContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.MenuScreensContext;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;

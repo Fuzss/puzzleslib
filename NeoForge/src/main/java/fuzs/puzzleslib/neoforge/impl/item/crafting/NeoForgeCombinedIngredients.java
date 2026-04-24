@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.item.crafting;
 
-import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
+import fuzs.puzzleslib.common.api.item.v2.crafting.CombinedIngredients;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.crafting.CompoundIngredient;

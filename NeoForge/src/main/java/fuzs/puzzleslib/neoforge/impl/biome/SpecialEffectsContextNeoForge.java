@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.biome;
 
-import fuzs.puzzleslib.api.biome.v1.SpecialEffectsContext;
+import fuzs.puzzleslib.common.api.biome.v1.SpecialEffectsContext;
 import fuzs.puzzleslib.neoforge.mixin.accessor.BiomeSpecialEffectsBuilderNeoForgeAccessor;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.neoforged.neoforge.common.world.BiomeSpecialEffectsBuilder;

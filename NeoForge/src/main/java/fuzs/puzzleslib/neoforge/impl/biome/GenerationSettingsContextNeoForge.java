@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.biome;
 
-import fuzs.puzzleslib.api.biome.v1.GenerationSettingsContext;
+import fuzs.puzzleslib.common.api.biome.v1.GenerationSettingsContext;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;

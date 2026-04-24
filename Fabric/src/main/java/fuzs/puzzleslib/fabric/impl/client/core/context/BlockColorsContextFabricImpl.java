@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.client.core.context;
 
-import fuzs.puzzleslib.api.client.core.v1.context.BlockColorsContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.BlockColorsContext;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockColorRegistry;
 import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.world.level.block.Block;

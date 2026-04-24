@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.biome;
 
 import com.google.common.collect.ImmutableSet;
-import fuzs.puzzleslib.api.biome.v1.MobSpawnSettingsContext;
+import fuzs.puzzleslib.common.api.biome.v1.MobSpawnSettingsContext;
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.random.Weighted;

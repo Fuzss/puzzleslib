@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.core;
 
-import fuzs.puzzleslib.api.core.v1.ModConstructor;
-import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
+import fuzs.puzzleslib.common.api.core.v1.ModConstructor;
+import fuzs.puzzleslib.common.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.impl.core.context.*;
 import net.minecraft.server.packs.PackType;

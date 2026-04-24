@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.neoforge.mixin;
 
 import com.google.common.collect.ImmutableSet;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.common.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.common.impl.PuzzlesLib;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;

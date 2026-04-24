@@ -2,8 +2,8 @@ package fuzs.puzzleslib.fabric.mixin.client;
 
 import com.llamalad7.mixinextras.sugar.Cancellable;
 import com.llamalad7.mixinextras.sugar.Local;
-import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.data.MutableValue;
+import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.common.api.event.v1.data.MutableValue;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.chat.ChatListener;

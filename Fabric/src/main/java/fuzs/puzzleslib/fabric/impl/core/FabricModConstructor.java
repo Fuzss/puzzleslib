@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.fabric.impl.core;
 
-import fuzs.puzzleslib.api.core.v1.ModConstructor;
+import fuzs.puzzleslib.common.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.fabric.impl.core.context.*;
-import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
+import fuzs.puzzleslib.common.impl.core.context.ModConstructorImpl;
 
 public final class FabricModConstructor implements ModConstructorImpl<ModConstructor> {
 

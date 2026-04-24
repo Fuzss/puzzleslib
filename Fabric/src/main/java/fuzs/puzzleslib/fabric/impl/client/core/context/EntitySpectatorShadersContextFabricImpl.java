@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.client.core.context;
 
-import fuzs.puzzleslib.api.client.core.v1.context.EntitySpectatorShadersContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.EntitySpectatorShadersContext;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;

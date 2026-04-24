@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.data;
 
-import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
+import fuzs.puzzleslib.common.api.data.v2.tags.AbstractTagAppender;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagBuilder;

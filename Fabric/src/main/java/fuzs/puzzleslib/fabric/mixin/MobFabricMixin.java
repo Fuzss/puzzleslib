@@ -1,10 +1,10 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.fabric.impl.event.SpawnReasonMob;
-import fuzs.puzzleslib.impl.PuzzlesLibMod;
-import fuzs.puzzleslib.impl.event.data.DefaultedValue;
+import fuzs.puzzleslib.common.impl.PuzzlesLibMod;
+import fuzs.puzzleslib.common.impl.event.data.DefaultedValue;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.*;

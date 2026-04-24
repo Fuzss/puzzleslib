@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.init;
 
-import fuzs.puzzleslib.api.init.v3.registry.RegistryFactory;
+import fuzs.puzzleslib.common.api.init.v3.registry.RegistryFactory;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.minecraft.core.Registry;

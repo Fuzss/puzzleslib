@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.client.core.context;
 
-import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
+import fuzs.puzzleslib.common.api.core.v1.context.PackRepositorySourcesContext;
 import fuzs.puzzleslib.fabric.impl.core.context.DataPackSourcesContextFabricImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;

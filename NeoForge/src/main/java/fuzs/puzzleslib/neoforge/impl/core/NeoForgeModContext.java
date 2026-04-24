@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.neoforge.impl.core;
 
-import fuzs.puzzleslib.api.data.v2.ModPackMetadataProvider;
-import fuzs.puzzleslib.impl.config.ConfigHolderImpl;
-import fuzs.puzzleslib.impl.core.ModContext;
-import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
+import fuzs.puzzleslib.common.api.data.v2.ModPackMetadataProvider;
+import fuzs.puzzleslib.common.impl.config.ConfigHolderImpl;
+import fuzs.puzzleslib.common.impl.core.ModContext;
+import fuzs.puzzleslib.common.impl.init.RegistryManagerImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.api.data.v2.core.DataProviderHelper;
 import fuzs.puzzleslib.neoforge.impl.config.NeoForgeConfigHolderImpl;

@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.attachment;
 
-import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
+import fuzs.puzzleslib.common.impl.attachment.AttachmentTypeAdapter;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.resources.Identifier;

@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.attachment.builder;
 
-import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
+import fuzs.puzzleslib.common.api.attachment.v4.DataAttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.entity.Entity;

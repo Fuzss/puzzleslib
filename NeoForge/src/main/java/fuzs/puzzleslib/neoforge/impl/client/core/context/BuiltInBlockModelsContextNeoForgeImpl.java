@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
-import fuzs.puzzleslib.api.client.core.v1.context.BuiltInBlockModelsContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.BuiltInBlockModelsContext;
 import net.minecraft.client.renderer.block.BuiltInBlockModels;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.world.level.block.Block;

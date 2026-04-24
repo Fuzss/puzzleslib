@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.biome;
 
-import fuzs.puzzleslib.api.biome.v1.ClimateSettingsContext;
+import fuzs.puzzleslib.common.api.biome.v1.ClimateSettingsContext;
 import net.minecraft.world.level.biome.Biome;
 import net.neoforged.neoforge.common.world.ClimateSettingsBuilder;
 import org.jspecify.annotations.NonNull;

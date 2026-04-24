@@ -1,0 +1,87 @@
+package fuzs.puzzleslib.common.api.init.v3.registry;
+
+import fuzs.puzzleslib.common.impl.core.proxy.ProxyImpl;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import org.jspecify.annotations.Nullable;
+
+/**
+ * Create new {@link Registry Registries}.
+ */
+public interface RegistryFactory {
+    /**
+     * the instance
+     */
+    RegistryFactory INSTANCE = ProxyImpl.get().getRegistryFactory();
+
+    /**
+     * Create an un-synchronized {@link net.minecraft.core.DefaultedMappedRegistry}.
+     *
+     * @param registryKey the registry key
+     * @param <T>         the registry value type
+     * @return the new registry
+     */
+    default <T> Registry<T> create(ResourceKey<Registry<T>> registryKey) {
+        return this.create(registryKey, (String) null);
+    }
+
+    /**
+     * Create a synchronized {@link net.minecraft.core.DefaultedMappedRegistry}, so that numeric registry ids can be
+     * used in networking.
+     *
+     * @param registryKey the registry key
+     * @param <T>         the registry value type
+     * @return the new registry
+     */
+    default <T> Registry<T> createSynced(ResourceKey<Registry<T>> registryKey) {
+        return this.createSynced(registryKey, (String) null);
+    }
+
+    /**
+     * Create an un-synchronized {@link net.minecraft.core.DefaultedMappedRegistry}.
+     *
+     * @param registryKey the registry key
+     * @param defaultKey  the default value key
+     * @param <T>         the registry value type
+     * @return the new registry
+     */
+    default <T> Registry<T> create(ResourceKey<Registry<T>> registryKey, @Nullable String defaultKey) {
+        return this.create(registryKey, defaultKey != null ? registryKey.identifier().withPath(defaultKey) : null);
+    }
+
+    /**
+     * Create a synchronized {@link net.minecraft.core.DefaultedMappedRegistry}, so that numeric registry ids can be
+     * used in networking.
+     *
+     * @param registryKey the registry key
+     * @param defaultKey  the default value key
+     * @param <T>         the registry value type
+     * @return the new registry
+     */
+    default <T> Registry<T> createSynced(ResourceKey<Registry<T>> registryKey, @Nullable String defaultKey) {
+        return this.createSynced(registryKey,
+                defaultKey != null ? registryKey.identifier().withPath(defaultKey) : null);
+    }
+
+    /**
+     * Create an un-synchronized {@link net.minecraft.core.DefaultedMappedRegistry}.
+     *
+     * @param registryKey the registry key
+     * @param defaultKey  the default value key
+     * @param <T>         the registry value type
+     * @return the new registry
+     */
+    <T> Registry<T> create(ResourceKey<Registry<T>> registryKey, @Nullable Identifier defaultKey);
+
+    /**
+     * Create a synchronized {@link net.minecraft.core.DefaultedMappedRegistry}, so that numeric registry ids can be
+     * used in networking.
+     *
+     * @param registryKey the registry key
+     * @param defaultKey  the default value key
+     * @param <T>         the registry value type
+     * @return the new registry
+     */
+    <T> Registry<T> createSynced(ResourceKey<Registry<T>> registryKey, @Nullable Identifier defaultKey);
+}

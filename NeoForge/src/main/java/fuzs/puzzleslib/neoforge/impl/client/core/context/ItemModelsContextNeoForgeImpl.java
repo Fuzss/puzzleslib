@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
 import com.mojang.serialization.MapCodec;
-import fuzs.puzzleslib.api.client.core.v1.context.ItemModelsContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.ItemModelsContext;
 import fuzs.puzzleslib.neoforge.impl.core.context.AbstractNeoForgeContext;
 import net.minecraft.client.color.item.ItemTintSource;
 import net.minecraft.client.renderer.item.ItemModel;

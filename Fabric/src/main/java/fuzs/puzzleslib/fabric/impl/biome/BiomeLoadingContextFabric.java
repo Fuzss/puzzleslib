@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.biome;
 
-import fuzs.puzzleslib.api.biome.v1.BiomeLoadingContext;
+import fuzs.puzzleslib.common.api.biome.v1.BiomeLoadingContext;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;

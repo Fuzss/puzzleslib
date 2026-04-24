@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.core.context;
 
 import com.google.common.base.Preconditions;
-import fuzs.puzzleslib.api.core.v1.context.EntityAttributesContext;
+import fuzs.puzzleslib.common.api.core.v1.context.EntityAttributesContext;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;

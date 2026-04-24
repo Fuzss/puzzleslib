@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
-import fuzs.puzzleslib.api.client.core.v1.context.LayerDefinitionsContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.LayerDefinitionsContext;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;

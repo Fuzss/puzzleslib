@@ -2,7 +2,7 @@ package fuzs.puzzleslib.fabric.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.authlib.GameProfile;
-import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import fuzs.puzzleslib.fabric.impl.event.CapturedDropsEntity;

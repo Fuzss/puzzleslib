@@ -3,23 +3,23 @@ package fuzs.puzzleslib.fabric.impl.event;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import fuzs.puzzleslib.api.event.v1.*;
-import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
-import fuzs.puzzleslib.api.event.v1.core.EventPhase;
-import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
-import fuzs.puzzleslib.api.event.v1.entity.*;
-import fuzs.puzzleslib.api.event.v1.entity.living.*;
-import fuzs.puzzleslib.api.event.v1.entity.player.*;
-import fuzs.puzzleslib.api.event.v1.level.*;
-import fuzs.puzzleslib.api.event.v1.level.BlockEvents;
-import fuzs.puzzleslib.api.event.v1.server.*;
-import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
+import fuzs.puzzleslib.common.api.event.v1.*;
+import fuzs.puzzleslib.common.api.event.v1.entity.*;
+import fuzs.puzzleslib.common.api.event.v1.entity.living.*;
+import fuzs.puzzleslib.common.api.event.v1.entity.player.*;
+import fuzs.puzzleslib.common.api.event.v1.level.*;
+import fuzs.puzzleslib.common.api.event.v1.core.EventInvoker;
+import fuzs.puzzleslib.common.api.event.v1.core.EventPhase;
+import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.common.api.event.v1.core.EventResultHolder;
+import fuzs.puzzleslib.common.api.event.v1.level.BlockEvents;
+import fuzs.puzzleslib.common.api.event.v1.server.*;
+import fuzs.puzzleslib.common.api.init.v3.registry.LookupHelper;
 import fuzs.puzzleslib.fabric.api.event.v1.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventInvokerRegistry;
 import fuzs.puzzleslib.fabric.impl.core.FabricProxy;
 import fuzs.puzzleslib.fabric.impl.init.FabricPotionBrewingBuilder;
-import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
+import fuzs.puzzleslib.common.impl.event.core.EventInvokerImpl;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTabOutput;
@@ -128,9 +128,9 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 (RegisterCommandsCallback callback) -> {
                     return callback::onRegisterCommands;
                 });
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Starting.class,
+        INSTANCE.register(fuzs.puzzleslib.common.api.event.v1.server.ServerLifecycleEvents.Starting.class,
                 ServerLifecycleEvents.SERVER_STARTING,
-                (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Starting callback) -> {
+                (fuzs.puzzleslib.common.api.event.v1.server.ServerLifecycleEvents.Starting callback) -> {
                     return callback::onServerStarting;
                 });
         INSTANCE.register(PlayerInteractEvents.UseBlock.class,
@@ -273,19 +273,19 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 (SyncDataPackContentsCallback callback) -> {
                     return callback::onSyncDataPackContents;
                 });
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Started.class,
+        INSTANCE.register(fuzs.puzzleslib.common.api.event.v1.server.ServerLifecycleEvents.Started.class,
                 ServerLifecycleEvents.SERVER_STARTED,
-                (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Started callback) -> {
+                (fuzs.puzzleslib.common.api.event.v1.server.ServerLifecycleEvents.Started callback) -> {
                     return callback::onServerStarted;
                 });
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Stopping.class,
+        INSTANCE.register(fuzs.puzzleslib.common.api.event.v1.server.ServerLifecycleEvents.Stopping.class,
                 ServerLifecycleEvents.SERVER_STOPPING,
-                (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Stopping callback) -> {
+                (fuzs.puzzleslib.common.api.event.v1.server.ServerLifecycleEvents.Stopping callback) -> {
                     return callback::onServerStopping;
                 });
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Stopped.class,
+        INSTANCE.register(fuzs.puzzleslib.common.api.event.v1.server.ServerLifecycleEvents.Stopped.class,
                 ServerLifecycleEvents.SERVER_STOPPED,
-                (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Stopped callback) -> {
+                (fuzs.puzzleslib.common.api.event.v1.server.ServerLifecycleEvents.Stopped callback) -> {
                     return callback::onServerStopped;
                 });
         INSTANCE.register(PlaySoundEvents.AtPosition.class, FabricLevelEvents.PLAY_SOUND_AT_POSITION);

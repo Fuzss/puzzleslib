@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.api.client.event.v1;
 
-import fuzs.puzzleslib.api.client.event.v1.ClientInputEvents;
-import fuzs.puzzleslib.api.client.event.v1.gui.ChatMessageReceivedCallback;
+import fuzs.puzzleslib.common.api.client.event.v1.ClientInputEvents;
+import fuzs.puzzleslib.common.api.client.event.v1.gui.ChatMessageReceivedCallback;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
 

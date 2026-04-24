@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.attachment.builder;
 
-import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
+import fuzs.puzzleslib.common.api.attachment.v4.DataAttachmentRegistry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.Level;
 

@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.event;
 
 import com.mojang.serialization.Codec;
-import fuzs.puzzleslib.api.util.v1.CodecExtras;
+import fuzs.puzzleslib.common.api.util.v1.CodecExtras;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.SpawnGroupData;

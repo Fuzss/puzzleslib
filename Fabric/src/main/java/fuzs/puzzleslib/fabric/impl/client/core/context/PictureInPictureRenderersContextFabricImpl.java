@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.client.core.context;
 
-import fuzs.puzzleslib.api.client.core.v1.context.PictureInPictureRenderersContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.PictureInPictureRenderersContext;
 import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;

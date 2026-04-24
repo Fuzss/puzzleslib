@@ -1,11 +1,11 @@
 package fuzs.puzzleslib.fabric.impl.event;
 
 import com.google.common.base.Preconditions;
-import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
-import fuzs.puzzleslib.api.event.v1.data.MutableValue;
+import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.common.api.event.v1.data.MutableFloat;
+import fuzs.puzzleslib.common.api.event.v1.data.MutableValue;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
-import fuzs.puzzleslib.impl.event.data.DefaultedFloat;
+import fuzs.puzzleslib.common.impl.event.data.DefaultedFloat;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;

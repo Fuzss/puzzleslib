@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import fuzs.puzzleslib.api.event.v1.data.MutableValue;
+import fuzs.puzzleslib.common.api.event.v1.data.MutableValue;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.ai.goal.BreedGoal;

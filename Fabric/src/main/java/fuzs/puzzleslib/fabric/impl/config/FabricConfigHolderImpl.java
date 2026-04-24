@@ -3,11 +3,11 @@ package fuzs.puzzleslib.fabric.impl.config;
 import com.electronwill.nightconfig.core.file.FileWatcher;
 import fuzs.forgeconfigapiport.fabric.api.v5.ConfigRegistry;
 import fuzs.forgeconfigapiport.fabric.api.v5.ModConfigEvents;
-import fuzs.puzzleslib.api.config.v3.ConfigCore;
-import fuzs.puzzleslib.api.config.v3.ConfigHolder;
-import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.config.ConfigDataHolderImpl;
-import fuzs.puzzleslib.impl.config.ConfigHolderImpl;
+import fuzs.puzzleslib.common.api.config.v3.ConfigCore;
+import fuzs.puzzleslib.common.api.config.v3.ConfigHolder;
+import fuzs.puzzleslib.common.impl.PuzzlesLib;
+import fuzs.puzzleslib.common.impl.config.ConfigDataHolderImpl;
+import fuzs.puzzleslib.common.impl.config.ConfigHolderImpl;
 import net.neoforged.fml.config.ModConfig;
 
 import java.nio.file.Path;

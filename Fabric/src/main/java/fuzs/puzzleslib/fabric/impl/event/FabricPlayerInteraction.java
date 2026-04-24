@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.event;
 
-import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
-import fuzs.puzzleslib.api.network.v4.MessageSender;
+import fuzs.puzzleslib.common.api.event.v1.core.EventResultHolder;
+import fuzs.puzzleslib.common.api.network.v4.MessageSender;
 import fuzs.puzzleslib.fabric.impl.core.FabricProxy;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;

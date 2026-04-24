@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.init;
 
-import fuzs.puzzleslib.api.init.v3.registry.RegistryFactory;
+import fuzs.puzzleslib.common.api.init.v3.registry.RegistryFactory;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;

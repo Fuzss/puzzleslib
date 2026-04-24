@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.data.MutableInt;
+import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.common.api.event.v1.data.MutableInt;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;

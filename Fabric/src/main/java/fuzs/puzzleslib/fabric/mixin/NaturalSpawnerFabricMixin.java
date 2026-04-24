@@ -2,7 +2,7 @@ package fuzs.puzzleslib.fabric.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
-import fuzs.puzzleslib.impl.event.PotentialSpawnsList;
+import fuzs.puzzleslib.common.impl.event.PotentialSpawnsList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;

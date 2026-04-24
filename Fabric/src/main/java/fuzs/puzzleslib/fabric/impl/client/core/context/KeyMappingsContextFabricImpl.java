@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.fabric.impl.client.core.context;
 
 import com.google.common.collect.Sets;
-import fuzs.puzzleslib.api.client.core.v1.context.KeyMappingsContext;
-import fuzs.puzzleslib.api.client.key.v1.KeyActivationContext;
-import fuzs.puzzleslib.api.client.key.v1.KeyActivationHandler;
+import fuzs.puzzleslib.common.api.client.core.v1.context.KeyMappingsContext;
+import fuzs.puzzleslib.common.api.client.key.v1.KeyActivationContext;
+import fuzs.puzzleslib.common.api.client.key.v1.KeyActivationHandler;
 import fuzs.puzzleslib.fabric.impl.client.key.ActivationContextKeyMapping;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;

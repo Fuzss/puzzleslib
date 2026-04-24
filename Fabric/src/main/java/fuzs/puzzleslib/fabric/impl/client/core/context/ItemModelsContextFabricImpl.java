@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.client.core.context;
 
 import com.mojang.serialization.MapCodec;
-import fuzs.puzzleslib.api.client.core.v1.context.ItemModelsContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.ItemModelsContext;
 import net.minecraft.client.color.item.ItemTintSource;
 import net.minecraft.client.color.item.ItemTintSources;
 import net.minecraft.client.renderer.item.ItemModel;

@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.neoforge.impl.core;
 
 import com.google.common.base.Suppliers;
-import fuzs.puzzleslib.api.core.v1.ModContainer;
-import fuzs.puzzleslib.api.core.v1.ModLoader;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.common.api.core.v1.ModContainer;
+import fuzs.puzzleslib.common.api.core.v1.ModLoader;
+import fuzs.puzzleslib.common.api.core.v1.ModLoaderEnvironment;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.data.loading.DatagenModLoader;

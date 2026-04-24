@@ -1,10 +1,10 @@
 package fuzs.puzzleslib.fabric.impl;
 
-import fuzs.puzzleslib.api.core.v1.ModConstructor;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.PuzzlesLibMod;
-import fuzs.puzzleslib.impl.content.PuzzlesLibDevelopment;
+import fuzs.puzzleslib.common.api.core.v1.ModConstructor;
+import fuzs.puzzleslib.common.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.common.impl.PuzzlesLib;
+import fuzs.puzzleslib.common.impl.PuzzlesLibMod;
+import fuzs.puzzleslib.common.impl.content.PuzzlesLibDevelopment;
 import net.fabricmc.api.ModInitializer;
 
 public class PuzzlesLibFabric implements ModInitializer {

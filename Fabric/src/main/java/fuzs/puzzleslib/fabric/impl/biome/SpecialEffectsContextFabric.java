@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.biome;
 
-import fuzs.puzzleslib.api.biome.v1.SpecialEffectsContext;
+import fuzs.puzzleslib.common.api.biome.v1.SpecialEffectsContext;
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import org.jspecify.annotations.NonNull;

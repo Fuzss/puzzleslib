@@ -1,10 +1,10 @@
 package fuzs.puzzleslib.fabric.impl.client.core;
 
 import fuzs.forgeconfigapiport.fabric.api.v5.client.ConfigScreenFactoryRegistry;
-import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
-import fuzs.puzzleslib.api.client.renderer.v1.model.MutableBakedQuad;
-import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
+import fuzs.puzzleslib.common.api.client.core.v1.ClientModConstructor;
+import fuzs.puzzleslib.common.api.client.key.v1.KeyMappingHelper;
+import fuzs.puzzleslib.common.api.client.renderer.v1.model.MutableBakedQuad;
+import fuzs.puzzleslib.common.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import fuzs.puzzleslib.fabric.impl.client.config.CustomConfigurationScreen;
 import fuzs.puzzleslib.fabric.impl.client.core.context.GuiLayersContextFabricImpl;
@@ -12,8 +12,8 @@ import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.fabric.impl.client.key.FabricKeyMappingHelper;
 import fuzs.puzzleslib.fabric.impl.core.FabricCommonProxy;
 import fuzs.puzzleslib.fabric.impl.core.context.PayloadTypesContextFabricImpl;
-import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
-import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
+import fuzs.puzzleslib.common.impl.client.core.proxy.ClientProxyImpl;
+import fuzs.puzzleslib.common.impl.core.context.ModConstructorImpl;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;

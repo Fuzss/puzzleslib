@@ -1,12 +1,12 @@
 package fuzs.puzzleslib.fabric.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.data.MutableInt;
-import fuzs.puzzleslib.api.event.v1.data.MutableValue;
+import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.common.api.event.v1.data.MutableInt;
+import fuzs.puzzleslib.common.api.event.v1.data.MutableValue;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import fuzs.puzzleslib.fabric.impl.event.GrindstoneExperienceHolder;
-import fuzs.puzzleslib.impl.event.EventImplHelper;
+import fuzs.puzzleslib.common.impl.event.EventImplHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;

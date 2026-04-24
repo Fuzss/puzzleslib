@@ -2,10 +2,10 @@ package fuzs.puzzleslib.fabric.impl.core.context;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.api.biome.v1.BiomeLoadingContext;
-import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
-import fuzs.puzzleslib.api.biome.v1.BiomeModificationContext;
-import fuzs.puzzleslib.api.core.v1.context.BiomeModificationsContext;
+import fuzs.puzzleslib.common.api.biome.v1.BiomeLoadingContext;
+import fuzs.puzzleslib.common.api.biome.v1.BiomeLoadingPhase;
+import fuzs.puzzleslib.common.api.biome.v1.BiomeModificationContext;
+import fuzs.puzzleslib.common.api.core.v1.context.BiomeModificationsContext;
 import fuzs.puzzleslib.fabric.impl.biome.*;
 import net.fabricmc.fabric.api.biome.v1.BiomeModification;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;

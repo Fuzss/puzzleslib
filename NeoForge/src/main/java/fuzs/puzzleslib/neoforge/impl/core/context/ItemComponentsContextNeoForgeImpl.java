@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.core.context;
 
-import fuzs.puzzleslib.api.core.v1.context.ItemComponentsContext;
+import fuzs.puzzleslib.common.api.core.v1.context.ItemComponentsContext;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;

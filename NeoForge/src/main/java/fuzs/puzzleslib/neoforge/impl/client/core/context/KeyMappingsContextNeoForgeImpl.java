@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
 import com.google.common.collect.Sets;
-import fuzs.puzzleslib.api.client.core.v1.context.KeyMappingsContext;
-import fuzs.puzzleslib.api.client.key.v1.KeyActivationHandler;
-import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
+import fuzs.puzzleslib.common.api.client.core.v1.context.KeyMappingsContext;
+import fuzs.puzzleslib.common.api.client.key.v1.KeyActivationHandler;
+import fuzs.puzzleslib.common.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.neoforge.impl.client.key.NeoForgeKeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;

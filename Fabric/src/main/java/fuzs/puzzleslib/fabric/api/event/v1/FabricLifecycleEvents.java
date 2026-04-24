@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.api.event.v1;
 
-import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
+import fuzs.puzzleslib.common.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
 

@@ -1,11 +1,11 @@
 package fuzs.puzzleslib.fabric.impl.attachment;
 
-import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
+import fuzs.puzzleslib.common.api.attachment.v4.DataAttachmentRegistry;
 import fuzs.puzzleslib.fabric.impl.attachment.builder.FabricBlockEntityDataAttachmentBuilder;
 import fuzs.puzzleslib.fabric.impl.attachment.builder.FabricEntityDataAttachmentBuilder;
 import fuzs.puzzleslib.fabric.impl.attachment.builder.FabricLevelChunkDataAttachmentBuilder;
 import fuzs.puzzleslib.fabric.impl.attachment.builder.FabricLevelDataAttachmentBuilder;
-import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
+import fuzs.puzzleslib.common.impl.attachment.DataAttachmentRegistryImpl;
 
 public final class FabricDataAttachmentRegistryImpl implements DataAttachmentRegistryImpl {
 

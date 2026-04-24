@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.client.core.context;
 
 import com.google.common.collect.ImmutableMap;
-import fuzs.puzzleslib.api.client.core.v1.context.ResourcePackReloadListenersContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.ResourcePackReloadListenersContext;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.fabric.api.resource.v1.reloader.ResourceReloaderKeys;
 import net.minecraft.resources.Identifier;

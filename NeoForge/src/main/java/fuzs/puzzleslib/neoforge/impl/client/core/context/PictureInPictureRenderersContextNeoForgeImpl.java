@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
-import fuzs.puzzleslib.api.client.core.v1.context.PictureInPictureRenderersContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.PictureInPictureRenderersContext;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;

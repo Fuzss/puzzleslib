@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.init;
 
-import fuzs.puzzleslib.api.event.v1.server.RegisterPotionBrewingMixesCallback;
+import fuzs.puzzleslib.common.api.event.v1.server.RegisterPotionBrewingMixesCallback;
 import net.minecraft.core.Holder;
 import net.minecraft.world.item.PotionItem;
 import net.minecraft.world.item.alchemy.Potion;

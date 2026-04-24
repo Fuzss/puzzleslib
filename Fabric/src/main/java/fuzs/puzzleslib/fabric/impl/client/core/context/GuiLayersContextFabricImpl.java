@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.client.core.context;
 
 import com.google.common.collect.ImmutableMap;
-import fuzs.puzzleslib.api.client.core.v1.context.GuiLayersContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.GuiLayersContext;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudStatusBarHeightRegistry;

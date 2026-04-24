@@ -4,7 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.authlib.GameProfile;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientPlayerEvents;
-import fuzs.puzzleslib.impl.event.data.DefaultedFloat;
+import fuzs.puzzleslib.common.impl.event.data.DefaultedFloat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.util.Mth;

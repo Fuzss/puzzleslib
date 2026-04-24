@@ -2,9 +2,9 @@ package fuzs.puzzleslib.fabric.impl.core;
 
 import fuzs.puzzleslib.fabric.impl.config.FabricConfigHolderImpl;
 import fuzs.puzzleslib.fabric.impl.init.FabricRegistryManager;
-import fuzs.puzzleslib.impl.config.ConfigHolderImpl;
-import fuzs.puzzleslib.impl.core.ModContext;
-import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
+import fuzs.puzzleslib.common.impl.config.ConfigHolderImpl;
+import fuzs.puzzleslib.common.impl.core.ModContext;
+import fuzs.puzzleslib.common.impl.init.RegistryManagerImpl;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;

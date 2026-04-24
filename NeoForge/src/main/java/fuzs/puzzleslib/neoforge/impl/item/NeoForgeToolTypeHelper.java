@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.item;
 
-import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
+import fuzs.puzzleslib.common.api.item.v2.ToolTypeHelper;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.Tags;

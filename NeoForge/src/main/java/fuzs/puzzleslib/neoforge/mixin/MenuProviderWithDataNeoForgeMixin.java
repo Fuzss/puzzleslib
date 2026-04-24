@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.neoforge.mixin;
 
-import fuzs.puzzleslib.api.container.v1.MenuProviderWithData;
-import fuzs.puzzleslib.impl.event.EventImplHelper;
+import fuzs.puzzleslib.common.api.container.v1.MenuProviderWithData;
+import fuzs.puzzleslib.common.impl.event.EventImplHelper;
 import fuzs.puzzleslib.neoforge.impl.init.MenuTypeWithData;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;

@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.client.renderer;
 
-import fuzs.puzzleslib.api.client.renderer.v1.model.MutableBakedQuad;
+import fuzs.puzzleslib.common.api.client.renderer.v1.model.MutableBakedQuad;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.neoforged.neoforge.client.model.quad.BakedColors;
 import net.neoforged.neoforge.client.model.quad.BakedNormals;

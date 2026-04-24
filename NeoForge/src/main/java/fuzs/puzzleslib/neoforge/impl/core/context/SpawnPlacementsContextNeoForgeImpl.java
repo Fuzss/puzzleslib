@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.core.context;
 
-import fuzs.puzzleslib.api.core.v1.context.SpawnPlacementsContext;
+import fuzs.puzzleslib.common.api.core.v1.context.SpawnPlacementsContext;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.SpawnPlacementType;

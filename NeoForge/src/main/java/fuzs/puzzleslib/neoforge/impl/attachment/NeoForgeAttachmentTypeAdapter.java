@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.attachment;
 
-import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
+import fuzs.puzzleslib.common.impl.attachment.AttachmentTypeAdapter;
 import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;

@@ -1,11 +1,11 @@
 package fuzs.puzzleslib.neoforge.impl.config;
 
 import com.electronwill.nightconfig.core.file.FileWatcher;
-import fuzs.puzzleslib.api.config.v3.ConfigCore;
-import fuzs.puzzleslib.api.config.v3.ConfigHolder;
-import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.config.ConfigDataHolderImpl;
-import fuzs.puzzleslib.impl.config.ConfigHolderImpl;
+import fuzs.puzzleslib.common.api.config.v3.ConfigCore;
+import fuzs.puzzleslib.common.api.config.v3.ConfigHolder;
+import fuzs.puzzleslib.common.impl.PuzzlesLib;
+import fuzs.puzzleslib.common.impl.config.ConfigDataHolderImpl;
+import fuzs.puzzleslib.common.impl.config.ConfigHolderImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;

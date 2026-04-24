@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricEntityEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;

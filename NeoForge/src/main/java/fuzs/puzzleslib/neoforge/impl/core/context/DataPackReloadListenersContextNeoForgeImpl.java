@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.core.context;
 
 import com.google.common.collect.ImmutableMap;
-import fuzs.puzzleslib.api.core.v1.context.DataPackReloadListenersContext;
+import fuzs.puzzleslib.common.api.core.v1.context.DataPackReloadListenersContext;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.neoforged.neoforge.event.AddServerReloadListenersEvent;

@@ -1,0 +1,46 @@
+package fuzs.puzzleslib.common.impl.resources;
+
+import fuzs.puzzleslib.common.api.resources.v1.AbstractModPackResources;
+import net.minecraft.SharedConstants;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.packs.PackLocationInfo;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.resources.ResourceMetadata;
+import net.minecraft.util.InclusiveRange;
+
+public record ModPackResourcesSupplier(PackType packType,
+                                       PackLocationInfo info,
+                                       PackResourcesSupplier<AbstractModPackResources> supplier,
+                                       ResourceMetadata metadata) implements Pack.ResourcesSupplier {
+
+    public static ModPackResourcesSupplier create(PackType packType, PackLocationInfo info, PackResourcesSupplier<AbstractModPackResources> supplier, Component description) {
+        PackMetadataSection metadataSection = new PackMetadataSection(description,
+                new InclusiveRange<>(SharedConstants.getCurrentVersion().packVersion(packType)));
+        return new ModPackResourcesSupplier(packType,
+                info,
+                supplier,
+                ResourceMetadata.of(PackMetadataSection.forPackType(packType), metadataSection));
+    }
+
+    @Override
+    public PackResources openPrimary(PackLocationInfo info) {
+        return this.getAndSetupPackResources();
+    }
+
+    @Override
+    public PackResources openFull(PackLocationInfo info, Pack.Metadata packMetadata) {
+        return this.getAndSetupPackResources();
+    }
+
+    private AbstractModPackResources getAndSetupPackResources() {
+        return this.supplier.apply(this.packType, this.info, this.metadata);
+    }
+
+    @FunctionalInterface
+    public interface PackResourcesSupplier<T extends PackResources> {
+        T apply(PackType packType, PackLocationInfo info, ResourceMetadata metadata);
+    }
+}

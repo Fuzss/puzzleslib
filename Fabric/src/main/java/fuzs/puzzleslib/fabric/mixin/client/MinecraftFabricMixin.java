@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
-import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientLevelEvents;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientPlayerEvents;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;

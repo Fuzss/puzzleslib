@@ -2,9 +2,9 @@ package fuzs.puzzleslib.fabric.mixin;
 
 import com.llamalad7.mixinextras.sugar.Cancellable;
 import com.llamalad7.mixinextras.sugar.Local;
-import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
-import fuzs.puzzleslib.impl.event.data.DefaultedValue;
+import fuzs.puzzleslib.common.impl.event.data.DefaultedValue;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.behavior.StartAttacking;

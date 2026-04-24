@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.neoforge.api.event.v1.core;
 
-import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
-import fuzs.puzzleslib.api.event.v1.core.EventInvokerRegistry;
-import fuzs.puzzleslib.api.event.v1.core.EventPhase;
+import fuzs.puzzleslib.common.api.event.v1.core.EventInvoker;
+import fuzs.puzzleslib.common.api.event.v1.core.EventInvokerRegistry;
+import fuzs.puzzleslib.common.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.neoforge.impl.event.NeoForgeEventInvokerRegistryImpl;
 import net.neoforged.bus.api.Event;
 import org.jspecify.annotations.Nullable;

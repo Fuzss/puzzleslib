@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.core.context;
 
 import com.mojang.serialization.Codec;
-import fuzs.puzzleslib.api.core.v1.context.DataPackRegistriesContext;
+import fuzs.puzzleslib.common.api.core.v1.context.DataPackRegistriesContext;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;

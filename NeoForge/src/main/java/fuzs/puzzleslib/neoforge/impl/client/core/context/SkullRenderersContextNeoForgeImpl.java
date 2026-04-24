@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
-import fuzs.puzzleslib.api.client.core.v1.context.SkullRenderersContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.SkullRenderersContext;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.object.skull.SkullModelBase;
 import net.minecraft.resources.Identifier;

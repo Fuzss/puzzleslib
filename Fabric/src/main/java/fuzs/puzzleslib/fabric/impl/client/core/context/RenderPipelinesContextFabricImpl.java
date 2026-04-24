@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.client.core.context;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import fuzs.puzzleslib.api.client.core.v1.context.RenderPipelinesContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.RenderPipelinesContext;
 import net.minecraft.client.renderer.RenderPipelines;
 
 import java.util.Objects;

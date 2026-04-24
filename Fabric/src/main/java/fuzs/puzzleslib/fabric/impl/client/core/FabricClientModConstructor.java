@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.fabric.impl.client.core;
 
-import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
+import fuzs.puzzleslib.common.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.fabric.impl.client.core.context.*;
-import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
+import fuzs.puzzleslib.common.impl.core.context.ModConstructorImpl;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.minecraft.client.Minecraft;
 

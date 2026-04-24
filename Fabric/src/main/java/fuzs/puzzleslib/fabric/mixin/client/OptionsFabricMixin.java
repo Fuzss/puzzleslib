@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
-import fuzs.puzzleslib.impl.content.client.PuzzlesLibClientDevelopment;
+import fuzs.puzzleslib.common.impl.content.client.PuzzlesLibClientDevelopment;
 import net.minecraft.client.Options;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

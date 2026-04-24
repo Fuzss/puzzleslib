@@ -1,16 +1,16 @@
 package fuzs.puzzleslib.neoforge.impl.core;
 
-import fuzs.puzzleslib.api.core.v1.ModConstructor;
-import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
-import fuzs.puzzleslib.api.data.v2.AbstractRecipeProvider;
-import fuzs.puzzleslib.api.data.v2.recipes.TransformingRecipeOutput;
-import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
-import fuzs.puzzleslib.api.init.v3.registry.RegistryFactory;
-import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
-import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
-import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
-import fuzs.puzzleslib.impl.core.ModContext;
-import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
+import fuzs.puzzleslib.common.api.core.v1.ModConstructor;
+import fuzs.puzzleslib.common.api.core.v1.context.PayloadTypesContext;
+import fuzs.puzzleslib.common.api.data.v2.AbstractRecipeProvider;
+import fuzs.puzzleslib.common.api.data.v2.recipes.TransformingRecipeOutput;
+import fuzs.puzzleslib.common.api.data.v2.tags.AbstractTagAppender;
+import fuzs.puzzleslib.common.api.init.v3.registry.RegistryFactory;
+import fuzs.puzzleslib.common.api.item.v2.ToolTypeHelper;
+import fuzs.puzzleslib.common.api.item.v2.crafting.CombinedIngredients;
+import fuzs.puzzleslib.common.impl.attachment.DataAttachmentRegistryImpl;
+import fuzs.puzzleslib.common.impl.core.ModContext;
+import fuzs.puzzleslib.common.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.neoforge.impl.attachment.NeoForgeDataAttachmentRegistryImpl;
 import fuzs.puzzleslib.neoforge.impl.core.context.PayloadTypesContextNeoForgeImpl;
 import fuzs.puzzleslib.neoforge.impl.data.NeoForgeTagAppender;

@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.core.context;
 
-import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
-import fuzs.puzzleslib.api.resources.v1.PackResourcesHelper;
+import fuzs.puzzleslib.common.api.core.v1.context.PackRepositorySourcesContext;
+import fuzs.puzzleslib.common.api.resources.v1.PackResourcesHelper;
 import net.fabricmc.fabric.api.resource.v1.pack.PackActivationType;
 import net.fabricmc.fabric.impl.resource.ResourceLoaderImpl;
 import net.fabricmc.loader.api.FabricLoader;

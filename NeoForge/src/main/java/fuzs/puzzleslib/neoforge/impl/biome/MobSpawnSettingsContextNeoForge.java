@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.biome;
 
-import fuzs.puzzleslib.api.biome.v1.MobSpawnSettingsContext;
+import fuzs.puzzleslib.common.api.biome.v1.MobSpawnSettingsContext;
 import net.minecraft.util.random.Weighted;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;

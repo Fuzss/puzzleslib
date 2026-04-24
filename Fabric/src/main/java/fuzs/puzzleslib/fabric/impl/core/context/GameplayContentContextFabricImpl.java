@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.core.context;
 
 import com.google.common.base.Preconditions;
-import fuzs.puzzleslib.api.core.v1.context.GameplayContentContext;
+import fuzs.puzzleslib.common.api.core.v1.context.GameplayContentContext;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import net.fabricmc.fabric.api.registry.*;

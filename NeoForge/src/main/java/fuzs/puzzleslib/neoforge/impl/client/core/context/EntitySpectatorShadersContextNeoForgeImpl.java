@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
-import fuzs.puzzleslib.api.client.core.v1.context.EntitySpectatorShadersContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.EntitySpectatorShadersContext;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.neoforged.neoforge.client.event.RegisterEntitySpectatorShadersEvent;

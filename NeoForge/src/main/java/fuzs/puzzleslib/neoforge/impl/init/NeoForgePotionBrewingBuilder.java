@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.init;
 
-import fuzs.puzzleslib.api.event.v1.server.RegisterPotionBrewingMixesCallback;
+import fuzs.puzzleslib.common.api.event.v1.server.RegisterPotionBrewingMixesCallback;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;

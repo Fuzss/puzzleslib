@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.core.context;
 
-import fuzs.puzzleslib.api.core.v1.context.EntityAttributesContext;
+import fuzs.puzzleslib.common.api.core.v1.context.EntityAttributesContext;
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;

@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.fabric.impl.core;
 
 import com.google.common.base.Suppliers;
-import fuzs.puzzleslib.api.core.v1.ModContainer;
-import fuzs.puzzleslib.api.core.v1.ModLoader;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.common.api.core.v1.ModContainer;
+import fuzs.puzzleslib.common.api.core.v1.ModLoader;
+import fuzs.puzzleslib.common.api.core.v1.ModLoaderEnvironment;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 

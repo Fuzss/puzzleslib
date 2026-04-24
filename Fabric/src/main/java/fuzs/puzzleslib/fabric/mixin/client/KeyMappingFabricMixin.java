@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
-import fuzs.puzzleslib.api.client.key.v1.KeyActivationContext;
+import fuzs.puzzleslib.common.api.client.key.v1.KeyActivationContext;
 import fuzs.puzzleslib.fabric.impl.client.key.ActivationContextKeyMapping;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.input.KeyEvent;

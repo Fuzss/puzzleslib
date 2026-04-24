@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
 import com.google.common.collect.ImmutableMap;
-import fuzs.puzzleslib.api.client.core.v1.context.GuiLayersContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.GuiLayersContext;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;

@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.item;
 
-import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
+import fuzs.puzzleslib.common.api.item.v2.ToolTypeHelper;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.world.item.ItemStack;
 

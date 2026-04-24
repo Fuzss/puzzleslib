@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.core;
 
-import fuzs.puzzleslib.api.core.v1.ModContainer;
+import fuzs.puzzleslib.common.api.core.v1.ModContainer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.api.metadata.Person;

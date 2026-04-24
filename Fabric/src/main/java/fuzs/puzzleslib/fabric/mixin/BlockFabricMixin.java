@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import fuzs.puzzleslib.api.event.v1.data.MutableInt;
+import fuzs.puzzleslib.common.api.event.v1.data.MutableInt;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;

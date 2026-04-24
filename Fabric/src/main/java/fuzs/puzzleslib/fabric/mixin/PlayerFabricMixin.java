@@ -2,12 +2,12 @@ package fuzs.puzzleslib.fabric.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Cancellable;
-import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
-import fuzs.puzzleslib.impl.event.data.DefaultedFloat;
-import fuzs.puzzleslib.impl.event.data.DefaultedValue;
+import fuzs.puzzleslib.common.impl.event.data.DefaultedFloat;
+import fuzs.puzzleslib.common.impl.event.data.DefaultedValue;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;

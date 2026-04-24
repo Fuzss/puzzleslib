@@ -1,12 +1,12 @@
 package fuzs.puzzleslib.neoforge.impl.client.core;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
-import fuzs.puzzleslib.api.client.renderer.v1.model.MutableBakedQuad;
-import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
-import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
-import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
+import fuzs.puzzleslib.common.api.client.core.v1.ClientModConstructor;
+import fuzs.puzzleslib.common.api.client.key.v1.KeyMappingHelper;
+import fuzs.puzzleslib.common.api.client.renderer.v1.model.MutableBakedQuad;
+import fuzs.puzzleslib.common.api.core.v1.context.PayloadTypesContext;
+import fuzs.puzzleslib.common.impl.client.core.proxy.ClientProxyImpl;
+import fuzs.puzzleslib.common.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.impl.client.config.CustomConfigurationScreen;
 import fuzs.puzzleslib.neoforge.impl.client.event.NeoForgeClientEventInvokers;

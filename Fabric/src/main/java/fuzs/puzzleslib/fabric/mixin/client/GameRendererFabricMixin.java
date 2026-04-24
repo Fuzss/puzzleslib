@@ -3,7 +3,7 @@ package fuzs.puzzleslib.fabric.mixin.client;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricRendererEvents;
 import fuzs.puzzleslib.fabric.impl.client.core.context.EntitySpectatorShadersContextFabricImpl;
-import fuzs.puzzleslib.impl.event.data.DefaultedFloat;
+import fuzs.puzzleslib.common.impl.event.data.DefaultedFloat;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.Identifier;

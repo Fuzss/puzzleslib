@@ -1,10 +1,10 @@
 package fuzs.puzzleslib.neoforge.impl.attachment.builder;
 
-import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
-import fuzs.puzzleslib.api.attachment.v4.DataAttachmentType;
-import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
-import fuzs.puzzleslib.impl.attachment.DataAttachmentTypeImpl;
-import fuzs.puzzleslib.impl.attachment.builder.DataAttachmentBuilder;
+import fuzs.puzzleslib.common.api.attachment.v4.DataAttachmentRegistry;
+import fuzs.puzzleslib.common.api.attachment.v4.DataAttachmentType;
+import fuzs.puzzleslib.common.impl.attachment.AttachmentTypeAdapter;
+import fuzs.puzzleslib.common.impl.attachment.DataAttachmentTypeImpl;
+import fuzs.puzzleslib.common.impl.attachment.builder.DataAttachmentBuilder;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.impl.attachment.NeoForgeAttachmentTypeAdapter;
 import net.minecraft.core.HolderLookup;

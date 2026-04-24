@@ -2,7 +2,7 @@ package fuzs.puzzleslib.fabric.mixin;
 
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.Entity;

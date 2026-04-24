@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
-import fuzs.puzzleslib.api.client.core.v1.context.ParticleProvidersContext;
+import fuzs.puzzleslib.common.api.client.core.v1.context.ParticleProvidersContext;
 import fuzs.puzzleslib.neoforge.impl.core.context.AbstractNeoForgeContext;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.ParticleOptions;

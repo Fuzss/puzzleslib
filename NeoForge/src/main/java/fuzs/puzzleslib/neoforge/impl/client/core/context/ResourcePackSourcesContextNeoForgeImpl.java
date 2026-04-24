@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
-import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
+import fuzs.puzzleslib.common.api.core.v1.context.PackRepositorySourcesContext;
 import fuzs.puzzleslib.neoforge.impl.core.context.DataPackSourcesContextNeoForgeImpl;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;

@@ -1,11 +1,11 @@
 package fuzs.puzzleslib.neoforge.impl.core.context;
 
-import fuzs.puzzleslib.api.network.v4.message.Message;
-import fuzs.puzzleslib.api.network.v4.message.configuration.ClientboundConfigurationMessage;
-import fuzs.puzzleslib.api.network.v4.message.configuration.ServerboundConfigurationMessage;
-import fuzs.puzzleslib.api.network.v4.message.play.ClientboundPlayMessage;
-import fuzs.puzzleslib.api.network.v4.message.play.ServerboundPlayMessage;
-import fuzs.puzzleslib.impl.core.context.PayloadTypesContextImpl;
+import fuzs.puzzleslib.common.api.network.v4.message.Message;
+import fuzs.puzzleslib.common.api.network.v4.message.configuration.ClientboundConfigurationMessage;
+import fuzs.puzzleslib.common.api.network.v4.message.configuration.ServerboundConfigurationMessage;
+import fuzs.puzzleslib.common.api.network.v4.message.play.ClientboundPlayMessage;
+import fuzs.puzzleslib.common.api.network.v4.message.play.ServerboundPlayMessage;
+import fuzs.puzzleslib.common.impl.core.context.PayloadTypesContextImpl;
 import fuzs.puzzleslib.neoforge.impl.network.MessageContextNeoForgeImpl;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.FriendlyByteBuf;

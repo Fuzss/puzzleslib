@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.core.context;
 
-import fuzs.puzzleslib.api.core.v1.context.ItemComponentsContext;
+import fuzs.puzzleslib.common.api.core.v1.context.ItemComponentsContext;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentGetter;

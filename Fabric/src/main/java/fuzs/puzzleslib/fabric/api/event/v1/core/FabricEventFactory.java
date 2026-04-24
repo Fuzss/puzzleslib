@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.fabric.api.event.v1.core;
 
 import com.google.common.reflect.AbstractInvocationHandler;
-import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
-import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.common.api.event.v1.core.EventResultHolder;
+import fuzs.puzzleslib.common.impl.PuzzlesLib;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.world.InteractionResult;
