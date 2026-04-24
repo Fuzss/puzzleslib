@@ -236,7 +236,7 @@ public final class TooltipRenderHelper {
      * @param posX              the position on x-axis; would be mouse cursor x for vanilla
      * @param posY              the position on y-axis; would be mouse cursor y for vanilla
      * @param tooltipComponents components to render in the tooltip
-     * @see GuiGraphicsExtractor#renderTooltip(Font, List, int, int, ClientTooltipPositioner, Identifier)
+     * @see GuiGraphicsExtractor#tooltip(Font, List, int, int, ClientTooltipPositioner, Identifier)
      */
     public static void renderTooltipComponents(GuiGraphicsExtractor guiGraphics, int posX, int posY, List<? extends ClientTooltipComponent> tooltipComponents) {
         renderTooltipComponents(guiGraphics, posX, posY, tooltipComponents, null);
@@ -257,7 +257,7 @@ public final class TooltipRenderHelper {
      * @param posY              the position on y-axis; would be mouse cursor y for vanilla
      * @param tooltipComponents the components to render in the tooltip
      * @param tooltipStyle      the optional identifier for overriding the background and frame sprites of the tooltip
-     * @see GuiGraphicsExtractor#renderTooltip(Font, List, int, int, ClientTooltipPositioner, Identifier)
+     * @see GuiGraphicsExtractor#tooltip(Font, List, int, int, ClientTooltipPositioner, Identifier)
      */
     public static void renderTooltipComponents(GuiGraphicsExtractor guiGraphics, int posX, int posY, List<? extends ClientTooltipComponent> tooltipComponents, @Nullable Identifier tooltipStyle) {
 

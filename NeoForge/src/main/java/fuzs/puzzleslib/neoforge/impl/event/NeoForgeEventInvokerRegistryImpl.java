@@ -65,6 +65,7 @@ import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import net.neoforged.neoforge.event.entity.living.*;
 import net.neoforged.neoforge.event.entity.player.*;
 import net.neoforged.neoforge.event.level.*;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
@@ -273,8 +274,8 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                     }
                 });
         INSTANCE.register(BlockEvents.Break.class,
-                BlockEvent.BreakEvent.class,
-                (BlockEvents.Break callback, BlockEvent.BreakEvent event) -> {
+                BreakBlockEvent.class,
+                (BlockEvents.Break callback, BreakBlockEvent event) -> {
                     if (!(event.getLevel() instanceof ServerLevel serverLevel)) {
                         return;
                     }

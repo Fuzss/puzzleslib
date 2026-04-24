@@ -100,7 +100,7 @@ public interface ClientModConstructor {
 
     /**
      * @param context register a resolver responsible for mapping each {@link BlockState} of a block to an
-     *                {@link net.minecraft.client.renderer.block.model.BlockStateModel.UnbakedRoot}
+     *                {@link net.minecraft.client.renderer.block.dispatch.BlockStateModel.UnbakedRoot}
      */
     default void onRegisterBlockStateResolver(BlockStateResolverContext context) {
         // NO-OP

@@ -1,7 +1,5 @@
 package fuzs.puzzleslib.common.api.client.event.v1.renderer;
 
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
 import fuzs.puzzleslib.common.api.event.v1.core.EventInvoker;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
@@ -9,18 +7,14 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.state.level.LevelRenderState;
-import org.joml.Matrix4f;
-import org.joml.Vector4f;
 
 @FunctionalInterface
 public interface ExtractLevelRenderStateCallback {
     EventInvoker<ExtractLevelRenderStateCallback> EVENT = EventInvoker.lookup(ExtractLevelRenderStateCallback.class);
 
     /**
-     * Called during
-     * {@link LevelRenderer#renderLevel(GraphicsResourceAllocator, DeltaTracker, boolean, Camera, Matrix4f, Matrix4f,
-     * Matrix4f, GpuBufferSlice, Vector4f, boolean)}, for setting up the render state of the level for future
-     * rendering.
+     * Called during {@link LevelRenderer#extractLevel(DeltaTracker, Camera, float)}, for setting up the render state of
+     * the level for future rendering.
      *
      * @param levelRenderer the level renderer
      * @param renderState   the level render state

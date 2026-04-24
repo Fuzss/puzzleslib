@@ -18,11 +18,10 @@ public final class RenderGuiEvents {
     public interface Before {
 
         /**
-         * Called at the beginning of {@link Gui#render(GuiGraphicsExtractor, DeltaTracker)}, before vanilla has drawn any gui
-         * elements.
+         * Called at the beginning of {@link Gui#extractRenderState(GuiGraphicsExtractor, DeltaTracker)}, before vanilla
+         * has drawn any gui elements.
          * <p>
-         * For rendering additional elements on the screen use
-         * {@link GuiLayersContext}.
+         * For rendering additional elements on the screen use {@link GuiLayersContext}.
          *
          * @param guiGraphics  the gui graphics component
          * @param deltaTracker the delta tracker, get the partial tick via
@@ -35,11 +34,10 @@ public final class RenderGuiEvents {
     public interface After {
 
         /**
-         * Called at the end of {@link Gui#render(GuiGraphicsExtractor, DeltaTracker)}, after vanilla has drawn all gui
-         * elements.
+         * Called at the end of {@link Gui#extractRenderState(GuiGraphicsExtractor, DeltaTracker)}, after vanilla has
+         * drawn all gui elements.
          * <p>
-         * For rendering additional elements on the screen use
-         * {@link GuiLayersContext}.
+         * For rendering additional elements on the screen use {@link GuiLayersContext}.
          *
          * @param guiGraphics  the gui graphics component
          * @param deltaTracker the delta tracker, get the partial tick via

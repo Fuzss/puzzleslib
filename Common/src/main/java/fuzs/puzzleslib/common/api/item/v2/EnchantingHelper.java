@@ -13,6 +13,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemInstance;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.ConditionalEffect;
 import net.minecraft.world.item.enchantment.EnchantedItemInUse;
@@ -94,7 +95,7 @@ public final class EnchantingHelper {
     }
 
     /**
-     * @see EnchantmentHelper#getItemEnchantmentLevel(Holder, ItemStack)
+     * @see EnchantmentHelper#getItemEnchantmentLevel(Holder, ItemInstance)
      */
     public static int getItemEnchantmentLevel(HolderLookup.Provider registries, ResourceKey<Enchantment> enchantment, ItemStack itemStack) {
         Holder<Enchantment> holder = lookup(registries, enchantment);
@@ -168,7 +169,7 @@ public final class EnchantingHelper {
      * @return the enchantment value effect bonus
      *
      * @see EnchantmentHelper#runIterationOnItem(ItemStack, EnchantmentHelper.EnchantmentVisitor)
-     * @see Enchantment#modifyItemFilteredCount(DataComponentType, ServerLevel, int, ItemStack, MutableFloat)
+     * @see Enchantment#modifyItemFilteredCount(DataComponentType, ServerLevel, int, ItemInstance, MutableFloat)
      */
     public static float getItemFilteredValueEffectBonus(ServerLevel serverLevel, ItemStack itemStack, DataComponentType<List<ConditionalEffect<EnchantmentValueEffect>>> componentType) {
         MutableFloat mutableFloat = new MutableFloat(0.0F);
@@ -186,7 +187,7 @@ public final class EnchantingHelper {
      * @return the enchantment value effect bonus
      *
      * @see EnchantmentHelper#runIterationOnEquipment(LivingEntity, EnchantmentHelper.EnchantmentInSlotVisitor)
-     * @see Enchantment#modifyItemFilteredCount(DataComponentType, ServerLevel, int, ItemStack, MutableFloat)
+     * @see Enchantment#modifyItemFilteredCount(DataComponentType, ServerLevel, int, ItemInstance, MutableFloat)
      */
     public static float getItemFilteredValueEffectBonus(ServerLevel serverLevel, LivingEntity livingEntity, DataComponentType<List<ConditionalEffect<EnchantmentValueEffect>>> componentType) {
         MutableFloat mutableFloat = new MutableFloat(0.0F);

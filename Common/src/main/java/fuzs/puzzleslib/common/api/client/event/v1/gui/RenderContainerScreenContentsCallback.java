@@ -10,9 +10,9 @@ public interface RenderContainerScreenContentsCallback {
             RenderContainerScreenContentsCallback.class);
 
     /**
-     * Called for {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen AbstractContainerScreens},
-     * after the screen foreground is drawn (like text labels) via
-     * {@link AbstractContainerScreen#renderContents(GuiGraphicsExtractor, int, int, float)}.
+     * Called for {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen}, after the screen
+     * foreground is drawn (like text labels) via
+     * {@link AbstractContainerScreen#extractContents(GuiGraphicsExtractor, int, int, float)}.
      *
      * @param screen      the currently displayed screen
      * @param guiGraphics the gui graphics component

@@ -94,7 +94,7 @@ public abstract class SingleChestRenderer<T extends BlockEntity & LidBlockEntity
     protected abstract SpriteId getChestMaterial(T blockEntity, boolean xmasTextures);
 
     /**
-     * A custom chest render state that stores the {@link Material} directly, to allow for working around vanilla's
+     * A custom chest render state that stores the {@link SpriteId} directly, to allow for working around vanilla's
      * {@link net.minecraft.client.renderer.blockentity.state.ChestRenderState.ChestMaterialType} enum class.
      */
     public static class SingleChestRenderState extends ChestRenderState {

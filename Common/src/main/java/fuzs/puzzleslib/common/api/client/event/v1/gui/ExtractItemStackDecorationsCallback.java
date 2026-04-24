@@ -17,8 +17,8 @@ public interface ExtractItemStackDecorationsCallback {
     }
 
     /**
-     * /** Fires at the end of {@link GuiGraphicsExtractor#renderItemDecorations(Font, ItemStack, int, int, String)} and
-     * allows for drawing custom item stack decorations.
+     * /** Fires at the end of {@link GuiGraphicsExtractor#itemDecorations(Font, ItemStack, int, int)} and allows for
+     * drawing custom item stack decorations.
      * <p>
      * In vanilla these are: durability bar, cooldown overlay, and stack count.
      *

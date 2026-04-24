@@ -65,7 +65,7 @@ public final class InteractionInputEvents {
          * Runs before the client performs a pick interaction based on {@link Minecraft#hitResult}, setting a new item
          * stack to the main hand if possible.
          * <p>
-         * This event is placed at the beginning of {@link Minecraft#pickBlock()}.
+         * This event is placed at the beginning of {@link Minecraft#pickBlockOrEntity()}.
          *
          * @param minecraft the minecraft singleton instance
          * @param player    the current client player

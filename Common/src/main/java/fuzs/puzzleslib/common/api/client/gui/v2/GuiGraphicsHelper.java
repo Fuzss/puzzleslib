@@ -12,7 +12,7 @@ import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
-import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 
 /**
  * A helper class for extending the functionality of {@link GuiGraphicsExtractor}. Especially useful for drawing
@@ -35,8 +35,8 @@ public final class GuiGraphicsHelper {
      * @param posY            the y-position
      * @param color           the text color
      * @param backgroundColor the background text color
-     * @see GuiGraphicsExtractor#drawString(Font, Component, int, int, int)
-     * @see Font#drawInBatch8xOutline(FormattedCharSequence, float, float, int, int, Matrix4f, MultiBufferSource,
+     * @see GuiGraphicsExtractor#text(Font, Component, int, int, int)
+     * @see Font#drawInBatch8xOutline(FormattedCharSequence, float, float, int, int, Matrix4fc, MultiBufferSource,
      *         int)
      */
     public static void drawInBatch8xOutline(GuiGraphicsExtractor guiGraphics, Font font, Component component, int posX, int posY, int color, int backgroundColor) {
