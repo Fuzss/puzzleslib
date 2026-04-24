@@ -22,13 +22,14 @@ public final class GameplayContentContextFabricImpl implements GameplayContentCo
         Objects.requireNonNull(fuelItem, "fuel item is null");
         Objects.requireNonNull(fuelValue, "fuel value is null");
         if (this.furnaceFuels.isEmpty()) {
-            FuelRegistryEvents.BUILD.register((FuelValues.Builder builder, FuelRegistryEvents.Context context) -> {
+            FuelValueEvents.BUILD.register((FuelValues.Builder builder, FuelValueEvents.Context context) -> {
                 Fraction fuelBaseValue = Fraction.getFraction(context.baseSmeltTime(), 1);
                 this.furnaceFuels.forEach((Holder<? extends ItemLike> holder, Fraction fraction) -> {
                     builder.add(holder.value(), fraction.multiplyBy(fuelBaseValue).intValue());
                 });
             });
         }
+
         this.furnaceFuels.put(fuelItem, fuelValue);
     }
 
@@ -46,7 +47,7 @@ public final class GameplayContentContextFabricImpl implements GameplayContentCo
         Preconditions.checkArgument(compostingChance >= 0.0F && compostingChance <= 1.0F,
                 "Value " + compostingChance + " outside of range 0.0 -> 1.0");
         Objects.requireNonNull(compostableItem, "compostable item is null");
-        CompostingChanceRegistry.INSTANCE.add(compostableItem.value(), compostingChance);
+        CompostableRegistry.INSTANCE.add(compostableItem.value(), compostingChance);
     }
 
     @Override
@@ -76,13 +77,13 @@ public final class GameplayContentContextFabricImpl implements GameplayContentCo
     public void registerOxidizable(Holder<Block> unoxidizedBlock, Holder<Block> oxidizedBlock) {
         Objects.requireNonNull(unoxidizedBlock, "unoxidized block is null");
         Objects.requireNonNull(oxidizedBlock, "oxidized block is null");
-        OxidizableBlocksRegistry.registerOxidizableBlockPair(unoxidizedBlock.value(), oxidizedBlock.value());
+        OxidizableBlocksRegistry.registerNextStage(unoxidizedBlock.value(), oxidizedBlock.value());
     }
 
     @Override
     public void registerWaxable(Holder<Block> unwaxedBlock, Holder<Block> waxedBlock) {
         Objects.requireNonNull(unwaxedBlock, "unwaxed block is null");
         Objects.requireNonNull(waxedBlock, "waxed block is null");
-        OxidizableBlocksRegistry.registerWaxableBlockPair(unwaxedBlock.value(), waxedBlock.value());
+        OxidizableBlocksRegistry.registerWaxable(unwaxedBlock.value(), waxedBlock.value());
     }
 }

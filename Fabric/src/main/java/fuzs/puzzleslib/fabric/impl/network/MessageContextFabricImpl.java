@@ -33,7 +33,7 @@ public final class MessageContextFabricImpl {
 
         @Override
         public ClientConfigurationPacketListenerImpl packetListener() {
-            ClientConfigurationPacketListenerImpl networkHandler = this.context.networkHandler();
+            ClientConfigurationPacketListenerImpl networkHandler = this.context.packetListener();
             Objects.requireNonNull(networkHandler, "network handler is null");
             return networkHandler;
         }
@@ -99,7 +99,7 @@ public final class MessageContextFabricImpl {
 
         @Override
         public ServerConfigurationPacketListenerImpl packetListener() {
-            ServerConfigurationPacketListenerImpl networkHandler = this.context().networkHandler();
+            ServerConfigurationPacketListenerImpl networkHandler = this.context().packetListener();
             Objects.requireNonNull(networkHandler, "network handler is null");
             return networkHandler;
         }

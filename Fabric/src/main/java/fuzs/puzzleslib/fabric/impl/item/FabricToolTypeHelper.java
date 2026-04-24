@@ -33,7 +33,7 @@ public final class FabricToolTypeHelper implements ToolTypeHelper {
 
     @Override
     public boolean isTridentLike(ItemStack itemStack) {
-        return ToolTypeHelper.super.isTridentLike(itemStack) || itemStack.is(ConventionalItemTags.SPEAR_TOOLS);
+        return ToolTypeHelper.super.isTridentLike(itemStack) || itemStack.is(ConventionalItemTags.TRIDENT_TOOLS);
     }
 
     @Override

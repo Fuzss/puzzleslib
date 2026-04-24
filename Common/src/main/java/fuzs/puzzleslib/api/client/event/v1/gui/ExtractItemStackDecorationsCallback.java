@@ -9,18 +9,18 @@ import net.minecraft.world.level.ItemLike;
 import java.util.Objects;
 
 @FunctionalInterface
-public interface DrawItemStackOverlayCallback {
+public interface ExtractItemStackDecorationsCallback {
 
-    static EventInvoker<DrawItemStackOverlayCallback> drawItemStackOverlay(ItemLike item) {
+    static EventInvoker<ExtractItemStackDecorationsCallback> extractItemStackDecorations(ItemLike item) {
         Objects.requireNonNull(item, "item is null");
-        return EventInvoker.lookup(DrawItemStackOverlayCallback.class, item.asItem());
+        return EventInvoker.lookup(ExtractItemStackDecorationsCallback.class, item.asItem());
     }
 
     /**
-     * /** Fires at the end of {@link GuiGraphicsExtractor#renderItemDecorations(Font, ItemStack, int, int, String)} and allows
-     * for drawing custom item stack decorations.
+     * /** Fires at the end of {@link GuiGraphicsExtractor#renderItemDecorations(Font, ItemStack, int, int, String)} and
+     * allows for drawing custom item stack decorations.
      * <p>
-     * In vanilla these are: durability bar, cooldown overlay and stack count.
+     * In vanilla these are: durability bar, cooldown overlay, and stack count.
      *
      * @param guiGraphics the gui graphics
      * @param font        the font renderer
@@ -28,5 +28,5 @@ public interface DrawItemStackOverlayCallback {
      * @param posX        the x-position of the item stack
      * @param posY        the y-position of the item stack
      */
-    void onDrawItemStackOverlay(GuiGraphicsExtractor guiGraphics, Font font, ItemStack itemStack, int posX, int posY);
+    void onExtractItemStackDecorations(GuiGraphicsExtractor guiGraphics, Font font, ItemStack itemStack, int posX, int posY);
 }

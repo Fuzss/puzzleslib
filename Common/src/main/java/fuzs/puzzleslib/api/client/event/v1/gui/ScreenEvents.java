@@ -32,9 +32,9 @@ public final class ScreenEvents {
         return EventInvoker.lookup((Class<Remove<T>>) (Class<?>) Remove.class, screen);
     }
 
-    public static <T extends Screen> EventInvoker<BeforeRender<T>> beforeRender(Class<T> screen) {
+    public static <T extends Screen> EventInvoker<BeforeExtract<T>> beforeRender(Class<T> screen) {
         Objects.requireNonNull(screen, "screen type is null");
-        return EventInvoker.lookup((Class<BeforeRender<T>>) (Class<?>) BeforeRender.class, screen);
+        return EventInvoker.lookup((Class<BeforeExtract<T>>) (Class<?>) BeforeExtract.class, screen);
     }
 
     public static <T extends Screen> EventInvoker<AfterBackground<T>> afterBackground(Class<T> screen) {
@@ -42,9 +42,9 @@ public final class ScreenEvents {
         return EventInvoker.lookup((Class<AfterBackground<T>>) (Class<?>) AfterBackground.class, screen);
     }
 
-    public static <T extends Screen> EventInvoker<AfterRender<T>> afterRender(Class<T> screen) {
+    public static <T extends Screen> EventInvoker<AfterExtract<T>> afterRender(Class<T> screen) {
         Objects.requireNonNull(screen, "screen type is null");
-        return EventInvoker.lookup((Class<AfterRender<T>>) (Class<?>) AfterRender.class, screen);
+        return EventInvoker.lookup((Class<AfterExtract<T>>) (Class<?>) AfterExtract.class, screen);
     }
 
     @FunctionalInterface
@@ -97,10 +97,11 @@ public final class ScreenEvents {
     }
 
     @FunctionalInterface
-    public interface BeforeRender<T extends Screen> {
+    public interface BeforeExtract<T extends Screen> {
 
         /**
-         * Runs before a screen is rendered in {@link Screen#render(GuiGraphicsExtractor, int, int, float)}.
+         * Runs before a screen is extracted in
+         * {@link Screen#extractRenderStateWithTooltipAndSubtitles(GuiGraphicsExtractor, int, int, float)}.
          *
          * @param screen      the currently displayed screen
          * @param guiGraphics the gui graphics component
@@ -108,14 +109,15 @@ public final class ScreenEvents {
          * @param mouseY      the y-position of the mouse
          * @param partialTick the partial tick time
          */
-        void onBeforeRender(T screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick);
+        void onBeforeExtract(T screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick);
     }
 
     @FunctionalInterface
     public interface AfterBackground<T extends Screen> {
 
         /**
-         * Runs after a screen background is rendered in {@link Screen#renderBackground(GuiGraphicsExtractor, int, int, float)}.
+         * Runs after a screen background is extracted in
+         * {@link Screen#extractBackground(GuiGraphicsExtractor, int, int, float)}.
          *
          * @param screen      the currently displayed screen
          * @param guiGraphics the gui graphics component
@@ -127,10 +129,11 @@ public final class ScreenEvents {
     }
 
     @FunctionalInterface
-    public interface AfterRender<T extends Screen> {
+    public interface AfterExtract<T extends Screen> {
 
         /**
-         * Runs after a screen is rendered in {@link Screen#render(GuiGraphicsExtractor, int, int, float)}.
+         * Runs after a screen is extracted in
+         * {@link Screen#extractRenderStateWithTooltipAndSubtitles(GuiGraphicsExtractor, int, int, float)}.
          *
          * @param screen      the currently displayed screen
          * @param guiGraphics the gui graphics component
@@ -138,6 +141,6 @@ public final class ScreenEvents {
          * @param mouseY      the y-position of the mouse
          * @param partialTick the partial tick time
          */
-        void onAfterRender(T screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick);
+        void onAfterExtract(T screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick);
     }
 }

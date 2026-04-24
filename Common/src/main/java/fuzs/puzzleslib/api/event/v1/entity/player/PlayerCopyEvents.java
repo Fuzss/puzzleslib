@@ -29,7 +29,7 @@ public final class PlayerCopyEvents {
     public interface Respawn {
 
         /**
-         * Called after player a has been respawned.
+         * Called after a player has been respawned.
          *
          * @param serverPlayer       the new player
          * @param originalStillAlive whether the copy was made when returning from the End dimension, otherwise caused

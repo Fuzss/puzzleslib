@@ -23,12 +23,13 @@ import fuzs.puzzleslib.impl.event.data.DefaultedInt;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
-import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.ExtractItemDecorationsCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityRenderLayerRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldExtractionContext;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelExtractionContext;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.client.player.ClientPreAttackCallback;
@@ -46,11 +47,10 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.item.ItemModel;
-import net.minecraft.client.renderer.state.BlockOutlineRenderState;
+import net.minecraft.client.renderer.state.level.BlockOutlineRenderState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -107,7 +107,7 @@ public final class FabricClientEventInvokers {
                                             EventResultHolder<ItemModel.Unbaked> eventResult = callback.onBeforeBakeItem(
                                                     context.itemId(),
                                                     model,
-                                                    context.bakeContext());
+                                                    context.bakingContext());
                                             return eventResult.getInterrupt().orElse(model);
                                         });
                     });
@@ -121,7 +121,7 @@ public final class FabricClientEventInvokers {
                                             EventResultHolder<ItemModel> eventResult = callback.onAfterBakeItem(context.itemId(),
                                                     model,
                                                     context.sourceModel(),
-                                                    context.bakeContext());
+                                                    context.bakingContext());
                                             return eventResult.getInterrupt().orElse(model);
                                         });
                     });
@@ -181,21 +181,21 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ClientSetupCallback.class, (ClientSetupCallback callback, @Nullable Object context) -> {
             callback.onClientSetup();
         });
-        INSTANCE.register(DrawItemStackOverlayCallback.class,
-                net.fabricmc.fabric.api.client.rendering.v1.DrawItemStackOverlayCallback.EVENT,
-                (DrawItemStackOverlayCallback callback, @Nullable Object context) -> {
+        INSTANCE.register(ExtractItemStackDecorationsCallback.class,
+                ExtractItemDecorationsCallback.EVENT,
+                (ExtractItemStackDecorationsCallback callback, @Nullable Object context) -> {
                     return (GuiGraphicsExtractor guiGraphics, Font font, ItemStack itemStack, int posX, int posY) -> {
                         Objects.requireNonNull(context, "context is null");
                         Item item = (Item) context;
                         if (itemStack.is(item)) {
-                            callback.onDrawItemStackOverlay(guiGraphics, font, itemStack, posX, posY);
+                            callback.onExtractItemStackDecorations(guiGraphics, font, itemStack, posX, posY);
                         }
                     };
                 });
         INSTANCE.register(AddLivingEntityRenderLayersCallback.class,
-                LivingEntityFeatureRendererRegistrationCallback.EVENT,
+                LivingEntityRenderLayerRegistrationCallback.EVENT,
                 (AddLivingEntityRenderLayersCallback callback) -> {
-                    return (EntityType<? extends LivingEntity> entityType, LivingEntityRenderer<?, ?, ?> entityRenderer, LivingEntityFeatureRendererRegistrationCallback.RegistrationHelper registrationHelper, EntityRendererProvider.Context context) -> {
+                    return (EntityType<? extends LivingEntity> entityType, LivingEntityRenderer<?, ?, ?> entityRenderer, LivingEntityRenderLayerRegistrationCallback.RegistrationHelper registrationHelper, EntityRendererProvider.Context context) -> {
                         callback.addLivingEntityRenderLayers(entityType, entityRenderer, context);
                     };
                 });
@@ -281,7 +281,7 @@ public final class FabricClientEventInvokers {
                         callback.onBeforeInit(screen,
                                 scaledWidth,
                                 scaledHeight,
-                                Collections.unmodifiableList(Screens.getButtons(screen)));
+                                Collections.unmodifiableList(Screens.getWidgets(screen)));
                     };
                 });
         INSTANCE.register(ScreenEvents.AfterInit.class,
@@ -293,7 +293,7 @@ public final class FabricClientEventInvokers {
                             return;
                         }
 
-                        List<AbstractWidget> widgets = Screens.getButtons(screen);
+                        List<AbstractWidget> widgets = Screens.getWidgets(screen);
                         callback.onAfterInit(screen,
                                 scaledWidth,
                                 scaledHeight,
@@ -311,18 +311,18 @@ public final class FabricClientEventInvokers {
                     return callback::onRemove;
                 },
                 net.fabricmc.fabric.api.client.screen.v1.ScreenEvents::remove);
-        registerScreenEvent(ScreenEvents.BeforeRender.class,
-                net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.BeforeRender.class,
+        registerScreenEvent(ScreenEvents.BeforeExtract.class,
+                net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.BeforeExtract.class,
                 callback -> {
-                    return callback::onBeforeRender;
+                    return callback::onBeforeExtract;
                 },
-                net.fabricmc.fabric.api.client.screen.v1.ScreenEvents::beforeRender);
-        registerScreenEvent(ScreenEvents.AfterRender.class,
-                net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AfterRender.class,
+                net.fabricmc.fabric.api.client.screen.v1.ScreenEvents::beforeExtract);
+        registerScreenEvent(ScreenEvents.AfterExtract.class,
+                net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AfterExtract.class,
                 callback -> {
-                    return callback::onAfterRender;
+                    return callback::onAfterExtract;
                 },
-                net.fabricmc.fabric.api.client.screen.v1.ScreenEvents::afterRender);
+                net.fabricmc.fabric.api.client.screen.v1.ScreenEvents::afterExtract);
         registerScreenEvent(ScreenEvents.AfterBackground.class,
                 net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AfterBackground.class,
                 callback -> {
@@ -448,7 +448,7 @@ public final class FabricClientEventInvokers {
                                         .translate(posX.getAsInt(), posY.getAsInt() - (guiGraphics.guiHeight() - 48));
                             }
 
-                            hudElement.render(guiGraphics, deltaTracker);
+                            hudElement.extractRenderState(guiGraphics, deltaTracker);
                             guiGraphics.pose().popMatrix();
                         };
                     });
@@ -468,14 +468,14 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(RenderHandEvents.OffHand.class, FabricRendererEvents.RENDER_OFF_HAND);
         INSTANCE.register(ComputeCameraAnglesCallback.class, FabricRendererEvents.COMPUTE_CAMERA_ANGLES);
         INSTANCE.register(ClientLevelTickEvents.Start.class,
-                net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.START_WORLD_TICK,
+                net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.START_LEVEL_TICK,
                 (ClientLevelTickEvents.Start callback) -> {
                     return (ClientLevel clientLevel) -> {
                         callback.onStartLevelTick(Minecraft.getInstance(), clientLevel);
                     };
                 });
         INSTANCE.register(ClientLevelTickEvents.End.class,
-                net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_WORLD_TICK,
+                net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_LEVEL_TICK,
                 (ClientLevelTickEvents.End callback) -> {
                     return (ClientLevel clientLevel) -> {
                         callback.onEndLevelTick(Minecraft.getInstance(), clientLevel);
@@ -592,27 +592,27 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(FogEvents.Color.class, FabricRendererEvents.FOG_COLOR);
         INSTANCE.register(RenderTooltipCallback.class, FabricGuiEvents.RENDER_TOOLTIP);
         INSTANCE.register(ExtractBlockOutlineCallback.class,
-                WorldRenderEvents.AFTER_BLOCK_OUTLINE_EXTRACTION,
+                LevelRenderEvents.AFTER_BLOCK_OUTLINE_EXTRACTION,
                 (ExtractBlockOutlineCallback callback) -> {
-                    return (WorldExtractionContext context, @Nullable HitResult hitResult) -> {
+                    return (LevelExtractionContext context, @Nullable HitResult hitResult) -> {
                         if (hitResult == null || hitResult.getType() != HitResult.Type.BLOCK) {
                             return;
                         }
 
-                        BlockOutlineRenderState renderState = context.worldState().blockOutlineRenderState;
+                        BlockOutlineRenderState renderState = context.levelState().blockOutlineRenderState;
                         if (renderState == null) {
                             return;
                         }
 
                         BlockPos blockPos = ((BlockHitResult) hitResult).getBlockPos();
-                        EventResultHolder<@Nullable VoxelShape> eventResult = callback.onExtractBlockOutline(context.world(),
+                        EventResultHolder<@Nullable VoxelShape> eventResult = callback.onExtractBlockOutline(context.level(),
                                 blockPos,
-                                context.world().getBlockState(blockPos),
+                                context.level().getBlockState(blockPos),
                                 (BlockHitResult) hitResult,
                                 CollisionContext.of(context.camera().entity()));
                         eventResult.ifInterrupt((@Nullable VoxelShape voxelShape) -> {
                             if (voxelShape != null) {
-                                context.worldState().blockOutlineRenderState = new BlockOutlineRenderState(renderState.pos(),
+                                context.levelState().blockOutlineRenderState = new BlockOutlineRenderState(renderState.pos(),
                                         renderState.isTranslucent(),
                                         renderState.highContrast(),
                                         voxelShape,
@@ -620,7 +620,7 @@ public final class FabricClientEventInvokers {
                                         renderState.occlusionShape(),
                                         renderState.interactionShape());
                             } else {
-                                context.worldState().blockOutlineRenderState = null;
+                                context.levelState().blockOutlineRenderState = null;
                             }
                         });
                     };
@@ -633,15 +633,15 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(GatherEffectScreenTooltipCallback.class, FabricGuiEvents.GATHER_EFFECT_SCREEN_TOOLTIP);
         INSTANCE.register(ExtractEntityRenderStateCallback.class, FabricRendererEvents.EXTRACT_ENTITY_RENDER_STATE);
         INSTANCE.register(ExtractLevelRenderStateCallback.class,
-                WorldRenderEvents.END_EXTRACTION,
+                LevelRenderEvents.END_EXTRACTION,
                 (ExtractLevelRenderStateCallback callback) -> {
-                    return (WorldExtractionContext context) -> {
-                        callback.onExtractLevelRenderState(context.worldRenderer(),
-                                context.worldState(),
-                                context.world(),
+                    return (LevelExtractionContext context) -> {
+                        callback.onExtractLevelRenderState(context.levelRenderer(),
+                                context.levelState(),
+                                context.level(),
                                 context.camera(),
-                                context.frustum(),
-                                context.tickCounter());
+                                context.camera().getCullFrustum(),
+                                context.deltaTracker());
                     };
                 });
     }

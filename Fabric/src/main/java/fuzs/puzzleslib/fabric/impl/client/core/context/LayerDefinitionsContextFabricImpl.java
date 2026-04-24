@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.client.core.context;
 
 import fuzs.puzzleslib.api.client.core.v1.context.LayerDefinitionsContext;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.ModelLayerRegistry;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 
@@ -14,6 +14,6 @@ public final class LayerDefinitionsContextFabricImpl implements LayerDefinitions
     public void registerLayerDefinition(ModelLayerLocation modelLayer, Supplier<LayerDefinition> layerSupplier) {
         Objects.requireNonNull(modelLayer, "layer location is null");
         Objects.requireNonNull(layerSupplier, "layer supplier is null");
-        EntityModelLayerRegistry.registerModelLayer(modelLayer, layerSupplier::get);
+        ModelLayerRegistry.registerModelLayer(modelLayer, layerSupplier::get);
     }
 }

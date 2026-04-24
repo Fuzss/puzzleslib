@@ -15,11 +15,11 @@ import java.util.Set;
 import java.util.function.BiPredicate;
 
 public record MobSpawnSettingsContextFabric(MobSpawnSettings mobSpawnSettings,
-                                            BiomeModificationContext.SpawnSettingsContext context) implements MobSpawnSettingsContext {
+                                            BiomeModificationContext.MobSpawnSettingsContext context) implements MobSpawnSettingsContext {
 
     @Override
     public void setCreatureGenerationProbability(float probability) {
-        this.context.setCreatureSpawnProbability(probability);
+        this.context.setCreatureGenerationProbability(probability);
     }
 
     @Override
@@ -34,13 +34,13 @@ public record MobSpawnSettingsContextFabric(MobSpawnSettings mobSpawnSettings,
 
     @Override
     public void setSpawnCost(EntityType<?> entityType, double energyBudget, double charge) {
-        this.context.setSpawnCost(entityType, charge, energyBudget);
+        this.context.addMobCharge(entityType, charge, energyBudget);
     }
 
     @Override
     public boolean clearSpawnCost(EntityType<?> entityType) {
         if (this.getSpawnCost(entityType) != null) {
-            this.context.clearSpawnCost(entityType);
+            this.context.clearMobCharge(entityType);
             return true;
         } else {
             return false;
@@ -49,7 +49,7 @@ public record MobSpawnSettingsContextFabric(MobSpawnSettings mobSpawnSettings,
 
     @Override
     public List<Weighted<MobSpawnSettings.SpawnerData>> getSpawnerData(MobCategory mobCategory) {
-        return this.context.getSpawnEntries(mobCategory);
+        return this.context.getMobs(mobCategory);
     }
 
     @Override

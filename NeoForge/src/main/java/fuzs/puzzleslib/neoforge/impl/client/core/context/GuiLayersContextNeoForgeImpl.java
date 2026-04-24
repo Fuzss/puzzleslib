@@ -50,7 +50,7 @@ public record GuiLayersContextNeoForgeImpl(RegisterGuiLayersEvent event) impleme
     public void registerGuiLayer(Identifier identifier, GuiLayersContext.Layer guiLayer) {
         Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(guiLayer, "gui layer is null");
-        this.event.registerAboveAll(identifier, guiLayer::render);
+        this.event.registerAboveAll(identifier, guiLayer::extractRenderState);
     }
 
     @Override
@@ -60,9 +60,9 @@ public record GuiLayersContextNeoForgeImpl(RegisterGuiLayersEvent event) impleme
         Objects.requireNonNull(guiLayer, "gui layer is null");
         // only check for vanilla layers, it simplifies the implementation and is all we need
         if (VANILLA_GUI_LAYERS.containsKey(identifier)) {
-            this.event.registerAbove(VANILLA_GUI_LAYERS.get(identifier), otherResourceLocation, guiLayer::render);
+            this.event.registerAbove(VANILLA_GUI_LAYERS.get(identifier), otherResourceLocation, guiLayer::extractRenderState);
         } else if (VANILLA_GUI_LAYERS.containsKey(otherResourceLocation)) {
-            this.event.registerBelow(VANILLA_GUI_LAYERS.get(otherResourceLocation), identifier, guiLayer::render);
+            this.event.registerBelow(VANILLA_GUI_LAYERS.get(otherResourceLocation), identifier, guiLayer::extractRenderState);
         } else {
             throw new RuntimeException("Unknown gui layers: " + identifier + ", " + otherResourceLocation);
         }
@@ -81,7 +81,7 @@ public record GuiLayersContextNeoForgeImpl(RegisterGuiLayersEvent event) impleme
                     // render condition is not inherited from the parent, add it back manually,
                     // since all are known for vanilla layers
                     if (isSleepOverlay || !Minecraft.getInstance().options.hideGui) {
-                        guiLayerFactory.apply(guiLayer::render).render(guiGraphics, deltaTracker);
+                        guiLayerFactory.apply(guiLayer::render).extractRenderState(guiGraphics, deltaTracker);
                     }
                 };
             });

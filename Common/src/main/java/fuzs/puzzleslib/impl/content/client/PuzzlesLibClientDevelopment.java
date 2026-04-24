@@ -225,7 +225,7 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
                     minecraft.gui.tabList.setVisible(true);
                     minecraft.gui.tabList.extractRenderState(guiGraphics, guiGraphics.guiWidth(), scoreboard, null);
                 } else {
-                    layer.render(guiGraphics, deltaTracker);
+                    layer.extractRenderState(guiGraphics, deltaTracker);
                 }
             };
         });

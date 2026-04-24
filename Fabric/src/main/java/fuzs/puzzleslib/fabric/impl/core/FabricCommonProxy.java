@@ -25,9 +25,9 @@ import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.item.v1.EnchantingContext;
+import net.fabricmc.fabric.api.menu.v1.ExtendedMenuProvider;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.impl.resource.pack.FabricPack;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
@@ -97,7 +97,7 @@ public class FabricCommonProxy implements FabricProxy {
 
     @Override
     public <T> void openMenu(Player player, MenuProvider menuProvider, T data) {
-        player.openMenu(new ExtendedScreenHandlerFactory<>() {
+        player.openMenu(new ExtendedMenuProvider<>() {
             @Override
             public T getScreenOpeningData(ServerPlayer serverPlayer) {
                 return data;
@@ -206,12 +206,12 @@ public class FabricCommonProxy implements FabricProxy {
 
     @Override
     public Packet<ClientCommonPacketListener> toClientboundPacket(CustomPacketPayload payload) {
-        return ServerPlayNetworking.createS2CPacket(payload);
+        return ServerPlayNetworking.createClientboundPacket(payload);
     }
 
     @Override
     public Packet<ServerCommonPacketListener> toServerboundPacket(CustomPacketPayload payload) {
-        return ClientPlayNetworking.createC2SPacket(payload);
+        return ClientPlayNetworking.createServerboundPacket(payload);
     }
 
     @Override

@@ -7,7 +7,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -22,7 +21,6 @@ public final class PlayerInteractEvents {
     public static final EventInvoker<AttackBlock> ATTACK_BLOCK = EventInvoker.lookup(AttackBlock.class);
     public static final EventInvoker<UseItem> USE_ITEM = EventInvoker.lookup(UseItem.class);
     public static final EventInvoker<UseEntity> USE_ENTITY = EventInvoker.lookup(UseEntity.class);
-    public static final EventInvoker<UseEntityAt> USE_ENTITY_AT = EventInvoker.lookup(UseEntityAt.class);
     public static final EventInvoker<AttackEntity> ATTACK_ENTITY = EventInvoker.lookup(AttackEntity.class);
 
     private PlayerInteractEvents() {
@@ -41,9 +39,10 @@ public final class PlayerInteractEvents {
          * @param level           the level the interaction is happening in
          * @param interactionHand the hand the player is using to interact
          * @param hitResult       the targeted block
-         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance
-         *         supplier to the holder instead, {@link EventResultHolder#pass()} to allow the vanilla behavior for
-         *         this interaction to proceed
+         * @return <ul>
+         *         <li>{@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead</li>
+         *         <li>{@link EventResultHolder#pass()} to allow the vanilla behavior for this interaction to proceed</li>
+         *         </ul>
          */
         EventResultHolder<InteractionResult> onUseBlock(Player player, Level level, InteractionHand interactionHand, BlockHitResult hitResult);
     }
@@ -60,8 +59,10 @@ public final class PlayerInteractEvents {
          * @param interactionHand the hand the player is using to interact
          * @param blockPos        the position of the block in the <code>level</code>
          * @param direction       the direction the block is clicked at
-         * @return {@link EventResult#INTERRUPT} to prevent the player from beginning to mine the block,
-         *         {@link EventResult#PASS} to allow the vanilla behavior for this interaction to proceed
+         * @return <ul>
+         *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the player from beginning to mine the block</li>
+         *         <li>{@link EventResult#PASS PASS} to allow the vanilla behavior for this interaction to proceed</li>
+         *         </ul>
          */
         EventResult onAttackBlock(Player player, Level level, InteractionHand interactionHand, BlockPos blockPos, Direction direction);
     }
@@ -76,9 +77,10 @@ public final class PlayerInteractEvents {
          * @param player          the player using the item
          * @param level           the level the interaction is happening in
          * @param interactionHand the hand the player is holding the item
-         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance
-         *         supplier to the holder instead, {@link EventResultHolder#pass()} to allow the vanilla behavior for
-         *         this interaction to proceed
+         * @return <ul>
+         *         <li>{@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead</li>
+         *         <li>{@link EventResultHolder#pass()} to allow the vanilla behavior for this interaction to proceed</li>
+         *         </ul>
          */
         EventResultHolder<InteractionResult> onUseItem(Player player, Level level, InteractionHand interactionHand);
     }
@@ -88,54 +90,36 @@ public final class PlayerInteractEvents {
 
         /**
          * Called when the player clicks an entity, runs on the player first, then proceeds to calling
-         * {@link Entity#interact(Player, InteractionHand)}.
-         * <p>This type of interaction also allows for opening menus via an entity implementing {@link MenuProvider}.
-         *
-         * @param player          the player interacting with the entity
-         * @param level           the level the interaction is happening in
-         * @param interactionHand the hand the player is using to interact
-         * @param entity          the entity this interaction is happening on
-         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance
-         *         supplier to the holder instead, {@link EventResultHolder#pass()} to allow the vanilla behavior for
-         *         this interaction to proceed
-         */
-        EventResultHolder<InteractionResult> onUseEntity(Player player, Level level, InteractionHand interactionHand, Entity entity);
-    }
-
-    @FunctionalInterface
-    public interface UseEntityAt {
-
-        /**
-         * Called when the player clicks an entity, this interaction includes the exact position where the player
-         * clicked on the entity's bounding box.
-         * <p>For this interaction {@link Entity#interactAt(Player, Vec3, InteractionHand)} is called, if it returns
-         * {@link InteractionResult#PASS} more interactions are tried.
+         * {@link Entity#interact(Player, InteractionHand, Vec3)}.
          *
          * @param player          the player interacting with the entity
          * @param level           the level the interaction is happening in
          * @param interactionHand the hand the player is using to interact
          * @param entity          the entity this interaction is happening on
          * @param hitVector       the exact position where the player has clicked on the entity's bounding box
-         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance
-         *         supplier to the holder instead, {@link EventResultHolder#pass()} to allow the vanilla behavior for
-         *         this interaction to proceed
+         * @return <ul>
+         *         <li>{@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead</li>
+         *         <li>{@link EventResultHolder#pass()} to allow the vanilla behavior for this interaction to proceed</li>
+         *         </ul>
          */
-        EventResultHolder<InteractionResult> onUseEntityAt(Player player, Level level, InteractionHand interactionHand, Entity entity, Vec3 hitVector);
+        EventResultHolder<InteractionResult> onUseEntity(Player player, Level level, InteractionHand interactionHand, Entity entity, Vec3 hitVector);
     }
 
     @FunctionalInterface
     public interface AttackEntity {
 
         /**
-         * Called before a player attack another entity in {@link Player#attack(Entity)}. Allows for preventing the
+         * Called before a player attacks another entity in {@link Player#attack(Entity)}. Allows for preventing the
          * attack.
          *
          * @param player          the player that is attacking
          * @param level           the level the interaction is happening in
          * @param interactionHand the hand the player is using to interact
          * @param entity          the entity under attack
-         * @return {@link EventResult#INTERRUPT} to prevent the entity from being attacked, allows for processing
-         *         different actions on hitting an entity, {@link EventResult#PASS} to allow the entity to be attack
+         * @return <ul>
+         *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the entity from being attacked, allows for processing different actions on hitting an entity</li>
+         *         <li>{@link EventResult#PASS PASS} to allow the entity to be attack</li>
+         *         </ul>
          */
         EventResult onAttackEntity(Player player, Level level, InteractionHand interactionHand, Entity entity);
     }

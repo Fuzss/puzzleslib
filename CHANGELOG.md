@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `CustomTransmuteRecipes` no longer store the `RecipeSerializer`, instead they use the ResourceKey for dynamically
   retrieving the serializer instance
 - Rename `ExtractRenderStateCallback` to `ExtractEntityRenderStateCallback`
+- Rename `DrawItemStackOverlayCallback` to `ExtractItemStackDecorationsCallback`
 
 ### Removed
 
@@ -26,3 +27,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove `VillagerTradesContext`
 - Remove plain `TickingBlockEntity::clientTick` and `TickingBlockEntity::serverTick` methods
 - Remove `AbstractLanguageProvider$BlockFamilyBuilder`
+- Remove `PlayerInteractEvents$UseEntityAt` in favor of `PlayerInteractEvents$UseEntity`

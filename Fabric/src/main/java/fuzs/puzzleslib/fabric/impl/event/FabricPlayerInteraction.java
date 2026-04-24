@@ -64,33 +64,6 @@ public interface FabricPlayerInteraction {
     FabricPlayerInteraction USE_ENTITY = new FabricPlayerInteraction() {
         @Override
         public boolean sendServerboundPacket(InteractionResult interactionResult) {
-            // cancel Fabric Api fully, it sends the wrong packet for a successful interaction
-            return true;
-        }
-
-        @Override
-        public void sendServerboundPacket(Player player, Level level, InteractionHand interactionHand, @Nullable Entity entity, @Nullable HitResult hitResult) {
-            Objects.requireNonNull(entity, "entity is null");
-            MessageSender.broadcast(ServerboundInteractPacket.createInteractionPacket(entity,
-                    player.isShiftKeyDown(),
-                    interactionHand));
-        }
-
-        @Override
-        public InteractionResult finalizeInteraction(InteractionResult interactionResult, Player player, InteractionHand interactionHand) {
-            // Fabric Api usually does this for us, but since we always fail, it will not
-            if (interactionResult instanceof InteractionResult.Success success) {
-                if (success.swingSource() == InteractionResult.SwingSource.CLIENT) {
-                    player.swing(interactionHand);
-                }
-            }
-
-            return InteractionResult.FAIL;
-        }
-    };
-    FabricPlayerInteraction USE_ENTITY_AT = new FabricPlayerInteraction() {
-        @Override
-        public boolean sendServerboundPacket(InteractionResult interactionResult) {
             return !interactionResult.consumesAction();
         }
 
@@ -98,19 +71,17 @@ public interface FabricPlayerInteraction {
         public void sendServerboundPacket(Player player, Level level, InteractionHand interactionHand, @Nullable Entity entity, @Nullable HitResult hitResult) {
             Objects.requireNonNull(entity, "entity is null");
             Objects.requireNonNull(hitResult, "hit result is null");
-            MessageSender.broadcast(ServerboundInteractPacket.createInteractionPacket(entity,
-                    player.isShiftKeyDown(),
+            MessageSender.broadcast(new ServerboundInteractPacket(entity.getId(),
                     interactionHand,
-                    hitResult.getLocation()));
+                    hitResult.getLocation(),
+                    player.isShiftKeyDown()));
         }
     };
 
     default InteractionResult getHandledInteractionResult(EventResultHolder<InteractionResult> eventResult, Player player, Level level, InteractionHand interactionHand, @Nullable Entity entity, @Nullable HitResult hitResult) {
         Optional<InteractionResult> optional = eventResult.getInterrupt();
-
         if (optional.isPresent()) {
             InteractionResult interactionResult = optional.get();
-
             if (level.isClientSide() && this.sendServerboundPacket(interactionResult)) {
                 // this brings parity with Forge where the server is notified regardless of the returned InteractionResult,
                 // as the Forge event runs after the server packet is sent

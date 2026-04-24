@@ -106,7 +106,7 @@ public interface GuiLayersContext {
      * Register a new gui layer rendered after all existing layers.
      *
      * @param identifier the gui layer identifier
-     * @param guiLayer         the gui layer
+     * @param guiLayer   the gui layer
      */
     void registerGuiLayer(Identifier identifier, Layer guiLayer);
 
@@ -115,19 +115,18 @@ public interface GuiLayersContext {
      * <p>
      * The ordering depends on the order in which both identifier arguments are passed.
      *
-     * @param identifier the gui layer identifier, either for the new layer or for the existing vanilla
-     *                         layer
-     * @param otherIdentifier  the other gui layer identifier, either for the new layer or for the existing
-     *                         vanilla layer
-     * @param guiLayer         the gui layer
+     * @param identifier      the gui layer identifier, either for the new layer or for the existing vanilla layer
+     * @param otherIdentifier the other gui layer identifier, either for the new layer or for the existing vanilla
+     *                        layer
+     * @param guiLayer        the gui layer
      */
     void registerGuiLayer(Identifier identifier, Identifier otherIdentifier, Layer guiLayer);
 
     /**
      * Replace an existing vanilla gui layer. Replacing custom layers is not supported.
      *
-     * @param identifier the vanilla gui layer identifier
-     * @param guiLayerFactory  the gui layer factory, receiving the existing layer
+     * @param identifier      the vanilla gui layer identifier
+     * @param guiLayerFactory the gui layer factory, receiving the existing layer
      */
     void replaceGuiLayer(Identifier identifier, UnaryOperator<Layer> guiLayerFactory);
 
@@ -139,8 +138,8 @@ public interface GuiLayersContext {
      * To retrieve the render height for a status bar during rendering of the layer use
      * {@link fuzs.puzzleslib.api.client.gui.v2.ScreenHelper#getLeftStatusBarHeight(Identifier)}.
      *
-     * @param identifier the gui layer identifier
-     * @param heightProvider   the status bar height provider
+     * @param identifier     the gui layer identifier
+     * @param heightProvider the status bar height provider
      */
     void addLeftStatusBarHeightProvider(Identifier identifier, ToIntFunction<Player> heightProvider);
 
@@ -152,8 +151,8 @@ public interface GuiLayersContext {
      * To retrieve the render height for a status bar during rendering of the layer use
      * {@link fuzs.puzzleslib.api.client.gui.v2.ScreenHelper#getRightStatusBarHeight(Identifier)}.
      *
-     * @param identifier the gui layer identifier
-     * @param heightProvider   the status bar height provider
+     * @param identifier     the gui layer identifier
+     * @param heightProvider the status bar height provider
      */
     void addRightStatusBarHeightProvider(Identifier identifier, ToIntFunction<Player> heightProvider);
 
@@ -166,6 +165,6 @@ public interface GuiLayersContext {
          * @param guiGraphics  the gui graphics
          * @param deltaTracker the delta tracker
          */
-        void render(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker);
+        void extractRenderState(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker);
     }
 }

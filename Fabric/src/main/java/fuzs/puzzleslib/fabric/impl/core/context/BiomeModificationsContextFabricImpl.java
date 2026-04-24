@@ -33,8 +33,7 @@ public final class BiomeModificationsContextFabricImpl implements BiomeModificat
     private final BiomeModification biomeModification;
 
     public BiomeModificationsContextFabricImpl(String modId) {
-        this.biomeModification = BiomeModifications.create(Identifier.fromNamespaceAndPath(modId,
-                "biome_modifiers"));
+        this.biomeModification = BiomeModifications.create(Identifier.fromNamespaceAndPath(modId, "biome_modifiers"));
     }
 
     @Override
@@ -60,7 +59,7 @@ public final class BiomeModificationsContextFabricImpl implements BiomeModificat
         GenerationSettingsContextFabric generationSettings = new GenerationSettingsContextFabric(biome.getGenerationSettings(),
                 modificationContext.getGenerationSettings());
         MobSpawnSettingsContextFabric mobSpawnSettings = new MobSpawnSettingsContextFabric(biome.getMobSettings(),
-                modificationContext.getSpawnSettings());
+                modificationContext.getMobSpawnSettings());
         return new BiomeModificationContext(climateSettings, specialEffects, generationSettings, mobSpawnSettings);
     }
 }

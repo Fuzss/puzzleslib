@@ -4,8 +4,8 @@ import fuzs.puzzleslib.api.init.v3.registry.RegistryFactory;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
@@ -19,7 +19,7 @@ public final class FabricRegistryFactory implements RegistryFactory {
         if (defaultKey != null) {
             builder = FabricRegistryBuilder.createDefaulted(registryKey, defaultKey);
         } else {
-            builder = FabricRegistryBuilder.createSimple(registryKey);
+            builder = FabricRegistryBuilder.create(registryKey);
         }
 
         return builder.attribute(RegistryAttribute.OPTIONAL).buildAndRegister();
@@ -32,7 +32,7 @@ public final class FabricRegistryFactory implements RegistryFactory {
         if (defaultKey != null) {
             builder = FabricRegistryBuilder.createDefaulted(registryKey, defaultKey);
         } else {
-            builder = FabricRegistryBuilder.createSimple(registryKey);
+            builder = FabricRegistryBuilder.create(registryKey);
         }
 
         return builder.attribute(RegistryAttribute.OPTIONAL).attribute(RegistryAttribute.SYNCED).buildAndRegister();

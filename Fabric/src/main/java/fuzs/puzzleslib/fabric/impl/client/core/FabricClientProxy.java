@@ -17,8 +17,8 @@ import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.ClientTooltipComponentCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey;
-import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudStatusBarHeightRegistry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -30,8 +30,8 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositione
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.*;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;
@@ -148,7 +148,8 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
 
     @Override
     public ClientTooltipComponent createImageComponent(TooltipComponent imageComponent) {
-        ClientTooltipComponent component = TooltipComponentCallback.EVENT.invoker().getComponent(imageComponent);
+        ClientTooltipComponent component = ClientTooltipComponentCallback.EVENT.invoker()
+                .getClientComponent(imageComponent);
         return Objects.requireNonNullElseGet(component, () -> ClientTooltipComponent.create(imageComponent));
     }
 
@@ -181,8 +182,8 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
         // This might register fine, but if another mod loads the Sheets class too early, it will be missing.
         // Also, wrap this in the event, so we ourselves do not load the Sheets class too early.
         ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft minecraft) -> {
-            Sheets.SIGN_MATERIALS.put(woodType, Sheets.createSignMaterial(woodType));
-            Sheets.HANGING_SIGN_MATERIALS.put(woodType, Sheets.createHangingSignMaterial(woodType));
+            Sheets.SIGN_SPRITES.put(woodType, Sheets.createSignSprite(woodType));
+            Sheets.HANGING_SIGN_SPRITES.put(woodType, Sheets.createHangingSignSprite(woodType));
         });
     }
 

@@ -221,18 +221,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                             });
                 });
         INSTANCE.register(PlayerInteractEvents.UseEntity.class,
-                PlayerInteractEvent.EntityInteract.class,
-                (PlayerInteractEvents.UseEntity callback, PlayerInteractEvent.EntityInteract event) -> {
-                    callback.onUseEntity(event.getEntity(), event.getLevel(), event.getHand(), event.getTarget())
-                            .ifInterrupt((InteractionResult interactionResult) -> {
-                                event.setCancellationResult(interactionResult);
-                                event.setCanceled(true);
-                            });
-                });
-        INSTANCE.register(PlayerInteractEvents.UseEntityAt.class,
                 PlayerInteractEvent.EntityInteractSpecific.class,
-                (PlayerInteractEvents.UseEntityAt callback, PlayerInteractEvent.EntityInteractSpecific event) -> {
-                    callback.onUseEntityAt(event.getEntity(),
+                (PlayerInteractEvents.UseEntity callback, PlayerInteractEvent.EntityInteractSpecific event) -> {
+                    callback.onUseEntity(event.getEntity(),
                             event.getLevel(),
                             event.getHand(),
                             event.getTarget(),

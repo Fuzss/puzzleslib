@@ -23,7 +23,7 @@ public record SpecialEffectsContextFabric(BiomeSpecialEffects specialEffects,
 
     @Override
     public void setFoliageColorOverride(Optional<Integer> foliageColorOverride) {
-        this.context.setFoliageColor(foliageColorOverride);
+        this.context.setFoliageColorOverride(foliageColorOverride);
     }
 
     @Override
@@ -33,7 +33,7 @@ public record SpecialEffectsContextFabric(BiomeSpecialEffects specialEffects,
 
     @Override
     public void setDryFoliageColorOverride(Optional<Integer> dryFoliageColorOverride) {
-        this.context.setDryFoliageColor(dryFoliageColorOverride);
+        this.context.setDryFoliageColorOverride(dryFoliageColorOverride);
     }
 
     @Override
@@ -43,7 +43,7 @@ public record SpecialEffectsContextFabric(BiomeSpecialEffects specialEffects,
 
     @Override
     public void setGrassColorOverride(Optional<Integer> grassColorOverride) {
-        this.context.setGrassColor(grassColorOverride);
+        this.context.setGrassColorOverride(grassColorOverride);
     }
 
     @Override

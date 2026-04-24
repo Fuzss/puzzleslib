@@ -40,18 +40,18 @@ public final class DataPackReloadListenersContextFabricImpl implements DataPackR
         if (VANILLA_SERVER_RELOAD_LISTENERS.containsKey(identifier)) {
             this.registerReloadListenerFactory(otherResourceLocation, reloadListenerFactory);
             DataResourceLoader.get()
-                    .addReloaderOrdering(VANILLA_SERVER_RELOAD_LISTENERS.get(identifier), otherResourceLocation);
+                    .addListenerOrdering(VANILLA_SERVER_RELOAD_LISTENERS.get(identifier), otherResourceLocation);
         } else if (VANILLA_SERVER_RELOAD_LISTENERS.containsKey(otherResourceLocation)) {
             this.registerReloadListenerFactory(identifier, reloadListenerFactory);
             DataResourceLoader.get()
-                    .addReloaderOrdering(identifier, VANILLA_SERVER_RELOAD_LISTENERS.get(otherResourceLocation));
+                    .addListenerOrdering(identifier, VANILLA_SERVER_RELOAD_LISTENERS.get(otherResourceLocation));
         } else {
             throw new RuntimeException("Unknown reload listeners: " + identifier + ", " + otherResourceLocation);
         }
     }
 
     private void registerReloadListenerFactory(Identifier identifier, PreparableReloadListenerFactory reloadListenerFactory) {
-        DataResourceLoader.get().registerReloader(identifier, (HolderLookup.Provider registries) -> {
+        DataResourceLoader.get().registerReloadListener(identifier, (HolderLookup.Provider registries) -> {
             ReloadableServerResources reloadableServerResources = RELOADABLE_SERVER_RESOURCES_REFERENCE.get().get();
             Objects.requireNonNull(reloadableServerResources, "reloadable server resources is null");
             return reloadListenerFactory.apply(reloadableServerResources, registries);

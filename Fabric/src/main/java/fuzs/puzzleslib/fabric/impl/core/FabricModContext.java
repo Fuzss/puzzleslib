@@ -19,8 +19,8 @@ public final class FabricModContext extends ModContext {
 
     public FabricModContext(String modId) {
         super(modId);
-        PayloadTypeRegistry.playC2S().register(this.payloadType, BrandPayload.STREAM_CODEC);
-        PayloadTypeRegistry.playS2C().register(this.payloadType, BrandPayload.STREAM_CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(this.payloadType, BrandPayload.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(this.payloadType, BrandPayload.STREAM_CODEC);
         FabricProxy.get().setupHandshakePayload(this.payloadType);
     }
 

@@ -55,7 +55,7 @@ public abstract class PayloadTypesContextFabricImpl extends PayloadTypesContextI
     <T extends ServerboundPlayMessage> void playToServer(CustomPacketPayload.Type<T> payloadType, StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec, Supplier<String> payloadContextSupplier) {
         this.register(payloadType,
                 streamCodec,
-                PayloadTypeRegistry.playC2S(),
+                PayloadTypeRegistry.serverboundPlay(),
                 (CustomPacketPayload.Type<T> type, BiConsumer<T, ServerPlayNetworking.Context> consumer) -> {
                     ServerPlayNetworking.registerGlobalReceiver(type, consumer::accept);
                 },
@@ -66,7 +66,7 @@ public abstract class PayloadTypesContextFabricImpl extends PayloadTypesContextI
     <T extends ServerboundConfigurationMessage> void configurationToServer(CustomPacketPayload.Type<T> payloadType, StreamCodec<? super FriendlyByteBuf, T> streamCodec, Supplier<String> payloadContextSupplier) {
         this.register(payloadType,
                 streamCodec,
-                PayloadTypeRegistry.configurationC2S(),
+                PayloadTypeRegistry.serverboundConfiguration(),
                 (CustomPacketPayload.Type<T> type, BiConsumer<T, ServerConfigurationNetworking.Context> consumer) -> {
                     ServerConfigurationNetworking.registerGlobalReceiver(type, consumer::accept);
                 },
@@ -100,24 +100,26 @@ public abstract class PayloadTypesContextFabricImpl extends PayloadTypesContextI
 
         @Override
         public <T extends ClientboundPlayMessage> void playToClient(Class<T> clazz, StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec) {
-            this.registerWithoutReceiver(this.registerPayloadType(clazz), streamCodec, PayloadTypeRegistry.playS2C());
+            this.registerWithoutReceiver(this.registerPayloadType(clazz),
+                    streamCodec,
+                    PayloadTypeRegistry.clientboundPlay());
         }
 
         @Override
         public <T extends ClientboundConfigurationMessage> void configurationToClient(Class<T> clazz, StreamCodec<? super FriendlyByteBuf, T> streamCodec) {
             this.registerWithoutReceiver(this.registerPayloadType(clazz),
                     streamCodec,
-                    PayloadTypeRegistry.configurationS2C());
+                    PayloadTypeRegistry.clientboundConfiguration());
         }
 
         @Override
         public <T extends ClientboundPlayMessage> void playToClient(CustomPacketPayload.Type<T> payloadType, StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec) {
-            this.registerWithoutReceiver(payloadType, streamCodec, PayloadTypeRegistry.playS2C());
+            this.registerWithoutReceiver(payloadType, streamCodec, PayloadTypeRegistry.clientboundPlay());
         }
 
         @Override
         public <T extends ClientboundConfigurationMessage> void configurationToClient(CustomPacketPayload.Type<T> payloadType, StreamCodec<? super FriendlyByteBuf, T> streamCodec) {
-            this.registerWithoutReceiver(payloadType, streamCodec, PayloadTypeRegistry.configurationS2C());
+            this.registerWithoutReceiver(payloadType, streamCodec, PayloadTypeRegistry.clientboundConfiguration());
         }
 
         <B extends FriendlyByteBuf, T extends Message<C>, C extends Message.Context<?>> void registerWithoutReceiver(CustomPacketPayload.Type<T> payloadType, StreamCodec<? super B, T> streamCodec, PayloadTypeRegistry<B> registrar) {
@@ -161,7 +163,7 @@ public abstract class PayloadTypesContextFabricImpl extends PayloadTypesContextI
         <T extends ClientboundPlayMessage> void playToClient(CustomPacketPayload.Type<T> payloadType, StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec, Supplier<String> payloadContextSupplier) {
             this.register(payloadType,
                     streamCodec,
-                    PayloadTypeRegistry.playS2C(),
+                    PayloadTypeRegistry.clientboundPlay(),
                     (CustomPacketPayload.Type<T> type, BiConsumer<T, ClientPlayNetworking.Context> consumer) -> {
                         ClientPlayNetworking.registerGlobalReceiver(type, consumer::accept);
                     },
@@ -172,7 +174,7 @@ public abstract class PayloadTypesContextFabricImpl extends PayloadTypesContextI
         <T extends ClientboundConfigurationMessage> void configurationToClient(CustomPacketPayload.Type<T> payloadType, StreamCodec<? super FriendlyByteBuf, T> streamCodec, Supplier<String> payloadContextSupplier) {
             this.register(payloadType,
                     streamCodec,
-                    PayloadTypeRegistry.configurationS2C(),
+                    PayloadTypeRegistry.clientboundConfiguration(),
                     (CustomPacketPayload.Type<T> type, BiConsumer<T, ClientConfigurationNetworking.Context> consumer) -> {
                         ClientConfigurationNetworking.registerGlobalReceiver(type, consumer::accept);
                     },

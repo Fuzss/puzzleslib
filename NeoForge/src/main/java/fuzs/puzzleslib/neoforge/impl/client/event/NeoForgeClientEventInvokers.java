@@ -113,14 +113,14 @@ public final class NeoForgeClientEventInvokers {
                 (ClientLifecycleEvents.Stopping callback, ClientStoppingEvent event) -> {
                     callback.onClientStopping(event.getClient());
                 });
-        INSTANCE.register(DrawItemStackOverlayCallback.class,
+        INSTANCE.register(ExtractItemStackDecorationsCallback.class,
                 RegisterItemDecorationsEvent.class,
-                (DrawItemStackOverlayCallback callback, RegisterItemDecorationsEvent event, @Nullable Object context) -> {
+                (ExtractItemStackDecorationsCallback callback, RegisterItemDecorationsEvent event, @Nullable Object context) -> {
                     Objects.requireNonNull(context, "context is null");
                     Item item = (Item) context;
                     event.register(item,
                             (GuiGraphicsExtractor guiGraphics, Font font, ItemStack itemStack, int posX, int posY) -> {
-                                callback.onDrawItemStackOverlay(guiGraphics, font, itemStack, posX, posY);
+                                callback.onExtractItemStackDecorations(guiGraphics, font, itemStack, posX, posY);
                                 return false;
                             });
                 });
@@ -247,8 +247,8 @@ public final class NeoForgeClientEventInvokers {
         registerScreenEvent(ScreenEvents.Remove.class, ScreenEvent.Closing.class, (callback, event) -> {
             callback.onRemove(event.getScreen());
         });
-        registerScreenEvent(ScreenEvents.BeforeRender.class, ScreenEvent.Render.Pre.class, (callback, event) -> {
-            callback.onBeforeRender(event.getScreen(),
+        registerScreenEvent(ScreenEvents.BeforeExtract.class, ScreenEvent.Render.Pre.class, (callback, event) -> {
+            callback.onBeforeExtract(event.getScreen(),
                     event.getGuiGraphics(),
                     event.getMouseX(),
                     event.getMouseY(),
@@ -263,8 +263,8 @@ public final class NeoForgeClientEventInvokers {
                             event.getMouseY(),
                             event.getPartialTick());
                 });
-        registerScreenEvent(ScreenEvents.AfterRender.class, ScreenEvent.Render.Post.class, (callback, event) -> {
-            callback.onAfterRender(event.getScreen(),
+        registerScreenEvent(ScreenEvents.AfterExtract.class, ScreenEvent.Render.Post.class, (callback, event) -> {
+            callback.onAfterExtract(event.getScreen(),
                     event.getGuiGraphics(),
                     event.getMouseX(),
                     event.getMouseY(),

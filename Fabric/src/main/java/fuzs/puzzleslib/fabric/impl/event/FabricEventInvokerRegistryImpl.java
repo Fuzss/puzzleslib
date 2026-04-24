@@ -194,38 +194,17 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 UseEntityCallback.EVENT,
                 (PlayerInteractEvents.UseEntity callback) -> {
                     return (Player player, Level level, InteractionHand interactionHand, Entity entity, @Nullable EntityHitResult hitResult) -> {
-                        // Fabric handles two possible cases in one event on the server, here we separate them again
-                        if (level instanceof ServerLevel && hitResult != null) {
+                        // The hit result should never be able to pass as null.
+                        if (hitResult == null) {
                             return InteractionResult.PASS;
                         }
 
                         EventResultHolder<InteractionResult> eventResult = callback.onUseEntity(player,
                                 level,
                                 interactionHand,
-                                entity);
-                        return FabricPlayerInteraction.USE_ENTITY.getHandledInteractionResult(eventResult,
-                                player,
-                                level,
-                                interactionHand,
-                                entity,
-                                null);
-                    };
-                });
-        INSTANCE.register(PlayerInteractEvents.UseEntityAt.class,
-                UseEntityCallback.EVENT,
-                (PlayerInteractEvents.UseEntityAt callback) -> {
-                    return (Player player, Level level, InteractionHand interactionHand, Entity entity, @Nullable EntityHitResult hitResult) -> {
-                        // Fabric handles two possible cases in one event on the server, here we separate them again
-                        if (hitResult == null) {
-                            return InteractionResult.PASS;
-                        }
-
-                        EventResultHolder<InteractionResult> eventResult = callback.onUseEntityAt(player,
-                                level,
-                                interactionHand,
                                 entity,
                                 hitResult.getLocation());
-                        return FabricPlayerInteraction.USE_ENTITY_AT.getHandledInteractionResult(eventResult,
+                        return FabricPlayerInteraction.USE_ENTITY.getHandledInteractionResult(eventResult,
                                 player,
                                 level,
                                 interactionHand,

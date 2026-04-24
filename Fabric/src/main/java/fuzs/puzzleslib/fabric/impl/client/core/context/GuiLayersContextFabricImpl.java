@@ -28,7 +28,7 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
             .put(HELD_ITEM_TOOLTIP, VanillaHudElements.HELD_ITEM_TOOLTIP)
             .put(EXPERIENCE_LEVEL, VanillaHudElements.EXPERIENCE_LEVEL)
             .put(SPECTATOR_TOOLTIP, VanillaHudElements.SPECTATOR_TOOLTIP)
-            .put(STATUS_EFFECTS, VanillaHudElements.STATUS_EFFECTS)
+            .put(STATUS_EFFECTS, VanillaHudElements.MOB_EFFECTS)
             .put(BOSS_BAR, VanillaHudElements.BOSS_BAR)
             .put(SLEEP_OVERLAY, VanillaHudElements.SLEEP)
             .put(DEMO_TIMER, VanillaHudElements.DEMO_TIMER)
@@ -48,7 +48,7 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
     public void registerGuiLayer(Identifier identifier, GuiLayersContext.Layer guiLayer) {
         Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(guiLayer, "gui layer is null");
-        HudElementRegistry.addLast(identifier, guiLayer::render);
+        HudElementRegistry.addLast(identifier, guiLayer::extractRenderState);
     }
 
     @Override
@@ -60,11 +60,11 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
         if (VANILLA_GUI_LAYERS.containsKey(identifier)) {
             HudElementRegistry.attachElementAfter(VANILLA_GUI_LAYERS.get(identifier),
                     otherIdentifier,
-                    guiLayer::render);
+                    guiLayer::extractRenderState);
         } else if (VANILLA_GUI_LAYERS.containsKey(otherIdentifier)) {
             HudElementRegistry.attachElementBefore(VANILLA_GUI_LAYERS.get(otherIdentifier),
                     identifier,
-                    guiLayer::render);
+                    guiLayer::extractRenderState);
         } else {
             throw new RuntimeException("Unknown gui layers: " + identifier + ", " + otherIdentifier);
         }
@@ -77,7 +77,7 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
         // only check for vanilla layers, it simplifies the implementation and is all we need
         if (VANILLA_GUI_LAYERS.containsKey(identifier)) {
             HudElementRegistry.replaceElement(VANILLA_GUI_LAYERS.get(identifier), (HudElement hudElement) -> {
-                return guiLayerFactory.apply(hudElement::render)::render;
+                return guiLayerFactory.apply(hudElement::extractRenderState)::extractRenderState;
             });
         } else {
             throw new RuntimeException("Unknown gui layer: " + identifier);

@@ -6,7 +6,7 @@ import fuzs.puzzleslib.api.client.key.v1.KeyActivationContext;
 import fuzs.puzzleslib.api.client.key.v1.KeyActivationHandler;
 import fuzs.puzzleslib.fabric.impl.client.key.ActivationContextKeyMapping;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.minecraft.client.KeyMapping;
@@ -26,7 +26,7 @@ public final class KeyMappingsContextFabricImpl implements KeyMappingsContext {
     public void registerKeyMapping(KeyMapping keyMapping, KeyActivationHandler activationHandler) {
         Objects.requireNonNull(keyMapping, "key mapping is null");
         Objects.requireNonNull(activationHandler, "activation handler is null");
-        KeyBindingHelper.registerKeyBinding(keyMapping);
+        KeyMappingHelper.registerKeyMapping(keyMapping);
         KeyActivationContext context = activationHandler.getActivationContext();
         ((ActivationContextKeyMapping) keyMapping).puzzleslib$setKeyActivationContext(context);
         this.registerKeyCategoryIfNecessary(keyMapping);
