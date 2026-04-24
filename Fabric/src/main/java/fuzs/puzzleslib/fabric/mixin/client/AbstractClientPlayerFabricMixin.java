@@ -3,8 +3,8 @@ package fuzs.puzzleslib.fabric.mixin.client;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.authlib.GameProfile;
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientPlayerEvents;
 import fuzs.puzzleslib.common.impl.event.data.DefaultedFloat;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientPlayerEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.util.Mth;
@@ -22,16 +22,16 @@ abstract class AbstractClientPlayerFabricMixin extends Player {
 
     @ModifyReturnValue(method = "getFieldOfViewModifier", at = @At("TAIL"))
     public float getFieldOfViewModifier(float scaledFieldOfView, @Local(ordinal = 0,
-            argsOnly = true) float fieldOfView) {
+                                                                        argsOnly = true) float effectScale) {
         float fovEffectScale = Minecraft.getInstance().options.fovEffectScale().get().floatValue();
         // if fov effects don't apply due to the option being set to 0, so no need to fire the event
         if (fovEffectScale != 0.0F) {
             // reverse fovEffectScale calculations applied by vanilla in return statement,
             // we could capture the original value previous to return, but this approach only needs one mixin
-            DefaultedFloat fieldOfViewModifier = DefaultedFloat.fromValue(fieldOfView);
+            DefaultedFloat fieldOfViewModifier = DefaultedFloat.fromValue(effectScale);
             FabricClientPlayerEvents.COMPUTE_FOV_MODIFIER.invoker().onComputeFovModifier(this, fieldOfViewModifier);
             return fieldOfViewModifier.getAsOptionalFloat()
-                    .map(value -> Mth.lerp(fovEffectScale, 1.0F, value))
+                    .map((Float value) -> Mth.lerp(fovEffectScale, 1.0F, value))
                     .orElse(scaledFieldOfView);
         } else {
             return scaledFieldOfView;

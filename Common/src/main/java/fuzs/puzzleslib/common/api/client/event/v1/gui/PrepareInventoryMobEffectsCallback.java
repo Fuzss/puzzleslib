@@ -15,7 +15,7 @@ public interface PrepareInventoryMobEffectsCallback {
      * rendering completely.
      *
      * @param screen             the screen drawing mob effect widgets
-     * @param maxWidth           the space available to the right of the menu
+     * @param availableWidth     the space available to the right of the menu
      * @param smallWidgets       is the compact square rendering mode selected by vanilla; otherwise the full size mode
      *                           is used
      * @param horizontalPosition the offset for the widgets to render from the left side of the window (this is an
@@ -26,5 +26,5 @@ public interface PrepareInventoryMobEffectsCallback {
      *         <li>{@link EventResult#PASS PASS} to let vanilla behaviour continue, using values set by this event</li>
      *         </ul>
      */
-    EventResult onPrepareInventoryMobEffects(Screen screen, int maxWidth, MutableBoolean smallWidgets, MutableInt horizontalPosition);
+    EventResult onPrepareInventoryMobEffects(Screen screen, int availableWidth, MutableBoolean smallWidgets, MutableInt horizontalPosition);
 }

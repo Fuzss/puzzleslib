@@ -19,9 +19,9 @@ abstract class KeyboardHandlerFabricMixin {
     private Minecraft minecraft;
 
     @Inject(method = "keyPress", at = @At("HEAD"), cancellable = true)
-    public void keyPress(long windowPointer, int action, KeyEvent keyEvent, CallbackInfo callback) {
-        if (windowPointer == this.minecraft.getWindow().handle()) {
-            EventResult result = FabricClientEvents.KEY_PRESS.invoker().onKeyPress(keyEvent, action);
+    public void keyPress(long handle, int action, KeyEvent event, CallbackInfo callback) {
+        if (handle == this.minecraft.getWindow().handle()) {
+            EventResult result = FabricClientEvents.KEY_PRESS.invoker().onKeyPress(event, action);
             if (result.isInterrupt()) callback.cancel();
         }
     }

@@ -27,27 +27,33 @@ abstract class ChatListenerFabricMixin {
     @Final
     private Minecraft minecraft;
 
-    @ModifyArg(method = "lambda$handleDisguisedChatMessage$3",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/components/ChatComponent;addMessage(Lnet/minecraft/network/chat/Component;)V"))
+    @ModifyArg(method = "lambda$handleDisguisedChatMessage$0",
+               at = @At(value = "INVOKE",
+                        target = "Lnet/minecraft/client/gui/components/ChatComponent;addPlayerMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V"))
     public Component handleDisguisedChatMessage(Component component, @Local(argsOnly = true) ChatType.Bound boundChatType, @Cancellable CallbackInfoReturnable<Boolean> callback) {
         MutableValue<Component> chatMessage = MutableValue.fromValue(component);
         EventResult result = FabricClientEvents.CHAT_MESSAGE_RECEIVED.invoker()
                 .onChatMessageReceived(chatMessage, boundChatType, null, false);
-        if (result.isInterrupt()) callback.setReturnValue(true);
+        if (result.isInterrupt()) {
+            callback.setReturnValue(true);
+        }
+
         return chatMessage.get();
     }
 
     @ModifyArg(method = "showMessageToPlayer",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/components/ChatComponent;addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V"),
-            require = 2)
+               at = @At(value = "INVOKE",
+                        target = "Lnet/minecraft/client/gui/components/ChatComponent;addPlayerMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V"),
+               require = 2)
     public Component showMessageToPlayer(Component component, @Local(argsOnly = true) ChatType.Bound boundChatType, @Local(
             argsOnly = true) PlayerChatMessage playerChatMessage, @Cancellable CallbackInfoReturnable<Boolean> callback) {
         MutableValue<Component> chatMessage = MutableValue.fromValue(component);
         EventResult result = FabricClientEvents.CHAT_MESSAGE_RECEIVED.invoker()
                 .onChatMessageReceived(chatMessage, boundChatType, playerChatMessage, false);
-        if (result.isInterrupt()) callback.setReturnValue(true);
+        if (result.isInterrupt()) {
+            callback.setReturnValue(true);
+        }
+
         return chatMessage.get();
     }
 
@@ -58,7 +64,10 @@ abstract class ChatListenerFabricMixin {
             MutableValue<Component> chatMessage = MutableValue.fromValue(component);
             EventResult result = FabricClientEvents.CHAT_MESSAGE_RECEIVED.invoker()
                     .onChatMessageReceived(chatMessage, null, null, isOverlay);
-            if (result.isInterrupt()) callback.cancel();
+            if (result.isInterrupt()) {
+                callback.cancel();
+            }
+
             return chatMessage.get();
         } else {
             return component;

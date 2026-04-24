@@ -11,9 +11,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 abstract class ServerMainFabricMixin {
 
     @Inject(method = "main", at = @At(value = "NEW", target = "net/minecraft/server/dedicated/DedicatedServerSettings"))
-    private static void main(String[] strings, CallbackInfo callback) {
-        // run after Fabric Data Generation Api for same behavior as Forge where load complete does not run
-        // during data generation (not that we use Fabric's data generation, but ¯\_(ツ)_/¯)
+    private static void main(String[] args, CallbackInfo callback) {
+        // Run after Fabric Data Generation Api to mirror NeoForge where load complete does not run
+        // during data generation.
         FabricLifecycleEvents.LOAD_COMPLETE.invoker().onLoadComplete();
     }
 }

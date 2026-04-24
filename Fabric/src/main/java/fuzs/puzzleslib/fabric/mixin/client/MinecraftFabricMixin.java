@@ -36,50 +36,55 @@ abstract class MinecraftFabricMixin {
     @Final
     private DeltaTracker.Timer deltaTracker;
     @Shadow
-    @Nullable public ClientLevel level;
+    @Nullable
+    public ClientLevel level;
     @Shadow
-    @Nullable public LocalPlayer player;
+    @Nullable
+    public LocalPlayer player;
     @Shadow
-    @Nullable public MultiPlayerGameMode gameMode;
+    @Nullable
+    public MultiPlayerGameMode gameMode;
     @Shadow
-    @Nullable public HitResult hitResult;
+    @Nullable
+    public HitResult hitResult;
     @Shadow
-    @Nullable public Screen screen;
+    @Nullable
+    public Screen screen;
 
     @Inject(method = "<init>",
             at = @At(value = "INVOKE",
-                    target = "Lcom/mojang/blaze3d/systems/RenderSystem;getBackendDescription()Ljava/lang/String;",
-                    shift = At.Shift.AFTER,
-                    remap = false))
+                     target = "Lcom/mojang/blaze3d/systems/RenderSystem;getBackendDescription()Ljava/lang/String;",
+                     shift = At.Shift.AFTER,
+                     remap = false))
     public void init(CallbackInfo callback) {
         // run after Fabric Data Generation Api for same behavior as Forge where load complete does not run
         // during data generation (not that we use Fabric's data generation, but ¯\_(ツ)_/¯)
         FabricLifecycleEvents.LOAD_COMPLETE.invoker().onLoadComplete();
     }
 
-    @Inject(method = "runTick",
+    @Inject(method = "renderFrame",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/GameRenderer;render(Lnet/minecraft/client/DeltaTracker;Z)V"))
+                     target = "Lnet/minecraft/client/renderer/GameRenderer;render(Lnet/minecraft/client/DeltaTracker;Z)V"))
     private void runTick$0(boolean renderLevel, CallbackInfo callback) {
         FabricRendererEvents.BEFORE_GAME_RENDER.invoker()
                 .onBeforeGameRender(Minecraft.class.cast(this), this.gameRenderer, this.deltaTracker);
     }
 
-    @Inject(method = "runTick",
+    @Inject(method = "renderFrame",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/GameRenderer;render(Lnet/minecraft/client/DeltaTracker;Z)V",
-                    shift = At.Shift.AFTER))
+                     target = "Lnet/minecraft/client/renderer/GameRenderer;render(Lnet/minecraft/client/DeltaTracker;Z)V",
+                     shift = At.Shift.AFTER))
     private void runTick$1(boolean renderLevel, CallbackInfo callback) {
         FabricRendererEvents.AFTER_GAME_RENDER.invoker()
                 .onAfterGameRender(Minecraft.class.cast(this), this.gameRenderer, this.deltaTracker);
     }
 
     @ModifyVariable(method = "setScreen",
-            at = @At(value = "LOAD", ordinal = 0),
-            slice = @Slice(from = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/client/player/LocalPlayer;respawn()V")),
-            ordinal = 0,
-            argsOnly = true)
+                    at = @At(value = "LOAD", ordinal = 0),
+                    slice = @Slice(from = @At(value = "INVOKE",
+                                              target = "Lnet/minecraft/client/player/LocalPlayer;respawn()V")),
+                    ordinal = 0,
+                    argsOnly = true)
     public Screen setScreen(@Nullable Screen newScreen) {
         // this implementation does not allow for cancelling a new screen being set,
         // due to vanilla's Screen::remove call happening before the new screen is properly computed (in regard to title &amp; death screens),
@@ -99,8 +104,8 @@ abstract class MinecraftFabricMixin {
 
     @Inject(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;ZZ)V",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/GameRenderer;resetData()V",
-                    shift = At.Shift.AFTER))
+                     target = "Lnet/minecraft/client/renderer/GameRenderer;resetData()V",
+                     shift = At.Shift.AFTER))
     public void disconnect(Screen screen, boolean keepResourcePacks, boolean stopSoundManager, CallbackInfo callback) {
         if (this.player != null && this.gameMode != null) {
             Connection connection = this.player.connection.getConnection();
@@ -113,8 +118,8 @@ abstract class MinecraftFabricMixin {
         }
     }
 
-    @Inject(method = "pickBlock", at = @At("HEAD"), cancellable = true)
-    private void pickBlock(CallbackInfo callback) {
+    @Inject(method = "pickBlockOrEntity", at = @At("HEAD"), cancellable = true)
+    private void pickBlockOrEntity(CallbackInfo callback) {
         if (this.hitResult != null && this.hitResult.getType() != HitResult.Type.MISS) {
             EventResult result = FabricClientPlayerEvents.PICK_INTERACTION_INPUT.invoker()
                     .onPickInteraction(Minecraft.class.cast(this), this.player, this.hitResult);

@@ -451,8 +451,7 @@ public final class NeoForgeClientEventInvokers {
                     MutableFloat pitch = MutableFloat.fromEvent(event::setPitch, event::getPitch);
                     MutableFloat yaw = MutableFloat.fromEvent(event::setYaw, event::getYaw);
                     MutableFloat roll = MutableFloat.fromEvent(event::setRoll, event::getRoll);
-                    callback.onComputeCameraAngles(event.getRenderer(),
-                            event.getCamera(),
+                    callback.onComputeCameraAngles(event.getCamera(),
                             (float) event.getPartialTick(),
                             pitch,
                             yaw,
@@ -754,8 +753,7 @@ public final class NeoForgeClientEventInvokers {
                 ViewportEvent.ComputeFov.class,
                 (ComputeFieldOfViewCallback callback, ViewportEvent.ComputeFov event) -> {
                     MutableFloat fieldOfView = MutableFloat.fromEvent(event::setFOV, event::getFOV);
-                    callback.onComputeFieldOfView(event.getRenderer(),
-                            event.getCamera(),
+                    callback.onComputeFieldOfView(event.getCamera(),
                             (float) event.getPartialTick(),
                             fieldOfView);
                 });

@@ -16,19 +16,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.List;
 
 @Mixin(GuiGraphicsExtractor.class)
-abstract class GuiGraphicsFabricMixin {
+abstract class GuiGraphicsExtractorFabricMixin {
 
-    @Inject(method = "renderTooltip", at = @At("HEAD"), cancellable = true)
-    private void renderTooltip(Font font, List<ClientTooltipComponent> tooltipComponents, int mouseX, int mouseY, ClientTooltipPositioner clientTooltipPositioner, @Nullable Identifier identifier, CallbackInfo callback) {
-        if (!tooltipComponents.isEmpty()) {
+    @Inject(method = "tooltip", at = @At("HEAD"), cancellable = true)
+    private void renderTooltip(Font font, List<ClientTooltipComponent> lines, int mouseX, int mouseY, ClientTooltipPositioner positioner, @Nullable Identifier style, CallbackInfo callback) {
+        if (!lines.isEmpty()) {
             EventResult result = FabricGuiEvents.RENDER_TOOLTIP.invoker()
-                    .onRenderTooltip(GuiGraphicsExtractor.class.cast(this),
-                            font,
-                            mouseX,
-                            mouseY,
-                            tooltipComponents,
-                            clientTooltipPositioner);
-            if (result.isInterrupt()) callback.cancel();
+                    .onRenderTooltip(GuiGraphicsExtractor.class.cast(this), font, mouseX, mouseY, lines, positioner);
+            if (result.isInterrupt()) {
+                callback.cancel();
+            }
         }
     }
 }

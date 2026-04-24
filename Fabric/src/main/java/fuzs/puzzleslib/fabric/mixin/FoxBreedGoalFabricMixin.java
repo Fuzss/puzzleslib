@@ -13,8 +13,8 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(targets = "net.minecraft.world.entity.animal.fox.Fox$FoxBreedGoal")
 abstract class FoxBreedGoalFabricMixin extends BreedGoal {
 
-    public FoxBreedGoalFabricMixin(Animal animal, double d) {
-        super(animal, d);
+    public FoxBreedGoalFabricMixin(Animal animal, double speedModifier) {
+        super(animal, speedModifier);
     }
 
     @ModifyVariable(method = "breed", at = @At("STORE"))

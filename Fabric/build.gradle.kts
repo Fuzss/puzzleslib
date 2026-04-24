@@ -67,7 +67,7 @@ multiloader {
             "EntityRendererFabricMixin",
             "FogRendererFabricMixin",
             "GameRendererFabricMixin",
-            "GuiGraphicsFabricMixin",
+            "GuiGraphicsExtractorFabricMixin",
             "ItemInHandRendererFabricMixin",
             "KeyboardHandlerFabricMixin",
             "KeyMappingFabricMixin",

@@ -22,14 +22,14 @@ import java.nio.file.Path;
 abstract class ChunkMapFabricMixin extends SimpleRegionStorage {
     @Shadow
     @Final
-    ServerLevel level;
+    private ServerLevel level;
 
     public ChunkMapFabricMixin(RegionStorageInfo info, Path folder, DataFixer fixerUpper, boolean sync, DataFixTypes dataFixType) {
         super(info, folder, fixerUpper, sync, dataFixType);
     }
 
     @Inject(method = "dropChunk", at = @At("HEAD"))
-    private static void dropChunk(ServerPlayer player, ChunkPos chunkPos, CallbackInfo callback) {
-        FabricLevelEvents.UNWATCH_CHUNK.invoker().onChunkUnwatch(player, chunkPos, player.level());
+    private static void dropChunk(ServerPlayer player, ChunkPos pos, CallbackInfo callback) {
+        FabricLevelEvents.UNWATCH_CHUNK.invoker().onChunkUnwatch(player, pos, player.level());
     }
 }

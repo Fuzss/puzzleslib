@@ -8,8 +8,8 @@ import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.common.api.event.v1.data.MutableBoolean;
 import fuzs.puzzleslib.common.api.event.v1.data.MutableInt;
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import fuzs.puzzleslib.common.impl.event.CopyOnWriteForwardingList;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.EffectsInInventory;
@@ -39,62 +39,62 @@ abstract class EffectsInInventoryFabricMixin {
     @Nullable
     private MobEffectInstance puzzleslib$hoveredEffect;
 
-    @WrapOperation(method = "render",
+    @WrapOperation(method = "extractRenderState",
                    at = @At(value = "INVOKE",
-                            target = "Lnet/minecraft/client/gui/screens/inventory/EffectsInInventory;renderEffects(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Ljava/util/Collection;IIIII)V"))
-    public void render(EffectsInInventory effectsInInventory, GuiGraphicsExtractor guiGraphics, Collection<MobEffectInstance> collection, int posX, int posY, int mouseX, int mouseY, int maxWidgetWidth, Operation<Void> operation) {
-        int maxWidth = this.screen.width - posX;
-        boolean smallWidgets = maxWidgetWidth == 32;
+                            target = "Lnet/minecraft/client/gui/screens/inventory/EffectsInInventory;extractEffects(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Ljava/util/Collection;IIIII)V"))
+    public void render(EffectsInInventory effectsInInventory, GuiGraphicsExtractor graphics, Collection<MobEffectInstance> activeEffects, int posX, int posY, int mouseX, int mouseY, int maxWidth, Operation<Void> operation) {
+        int availableWidth = this.screen.width - posX;
+        boolean smallWidgets = maxWidth == 32;
         MutableBoolean smallWidgetsValue = MutableBoolean.fromValue(smallWidgets);
         MutableInt horizontalPositionValue = MutableInt.fromValue(posX);
         EventResult eventResult = FabricGuiEvents.INVENTORY_MOB_EFFECTS.invoker()
-                .onPrepareInventoryMobEffects(this.screen, maxWidth, smallWidgetsValue, horizontalPositionValue);
+                .onPrepareInventoryMobEffects(this.screen, availableWidth, smallWidgetsValue, horizontalPositionValue);
         if (smallWidgetsValue.getAsBoolean() != smallWidgets) {
             // Careful, this is inverted compared to vanilla.
-            maxWidgetWidth = smallWidgetsValue.getAsBoolean() ? 32 : maxWidth - 7;
+            maxWidth = smallWidgetsValue.getAsBoolean() ? 32 : availableWidth - 7;
         }
 
         if (eventResult.isPass()) {
             operation.call(effectsInInventory,
-                    guiGraphics,
-                    collection,
+                    graphics,
+                    activeEffects,
                     horizontalPositionValue.getAsInt(),
                     posY,
                     mouseX,
                     mouseY,
-                    maxWidgetWidth);
+                    maxWidth);
         }
     }
 
-    @ModifyVariable(method = "renderEffects", at = @At("STORE"))
-    private MobEffectInstance renderEffects(MobEffectInstance mobEffect) {
-        this.puzzleslib$hoveredEffect = mobEffect;
-        return mobEffect;
+    @ModifyVariable(method = "extractEffects", at = @At("STORE"))
+    private MobEffectInstance renderEffects(MobEffectInstance effect) {
+        this.puzzleslib$hoveredEffect = effect;
+        return effect;
     }
 
-    @ModifyVariable(method = "renderText",
+    @ModifyVariable(method = "extractText",
                     at = @At("STORE"),
                     ordinal = 0,
                     slice = @Slice(from = @At(value = "INVOKE",
-                                              target = "Lnet/minecraft/client/gui/components/StringWidget;clipText(Lnet/minecraft/network/chat/Component;Lnet/minecraft/client/gui/Font;I)Lnet/minecraft/util/FormattedCharSequence;")))
-    private boolean renderText(boolean mustClipText, @Share("mustClipText") LocalBooleanRef originalMustClipText) {
+                                              target = "Lnet/minecraft/client/gui/components/ComponentRenderUtils;clipText(Lnet/minecraft/network/chat/Component;Lnet/minecraft/client/gui/Font;I)Lnet/minecraft/util/FormattedCharSequence;")))
+    private boolean renderText(boolean isCompact, @Share("wasCompact") LocalBooleanRef wasCompact) {
         if (this.puzzleslib$hoveredEffect != null) {
-            originalMustClipText.set(mustClipText);
+            wasCompact.set(isCompact);
             // This makes the tooltip always render, so we can then modify it later on.
             return true;
         } else {
-            return mustClipText;
+            return isCompact;
         }
     }
 
-    @ModifyArg(method = "renderText",
+    @ModifyArg(method = "extractText",
                at = @At(value = "INVOKE",
                         target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;II)V"))
     private List<Component> renderText(List<Component> tooltipLines, @Cancellable CallbackInfo callback, @Share(
-            "mustClipText") LocalBooleanRef originalMustClipText) {
+            "wasCompact") LocalBooleanRef wasCompact) {
         if (this.puzzleslib$hoveredEffect != null) {
             CopyOnWriteForwardingList<Component> wrappedTooltipLines = new CopyOnWriteForwardingList<>(
-                    originalMustClipText.get() ? tooltipLines : Collections.emptyList());
+                    wasCompact.get() ? tooltipLines : Collections.emptyList());
             FabricGuiEvents.GATHER_EFFECT_SCREEN_TOOLTIP.invoker()
                     .onGatherEffectScreenTooltip(this.screen, this.puzzleslib$hoveredEffect, wrappedTooltipLines);
             if (wrappedTooltipLines.isEmpty()) {

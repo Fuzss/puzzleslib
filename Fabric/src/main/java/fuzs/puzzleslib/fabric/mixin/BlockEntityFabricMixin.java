@@ -14,7 +14,7 @@ abstract class BlockEntityFabricMixin {
 
     @Inject(method = "isValidBlockState", at = @At("HEAD"), cancellable = true)
     public void isValidBlockState(BlockState blockState, CallbackInfoReturnable<Boolean> callback) {
-        // allow 1.21.1 mods to work without any code changes
+        // Allow 1.21.1 mods to work without any code changes.
         if (this.getType().isValid(blockState)) {
             callback.setReturnValue(true);
         }
