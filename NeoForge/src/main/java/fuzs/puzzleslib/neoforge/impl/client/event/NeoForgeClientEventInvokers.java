@@ -39,7 +39,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -402,12 +401,7 @@ public final class NeoForgeClientEventInvokers {
 
                     EventResult eventResult = callback.onEntityLoad(event.getEntity(), clientLevel);
                     if (eventResult.isInterrupt()) {
-                        if (event.getEntity() instanceof Player) {
-                            // we do not support players as it isn't as straight-forward to implement for the server event on Fabric
-                            throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
-                        } else {
-                            event.setCanceled(true);
-                        }
+                        event.setCanceled(true);
                     }
                 });
         INSTANCE.register(ClientEntityLevelEvents.Unload.class,
@@ -451,11 +445,7 @@ public final class NeoForgeClientEventInvokers {
                     MutableFloat pitch = MutableFloat.fromEvent(event::setPitch, event::getPitch);
                     MutableFloat yaw = MutableFloat.fromEvent(event::setYaw, event::getYaw);
                     MutableFloat roll = MutableFloat.fromEvent(event::setRoll, event::getRoll);
-                    callback.onComputeCameraAngles(event.getCamera(),
-                            (float) event.getPartialTick(),
-                            pitch,
-                            yaw,
-                            roll);
+                    callback.onComputeCameraAngles(event.getCamera(), (float) event.getPartialTick(), pitch, yaw, roll);
                 });
         INSTANCE.register(SubmitLivingEntityEvents.Before.class, RenderLivingEvent.Pre.class, (callback, event) -> {
             EventResult eventResult = callback.onBeforeSubmitLivingEntity(event.getRenderState(),
@@ -753,9 +743,7 @@ public final class NeoForgeClientEventInvokers {
                 ViewportEvent.ComputeFov.class,
                 (ComputeFieldOfViewCallback callback, ViewportEvent.ComputeFov event) -> {
                     MutableFloat fieldOfView = MutableFloat.fromEvent(event::setFOV, event::getFOV);
-                    callback.onComputeFieldOfView(event.getCamera(),
-                            (float) event.getPartialTick(),
-                            fieldOfView);
+                    callback.onComputeFieldOfView(event.getCamera(), (float) event.getPartialTick(), fieldOfView);
                 });
         INSTANCE.register(ChatMessageReceivedCallback.class,
                 ClientChatReceivedEvent.class,

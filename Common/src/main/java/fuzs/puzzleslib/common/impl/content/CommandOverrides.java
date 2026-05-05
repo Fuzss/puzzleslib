@@ -1,8 +1,7 @@
 package fuzs.puzzleslib.common.impl.content;
 
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.common.api.event.v1.entity.ServerEntityLevelEvents;
+import fuzs.puzzleslib.common.api.event.v1.entity.ServerEntityEvents;
 import fuzs.puzzleslib.common.api.event.v1.entity.player.PlayerCopyEvents;
 import fuzs.puzzleslib.common.api.event.v1.server.ServerLifecycleEvents;
 import fuzs.puzzleslib.common.impl.PuzzlesLibMod;
@@ -14,7 +13,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -85,9 +86,9 @@ public final class CommandOverrides {
                         UnaryOperator.identity());
             }
         });
-        ServerEntityLevelEvents.LOAD.register((Entity entity, ServerLevel serverLevel, boolean isFreshEntity) -> {
+        ServerEntityEvents.LOAD.register((Entity entity, ServerLevel serverLevel, boolean isLoadedFromDisk, @Nullable EntitySpawnReason entitySpawnReason) -> {
             // idea from Serilum's Starter Kit mod
-            if (isFreshEntity && entity instanceof ServerPlayer serverPlayer && !serverPlayer.entityTags()
+            if (!isLoadedFromDisk && entity instanceof ServerPlayer serverPlayer && !serverPlayer.entityTags()
                     .contains(KEY_PLAYER_JOINED_WORLD)) {
                 serverPlayer.addTag(KEY_PLAYER_JOINED_WORLD);
                 // do not check if commands are enabled for the world, the option is always off on dedicated servers
@@ -96,17 +97,18 @@ public final class CommandOverrides {
                         .isAllowCommands()) {
                     serverLevel.getServer().schedule(new TickTask(serverLevel.getServer().getTickCount(), () -> {
                         String playerName = serverPlayer.getGameProfile().name();
-                        executeCommandOverrides(serverPlayer.level().getServer(),
+                        executeCommandOverrides(serverLevel.getServer(),
                                 CommandEnvironment.PLAYER,
                                 CommandEnvironment.DEDICATED_PLAYER,
                                 (String s) -> s.replaceAll("@[sp]", playerName));
                     }));
                 }
             }
-            return EventResult.PASS;
         });
         PlayerCopyEvents.COPY.register((ServerPlayer originalServerPlayer, ServerPlayer newServerPlayer, boolean originalStillAlive) -> {
-            if (!originalStillAlive) originalServerPlayer.removeTag(KEY_PLAYER_JOINED_WORLD);
+            if (!originalStillAlive) {
+                originalServerPlayer.removeTag(KEY_PLAYER_JOINED_WORLD);
+            }
         });
     }
 

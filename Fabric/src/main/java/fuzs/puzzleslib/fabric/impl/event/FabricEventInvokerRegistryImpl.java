@@ -28,7 +28,6 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.*;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleEvents;
@@ -287,19 +286,40 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 });
         INSTANCE.register(PlaySoundEvents.AtPosition.class, FabricLevelEvents.PLAY_SOUND_AT_POSITION);
         INSTANCE.register(PlaySoundEvents.AtEntity.class, FabricLevelEvents.PLAY_SOUND_AT_ENTITY);
-        INSTANCE.register(ServerEntityLevelEvents.Load.class, ServerEntityEvents.ALLOW_LOAD, callback -> {
-            return (Entity entity, ServerLevel level, @Nullable EntitySpawnReason spawnReason, boolean isLoadedFromDisk) -> {
-                EventResult eventResult = callback.onEntityLoad(entity, level, !isLoadedFromDisk);
-                if (eventResult.isInterrupt() && entity instanceof Player) {
-                    // We do not support players as it isn't as straight-forward to implement for the server player on Fabric.
-                    throw new UnsupportedOperationException("Cannot prevent player from loading in!");
-                } else {
-                    return eventResult.isPass();
-                }
-            };
-        });
+        INSTANCE.register(ServerEntityEvents.Join.class,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ALLOW_LOAD,
+                (ServerEntityEvents.Join callback) -> {
+                    return (Entity entity, ServerLevel level, @Nullable EntitySpawnReason spawnReason, boolean isLoadedFromDisk) -> {
+                        return callback.onEntityJoin(entity, level, isLoadedFromDisk, spawnReason).isPass();
+                    };
+                });
+        INSTANCE.register(ServerEntityEvents.Load.class,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_LOAD,
+                (ServerEntityEvents.Load callback) -> {
+                    return (Entity entity, ServerLevel level) -> {
+                        callback.onEntityLoad(entity, level, entity.isLoadedFromDisk(), entity.spawnReason());
+                    };
+                });
+        INSTANCE.register(ServerEntityEvents.Unload.class,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_UNLOAD,
+                (ServerEntityEvents.Unload callback) -> {
+                    return callback::onEntityUnload;
+                });
+        INSTANCE.register(ServerEntityLevelEvents.Load.class,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ALLOW_LOAD,
+                (ServerEntityLevelEvents.Load callback) -> {
+                    return (Entity entity, ServerLevel level, @Nullable EntitySpawnReason spawnReason, boolean isLoadedFromDisk) -> {
+                        EventResult eventResult = callback.onEntityLoad(entity, level, !isLoadedFromDisk);
+                        if (eventResult.isInterrupt() && entity instanceof Player) {
+                            // We do not support players as it isn't as straight-forward to implement for the server player on Fabric.
+                            throw new UnsupportedOperationException("Cannot prevent player from loading in!");
+                        } else {
+                            return eventResult.isPass();
+                        }
+                    };
+                });
         INSTANCE.register(ServerEntityLevelEvents.Unload.class,
-                ServerEntityEvents.ENTITY_UNLOAD,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_UNLOAD,
                 (ServerEntityLevelEvents.Unload callback) -> {
                     return callback::onEntityUnload;
                 });
@@ -412,7 +432,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(ServerChunkEvents.Watch.class, FabricLevelEvents.WATCH_CHUNK);
         INSTANCE.register(ServerChunkEvents.Unwatch.class, FabricLevelEvents.UNWATCH_CHUNK);
         INSTANCE.register(LivingEquipmentChangeCallback.class,
-                ServerEntityEvents.EQUIPMENT_CHANGE,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.EQUIPMENT_CHANGE,
                 (LivingEquipmentChangeCallback callback) -> {
                     return callback::onLivingEquipmentChange;
                 });

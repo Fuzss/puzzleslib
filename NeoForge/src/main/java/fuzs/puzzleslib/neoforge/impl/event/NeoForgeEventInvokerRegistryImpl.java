@@ -39,9 +39,7 @@ import net.minecraft.util.TriState;
 import net.minecraft.util.random.Weighted;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.AgeableMob;
-import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.GrindstoneMenu;
 import net.minecraft.world.item.CreativeModeTab;
@@ -61,6 +59,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.*;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.*;
+import net.neoforged.neoforge.event.entity.EntityEvent;
 import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import net.neoforged.neoforge.event.entity.living.*;
 import net.neoforged.neoforge.event.entity.player.*;
@@ -594,6 +593,46 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                             soundPitch).isInterrupt()) {
                         event.setCanceled(true);
                     }
+                });
+        // For NeoForge these use the same event, as the chunk access deadlock is fixed by the mod loader itself.
+        INSTANCE.register(ServerEntityEvents.Join.class,
+                EntityJoinLevelEvent.class,
+                (ServerEntityEvents.Join callback, EntityJoinLevelEvent event) -> {
+                    if (!(event.getLevel() instanceof ServerLevel serverLevel)) {
+                        return;
+                    }
+
+                    EntitySpawnReason entitySpawnReason =
+                            event.getEntity() instanceof Mob mob ? mob.getSpawnType() : null;
+                    if (callback.onEntityJoin(event.getEntity(), serverLevel, event.loadedFromDisk(), entitySpawnReason)
+                            .isInterrupt()) {
+                        event.setCanceled(true);
+                    }
+                });
+        INSTANCE.register(ServerEntityEvents.Load.class,
+                EntityJoinLevelEvent.class,
+                (ServerEntityEvents.Load callback, EntityJoinLevelEvent event) -> {
+                    if (!(event.getLevel() instanceof ServerLevel serverLevel)) {
+                        return;
+                    }
+
+                    boolean removed = event.getEntity().isRemoved();
+                    EntitySpawnReason entitySpawnReason =
+                            event.getEntity() instanceof Mob mob ? mob.getSpawnType() : null;
+                    callback.onEntityLoad(event.getEntity(), serverLevel, event.loadedFromDisk(), entitySpawnReason);
+                    // Solely marking the entity as removed does nothing with the current event on NeoForge.
+                    if (!removed && event.getEntity().isRemoved()) {
+                        event.setCanceled(true);
+                    }
+                });
+        INSTANCE.register(ServerEntityEvents.Unload.class,
+                EntityLeaveLevelEvent.class,
+                (ServerEntityEvents.Unload callback, EntityLeaveLevelEvent event) -> {
+                    if (!(event.getLevel() instanceof ServerLevel serverLevel)) {
+                        return;
+                    }
+
+                    callback.onEntityUnload(event.getEntity(), serverLevel);
                 });
         INSTANCE.register(ServerEntityLevelEvents.Load.class,
                 EntityJoinLevelEvent.class,

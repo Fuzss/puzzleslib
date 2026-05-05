@@ -24,7 +24,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.storage.WritableLevelData;
@@ -48,10 +47,8 @@ abstract class ClientLevelFabricMixin extends Level {
         FabricClientLevelEvents.LOAD_LEVEL.invoker().onLevelLoad(Minecraft.getInstance(), ClientLevel.class.cast(this));
     }
 
-    @WrapWithCondition(
-            method = "tickNonPassenger",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V")
-    )
+    @WrapWithCondition(method = "tickNonPassenger",
+                       at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V"))
     public boolean tickNonPassenger(Entity entity, @Share("isEntityTickCancelled") LocalBooleanRef isEntityTickCancelled) {
         // avoid using @WrapOperation, so we are not blamed for any overhead from running the entity tick
         EventResult eventResult = FabricEntityEvents.ENTITY_TICK_START.invoker().onStartEntityTick(entity);
@@ -59,10 +56,8 @@ abstract class ClientLevelFabricMixin extends Level {
         return eventResult.isPass();
     }
 
-    @Inject(
-            method = "tickNonPassenger",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V", shift = At.Shift.AFTER)
-    )
+    @Inject(method = "tickNonPassenger",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V", shift = At.Shift.AFTER))
     public void tickNonPassenger(Entity entity, CallbackInfo callback, @Share("isEntityTickCancelled") LocalBooleanRef isEntityTickCancelled) {
         if (!isEntityTickCancelled.get()) {
             FabricEntityEvents.ENTITY_TICK_END.invoker().onEndEntityTick(entity);
@@ -71,25 +66,16 @@ abstract class ClientLevelFabricMixin extends Level {
 
     @Inject(method = "addEntity", at = @At("HEAD"), cancellable = true)
     private void addEntity(Entity entityToSpawn, CallbackInfo callback) {
-        if (FabricClientEntityEvents.ENTITY_LOAD.invoker()
-                .onEntityLoad(entityToSpawn, ClientLevel.class.cast(this))
-                .isInterrupt()) {
-            if (entityToSpawn instanceof Player) {
-                // we do not support players as it isn't as straight-forward to implement for the server event on Fabric
-                throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
-            } else {
-                callback.cancel();
-            }
+        EventResult eventResult = FabricClientEntityEvents.ENTITY_LOAD.invoker()
+                .onEntityLoad(entityToSpawn, ClientLevel.class.cast(this));
+        if (eventResult.isInterrupt()) {
+            callback.cancel();
         }
     }
 
-    @ModifyArgs(
-            method = "playSeededSound(Lnet/minecraft/world/entity/Entity;DDDLnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/multiplayer/ClientLevel;playSound(DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZJ)V"
-            )
-    )
+    @ModifyArgs(method = "playSeededSound(Lnet/minecraft/world/entity/Entity;DDDLnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V",
+                at = @At(value = "INVOKE",
+                         target = "Lnet/minecraft/client/multiplayer/ClientLevel;playSound(DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFZJ)V"))
     public void playSeededSound$0(Args args, @Cancellable CallbackInfo callback) {
         Preconditions.checkArgument(args.get(3) instanceof SoundEvent, "sound event is wrong type");
         EventResult eventResult = FabricEventImplHelper.onPlaySound((MutableValue<Holder<SoundEvent>> soundEvent, MutableValue<SoundSource> soundSource, MutableFloat soundVolume, MutableFloat soundPitch) -> {
@@ -107,16 +93,14 @@ abstract class ClientLevelFabricMixin extends Level {
                 4,
                 5,
                 6);
-        if (eventResult.isInterrupt()) callback.cancel();
+        if (eventResult.isInterrupt()) {
+            callback.cancel();
+        }
     }
 
-    @ModifyArgs(
-            method = "playSeededSound(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/resources/sounds/EntityBoundSoundInstance;<init>(Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFLnet/minecraft/world/entity/Entity;J)V"
-            )
-    )
+    @ModifyArgs(method = "playSeededSound(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V",
+                at = @At(value = "INVOKE",
+                         target = "Lnet/minecraft/client/resources/sounds/EntityBoundSoundInstance;<init>(Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFLnet/minecraft/world/entity/Entity;J)V"))
     public void playSeededSound$1(Args args, @Cancellable CallbackInfo callback) {
         Preconditions.checkArgument(args.get(0) instanceof SoundEvent, "sound event is wrong type");
         EventResult eventResult = FabricEventImplHelper.onPlaySound((MutableValue<Holder<SoundEvent>> soundEvent, MutableValue<SoundSource> soundSource, MutableFloat soundVolume, MutableFloat soundPitch) -> {
@@ -129,6 +113,8 @@ abstract class ClientLevelFabricMixin extends Level {
                 1,
                 2,
                 3);
-        if (eventResult.isInterrupt()) callback.cancel();
+        if (eventResult.isInterrupt()) {
+            callback.cancel();
+        }
     }
 }

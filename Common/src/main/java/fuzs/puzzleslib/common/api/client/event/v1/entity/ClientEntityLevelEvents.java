@@ -5,12 +5,15 @@ import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
 
+/**
+ * TODO rename to ClientEntityEvents
+ */
 public final class ClientEntityLevelEvents {
     public static final EventInvoker<Load> LOAD = EventInvoker.lookup(Load.class);
     public static final EventInvoker<Unload> UNLOAD = EventInvoker.lookup(Unload.class);
 
     private ClientEntityLevelEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface
@@ -19,10 +22,12 @@ public final class ClientEntityLevelEvents {
         /**
          * Fired when an entity is added to the level on the client.
          *
-         * @param entity    the entity that is being loaded
-         * @param level     the level the entity is loaded in
-         * @return {@link EventResult#INTERRUPT} to prevent the entity from being added to the level (on Fabric the entity will instead just immediately be removed again),
-         * {@link EventResult#PASS} for the entity to be added normally
+         * @param entity the entity that is being loaded
+         * @param level  the level the entity is loaded in
+         * @return <ul>
+         *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the entity from being added to the level</li>
+         *         <li>{@link EventResult#PASS PASS} for the entity to be added normally</li>
+         *         </ul>
          */
         EventResult onEntityLoad(Entity entity, ClientLevel level);
     }
@@ -33,8 +38,8 @@ public final class ClientEntityLevelEvents {
         /**
          * Fired when an entity is removed from the level on the client.
          *
-         * @param entity    the entity that is being unloaded
-         * @param level     the level the entity is unloaded in
+         * @param entity the entity that is being unloaded
+         * @param level  the level the entity is unloaded in
          */
         void onEntityUnload(Entity entity, ClientLevel level);
     }
