@@ -9,6 +9,7 @@ multiloader {
         plugin.set("${project.group}.${project.packageName}.mixin.MixinConfigPluginNeoForgeImpl")
         mixin("MenuProviderWithDataNeoForgeMixin")
         accessor("BiomeSpecialEffectsBuilderNeoForgeAccessor", "EntityNeoForgeAccessor", "PackNeoForgeAccessor")
+        clientMixin("MouseHandlerNeoForgeMixin")
         clientAccessor("RegisterKeyMappingsEventNeoForgeAccessor")
     }
 }

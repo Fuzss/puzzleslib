@@ -21,6 +21,7 @@ import fuzs.puzzleslib.common.api.event.v1.data.MutableValue;
 import fuzs.puzzleslib.common.impl.client.event.ScreenButtonList;
 import fuzs.puzzleslib.common.impl.event.data.DefaultedFloat;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.ScrollWheelHandler;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -39,6 +40,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.item.Item;
@@ -57,6 +59,7 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import org.joml.Vector2i;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
@@ -70,6 +73,7 @@ import static fuzs.puzzleslib.neoforge.api.event.v1.core.NeoForgeEventInvokerReg
 
 @SuppressWarnings("unchecked")
 public final class NeoForgeClientEventInvokers {
+    public static Vector2i wheelXY = new Vector2i();
 
     private NeoForgeClientEventInvokers() {
         // NO-OP
@@ -427,14 +431,19 @@ public final class NeoForgeClientEventInvokers {
                         return;
                     }
 
-                    EventResultHolder<Integer> holder = callback.onHotbarScrolling(player.getInventory(),
-                            player.getInventory().getSelectedSlot(),
-                            0,
+                    Inventory inventory = player.getInventory();
+                    int wheel = wheelXY.y == 0 ? -wheelXY.x : wheelXY.y;
+                    int newSlot = ScrollWheelHandler.getNextScrollWheelSelection(wheel,
+                            inventory.getSelectedSlot(),
+                            Inventory.getSelectionSize());
+                    EventResultHolder<Integer> holder = callback.onHotbarScrolling(inventory,
+                            inventory.getSelectedSlot(),
+                            newSlot,
                             event.getScrollDeltaX(),
                             event.getScrollDeltaY());
                     holder.ifAllow((Integer slot) -> {
                         Objects.requireNonNull(slot, "slot is null");
-                        player.getInventory().setSelectedSlot(slot);
+                        inventory.setSelectedSlot(slot);
                     });
                     if (holder.isInterrupt()) {
                         event.setCanceled(true);
