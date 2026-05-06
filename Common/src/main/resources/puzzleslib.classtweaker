@@ -385,6 +385,12 @@ transitive-accessible	class	net/minecraft/client/renderer/block/BuiltInBlockMode
 accessible  method  net/minecraft/core/component/DataComponentMap$Builder   <init>  ()V
 accessible  field   net/minecraft/core/component/DataComponentMap$Builder   map Lit/unimi/dsi/fastutil/objects/Reference2ObjectMap;
 mutable field   net/minecraft/core/component/DataComponentMap$Builder   map Lit/unimi/dsi/fastutil/objects/Reference2ObjectMap;
+transitive-extendable   method  net/minecraft/client/renderer/entity/layers/ItemInHandLayer useBabyOffset   (Lnet/minecraft/client/renderer/entity/state/ArmedEntityRenderState;)Z
+accessible  field   net/minecraft/client/renderer/entity/layers/HumanoidArmorLayer  equipmentRenderer   Lnet/minecraft/client/renderer/entity/layers/EquipmentLayerRenderer;
+accessible  method  net/minecraft/client/renderer/entity/layers/HumanoidArmorLayer  shouldRender    (Lnet/minecraft/world/item/equipment/Equippable;Lnet/minecraft/world/entity/EquipmentSlot;)Z
+extendable  method  net/minecraft/client/renderer/entity/layers/HumanoidArmorLayer  renderArmorPiece    (Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/EquipmentSlot;ILnet/minecraft/client/renderer/entity/state/HumanoidRenderState;)V
+accessible  method  net/minecraft/client/renderer/entity/layers/HumanoidArmorLayer  getArmorModel   (Lnet/minecraft/client/renderer/entity/state/HumanoidRenderState;Lnet/minecraft/world/entity/EquipmentSlot;)Lnet/minecraft/client/model/HumanoidModel;
+accessible  method  net/minecraft/client/renderer/entity/layers/HumanoidArmorLayer  usesInnerModel  (Lnet/minecraft/world/entity/EquipmentSlot;)Z
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;

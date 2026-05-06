@@ -39,7 +39,6 @@ public final class EventResultHolder<T> {
      */
     private EventResultHolder(EventResult result, @Nullable T value) {
         Objects.requireNonNull(result, "result is null");
-        Objects.requireNonNull(value, "value is null");
         this.result = result;
         this.value = value;
     }
@@ -103,6 +102,7 @@ public final class EventResultHolder<T> {
         if (this.isInterrupt()) {
             action.accept(this.value);
         }
+
         return this;
     }
 
@@ -115,6 +115,7 @@ public final class EventResultHolder<T> {
         if (this.isInterrupt() && this.result.getAsBoolean()) {
             action.accept(this.value);
         }
+
         return this;
     }
 
@@ -127,6 +128,7 @@ public final class EventResultHolder<T> {
         if (this.isInterrupt() && !this.result.getAsBoolean()) {
             action.accept(this.value);
         }
+
         return this;
     }
 
