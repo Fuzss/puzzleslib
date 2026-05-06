@@ -12,11 +12,6 @@ public final class FabricClientEvents {
     public static final Event<ClientInputEvents.MouseClick> MOUSE_CLICK = FabricEventFactory.createResult(
             ClientInputEvents.MouseClick.class);
     /**
-     * Called before a mouse has scrolled without a screen being open.
-     */
-    public static final Event<ClientInputEvents.MouseScroll> MOUSE_SCROLL = FabricEventFactory.createResult(
-            ClientInputEvents.MouseScroll.class);
-    /**
      * Called before a key press, release or repeat action is handled.
      */
     public static final Event<ClientInputEvents.KeyPress> KEY_PRESS = FabricEventFactory.createResult(ClientInputEvents.KeyPress.class);

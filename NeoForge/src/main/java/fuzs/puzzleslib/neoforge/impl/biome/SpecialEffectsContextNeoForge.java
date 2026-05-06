@@ -4,7 +4,6 @@ import fuzs.puzzleslib.common.api.biome.v1.SpecialEffectsContext;
 import fuzs.puzzleslib.neoforge.mixin.accessor.BiomeSpecialEffectsBuilderNeoForgeAccessor;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.neoforged.neoforge.common.world.BiomeSpecialEffectsBuilder;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -59,7 +58,7 @@ public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) 
     }
 
     @Override
-    public void setGrassColorModifier(BiomeSpecialEffects.@NonNull GrassColorModifier grassColorModifier) {
+    public void setGrassColorModifier(BiomeSpecialEffects.GrassColorModifier grassColorModifier) {
         Objects.requireNonNull(grassColorModifier, "grass color modifier is null");
         this.context.grassColorModifier(grassColorModifier);
     }

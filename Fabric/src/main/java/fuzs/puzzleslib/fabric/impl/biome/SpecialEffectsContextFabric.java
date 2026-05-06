@@ -3,7 +3,6 @@ package fuzs.puzzleslib.fabric.impl.biome;
 import fuzs.puzzleslib.common.api.biome.v1.SpecialEffectsContext;
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -52,7 +51,7 @@ public record SpecialEffectsContextFabric(BiomeSpecialEffects specialEffects,
     }
 
     @Override
-    public void setGrassColorModifier(BiomeSpecialEffects.@NonNull GrassColorModifier grassColorModifier) {
+    public void setGrassColorModifier(BiomeSpecialEffects.GrassColorModifier grassColorModifier) {
         Objects.requireNonNull(grassColorModifier, "grass color modifier is null");
         this.context.setGrassColorModifier(grassColorModifier);
     }

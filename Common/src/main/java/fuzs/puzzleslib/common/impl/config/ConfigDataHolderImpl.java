@@ -22,9 +22,11 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
     final T config;
     private final Supplier<T> defaultConfigSupplier;
     private final List<Consumer<T>> additionalCallbacks = new ArrayList<>();
-    @Nullable private T defaultConfig;
+    @Nullable
+    private T defaultConfig;
     private UnaryOperator<String> fileNameFactory;
-    @Nullable private String fileName;
+    @Nullable
+    private String fileName;
     private List<Runnable> configValueCallbacks = new ArrayList<>();
     private ModConfigStatus status = ModConfigStatus.CONFIG_MISSING;
     private int consecutiveConfigReloads;
@@ -50,6 +52,7 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
                 callback.accept(this.defaultConfig);
             }
         }
+
         return this.defaultConfig;
     }
 
@@ -88,6 +91,7 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
             } else {
                 this.status = ModConfigStatus.DATA_MISSING;
             }
+
             if (eventType != ModConfigEventType.RELOADING) {
                 this.consecutiveConfigReloads = 0;
             } else if (++this.consecutiveConfigReloads >= MAX_CONSECUTIVE_CONFIG_RELOADS) {
@@ -100,11 +104,12 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
     }
 
     protected final ModConfigSpec initialize(String modId) {
-        Objects.requireNonNull(this.config, "Attempting to register invalid config for " + modId);
+        Objects.requireNonNull(this.config, () -> "config for " + modId + " is null");
         if (this.fileName != null || this.status != ModConfigStatus.CONFIG_MISSING) {
             throw new IllegalStateException(
                     "Config has already been registered at " + this.fileNameFactory.apply(modId));
         }
+
         this.fileName = this.fileNameFactory.apply(modId);
         this.status = ModConfigStatus.DATA_MISSING;
         return this.buildConfigSpec();
@@ -147,7 +152,8 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
         DATA_MISSING("Config data is missing"),
         FULLY_LOADED(null);
 
-        @Nullable private final String message;
+        @Nullable
+        private final String message;
 
         ModConfigStatus(@Nullable String message) {
             this.message = message;

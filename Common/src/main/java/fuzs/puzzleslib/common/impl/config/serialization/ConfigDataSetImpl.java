@@ -10,7 +10,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.*;
@@ -22,7 +21,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
- * implementation of {@link ConfigDataSet}
+ * An implementation of {@link ConfigDataSet}.
  *
  * @param <T> registry entry type for stored values
  */
@@ -135,13 +134,13 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         return this.toSet().contains(o);
     }
 
-    @NonNull @Override
+    @Override
     public Object[] toArray() {
         return this.toSet().toArray();
     }
 
-    @NonNull @Override
-    public <T1> T1[] toArray(@NonNull T1[] a) {
+    @Override
+    public <T1> T1[] toArray(T1[] a) {
         return this.toSet().toArray(a);
     }
 
@@ -156,22 +155,22 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
     }
 
     @Override
-    public boolean containsAll(@NonNull Collection<?> c) {
+    public boolean containsAll(Collection<?> c) {
         return this.toSet().containsAll(c);
     }
 
     @Override
-    public boolean addAll(@NonNull Collection<? extends T> c) {
+    public boolean addAll(Collection<? extends T> c) {
         return this.toSet().addAll(c);
     }
 
     @Override
-    public boolean removeAll(@NonNull Collection<?> c) {
+    public boolean removeAll(Collection<?> c) {
         return this.toSet().removeAll(c);
     }
 
     @Override
-    public boolean retainAll(@NonNull Collection<?> c) {
+    public boolean retainAll(Collection<?> c) {
         return this.toSet().retainAll(c);
     }
 
@@ -180,7 +179,8 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         this.toMap().clear();
     }
 
-    @Nullable @Override
+    @Nullable
+    @Override
     public Object[] get(T entry) {
         return this.toMap().get(entry);
     }

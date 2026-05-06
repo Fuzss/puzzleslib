@@ -3,7 +3,6 @@ package fuzs.puzzleslib.fabric.impl.biome;
 import fuzs.puzzleslib.common.api.biome.v1.ClimateSettingsContext;
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
 import net.minecraft.world.level.biome.Biome;
-import org.jspecify.annotations.NonNull;
 
 public record ClimateSettingsContextFabric(Biome biome,
                                            BiomeModificationContext.WeatherContext context) implements ClimateSettingsContext {
@@ -29,7 +28,7 @@ public record ClimateSettingsContextFabric(Biome biome,
     }
 
     @Override
-    public void setTemperatureModifier(Biome.@NonNull TemperatureModifier temperatureModifier) {
+    public void setTemperatureModifier(Biome.TemperatureModifier temperatureModifier) {
         this.context.setTemperatureModifier(temperatureModifier);
     }
 

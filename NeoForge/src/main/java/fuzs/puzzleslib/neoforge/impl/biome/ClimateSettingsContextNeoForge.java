@@ -3,7 +3,6 @@ package fuzs.puzzleslib.neoforge.impl.biome;
 import fuzs.puzzleslib.common.api.biome.v1.ClimateSettingsContext;
 import net.minecraft.world.level.biome.Biome;
 import net.neoforged.neoforge.common.world.ClimateSettingsBuilder;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 
@@ -30,7 +29,7 @@ public record ClimateSettingsContextNeoForge(ClimateSettingsBuilder context) imp
     }
 
     @Override
-    public void setTemperatureModifier(Biome.@NonNull TemperatureModifier temperatureModifier) {
+    public void setTemperatureModifier(Biome.TemperatureModifier temperatureModifier) {
         Objects.requireNonNull(temperatureModifier, "temperature modifier is null");
         this.context.setTemperatureModifier(temperatureModifier);
     }

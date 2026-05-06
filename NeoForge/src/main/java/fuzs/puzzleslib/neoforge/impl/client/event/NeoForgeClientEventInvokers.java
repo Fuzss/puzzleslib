@@ -39,6 +39,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -413,6 +414,28 @@ public final class NeoForgeClientEventInvokers {
 
                     callback.onEntityUnload(event.getEntity(), clientLevel);
                 });
+        INSTANCE.register(HotbarScrollingCallback.class,
+                InputEvent.MouseScrollingEvent.class,
+                (HotbarScrollingCallback callback, InputEvent.MouseScrollingEvent event) -> {
+                    // Only handle scrolling in the inventory to mirror Fabric.
+                    Player player = Minecraft.getInstance().player;
+                    if (player.isSpectator()) {
+                        return;
+                    }
+
+                    EventResultHolder<Integer> holder = callback.onHotbarScrolling(player.getInventory(),
+                            player.getInventory().getSelectedSlot(),
+                            0,
+                            event.getScrollDeltaX(),
+                            event.getScrollDeltaY());
+                    holder.ifAllow((Integer slot) -> {
+                        Objects.requireNonNull(slot, "slot is null");
+                        player.getInventory().setSelectedSlot(slot);
+                    });
+                    if (holder.isInterrupt()) {
+                        event.setCanceled(true);
+                    }
+                });
         INSTANCE.register(ClientInputEvents.MouseClick.class,
                 InputEvent.MouseButton.Pre.class,
                 (ClientInputEvents.MouseClick callback, InputEvent.MouseButton.Pre event) -> {
@@ -424,6 +447,11 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(ClientInputEvents.MouseScroll.class,
                 InputEvent.MouseScrollingEvent.class,
                 (ClientInputEvents.MouseScroll callback, InputEvent.MouseScrollingEvent event) -> {
+                    // Only handle scrolling in the inventory to mirror Fabric.
+                    if (Minecraft.getInstance().player.isSpectator()) {
+                        return;
+                    }
+
                     EventResult eventResult = callback.onMouseScroll(event.isLeftDown(),
                             event.isMiddleDown(),
                             event.isRightDown(),

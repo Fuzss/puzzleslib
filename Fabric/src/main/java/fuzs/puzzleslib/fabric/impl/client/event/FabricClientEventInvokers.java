@@ -17,9 +17,9 @@ import fuzs.puzzleslib.common.api.client.event.v1.renderer.*;
 import fuzs.puzzleslib.common.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.common.api.event.v1.core.EventResultHolder;
-import fuzs.puzzleslib.fabric.api.client.event.v1.*;
 import fuzs.puzzleslib.common.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.common.impl.event.data.DefaultedInt;
+import fuzs.puzzleslib.fabric.api.client.event.v1.*;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
@@ -32,12 +32,14 @@ import net.fabricmc.fabric.api.client.rendering.v1.level.LevelExtractionContext;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.client.player.ClientHotbarScrollEvents;
 import net.fabricmc.fabric.api.event.client.player.ClientPreAttackCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.MouseHandler;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -59,6 +61,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -459,8 +462,35 @@ public final class FabricClientEventInvokers {
                 (ClientEntityLevelEvents.Unload callback) -> {
                     return callback::onEntityUnload;
                 });
+        INSTANCE.register(HotbarScrollingCallback.class,
+                ClientHotbarScrollEvents.ALLOW,
+                (HotbarScrollingCallback callback) -> {
+                    return (Inventory inventory, int currentSlot, int newSlot, double xOffset, double yOffset) -> {
+                        EventResultHolder<Integer> holder = callback.onHotbarScrolling(inventory,
+                                currentSlot,
+                                newSlot,
+                                xOffset,
+                                yOffset);
+                        holder.ifAllow((Integer slot) -> {
+                            Objects.requireNonNull(slot, "slot is null");
+                            inventory.setSelectedSlot(slot);
+                        });
+                        return holder.isPass();
+                    };
+                });
         INSTANCE.register(ClientInputEvents.MouseClick.class, FabricClientEvents.MOUSE_CLICK);
-        INSTANCE.register(ClientInputEvents.MouseScroll.class, FabricClientEvents.MOUSE_SCROLL);
+        INSTANCE.register(ClientInputEvents.MouseScroll.class,
+                ClientHotbarScrollEvents.ALLOW,
+                (ClientInputEvents.MouseScroll callback) -> {
+                    return (Inventory inventory, int currentSlot, int newSlot, double xOffset, double yOffset) -> {
+                        MouseHandler mouseHandler = Minecraft.getInstance().mouseHandler;
+                        return callback.onMouseScroll(mouseHandler.isLeftPressed(),
+                                mouseHandler.isLeftPressed(),
+                                mouseHandler.isLeftPressed(),
+                                xOffset,
+                                yOffset).isPass();
+                    };
+                });
         INSTANCE.register(ClientInputEvents.KeyPress.class, FabricClientEvents.KEY_PRESS);
         INSTANCE.register(SubmitLivingEntityEvents.Before.class, FabricRendererEvents.BEFORE_SUBMIT_LIVING_ENTITY);
         INSTANCE.register(SubmitLivingEntityEvents.After.class, FabricRendererEvents.AFTER_SUBMIT_LIVING_ENTITY);

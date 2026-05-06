@@ -4,7 +4,6 @@ import fuzs.puzzleslib.common.impl.config.serialization.ConfigDataSetImpl;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.ApiStatus;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.*;
@@ -180,15 +179,15 @@ public interface ConfigDataSet<T> extends Collection<T> {
 
     @ApiStatus.Internal
     @Override
-    boolean addAll(@NonNull Collection<? extends T> c);
+    boolean addAll(Collection<? extends T> c);
 
     @ApiStatus.Internal
     @Override
-    boolean removeAll(@NonNull Collection<?> c);
+    boolean removeAll(Collection<?> c);
 
     @ApiStatus.Internal
     @Override
-    boolean retainAll(@NonNull Collection<?> c);
+    boolean retainAll(Collection<?> c);
 
     @ApiStatus.Internal
     @Override

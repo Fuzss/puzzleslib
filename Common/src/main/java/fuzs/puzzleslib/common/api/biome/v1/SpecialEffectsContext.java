@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.common.api.biome.v1;
 
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
 
@@ -119,7 +118,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#grassColorModifier()
      * @see BiomeSpecialEffects.Builder#grassColorModifier(BiomeSpecialEffects.GrassColorModifier)
      */
-    void setGrassColorModifier(BiomeSpecialEffects.@NonNull GrassColorModifier grassColorModifier);
+    void setGrassColorModifier(BiomeSpecialEffects.GrassColorModifier grassColorModifier);
 
     /**
      * @see BiomeSpecialEffects#grassColorModifier()
