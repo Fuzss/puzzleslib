@@ -87,6 +87,10 @@ import static fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventInvokerRegistr
 @SuppressWarnings("unchecked")
 public final class FabricClientEventInvokers {
 
+    private FabricClientEventInvokers() {
+        // NO-OP
+    }
+
     public static void registerLoadingHandlers() {
         INSTANCE.register(ScreenOpeningCallback.class, FabricGuiEvents.SCREEN_OPENING);
         INSTANCE.register(ModelLoadingEvents.LoadModel.class,

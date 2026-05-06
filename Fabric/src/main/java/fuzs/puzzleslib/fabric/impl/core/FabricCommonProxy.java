@@ -14,7 +14,7 @@ import fuzs.puzzleslib.common.api.item.v2.crafting.CombinedIngredients;
 import fuzs.puzzleslib.fabric.impl.attachment.FabricDataAttachmentRegistryImpl;
 import fuzs.puzzleslib.fabric.impl.core.context.PayloadTypesContextFabricImpl;
 import fuzs.puzzleslib.fabric.impl.data.FabricTagAppender;
-import fuzs.puzzleslib.fabric.impl.event.FabricEventInvokerRegistryImpl;
+import fuzs.puzzleslib.fabric.impl.event.FabricEventInvokers;
 import fuzs.puzzleslib.fabric.impl.event.SpawnReasonMob;
 import fuzs.puzzleslib.fabric.impl.init.FabricRegistryFactory;
 import fuzs.puzzleslib.fabric.impl.item.FabricToolTypeHelper;
@@ -176,13 +176,13 @@ public class FabricCommonProxy implements FabricProxy {
     @MustBeInvokedByOverriders
     @Override
     public void registerAllLoadingHandlers() {
-        FabricEventInvokerRegistryImpl.registerLoadingHandlers();
+        FabricEventInvokers.registerLoadingHandlers();
     }
 
     @MustBeInvokedByOverriders
     @Override
     public void registerAllEventHandlers() {
-        FabricEventInvokerRegistryImpl.registerEventHandlers();
+        FabricEventInvokers.registerEventHandlers();
     }
 
     @MustBeInvokedByOverriders

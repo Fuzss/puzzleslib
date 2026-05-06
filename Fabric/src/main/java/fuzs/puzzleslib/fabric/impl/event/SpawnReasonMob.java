@@ -18,7 +18,7 @@ import org.jspecify.annotations.Nullable;
  * {@link net.minecraft.world.entity.Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, EntitySpawnReason,
  * SpawnGroupData)} was overridden without calling {@code super}.
  */
-@Deprecated
+@Deprecated(forRemoval = true)
 public interface SpawnReasonMob {
     /**
      * Use {@link Enum#name()} for backward compatibility.

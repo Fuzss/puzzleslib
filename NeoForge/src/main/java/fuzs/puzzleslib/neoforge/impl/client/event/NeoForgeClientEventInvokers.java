@@ -71,6 +71,10 @@ import static fuzs.puzzleslib.neoforge.api.event.v1.core.NeoForgeEventInvokerReg
 @SuppressWarnings("unchecked")
 public final class NeoForgeClientEventInvokers {
 
+    private NeoForgeClientEventInvokers() {
+        // NO-OP
+    }
+
     public static void registerLoadingHandlers() {
         INSTANCE.register(ClientSetupCallback.class,
                 FMLClientSetupEvent.class,

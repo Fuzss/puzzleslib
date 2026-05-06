@@ -11,12 +11,14 @@ import fuzs.puzzleslib.common.api.item.v2.crafting.CombinedIngredients;
 import fuzs.puzzleslib.common.impl.attachment.DataAttachmentRegistryImpl;
 import fuzs.puzzleslib.common.impl.core.ModContext;
 import fuzs.puzzleslib.common.impl.core.context.ModConstructorImpl;
+import fuzs.puzzleslib.neoforge.api.event.v1.core.NeoForgeEventInvokerRegistry;
 import fuzs.puzzleslib.neoforge.impl.attachment.NeoForgeDataAttachmentRegistryImpl;
 import fuzs.puzzleslib.neoforge.impl.core.context.PayloadTypesContextNeoForgeImpl;
 import fuzs.puzzleslib.neoforge.impl.data.NeoForgeTagAppender;
 import fuzs.puzzleslib.neoforge.impl.event.ForwardingLootPoolBuilder;
 import fuzs.puzzleslib.neoforge.impl.event.ForwardingLootTableBuilder;
 import fuzs.puzzleslib.neoforge.impl.event.NeoForgeEventInvokerRegistryImpl;
+import fuzs.puzzleslib.neoforge.impl.event.NeoForgeEventInvokers;
 import fuzs.puzzleslib.neoforge.impl.init.MenuTypeWithData;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgeRegistryFactory;
 import fuzs.puzzleslib.neoforge.impl.item.NeoForgeToolTypeHelper;
@@ -161,14 +163,14 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     @MustBeInvokedByOverriders
     @Override
     public void registerAllLoadingHandlers() {
-        NeoForgeEventInvokerRegistryImpl.registerLoadingHandlers();
+        NeoForgeEventInvokers.registerLoadingHandlers();
     }
 
     @MustBeInvokedByOverriders
     @Override
     public void registerAllEventHandlers() {
-        NeoForgeEventInvokerRegistryImpl.freezeModBusEvents();
-        NeoForgeEventInvokerRegistryImpl.registerEventHandlers();
+        ((NeoForgeEventInvokerRegistryImpl) NeoForgeEventInvokerRegistry.INSTANCE).freezeModBusEvents();
+        NeoForgeEventInvokers.registerEventHandlers();
     }
 
     @Override
