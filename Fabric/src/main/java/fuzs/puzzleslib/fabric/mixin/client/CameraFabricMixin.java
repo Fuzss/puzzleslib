@@ -15,21 +15,23 @@ import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
+import java.util.Optional;
+
 @Mixin(Camera.class)
 abstract class CameraFabricMixin {
     @Unique
-    private float puzzleslib$zRot;
+    private Optional<Float> puzzleslib$zRot = Optional.empty();
 
     @ModifyArgs(method = "alignWithEntity",
                 at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FF)V", ordinal = 0),
                 slice = @Slice(from = @At(value = "INVOKE",
                                           target = "Lnet/minecraft/client/Camera;setPosition(Lnet/minecraft/world/phys/Vec3;)V")))
     public void alignWithEntity(Args args, float partialTicks) {
-        this.puzzleslib$zRot = 0.0F;
+        this.puzzleslib$zRot = Optional.empty();
         MutableFloat pitch = MutableFloat.fromEvent((Float xRot) -> args.set(1, xRot), () -> args.get(1));
         MutableFloat yaw = MutableFloat.fromEvent((Float yRot) -> args.set(0, yRot), () -> args.get(0));
-        MutableFloat roll = MutableFloat.fromEvent((Float zRot) -> this.puzzleslib$zRot = zRot,
-                () -> this.puzzleslib$zRot);
+        MutableFloat roll = MutableFloat.fromEvent((Float zRot) -> this.puzzleslib$zRot = Optional.of(zRot),
+                () -> this.puzzleslib$zRot.orElse(0.0F));
         FabricRendererEvents.COMPUTE_CAMERA_ANGLES.invoker()
                 .onComputeCameraAngles(Camera.class.cast(this), partialTicks, pitch, yaw, roll);
     }
@@ -38,7 +40,11 @@ abstract class CameraFabricMixin {
                at = @At(value = "INVOKE", target = "Lorg/joml/Quaternionf;rotationYXZ(FFF)Lorg/joml/Quaternionf;"),
                index = 2)
     protected float setRotation(float zRot) {
-        return -this.puzzleslib$zRot * Mth.DEG_TO_RAD;
+        if (this.puzzleslib$zRot.isPresent()) {
+            return -this.puzzleslib$zRot.get() * Mth.DEG_TO_RAD;
+        } else {
+            return zRot;
+        }
     }
 
     @ModifyReturnValue(method = "modifyFovBasedOnDeathOrFluid", at = @At("TAIL"))
