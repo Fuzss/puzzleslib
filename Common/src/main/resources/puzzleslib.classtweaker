@@ -4,8 +4,14 @@ transitive-accessible   field   net/minecraft/world/entity/Mob  goalSelector    
 transitive-accessible   field   net/minecraft/world/entity/Mob  targetSelector  Lnet/minecraft/world/entity/ai/goal/GoalSelector;
 transitive-accessible   field   net/minecraft/client/gui/screens/Screen     renderables     Ljava/util/List;
 transitive-accessible   field   net/minecraft/client/renderer/blockentity/SkullBlockRenderer    SKIN_BY_TYPE    Ljava/util/Map;
+transitive-accessible   field   net/minecraft/client/model/geom/LayerDefinitions    FISH_PATTERN_DEFORMATION    Lnet/minecraft/client/model/geom/builders/CubeDeformation;
 transitive-accessible	field	net/minecraft/client/model/geom/LayerDefinitions    OUTER_ARMOR_DEFORMATION     Lnet/minecraft/client/model/geom/builders/CubeDeformation;
 transitive-accessible	field	net/minecraft/client/model/geom/LayerDefinitions    INNER_ARMOR_DEFORMATION     Lnet/minecraft/client/model/geom/builders/CubeDeformation;
+transitive-accessible   field   net/minecraft/client/model/geom/LayerDefinitions    BABY_OUTER_ARMOR_DEFORMATION    Lnet/minecraft/client/model/geom/builders/CubeDeformation;
+transitive-accessible   field   net/minecraft/client/model/geom/LayerDefinitions    BABY_INNER_ARMOR_DEFORMATION    Lnet/minecraft/client/model/geom/builders/CubeDeformation;
+transitive-accessible   field   net/minecraft/client/model/geom/LayerDefinitions    BABY_PIGLIN_INNER_ARMOR_DEFORMATION Lnet/minecraft/client/model/geom/builders/CubeDeformation;
+transitive-accessible   field   net/minecraft/client/model/geom/LayerDefinitions    BABY_PIGLIN_OUTER_ARMOR_DEFORMATION Lnet/minecraft/client/model/geom/builders/CubeDeformation;
+transitive-accessible   field   net/minecraft/client/model/geom/LayerDefinitions    BABY_PIGLIN_ARMOR_ARM_OFFSET    Lnet/minecraft/client/model/geom/PartPose;
 transitive-accessible   class   net/minecraft/client/particle/ParticleResources$SpriteParticleRegistration
 transitive-accessible   field   net/minecraft/client/renderer/entity/EntityRenderDispatcher renderers   Ljava/util/Map;
 transitive-accessible   method  net/minecraft/client/data/models/model/ModelTemplates  create  ([Lnet/minecraft/client/data/models/model/TextureSlot;)Lnet/minecraft/client/data/models/model/ModelTemplate;
@@ -117,6 +123,7 @@ mutable field   net/minecraft/client/data/models/BlockModelGenerators  FULL_BLOC
 transitive-accessible   field   net/minecraft/client/data/models/BlockModelGenerators  TEXTURED_MODELS  Ljava/util/Map;
 mutable field   net/minecraft/client/data/models/BlockModelGenerators  TEXTURED_MODELS  Ljava/util/Map;
 transitive-accessible   field   net/minecraft/client/data/models/BlockModelGenerators  SHAPE_CONSUMERS Ljava/util/Map;
+transitive-mutable  field   net/minecraft/client/gui/components/ImageButton sprites Lnet/minecraft/client/gui/components/WidgetSprites;
 transitive-accessible   field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
 mutable field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
 extendable  method  net/minecraft/client/gui/components/WidgetTooltipHolder createTooltipPositioner (Lnet/minecraft/client/gui/navigation/ScreenRectangle;ZZ)Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;
