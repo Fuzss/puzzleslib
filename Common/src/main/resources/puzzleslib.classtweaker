@@ -12,6 +12,8 @@ transitive-accessible   field   net/minecraft/client/model/geom/LayerDefinitions
 transitive-accessible   field   net/minecraft/client/model/geom/LayerDefinitions    BABY_PIGLIN_INNER_ARMOR_DEFORMATION Lnet/minecraft/client/model/geom/builders/CubeDeformation;
 transitive-accessible   field   net/minecraft/client/model/geom/LayerDefinitions    BABY_PIGLIN_OUTER_ARMOR_DEFORMATION Lnet/minecraft/client/model/geom/builders/CubeDeformation;
 transitive-accessible   field   net/minecraft/client/model/geom/LayerDefinitions    BABY_PIGLIN_ARMOR_ARM_OFFSET    Lnet/minecraft/client/model/geom/PartPose;
+transitive-accessible   field   net/minecraft/client/model/geom/builders/LayerDefinition    mesh    Lnet/minecraft/client/model/geom/builders/MeshDefinition;
+transitive-accessible   field   net/minecraft/client/model/geom/builders/LayerDefinition    material    Lnet/minecraft/client/model/geom/builders/MaterialDefinition;
 transitive-accessible   class   net/minecraft/client/particle/ParticleResources$SpriteParticleRegistration
 transitive-accessible   field   net/minecraft/client/renderer/entity/EntityRenderDispatcher renderers   Ljava/util/Map;
 transitive-accessible   method  net/minecraft/client/data/models/model/ModelTemplates  create  ([Lnet/minecraft/client/data/models/model/TextureSlot;)Lnet/minecraft/client/data/models/model/ModelTemplate;
@@ -69,8 +71,6 @@ transitive-accessible   field   net/minecraft/client/renderer/entity/AgeableMobR
 transitive-mutable  field   net/minecraft/client/renderer/entity/AgeableMobRenderer adultModel  Lnet/minecraft/client/model/EntityModel;
 transitive-accessible   field   net/minecraft/client/renderer/entity/AgeableMobRenderer babyModel   Lnet/minecraft/client/model/EntityModel;
 transitive-mutable  field   net/minecraft/client/renderer/entity/AgeableMobRenderer babyModel   Lnet/minecraft/client/model/EntityModel;
-transitive-accessible   field   net/minecraft/client/model/geom/builders/LayerDefinition    mesh    Lnet/minecraft/client/model/geom/builders/MeshDefinition;
-transitive-accessible   field   net/minecraft/client/model/geom/builders/LayerDefinition    material    Lnet/minecraft/client/model/geom/builders/MaterialDefinition;
 transitive-accessible   field   net/minecraft/client/renderer/entity/LivingEntityRenderer   layers  Ljava/util/List;
 transitive-accessible   field   net/minecraft/world/level/storage/loot/parameters/LootContextParamSets  REGISTRY    Lcom/google/common/collect/BiMap;
 transitive-accessible   field   net/minecraft/world/entity/Mob  lootTable   Ljava/util/Optional;
@@ -307,6 +307,11 @@ transitive-accessible	method	net/minecraft/world/entity/decoration/painting/Pain
 transitive-accessible   method	net/minecraft/world/entity/decoration/painting/PaintingVariants register	(Lnet/minecraft/data/worldgen/BootstrapContext;Lnet/minecraft/resources/ResourceKey;IIZ)V
 accessible  field   net/minecraft/client/data/models/EquipmentAssetProvider pathProvider    Lnet/minecraft/data/PackOutput$PathProvider;
 transitive-accessible   method  net/minecraft/client/renderer/entity/LivingEntityRenderer   addLayer    (Lnet/minecraft/client/renderer/entity/layers/RenderLayer;)Z
+transitive-accessible   field   net/minecraft/client/model/HumanoidModel    ADULT_ARMOR_PARTS_PER_SLOT  Ljava/util/Map;
+transitive-accessible   field   net/minecraft/client/model/HumanoidModel    BABY_ARMOR_PARTS_PER_SLOT   Ljava/util/Map;
+transitive-accessible   method  net/minecraft/client/model/HumanoidModel    createBaseArmorMesh (Lnet/minecraft/client/model/geom/builders/CubeDeformation;)Lnet/minecraft/client/model/geom/builders/MeshDefinition;
+transitive-accessible   method  net/minecraft/client/model/HumanoidModel    createBabyArmorMesh (Lnet/minecraft/client/model/geom/builders/CubeDeformation;Lnet/minecraft/client/model/geom/PartPose;)Lnet/minecraft/client/model/geom/builders/MeshDefinition;
+transitive-accessible   method  net/minecraft/client/model/monster/zombie/ZombieVillagerModel   createBaseArmorMesh (Lnet/minecraft/client/model/geom/builders/CubeDeformation;)Lnet/minecraft/client/model/geom/builders/MeshDefinition;
 transitive-accessible   field   net/minecraft/client/model/player/PlayerModel   slim    Z
 accessible	field	net/minecraft/data/tags/TagsProvider	builders	Ljava/util/Map;
 accessible	field	net/minecraft/tags/TagEntry	id  Lnet/minecraft/resources/Identifier;
