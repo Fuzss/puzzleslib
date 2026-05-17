@@ -405,6 +405,8 @@ accessible  method  net/minecraft/client/renderer/entity/layers/HumanoidArmorLay
 extendable  method  net/minecraft/client/renderer/entity/layers/HumanoidArmorLayer  renderArmorPiece    (Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/EquipmentSlot;ILnet/minecraft/client/renderer/entity/state/HumanoidRenderState;)V
 accessible  method  net/minecraft/client/renderer/entity/layers/HumanoidArmorLayer  getArmorModel   (Lnet/minecraft/client/renderer/entity/state/HumanoidRenderState;Lnet/minecraft/world/entity/EquipmentSlot;)Lnet/minecraft/client/model/HumanoidModel;
 accessible  method  net/minecraft/client/renderer/entity/layers/HumanoidArmorLayer  usesInnerModel  (Lnet/minecraft/world/entity/EquipmentSlot;)Z
+transitive-accessible   class   net/minecraft/server/MinecraftServer$ReloadableResources
+transitive-accessible   field   net/minecraft/server/MinecraftServer    resources   Lnet/minecraft/server/MinecraftServer$ReloadableResources;
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;
