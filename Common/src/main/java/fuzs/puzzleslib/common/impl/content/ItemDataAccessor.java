@@ -69,7 +69,7 @@ public class ItemDataAccessor implements DataAccessor {
     }
 
     @Override
-    public void setData(CompoundTag compoundTag) throws CommandSyntaxException {
+    public void setData(CompoundTag compoundTag) {
         RegistryOps<Tag> registryOps = this.registryAccess.createSerializationContext(NbtOps.INSTANCE);
         DataComponentMap.CODEC.parse(registryOps, compoundTag)
                 .resultOrPartial()
