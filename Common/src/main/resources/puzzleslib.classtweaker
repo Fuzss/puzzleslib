@@ -316,7 +316,7 @@ transitive-accessible   method  net/minecraft/client/model/monster/zombie/Zombie
 transitive-accessible   field   net/minecraft/client/model/player/PlayerModel   slim    Z
 accessible	field	net/minecraft/data/tags/TagsProvider	builders	Ljava/util/Map;
 accessible	field	net/minecraft/tags/TagEntry	id  Lnet/minecraft/resources/Identifier;
-accessible  method  net/minecraft/tags/TagEntry elementOrTag    ()Lnet/minecraft/util/ExtraCodecs$TagOrElementLocation;
+accessible  field   net/minecraft/tags/TagEntry tag Z
 transitive-accessible   method  net/minecraft/world/entity/LivingEntity shouldDropLoot  (Lnet/minecraft/server/level/ServerLevel;)Z
 transitive-accessible   method  net/minecraft/world/entity/monster/Monster  shouldDropLoot  (Lnet/minecraft/server/level/ServerLevel;)Z
 transitive-accessible   method  net/minecraft/client/gui/components/AbstractSelectionList   clearEntries    ()V

@@ -46,11 +46,11 @@ public final class NeoForgeTagAppender<T> extends AbstractTagAppender<T> {
     public List<String> asStringList() {
         List<String> list = new ArrayList<>();
         for (TagEntry tagEntry : this.tagBuilder.build()) {
-            list.add(tagEntry.elementOrTag().toString());
+            list.add(this.elementOrTag(tagEntry));
         }
 
         for (TagEntry tagEntry : this.tagBuilder.getRemoveEntries().toList()) {
-            list.add("!" + tagEntry.elementOrTag());
+            list.add("!" + this.elementOrTag(tagEntry));
         }
 
         return list;

@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import fuzs.puzzleslib.common.api.client.event.v1.ClientTagsUpdatedCallback;
 import fuzs.puzzleslib.common.api.config.v3.serialization.ConfigDataSet;
 import fuzs.puzzleslib.common.api.config.v3.serialization.KeyedValueProvider;
+import fuzs.puzzleslib.common.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.common.api.event.v1.server.ServerResourcesLoadCallback;
 import fuzs.puzzleslib.common.impl.PuzzlesLib;
 import net.minecraft.core.Holder;
@@ -82,9 +83,11 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         ServerResourcesLoadCallback.EVENT.register((ReloadableServerResources _, RegistryAccess _) -> {
             this.dissolved = null;
         });
-        ClientTagsUpdatedCallback.EVENT.register((RegistryAccess _) -> {
-            this.dissolved = null;
-        });
+        if (ModLoaderEnvironment.INSTANCE.isClient()) {
+            ClientTagsUpdatedCallback.EVENT.register((RegistryAccess _) -> {
+                this.dissolved = null;
+            });
+        }
     }
 
     /**

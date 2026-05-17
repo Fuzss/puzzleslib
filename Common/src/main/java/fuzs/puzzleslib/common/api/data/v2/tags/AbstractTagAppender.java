@@ -5,7 +5,9 @@ import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagBuilder;
+import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.ExtraCodecs;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
@@ -392,4 +394,13 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
     }
 
     public abstract List<String> asStringList();
+
+    /**
+     * Do not use the vanilla method, there is an issue with the ModernFix mod overwriting it.
+     *
+     * @see TagEntry#elementOrTag()
+     */
+    protected final String elementOrTag(TagEntry entry) {
+        return new ExtraCodecs.TagOrElementLocation(entry.id, entry.tag).toString();
+    }
 }
