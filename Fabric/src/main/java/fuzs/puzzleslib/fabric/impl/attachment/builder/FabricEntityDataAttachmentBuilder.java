@@ -9,7 +9,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@SuppressWarnings("UnstableApiUsage")
 public final class FabricEntityDataAttachmentBuilder<V> extends FabricDataAttachmentBuilder<Entity, V, DataAttachmentRegistry.EntityBuilder<V>> implements DataAttachmentRegistry.EntityBuilder<V> {
     private boolean copyOnDeath;
 

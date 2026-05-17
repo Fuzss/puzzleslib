@@ -33,7 +33,7 @@ import java.util.Collection;
  *
  * @see net.minecraft.server.commands.EnchantCommand
  */
-public class ModEnchantCommand {
+public class CustomEnchantCommand {
     public static final String KEY_REMOVE_SUCCESS_SINGLE = "commands.enchant.remove.success.single";
     public static final String KEY_REMOVE_SUCCESS_MULTIPLE = "commands.enchant.remove.success.multiple";
     private static final DynamicCommandExceptionType ERROR_NOT_LIVING_ENTITY = new DynamicCommandExceptionType(object -> Component.translatable(
@@ -72,10 +72,9 @@ public class ModEnchantCommand {
     }
 
     private static int enchant(CommandSourceStack commandSourceStack, Collection<? extends Entity> entities, Holder<Enchantment> enchantment, int level) throws CommandSyntaxException {
-
-        // removed max level check (/effect command doesn't have it as well)
-        // this should actually be restricted via the argument type, but doesn't seem to work reliably
-        // so just throw the same exception the argument type would
+        // Removed the max level check (the /effect command doesn't have it as well).
+        // This should actually be restricted via the argument type, but doesn't seem to work reliably,
+        // so just throw the same exception the argument type would.
         if (level > 255) {
             throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.integerTooHigh().create(level, 255);
         }

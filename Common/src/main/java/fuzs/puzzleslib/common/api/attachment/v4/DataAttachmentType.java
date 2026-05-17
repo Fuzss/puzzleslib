@@ -41,11 +41,21 @@ public interface DataAttachmentType<T, V> {
      * Set a new value for the attachment type.
      * <p>
      * Setting a {@code null} value removes the attachment from the holder.
+     * <p>
+     * TODO make this return the old value as nullable
      *
-     * @param holder   the attachment holder
-     * @param newValue the new attachment value
+     * @param holder the attachment holder
+     * @param value  the new attachment value
      */
-    void set(T holder, @Nullable V newValue);
+    void set(T holder, @Nullable V value);
+
+    /**
+     * Remove the value for the attachment type.
+     *
+     * @param holder the attachment holder
+     * @return the attachment value if present, or {@code null}
+     */
+    @Nullable V remove(T holder);
 
     /**
      * Updates the attachment value on the holder.

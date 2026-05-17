@@ -23,8 +23,8 @@ public class TransmuteShapelessRecipeBuilder extends ShapelessRecipeBuilder {
     private final ResourceKey<RecipeSerializer<?>> serializerKey;
     private Ingredient input;
 
-    public TransmuteShapelessRecipeBuilder(ResourceKey<RecipeSerializer<?>> serializerKey, HolderGetter<Item> holderGetter, RecipeCategory recipeCategory, ItemStackTemplate result) {
-        super(holderGetter, recipeCategory, result);
+    public TransmuteShapelessRecipeBuilder(ResourceKey<RecipeSerializer<?>> serializerKey, HolderGetter<Item> holderGetter, RecipeCategory category, ItemStackTemplate result) {
+        super(holderGetter, category, result);
         this.serializerKey = serializerKey;
     }
 
@@ -52,8 +52,8 @@ public class TransmuteShapelessRecipeBuilder extends ShapelessRecipeBuilder {
     }
 
     @Override
-    public TransmuteShapelessRecipeBuilder requires(ItemLike item, int quantity) {
-        super.requires(item, quantity);
+    public TransmuteShapelessRecipeBuilder requires(ItemLike item, int count) {
+        super.requires(item, count);
         return this;
     }
 
@@ -64,20 +64,20 @@ public class TransmuteShapelessRecipeBuilder extends ShapelessRecipeBuilder {
     }
 
     @Override
-    public TransmuteShapelessRecipeBuilder requires(Ingredient ingredient, int quantity) {
-        super.requires(ingredient, quantity);
+    public TransmuteShapelessRecipeBuilder requires(Ingredient ingredient, int count) {
+        super.requires(ingredient, count);
         return this;
     }
 
     @Override
-    public TransmuteShapelessRecipeBuilder unlockedBy(String criterionName, Criterion<?> criterionTrigger) {
-        super.unlockedBy(criterionName, criterionTrigger);
+    public TransmuteShapelessRecipeBuilder unlockedBy(String name, Criterion<?> criterion) {
+        super.unlockedBy(name, criterion);
         return this;
     }
 
     @Override
-    public TransmuteShapelessRecipeBuilder group(@Nullable String groupName) {
-        super.group(groupName);
+    public TransmuteShapelessRecipeBuilder group(@Nullable String group) {
+        super.group(group);
         return this;
     }
 
@@ -92,12 +92,12 @@ public class TransmuteShapelessRecipeBuilder extends ShapelessRecipeBuilder {
     }
 
     @Override
-    public void save(RecipeOutput recipeOutput, ResourceKey<Recipe<?>> resourceKey) {
+    public void save(RecipeOutput output, ResourceKey<Recipe<?>> id) {
         Objects.requireNonNull(this.input, "input is null");
-        super.save(TransformingRecipeOutput.transformed(recipeOutput, (Recipe<?> recipe) -> {
+        super.save(TransformingRecipeOutput.transformed(output, (Recipe<?> recipe) -> {
             return new TransmuteShapelessRecipe(TransmuteShapelessRecipeBuilder.this.serializerKey,
                     (ShapelessRecipe) recipe,
                     TransmuteShapelessRecipeBuilder.this.input);
-        }), resourceKey);
+        }), id);
     }
 }

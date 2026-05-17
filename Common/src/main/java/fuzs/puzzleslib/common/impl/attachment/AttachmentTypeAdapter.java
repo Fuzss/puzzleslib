@@ -5,13 +5,13 @@ import org.jspecify.annotations.Nullable;
 
 public interface AttachmentTypeAdapter<T, V> {
 
-    Identifier identifier();
+    Identifier id();
 
     boolean hasData(T holder);
 
     @Nullable V getData(T holder);
 
-    void setData(T holder, V value);
+    @Nullable V setData(T holder, V value);
 
-    void removeData(T holder);
+    @Nullable V removeData(T holder);
 }

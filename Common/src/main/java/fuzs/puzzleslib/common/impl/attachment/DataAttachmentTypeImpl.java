@@ -22,7 +22,8 @@ public final class DataAttachmentTypeImpl<T, V> implements DataAttachmentType<T,
         this.defaultValues = ImmutableMap.copyOf(defaultValues);
     }
 
-    @Nullable private V getDefaultValue(T holder) {
+    @Nullable
+    private V getDefaultValue(T holder) {
         for (Map.Entry<Predicate<T>, Function<RegistryAccess, V>> entry : this.defaultValues.entrySet()) {
             if (entry.getKey().test(holder)) {
                 return entry.getValue().apply(this.registryAccessExtractor.apply(holder));
@@ -44,7 +45,7 @@ public final class DataAttachmentTypeImpl<T, V> implements DataAttachmentType<T,
         if (this.attachmentType.hasData(holder)) {
             V value = this.attachmentType.getData(holder);
             // do not support setting null values (Fabric does not), the attachment type can still be removed though
-            Objects.requireNonNull(value, () -> "value for " + this.attachmentType.identifier() + " is null");
+            Objects.requireNonNull(value, () -> "value for " + this.attachmentType.id() + " is null");
             return value;
         } else {
             return null;
@@ -63,16 +64,31 @@ public final class DataAttachmentTypeImpl<T, V> implements DataAttachmentType<T,
     }
 
     @Override
-    public void set(T holder, @Nullable V newValue) {
+    public void set(T holder, @Nullable V value) {
+        this.setWithReturn(holder, value);
+    }
+
+    /**
+     * TODO this should become the default set method when the return type is fixed
+     */
+    private @Nullable V setWithReturn(T holder, @Nullable V value) {
         V oldValue = this.attachmentType.hasData(holder) ? this.attachmentType.getData(holder) : null;
-        if (!Objects.equals(oldValue, newValue)) {
-            // do not support setting null values (Fabric does not), the attachment type can still be removed though
-            if (newValue != null) {
-                this.attachmentType.setData(holder, newValue);
+        if (!Objects.equals(oldValue, value)) {
+            // Do not support setting null values as Fabric does not.
+            // The attachment type can still be removed, though.
+            if (value != null) {
+                return this.attachmentType.setData(holder, value);
             } else {
-                this.attachmentType.removeData(holder);
+                return this.attachmentType.removeData(holder);
             }
+        } else {
+            return oldValue;
         }
+    }
+
+    @Override
+    public @Nullable V remove(T holder) {
+        return this.setWithReturn(holder, null);
     }
 
     @Override

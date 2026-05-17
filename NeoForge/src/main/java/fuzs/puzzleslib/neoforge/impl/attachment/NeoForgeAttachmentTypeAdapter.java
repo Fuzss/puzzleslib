@@ -12,7 +12,7 @@ import java.util.Objects;
 public record NeoForgeAttachmentTypeAdapter<T extends IAttachmentHolder, A>(DeferredHolder<AttachmentType<?>, AttachmentType<A>> attachmentType) implements AttachmentTypeAdapter<T, A> {
 
     @Override
-    public Identifier identifier() {
+    public Identifier id() {
         return this.attachmentType.getKey().identifier();
     }
 
@@ -29,15 +29,15 @@ public record NeoForgeAttachmentTypeAdapter<T extends IAttachmentHolder, A>(Defe
     }
 
     @Override
-    public void setData(T holder, A value) {
+    public @Nullable A setData(T holder, A value) {
         Objects.requireNonNull(holder, "holder is null");
         Objects.requireNonNull(value, "value is null");
-        holder.setData(this.attachmentType, value);
+        return holder.setData(this.attachmentType, value);
     }
 
     @Override
-    public void removeData(T holder) {
+    public @Nullable A removeData(T holder) {
         Objects.requireNonNull(holder, "holder is null");
-        holder.removeData(this.attachmentType);
+        return holder.removeData(this.attachmentType);
     }
 }

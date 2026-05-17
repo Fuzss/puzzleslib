@@ -66,6 +66,7 @@ transitive-accessible   field   net/minecraft/world/inventory/InventoryMenu TEXT
 transitive-accessible   class   net/minecraft/world/item/enchantment/EnchantmentHelper$EnchantmentInSlotVisitor
 transitive-accessible   class   net/minecraft/world/item/enchantment/EnchantmentHelper$EnchantmentVisitor
 transitive-accessible   method  net/minecraft/data/recipes/ShapedRecipeBuilder  <init>  (Lnet/minecraft/core/HolderGetter;Lnet/minecraft/data/recipes/RecipeCategory;Lnet/minecraft/world/level/ItemLike;I)V
+transitive-accessible   method  net/minecraft/data/recipes/ShapedRecipeBuilder  <init>  (Lnet/minecraft/core/HolderGetter;Lnet/minecraft/data/recipes/RecipeCategory;Lnet/minecraft/world/item/ItemStackTemplate;)V
 transitive-accessible   method  net/minecraft/data/recipes/ShapelessRecipeBuilder   <init>  (Lnet/minecraft/core/HolderGetter;Lnet/minecraft/data/recipes/RecipeCategory;Lnet/minecraft/world/item/ItemStackTemplate;)V
 transitive-accessible   field   net/minecraft/client/renderer/entity/AgeableMobRenderer adultModel  Lnet/minecraft/client/model/EntityModel;
 transitive-mutable  field   net/minecraft/client/renderer/entity/AgeableMobRenderer adultModel  Lnet/minecraft/client/model/EntityModel;

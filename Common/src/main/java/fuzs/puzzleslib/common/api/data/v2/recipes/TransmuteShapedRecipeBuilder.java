@@ -9,7 +9,7 @@ import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -23,8 +23,8 @@ public class TransmuteShapedRecipeBuilder extends ShapedRecipeBuilder {
     private final ResourceKey<RecipeSerializer<?>> serializerKey;
     private Ingredient input;
 
-    public TransmuteShapedRecipeBuilder(ResourceKey<RecipeSerializer<?>> serializerKey, HolderGetter<Item> holderGetter, RecipeCategory recipeCategory, ItemStack result) {
-        super(holderGetter, recipeCategory, result.getItem(), result.getCount());
+    public TransmuteShapedRecipeBuilder(ResourceKey<RecipeSerializer<?>> serializerKey, HolderGetter<Item> holderGetter, RecipeCategory category, ItemStackTemplate result) {
+        super(holderGetter, category, result);
         this.serializerKey = serializerKey;
     }
 
@@ -36,7 +36,7 @@ public class TransmuteShapedRecipeBuilder extends ShapedRecipeBuilder {
         return new TransmuteShapedRecipeBuilder(recipeSerializer,
                 holderGetter,
                 category,
-                result.asItem().getDefaultInstance().copyWithCount(count));
+                new ItemStackTemplate(result.asItem(), count));
     }
 
     @Override
@@ -58,26 +58,26 @@ public class TransmuteShapedRecipeBuilder extends ShapedRecipeBuilder {
     }
 
     @Override
-    public TransmuteShapedRecipeBuilder pattern(String pattern) {
-        super.pattern(pattern);
+    public TransmuteShapedRecipeBuilder pattern(String row) {
+        super.pattern(row);
         return this;
     }
 
     @Override
-    public TransmuteShapedRecipeBuilder unlockedBy(String criterionName, Criterion<?> criterionTrigger) {
-        super.unlockedBy(criterionName, criterionTrigger);
+    public TransmuteShapedRecipeBuilder unlockedBy(String name, Criterion<?> criterion) {
+        super.unlockedBy(name, criterion);
         return this;
     }
 
     @Override
-    public TransmuteShapedRecipeBuilder group(@Nullable String groupName) {
-        super.group(groupName);
+    public TransmuteShapedRecipeBuilder group(@Nullable String group) {
+        super.group(group);
         return this;
     }
 
     @Override
-    public TransmuteShapedRecipeBuilder showNotification(boolean bl) {
-        super.showNotification(bl);
+    public TransmuteShapedRecipeBuilder showNotification(boolean showNotification) {
+        super.showNotification(showNotification);
         return this;
     }
 
@@ -92,12 +92,12 @@ public class TransmuteShapedRecipeBuilder extends ShapedRecipeBuilder {
     }
 
     @Override
-    public void save(RecipeOutput recipeOutput, ResourceKey<Recipe<?>> resourceKey) {
+    public void save(RecipeOutput output, ResourceKey<Recipe<?>> id) {
         Objects.requireNonNull(this.input, "input is null");
-        super.save(TransformingRecipeOutput.transformed(recipeOutput, (Recipe<?> recipe) -> {
+        super.save(TransformingRecipeOutput.transformed(output, (Recipe<?> recipe) -> {
             return new TransmuteShapedRecipe(TransmuteShapedRecipeBuilder.this.serializerKey,
                     (ShapedRecipe) recipe,
                     TransmuteShapedRecipeBuilder.this.input);
-        }), resourceKey);
+        }), id);
     }
 }

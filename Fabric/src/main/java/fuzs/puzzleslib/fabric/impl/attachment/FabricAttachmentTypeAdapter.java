@@ -8,11 +8,10 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
-@SuppressWarnings("UnstableApiUsage")
 public record FabricAttachmentTypeAdapter<T extends AttachmentTarget, A>(AttachmentType<A> attachmentType) implements AttachmentTypeAdapter<T, A> {
 
     @Override
-    public Identifier identifier() {
+    public Identifier id() {
         return this.attachmentType.identifier();
     }
 
@@ -29,15 +28,15 @@ public record FabricAttachmentTypeAdapter<T extends AttachmentTarget, A>(Attachm
     }
 
     @Override
-    public void setData(T holder, A value) {
+    public @Nullable A setData(T holder, A value) {
         Objects.requireNonNull(holder, "holder is null");
         Objects.requireNonNull(value, "value is null");
-        holder.setAttached(this.attachmentType, value);
+        return holder.setAttached(this.attachmentType, value);
     }
 
     @Override
-    public void removeData(T holder) {
+    public @Nullable A removeData(T holder) {
         Objects.requireNonNull(holder, "holder is null");
-        holder.removeAttached(this.attachmentType);
+        return holder.removeAttached(this.attachmentType);
     }
 }

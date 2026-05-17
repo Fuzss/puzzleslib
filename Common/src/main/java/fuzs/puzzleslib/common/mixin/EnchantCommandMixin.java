@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.common.mixin;
 
 import com.mojang.brigadier.CommandDispatcher;
-import fuzs.puzzleslib.common.impl.content.ModEnchantCommand;
+import fuzs.puzzleslib.common.impl.content.CustomEnchantCommand;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.commands.EnchantCommand;
@@ -15,7 +15,7 @@ abstract class EnchantCommandMixin {
 
     @Inject(method = "register", at = @At("HEAD"), cancellable = true)
     private static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, CallbackInfo callback) {
-        ModEnchantCommand.register(dispatcher, context);
+        CustomEnchantCommand.register(dispatcher, context);
         callback.cancel();
     }
 }
