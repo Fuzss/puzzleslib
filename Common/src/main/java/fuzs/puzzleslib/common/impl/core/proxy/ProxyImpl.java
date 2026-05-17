@@ -14,6 +14,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackCompatibility;
+import net.minecraft.tags.TagEntry;
+import net.minecraft.tags.TagFile;
 import net.minecraft.util.Util;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
@@ -29,6 +31,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 public interface ProxyImpl extends SidedProxy, FactoriesProxy, NetworkingProxy, EntityProxy {
@@ -71,4 +74,6 @@ public interface ProxyImpl extends SidedProxy, FactoriesProxy, NetworkingProxy, 
     float getEnchantPowerBonus(BlockState blockState, Level level, BlockPos blockPos);
 
     boolean canApplyAtEnchantingTable(Holder<Enchantment> enchantment, ItemStack itemStack);
+
+    List<TagEntry> getTagFileRemovals(TagFile tagFile);
 }

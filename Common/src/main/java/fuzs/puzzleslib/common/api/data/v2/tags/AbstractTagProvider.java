@@ -1,10 +1,13 @@
 package fuzs.puzzleslib.common.api.data.v2.tags;
 
 import com.google.common.collect.ImmutableMap;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fuzs.puzzleslib.common.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.common.api.init.v3.family.BlockSetVariant;
 import fuzs.puzzleslib.common.api.init.v3.registry.LookupHelper;
 import fuzs.puzzleslib.common.api.init.v3.tags.TagFactory;
+import fuzs.puzzleslib.common.api.util.v1.CodecExtras;
 import fuzs.puzzleslib.common.impl.core.proxy.ProxyImpl;
 import fuzs.puzzleslib.common.impl.data.SortingTagBuilder;
 import net.minecraft.core.Holder;
@@ -20,12 +23,29 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
+    /**
+     * A custom {@link Codec} for {@link TagFile} which adds both NeoForge and Fabric remove fields.
+     * <p>
+     * The respective codecs for those fields are directly copied from the corresponding loader.
+     */
+    public static final Codec<TagFile> TAG_FILE_CODEC = CodecExtras.encodeOnly(RecordCodecBuilder.create((RecordCodecBuilder.Instance<TagFile> instance) -> instance.group(
+                    TagEntry.CODEC.listOf().fieldOf("values").forGetter(TagFile::entries),
+                    Codec.BOOL.optionalFieldOf("replace", false).forGetter(TagFile::replace),
+                    TagEntry.CODEC.listOf().optionalFieldOf("remove", List.of()).forGetter(ProxyImpl.get()::getTagFileRemovals),
+                    TagEntry.CODEC.listOf()
+                            .lenientOptionalFieldOf("fabric:remove", Collections.emptyList())
+                            .forGetter(ProxyImpl.get()::getTagFileRemovals))
+            .apply(instance,
+                    (List<TagEntry> entries, Boolean replace, List<TagEntry> _, List<TagEntry> _) -> new TagFile(entries,
+                            replace))));
     /**
      * @see #generateFor(Map, Map)
      */
@@ -127,28 +147,48 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     public abstract void addTags(HolderLookup.Provider registries);
 
     @Override
-    protected TagBuilder getOrCreateRawBuilder(TagKey<T> tagKey) {
-        // use our own tag builder implementation
-        return this.builders.computeIfAbsent(tagKey.location(), (Identifier identifier) -> new SortingTagBuilder());
+    protected TagBuilder getOrCreateRawBuilder(TagKey<T> tag) {
+        return this.builders.computeIfAbsent(tag.location(), (Identifier id) -> new SortingTagBuilder());
     }
 
-    public AbstractTagAppender<T> tag(String string) {
-        return this.tag(Identifier.parse(string));
+    public AbstractTagAppender<T> tag(String id) {
+        return this.tag(Identifier.parse(id));
     }
 
-    public AbstractTagAppender<T> tag(Identifier identifier) {
-        return this.tag(TagKey.create(this.registryKey, identifier));
+    public AbstractTagAppender<T> tag(String id, boolean replace) {
+        return this.tag(Identifier.parse(id), replace);
     }
 
-    public AbstractTagAppender<T> tag(TagKey<T> tagKey) {
-        return createTagAppender(this.getOrCreateRawBuilder(tagKey), this.registryKey);
+    public AbstractTagAppender<T> tag(Identifier id) {
+        return this.tag(TagKey.create(this.registryKey, id));
+    }
+
+    public AbstractTagAppender<T> tag(Identifier id, boolean replace) {
+        return this.tag(TagKey.create(this.registryKey, id), replace);
+    }
+
+    /**
+     * @see net.minecraft.data.tags.KeyTagProvider#tag(TagKey)
+     */
+    public AbstractTagAppender<T> tag(TagKey<T> tag) {
+        TagBuilder builder = this.getOrCreateRawBuilder(tag);
+        return createTagAppender(builder, this.registryKey);
+    }
+
+    /**
+     * @see net.minecraft.data.tags.KeyTagProvider#tag(TagKey, boolean)
+     */
+    public AbstractTagAppender<T> tag(TagKey<T> tag, boolean replace) {
+        TagBuilder builder = this.getOrCreateRawBuilder(tag);
+        builder.setReplace(replace);
+        return createTagAppender(builder, this.registryKey);
     }
 
     public final void generateFor(Map<BlockSetVariant, Holder.Reference<T>> variants, Map<BlockSetVariant, TagKey<T>> variantTags) {
         variants.forEach((BlockSetVariant variant, Holder.Reference<T> holder) -> {
-            TagKey<T> tagKey = variantTags.get(variant);
-            if (tagKey != null) {
-                this.tag(tagKey).add(holder);
+            TagKey<T> tag = variantTags.get(variant);
+            if (tag != null) {
+                this.tag(tag).add(holder);
             }
         });
     }

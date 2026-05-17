@@ -11,6 +11,9 @@ import fuzs.puzzleslib.common.api.event.v1.server.ServerLifecycleEvents;
 import fuzs.puzzleslib.common.api.init.v3.registry.RegistryFactory;
 import fuzs.puzzleslib.common.api.item.v2.ToolTypeHelper;
 import fuzs.puzzleslib.common.api.item.v2.crafting.CombinedIngredients;
+import fuzs.puzzleslib.common.impl.attachment.DataAttachmentRegistryImpl;
+import fuzs.puzzleslib.common.impl.core.ModContext;
+import fuzs.puzzleslib.common.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.fabric.impl.attachment.FabricDataAttachmentRegistryImpl;
 import fuzs.puzzleslib.fabric.impl.core.context.PayloadTypesContextFabricImpl;
 import fuzs.puzzleslib.fabric.impl.data.FabricTagAppender;
@@ -19,9 +22,6 @@ import fuzs.puzzleslib.fabric.impl.event.SpawnReasonMob;
 import fuzs.puzzleslib.fabric.impl.init.FabricRegistryFactory;
 import fuzs.puzzleslib.fabric.impl.item.FabricToolTypeHelper;
 import fuzs.puzzleslib.fabric.impl.item.crafting.FabricCombinedIngredients;
-import fuzs.puzzleslib.common.impl.attachment.DataAttachmentRegistryImpl;
-import fuzs.puzzleslib.common.impl.core.ModContext;
-import fuzs.puzzleslib.common.impl.core.context.ModConstructorImpl;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.item.v1.EnchantingContext;
@@ -60,6 +60,8 @@ import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagBuilder;
+import net.minecraft.tags.TagEntry;
+import net.minecraft.tags.TagFile;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.*;
@@ -82,6 +84,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -121,6 +124,7 @@ public class FabricCommonProxy implements FabricProxy {
         return new Pack.Metadata(descriptionComponent, packCompatibility, featureFlagSet, Collections.emptyList());
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     @Override
     public boolean isPackHidden(Pack pack) {
         try {
@@ -131,6 +135,7 @@ public class FabricCommonProxy implements FabricProxy {
         }
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     @Override
     public void setPackHidden(Pack pack, boolean isHidden) {
         if (isHidden && !this.isPackHidden(pack)) {
@@ -144,7 +149,7 @@ public class FabricCommonProxy implements FabricProxy {
                 // NO-OP
             }
         } else {
-            throw new IllegalArgumentException("unable to reveal pack");
+            throw new IllegalArgumentException("Unable to reveal pack");
         }
     }
 
@@ -256,6 +261,11 @@ public class FabricCommonProxy implements FabricProxy {
     @Override
     public CombinedIngredients getCombinedIngredients() {
         return new FabricCombinedIngredients();
+    }
+
+    @Override
+    public List<TagEntry> getTagFileRemovals(TagFile tagFile) {
+        return tagFile.remove();
     }
 
     @Override

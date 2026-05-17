@@ -51,6 +51,8 @@ import net.minecraft.server.network.ConfigurationTask;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.tags.TagBuilder;
+import net.minecraft.tags.TagEntry;
+import net.minecraft.tags.TagFile;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.*;
@@ -76,6 +78,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -227,6 +230,11 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     @Override
     public CombinedIngredients getCombinedIngredients() {
         return new NeoForgeCombinedIngredients();
+    }
+
+    @Override
+    public List<TagEntry> getTagFileRemovals(TagFile tagFile) {
+        return tagFile.remove();
     }
 
     @Override

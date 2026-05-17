@@ -51,14 +51,14 @@ public final class ScreenKeyboardEvents {
         /**
          * Called before a key is pressed.
          *
-         * @param screen   the currently displayed screen
-         * @param keyEvent the key event; for bundled values see {@link com.mojang.blaze3d.platform.InputConstants}
+         * @param screen the currently displayed screen
+         * @param event  the key event; for bundled values see {@link com.mojang.blaze3d.platform.InputConstants}
          * @return <ul>
          *         <li>{@link EventResult#INTERRUPT INTERRUPT} for marking the event as handled, it will not be passed to other listeners and vanilla behaviour will not run</li>
          *         <li>{@link EventResult#PASS PASS} for letting other listeners as well as vanilla process this event</li>
          *         </ul>
          */
-        EventResult onBeforeKeyPress(T screen, KeyEvent keyEvent);
+        EventResult onBeforeKeyPress(T screen, KeyEvent event);
     }
 
     @FunctionalInterface
@@ -67,10 +67,10 @@ public final class ScreenKeyboardEvents {
         /**
          * Called after a key is pressed.
          *
-         * @param screen   the currently displayed screen
-         * @param keyEvent the key event; for bundled values see {@link com.mojang.blaze3d.platform.InputConstants}
+         * @param screen the currently displayed screen
+         * @param event  the key event; for bundled values see {@link com.mojang.blaze3d.platform.InputConstants}
          */
-        void onAfterKeyPress(T screen, KeyEvent keyEvent);
+        void onAfterKeyPress(T screen, KeyEvent event);
     }
 
     @FunctionalInterface
@@ -79,14 +79,14 @@ public final class ScreenKeyboardEvents {
         /**
          * Called before a pressed key is released.
          *
-         * @param screen   the currently displayed screen
-         * @param keyEvent the key event; for bundled values see {@link com.mojang.blaze3d.platform.InputConstants}
+         * @param screen the currently displayed screen
+         * @param event  the key event; for bundled values see {@link com.mojang.blaze3d.platform.InputConstants}
          * @return <ul>
          *         <li>{@link EventResult#INTERRUPT INTERRUPT} for marking the event as handled, it will not be passed to other listeners and vanilla behaviour will not run</li>
          *         <li>{@link EventResult#PASS PASS} for letting other listeners as well as vanilla process this event</li>
          *         </ul>
          */
-        EventResult onBeforeKeyRelease(T screen, KeyEvent keyEvent);
+        EventResult onBeforeKeyRelease(T screen, KeyEvent event);
     }
 
     @FunctionalInterface
@@ -95,10 +95,10 @@ public final class ScreenKeyboardEvents {
         /**
          * Called after a pressed key is released.
          *
-         * @param screen   the currently displayed screen
-         * @param keyEvent the key event; for bundled values see {@link com.mojang.blaze3d.platform.InputConstants}
+         * @param screen the currently displayed screen
+         * @param event  the key event; for bundled values see {@link com.mojang.blaze3d.platform.InputConstants}
          */
-        void onAfterKeyRelease(T screen, KeyEvent keyEvent);
+        void onAfterKeyRelease(T screen, KeyEvent event);
     }
 
     @FunctionalInterface
@@ -107,14 +107,14 @@ public final class ScreenKeyboardEvents {
         /**
          * Called before a character is typed.
          *
-         * @param screen         the currently displayed screen
-         * @param characterEvent the character event; in particular {@link CharacterEvent#codepointAsString()}
+         * @param screen the currently displayed screen
+         * @param event  the character event; in particular {@link CharacterEvent#codepointAsString()}
          * @return <ul>
          *         <li>{@link EventResult#INTERRUPT INTERRUPT} for marking the event as handled, it will not be passed to other listeners and vanilla behaviour will not run</li>
          *         <li>{@link EventResult#PASS PASS} for letting other listeners as well as vanilla process this event</li>
          *         </ul>
          */
-        EventResult onBeforeCharacterType(T screen, CharacterEvent characterEvent);
+        EventResult onBeforeCharacterType(T screen, CharacterEvent event);
     }
 
     @FunctionalInterface
@@ -123,9 +123,9 @@ public final class ScreenKeyboardEvents {
         /**
          * Called after a character is typed.
          *
-         * @param screen         the currently displayed screen
-         * @param characterEvent the character event; in particular {@link CharacterEvent#codepointAsString()}
+         * @param screen the currently displayed screen
+         * @param event  the character event; in particular {@link CharacterEvent#codepointAsString()}
          */
-        void onAfterCharacterType(T screen, CharacterEvent characterEvent);
+        void onAfterCharacterType(T screen, CharacterEvent event);
     }
 }

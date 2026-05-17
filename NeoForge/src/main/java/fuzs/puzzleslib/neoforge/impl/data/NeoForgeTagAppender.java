@@ -1,12 +1,11 @@
 package fuzs.puzzleslib.neoforge.impl.data;
 
 import fuzs.puzzleslib.common.api.data.v2.tags.AbstractTagAppender;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagBuilder;
 import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.ExtraCodecs;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -20,32 +19,26 @@ public final class NeoForgeTagAppender<T> extends AbstractTagAppender<T> {
     }
 
     @Override
-    public AbstractTagAppender<T> setReplace(boolean replace) {
-        this.tagBuilder.replace(replace);
+    public AbstractTagAppender<T> remove(Identifier id) {
+        this.tagBuilder.remove(TagEntry.element(id));
         return this;
     }
 
     @Override
-    public AbstractTagAppender<T> remove(Identifier identifier) {
-        this.tagBuilder.remove(TagEntry.element(identifier));
+    public AbstractTagAppender<T> removeOptional(Identifier id) {
+        this.tagBuilder.remove(TagEntry.optionalElement(id));
         return this;
     }
 
     @Override
-    public AbstractTagAppender<T> removeOptional(Identifier identifier) {
-        this.tagBuilder.remove(TagEntry.optionalElement(identifier));
+    public AbstractTagAppender<T> removeTag(Identifier id) {
+        this.tagBuilder.remove(TagEntry.tag(id));
         return this;
     }
 
     @Override
-    public AbstractTagAppender<T> removeTag(Identifier identifier) {
-        this.tagBuilder.remove(TagEntry.tag(identifier));
-        return this;
-    }
-
-    @Override
-    public AbstractTagAppender<T> removeOptionalTag(Identifier identifier) {
-        this.tagBuilder.remove(TagEntry.optionalTag(identifier));
+    public AbstractTagAppender<T> removeOptionalTag(Identifier id) {
+        this.tagBuilder.remove(TagEntry.optionalTag(id));
         return this;
     }
 
@@ -53,11 +46,11 @@ public final class NeoForgeTagAppender<T> extends AbstractTagAppender<T> {
     public List<String> asStringList() {
         List<String> list = new ArrayList<>();
         for (TagEntry tagEntry : this.tagBuilder.build()) {
-            list.add(new ExtraCodecs.TagOrElementLocation(tagEntry.getId(), tagEntry.isTag()).toString());
+            list.add(tagEntry.elementOrTag().toString());
         }
 
         for (TagEntry tagEntry : this.tagBuilder.getRemoveEntries().toList()) {
-            list.add("!" + new ExtraCodecs.TagOrElementLocation(tagEntry.getId(), tagEntry.isTag()));
+            list.add("!" + tagEntry.elementOrTag());
         }
 
         return list;
@@ -74,7 +67,7 @@ public final class NeoForgeTagAppender<T> extends AbstractTagAppender<T> {
     }
 
     @Override
-    public AbstractTagAppender<T> remove(TagKey<T> tagKey) {
+    public AbstractTagAppender<T> remove(TagKey<T> tag) {
         throw new UnsupportedOperationException();
     }
 }

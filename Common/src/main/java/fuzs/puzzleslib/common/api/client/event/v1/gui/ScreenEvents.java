@@ -32,6 +32,9 @@ public final class ScreenEvents {
         return EventInvoker.lookup((Class<Remove<T>>) (Class<?>) Remove.class, screen);
     }
 
+    /**
+     * TODO rename to beforeExtract
+     */
     public static <T extends Screen> EventInvoker<BeforeExtract<T>> beforeRender(Class<T> screen) {
         Objects.requireNonNull(screen, "screen type is null");
         return EventInvoker.lookup((Class<BeforeExtract<T>>) (Class<?>) BeforeExtract.class, screen);
@@ -42,6 +45,9 @@ public final class ScreenEvents {
         return EventInvoker.lookup((Class<AfterBackground<T>>) (Class<?>) AfterBackground.class, screen);
     }
 
+    /**
+     * TODO rename to afterExtract
+     */
     public static <T extends Screen> EventInvoker<AfterExtract<T>> afterRender(Class<T> screen) {
         Objects.requireNonNull(screen, "screen type is null");
         return EventInvoker.lookup((Class<AfterExtract<T>>) (Class<?>) AfterExtract.class, screen);

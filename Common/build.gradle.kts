@@ -11,18 +11,8 @@ dependencies {
 multiloader {
     mixins {
         plugin.set("${project.group}.${project.packageName}.mixin.MixinConfigPluginImpl")
-        mixin(
-            "DataCommandsMixin",
-            "EnchantCommandMixin"
-        )
-        clientMixin(
-            "ClientSuggestionProviderMixin",
-            "EditBoxMixin",
-            "MinecraftMixin"
-        )
-        serverMixin(
-            "DedicatedServerSettingsMixin",
-            "EulaMixin"
-        )
+        mixin("DataCommandsMixin", "EnchantCommandMixin", "TagsProviderMixin")
+        clientMixin("ClientSuggestionProviderMixin", "EditBoxMixin", "MinecraftMixin")
+        serverMixin("DedicatedServerSettingsMixin", "EulaMixin")
     }
 }

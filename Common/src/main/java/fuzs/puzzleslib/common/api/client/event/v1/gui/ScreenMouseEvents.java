@@ -60,15 +60,15 @@ public final class ScreenMouseEvents {
         /**
          * Called before a mouse button is pressed on a screen.
          *
-         * @param screen           the currently displayed screen
-         * @param mouseButtonEvent the mouse button event; for bundled values see
-         *                         {@link com.mojang.blaze3d.platform.InputConstants}
+         * @param screen the currently displayed screen
+         * @param event  the mouse button event; for bundled values see
+         *               {@link com.mojang.blaze3d.platform.InputConstants}
          * @return <ul>
          *         <li>{@link EventResult#INTERRUPT INTERRUPT} for marking the click event as handled, it will not be passed to other listeners and vanilla behaviour will not run</li>
          *         <li>{@link EventResult#PASS PASS} for letting other listeners as well as vanilla process this event</li>
          *         </ul>
          */
-        EventResult onBeforeMouseClick(T screen, MouseButtonEvent mouseButtonEvent);
+        EventResult onBeforeMouseClick(T screen, MouseButtonEvent event);
     }
 
     @FunctionalInterface
@@ -77,11 +77,11 @@ public final class ScreenMouseEvents {
         /**
          * Called after a mouse button is pressed on a screen.
          *
-         * @param screen           the currently displayed screen
-         * @param mouseButtonEvent the mouse button event; for bundled values see
-         *                         {@link com.mojang.blaze3d.platform.InputConstants}
+         * @param screen the currently displayed screen
+         * @param event  the mouse button event; for bundled values see
+         *               {@link com.mojang.blaze3d.platform.InputConstants}
          */
-        void onAfterMouseClick(T screen, MouseButtonEvent mouseButtonEvent);
+        void onAfterMouseClick(T screen, MouseButtonEvent event);
     }
 
     @FunctionalInterface
@@ -90,15 +90,15 @@ public final class ScreenMouseEvents {
         /**
          * Called before a mouse click has released on a screen.
          *
-         * @param screen           the currently displayed screen
-         * @param mouseButtonEvent the mouse button event; for bundled values see
-         *                         {@link com.mojang.blaze3d.platform.InputConstants}
+         * @param screen the currently displayed screen
+         * @param event  the mouse button event; for bundled values see
+         *               {@link com.mojang.blaze3d.platform.InputConstants}
          * @return <ul>
          *         <li>{@link EventResult#INTERRUPT INTERRUPT} for marking the release event as handled, it will not be passed to other listeners and vanilla behavior will not run</li>
          *         <li>{@link EventResult#PASS PASS} for letting other listeners as well as vanilla process this event</li>
          *         </ul>
          */
-        EventResult onBeforeMouseRelease(T screen, MouseButtonEvent mouseButtonEvent);
+        EventResult onBeforeMouseRelease(T screen, MouseButtonEvent event);
     }
 
     @FunctionalInterface
@@ -107,11 +107,11 @@ public final class ScreenMouseEvents {
         /**
          * Called after a mouse click has released on a screen.
          *
-         * @param screen           the currently displayed screen
-         * @param mouseButtonEvent the mouse button event; for bundled values see
-         *                         {@link com.mojang.blaze3d.platform.InputConstants}
+         * @param screen the currently displayed screen
+         * @param event  the mouse button event; for bundled values see
+         *               {@link com.mojang.blaze3d.platform.InputConstants}
          */
-        void onAfterMouseRelease(T screen, MouseButtonEvent mouseButtonEvent);
+        void onAfterMouseRelease(T screen, MouseButtonEvent event);
     }
 
     @FunctionalInterface
@@ -154,17 +154,17 @@ public final class ScreenMouseEvents {
         /**
          * Called before a mouse is dragged on screen.
          *
-         * @param screen           the currently displayed screen
-         * @param mouseButtonEvent the mouse button event; for bundled values see
-         *                         {@link com.mojang.blaze3d.platform.InputConstants}
-         * @param dragX            the horizontal amount the cursor has been dragged since the last drag event
-         * @param dragY            the vertical amount the cursor has been dragged since the last drag event
+         * @param screen the currently displayed screen
+         * @param event  the mouse button event; for bundled values see
+         *               {@link com.mojang.blaze3d.platform.InputConstants}
+         * @param dragX  the horizontal amount the cursor has been dragged since the last drag event
+         * @param dragY  the vertical amount the cursor has been dragged since the last drag event
          * @return <ul>
          *         <li>{@link EventResult#INTERRUPT INTERRUPT} for marking the drag event as handled, it will not be passed to other listeners and vanilla behaviour will not run</li>
          *         <li>{@link EventResult#PASS PASS} for letting other listeners as well as vanilla process this event</li>
          *         </ul>
          */
-        EventResult onBeforeMouseDrag(T screen, MouseButtonEvent mouseButtonEvent, double dragX, double dragY);
+        EventResult onBeforeMouseDrag(T screen, MouseButtonEvent event, double dragX, double dragY);
     }
 
     @FunctionalInterface
@@ -173,12 +173,12 @@ public final class ScreenMouseEvents {
         /**
          * Called after a mouse is dragged on screen.
          *
-         * @param screen           the currently displayed screen
-         * @param mouseButtonEvent the mouse button event; for bundled values see
-         *                         {@link com.mojang.blaze3d.platform.InputConstants}
-         * @param dragX            the horizontal amount the cursor has been dragged since the last drag event
-         * @param dragY            the vertical amount the cursor has been dragged since the last drag event
+         * @param screen the currently displayed screen
+         * @param event  the mouse button event; for bundled values see
+         *               {@link com.mojang.blaze3d.platform.InputConstants}
+         * @param dragX  the horizontal amount the cursor has been dragged since the last drag event
+         * @param dragY  the vertical amount the cursor has been dragged since the last drag event
          */
-        void onAfterMouseDrag(T screen, MouseButtonEvent mouseButtonEvent, double dragX, double dragY);
+        void onAfterMouseDrag(T screen, MouseButtonEvent event, double dragX, double dragY);
     }
 }

@@ -86,11 +86,11 @@ public final class ContentRegistrationHelper {
         builderConsumer.accept(builder);
         ContextKeySet contextKeySet = builder.build();
         if (ModLoaderEnvironment.INSTANCE.isDataGeneration()) {
-            // run this immediately, as the common setup does not run during data generation, but we need this for generating loot tables
-            // this can only ever run in a development environment where no other mods conflicting here will be present
+            // Run this immediately, as the common setup does not run during data generation, but we need this for generating loot tables.
+            // This can only ever run in a development environment where no other mods conflicting here will be present.
             registerContextKeySet(identifier, contextKeySet);
         } else {
-            // delay this, as the underlying registry map is not concurrent, possibly leading to issues with other mods on NeoForge
+            // Delay this, as the underlying registry map is not concurrent, possibly leading to issues with other mods on NeoForge.
             CommonSetupCallback.EVENT.register(() -> {
                 registerContextKeySet(identifier, contextKeySet);
             });

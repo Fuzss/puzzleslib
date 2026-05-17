@@ -14,6 +14,7 @@ import java.util.Set;
 public class MixinConfigPluginImpl implements IMixinConfigPlugin {
     private static final Collection<String> DEVELOPMENT_MIXINS = ImmutableSet.of("DataCommandsMixin",
             "EnchantCommandMixin",
+            "TagsProviderMixin",
             "client.ClientSuggestionProviderMixin",
             "client.EditBoxMixin",
             "client.MinecraftMixin",

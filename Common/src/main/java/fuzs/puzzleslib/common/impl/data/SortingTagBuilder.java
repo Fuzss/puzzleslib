@@ -14,7 +14,7 @@ public class SortingTagBuilder extends TagBuilder {
 
     @Override
     public List<TagEntry> build() {
-        // sorting by id only is enough, there are no duplicates allowed
+        // Sorting by id only is enough, as there are no duplicates allowed.
         return super.build().stream().sorted(Comparator.comparing((TagEntry tagEntry) -> tagEntry.id)).toList();
     }
 }

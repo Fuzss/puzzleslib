@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.data;
 
 import fuzs.puzzleslib.common.api.data.v2.tags.AbstractTagAppender;
-import net.fabricmc.fabric.impl.datagen.FabricTagBuilder;
+import net.fabricmc.fabric.impl.datagen.TagBuilderHooks;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagBuilder;
@@ -13,42 +13,37 @@ import java.util.List;
 import java.util.function.Function;
 
 public final class FabricTagAppender<T> extends AbstractTagAppender<T> {
-    /**
-     * Only fully supported on NeoForge.
-     */
-    private final List<TagEntry> removeEntries = new ArrayList<>();
 
     public FabricTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
         super(tagBuilder, keyExtractor);
     }
 
+    @SuppressWarnings("UnstableApiUsage")
+    private List<TagEntry> getRemoveEntries() {
+        return ((TagBuilderHooks) this.tagBuilder).fabric_getRemove();
+    }
+
     @Override
-    public AbstractTagAppender<T> setReplace(boolean replace) {
-        ((FabricTagBuilder) this.tagBuilder).fabric_setReplace(replace);
+    public AbstractTagAppender<T> remove(Identifier id) {
+        this.getRemoveEntries().add(TagEntry.element(id));
         return this;
     }
 
     @Override
-    public AbstractTagAppender<T> remove(Identifier identifier) {
-        this.removeEntries.add(TagEntry.element(identifier));
+    public AbstractTagAppender<T> removeOptional(Identifier id) {
+        this.getRemoveEntries().add(TagEntry.optionalElement(id));
         return this;
     }
 
     @Override
-    public AbstractTagAppender<T> removeOptional(Identifier identifier) {
-        this.removeEntries.add(TagEntry.optionalElement(identifier));
+    public AbstractTagAppender<T> removeTag(Identifier id) {
+        this.getRemoveEntries().add(TagEntry.tag(id));
         return this;
     }
 
     @Override
-    public AbstractTagAppender<T> removeTag(Identifier identifier) {
-        this.removeEntries.add(TagEntry.tag(identifier));
-        return this;
-    }
-
-    @Override
-    public AbstractTagAppender<T> removeOptionalTag(Identifier identifier) {
-        this.removeEntries.add(TagEntry.optionalTag(identifier));
+    public AbstractTagAppender<T> removeOptionalTag(Identifier id) {
+        this.getRemoveEntries().add(TagEntry.optionalTag(id));
         return this;
     }
 
@@ -56,11 +51,11 @@ public final class FabricTagAppender<T> extends AbstractTagAppender<T> {
     public List<String> asStringList() {
         List<String> list = new ArrayList<>();
         for (TagEntry tagEntry : this.tagBuilder.build()) {
-            list.add(tagEntry.toString());
+            list.add(tagEntry.elementOrTag().toString());
         }
 
-        for (TagEntry tagEntry : this.removeEntries) {
-            list.add("!" + tagEntry);
+        for (TagEntry tagEntry : this.getRemoveEntries()) {
+            list.add("!" + tagEntry.elementOrTag());
         }
 
         return list;
