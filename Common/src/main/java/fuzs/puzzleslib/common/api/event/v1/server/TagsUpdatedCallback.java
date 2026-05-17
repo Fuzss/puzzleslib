@@ -3,13 +3,13 @@ package fuzs.puzzleslib.common.api.event.v1.server;
 import fuzs.puzzleslib.common.api.event.v1.core.EventInvoker;
 import net.minecraft.core.HolderLookup;
 
+@Deprecated(forRemoval = true)
 @FunctionalInterface
 public interface TagsUpdatedCallback {
     EventInvoker<TagsUpdatedCallback> EVENT = EventInvoker.lookup(TagsUpdatedCallback.class);
 
     /**
-     * An event that runs on servers and clients when tags have been updated; useful for reloading data that depends on
-     * tags.
+     * Fires on servers and clients when tags have been updated; useful for reloading data that depends on tags.
      *
      * @param registries     access to dynamic registries
      * @param isClientUpdate <code>true</code> when the client triggered this update by receiving the sync packet

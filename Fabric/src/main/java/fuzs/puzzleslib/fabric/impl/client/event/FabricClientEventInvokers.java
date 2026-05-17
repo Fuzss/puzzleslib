@@ -1,10 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.client.event;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import fuzs.puzzleslib.common.api.client.event.v1.ClientInputEvents;
-import fuzs.puzzleslib.common.api.client.event.v1.ClientLifecycleEvents;
-import fuzs.puzzleslib.common.api.client.event.v1.ClientSetupCallback;
-import fuzs.puzzleslib.common.api.client.event.v1.ClientTickEvents;
+import fuzs.puzzleslib.common.api.client.event.v1.*;
 import fuzs.puzzleslib.common.api.client.event.v1.entity.ClientEntityLevelEvents;
 import fuzs.puzzleslib.common.api.client.event.v1.entity.player.*;
 import fuzs.puzzleslib.common.api.client.event.v1.gui.*;
@@ -34,6 +31,7 @@ import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.client.player.ClientHotbarScrollEvents;
 import net.fabricmc.fabric.api.event.client.player.ClientPreAttackCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
@@ -55,6 +53,7 @@ import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.state.level.BlockOutlineRenderState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -209,6 +208,15 @@ public final class FabricClientEventInvokers {
     }
 
     public static void registerEventHandlers() {
+        INSTANCE.register(ClientTagsUpdatedCallback.class,
+                CommonLifecycleEvents.TAGS_LOADED,
+                (ClientTagsUpdatedCallback callback) -> {
+                    return (RegistryAccess registries, boolean client) -> {
+                        if (client) {
+                            callback.onClientTagsUpdated(registries);
+                        }
+                    };
+                });
         INSTANCE.register(ClientTickEvents.Start.class,
                 net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.START_CLIENT_TICK,
                 (ClientTickEvents.Start callback) -> {

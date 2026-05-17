@@ -11,6 +11,7 @@ import fuzs.puzzleslib.common.api.event.v1.level.*;
 import fuzs.puzzleslib.common.api.event.v1.level.BlockEvents;
 import fuzs.puzzleslib.common.api.event.v1.server.*;
 import fuzs.puzzleslib.common.api.init.v3.registry.LookupHelper;
+import fuzs.puzzleslib.common.impl.PuzzlesLib;
 import fuzs.puzzleslib.fabric.api.event.v1.*;
 import fuzs.puzzleslib.fabric.impl.core.FabricProxy;
 import fuzs.puzzleslib.fabric.impl.init.FabricPotionBrewingBuilder;
@@ -29,14 +30,12 @@ import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableSource;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.Registry;
+import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.ReloadableServerResources;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
@@ -68,6 +67,7 @@ import java.util.function.UnaryOperator;
 import static fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventInvokerRegistry.INSTANCE;
 
 public final class FabricEventInvokers {
+    public static final ThreadLocal<ReloadableServerResources> SERVER_RESOURCES = new ThreadLocal<>();
 
     private FabricEventInvokers() {
         // NO-OP
@@ -122,6 +122,21 @@ public final class FabricEventInvokers {
                 CommonLifecycleEvents.TAGS_LOADED,
                 (TagsUpdatedCallback callback) -> {
                     return callback::onTagsUpdated;
+                });
+        INSTANCE.register(ServerResourcesLoadCallback.class,
+                CommonLifecycleEvents.TAGS_LOADED,
+                (ServerResourcesLoadCallback callback) -> {
+                    return (RegistryAccess registries, boolean client) -> {
+                        if (!client) {
+                            ReloadableServerResources serverResources = SERVER_RESOURCES.get();
+                            if (serverResources != null) {
+                                callback.onServerResourcesLoad(serverResources, registries);
+                            } else {
+                                PuzzlesLib.LOGGER.warn("Missing server resources for {}",
+                                        ServerResourcesLoadCallback.class.getSimpleName());
+                            }
+                        }
+                    };
                 });
         INSTANCE.register(RegisterCommandsCallback.class,
                 CommandRegistrationCallback.EVENT,

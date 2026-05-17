@@ -18,11 +18,11 @@ public final class DataPackReloadListenersContextFabricImpl implements DataPackR
             .put(FUNCTIONS, ResourceReloaderKeys.Server.FUNCTIONS)
             .put(ADVANCEMENTS, ResourceReloaderKeys.Server.ADVANCEMENTS)
             .build();
-    private static final ThreadLocal<WeakReference<ReloadableServerResources>> RELOADABLE_SERVER_RESOURCES_REFERENCE = ThreadLocal.withInitial(
+    private static final ThreadLocal<WeakReference<ReloadableServerResources>> SERVER_RESOURCES_REFERENCE = ThreadLocal.withInitial(
             () -> new WeakReference<>(null));
 
-    public static void setReloadableServerResources(ReloadableServerResources reloadableServerResources) {
-        RELOADABLE_SERVER_RESOURCES_REFERENCE.set(new WeakReference<>(reloadableServerResources));
+    public static void setServerResources(ReloadableServerResources reloadableServerResources) {
+        SERVER_RESOURCES_REFERENCE.set(new WeakReference<>(reloadableServerResources));
     }
 
     @Override
@@ -52,9 +52,13 @@ public final class DataPackReloadListenersContextFabricImpl implements DataPackR
 
     private void registerReloadListenerFactory(Identifier identifier, PreparableReloadListenerFactory reloadListenerFactory) {
         DataResourceLoader.get().registerReloadListener(identifier, (HolderLookup.Provider registries) -> {
-            ReloadableServerResources reloadableServerResources = RELOADABLE_SERVER_RESOURCES_REFERENCE.get().get();
-            Objects.requireNonNull(reloadableServerResources, "reloadable server resources is null");
-            return reloadListenerFactory.apply(reloadableServerResources, registries);
+            return reloadListenerFactory.apply(this.getServerResources(), registries);
         });
+    }
+
+    private ReloadableServerResources getServerResources() {
+        ReloadableServerResources serverResources = SERVER_RESOURCES_REFERENCE.get().get();
+        Objects.requireNonNull(serverResources, "server resources is null");
+        return serverResources;
     }
 }

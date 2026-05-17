@@ -1,10 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.client.event;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import fuzs.puzzleslib.common.api.client.event.v1.ClientInputEvents;
-import fuzs.puzzleslib.common.api.client.event.v1.ClientLifecycleEvents;
-import fuzs.puzzleslib.common.api.client.event.v1.ClientSetupCallback;
-import fuzs.puzzleslib.common.api.client.event.v1.ClientTickEvents;
+import fuzs.puzzleslib.common.api.client.event.v1.*;
 import fuzs.puzzleslib.common.api.client.event.v1.entity.ClientEntityLevelEvents;
 import fuzs.puzzleslib.common.api.client.event.v1.entity.player.*;
 import fuzs.puzzleslib.common.api.client.event.v1.gui.*;
@@ -18,6 +15,7 @@ import fuzs.puzzleslib.common.api.event.v1.data.MutableBoolean;
 import fuzs.puzzleslib.common.api.event.v1.data.MutableFloat;
 import fuzs.puzzleslib.common.api.event.v1.data.MutableInt;
 import fuzs.puzzleslib.common.api.event.v1.data.MutableValue;
+import fuzs.puzzleslib.common.api.event.v1.server.TagsUpdatedCallback;
 import fuzs.puzzleslib.common.impl.client.event.ScreenButtonList;
 import fuzs.puzzleslib.common.impl.event.data.DefaultedFloat;
 import net.minecraft.client.Minecraft;
@@ -53,6 +51,7 @@ import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.event.lifecycle.ClientStartedEvent;
 import net.neoforged.neoforge.client.event.lifecycle.ClientStoppingEvent;
 import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent;
+import net.neoforged.neoforge.event.TagsUpdatedEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
@@ -80,6 +79,17 @@ public final class NeoForgeClientEventInvokers {
     }
 
     public static void registerLoadingHandlers() {
+        INSTANCE.register(TagsUpdatedCallback.class,
+                TagsUpdatedEvent.ClientPacketReceived.class,
+                (TagsUpdatedCallback callback, TagsUpdatedEvent.ClientPacketReceived event) -> {
+                    callback.onTagsUpdated(event.getRegistries(), true);
+                },
+                true);
+        INSTANCE.register(ClientTagsUpdatedCallback.class,
+                TagsUpdatedEvent.ClientPacketReceived.class,
+                (ClientTagsUpdatedCallback callback, TagsUpdatedEvent.ClientPacketReceived event) -> {
+                    callback.onClientTagsUpdated(event.getRegistries());
+                });
         INSTANCE.register(ClientSetupCallback.class,
                 FMLClientSetupEvent.class,
                 (ClientSetupCallback callback, FMLClientSetupEvent event) -> {

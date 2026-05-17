@@ -2,13 +2,16 @@ package fuzs.puzzleslib.common.impl.config.serialization;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import fuzs.puzzleslib.common.api.client.event.v1.ClientTagsUpdatedCallback;
 import fuzs.puzzleslib.common.api.config.v3.serialization.ConfigDataSet;
 import fuzs.puzzleslib.common.api.config.v3.serialization.KeyedValueProvider;
-import fuzs.puzzleslib.common.api.event.v1.server.TagsUpdatedCallback;
+import fuzs.puzzleslib.common.api.event.v1.server.ServerResourcesLoadCallback;
 import fuzs.puzzleslib.common.impl.PuzzlesLib;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.ReloadableServerResources;
 import net.minecraft.tags.TagKey;
 import org.jspecify.annotations.Nullable;
 
@@ -76,31 +79,38 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
             this.deserialize(value, types).ifPresent(this.values::add);
         }
 
-        TagsUpdatedCallback.EVENT.register((registryAccess, client) -> {
+        ServerResourcesLoadCallback.EVENT.register((ReloadableServerResources _, RegistryAccess _) -> {
+            this.dissolved = null;
+        });
+        ClientTagsUpdatedCallback.EVENT.register((RegistryAccess _) -> {
             this.dissolved = null;
         });
     }
 
     /**
-     * @param clazz  clazz type of parameter
-     * @param source type as string
+     * @param clazz clazz type of parameter
+     * @param input type as string
      * @return <code>source</code> converted to type <code>clazz</code>
      *
      * @throws RuntimeException if <code>clazz</code> is not supported
      */
-    private static Object deserializeData(Class<?> clazz, String source) throws RuntimeException {
+    private static Object deserializeData(Class<?> clazz, String input) throws RuntimeException {
         if (clazz == boolean.class || clazz == Boolean.class) {
-            if (source.equals("true")) return true;
-            if (source.equals("false")) return false;
-            throw new IllegalArgumentException("%s is not a boolean value".formatted(source));
+            if (input.equals("true")) {
+                return true;
+            } else if (input.equals("false")) {
+                return false;
+            } else {
+                throw new IllegalArgumentException("%s is not a boolean value".formatted(input));
+            }
         } else if (clazz == int.class || clazz == Integer.class) {
-            return Integer.parseInt(source);
+            return Integer.parseInt(input);
         } else if (clazz == double.class || clazz == Double.class) {
-            return Double.parseDouble(source);
+            return Double.parseDouble(input);
         } else if (clazz == String.class) {
-            return source;
+            return input;
         } else {
-            throw new IllegalArgumentException("Data type of clazz %s is not supported".formatted(clazz));
+            throw new IllegalArgumentException("Unsupported type: " + clazz);
         }
     }
 

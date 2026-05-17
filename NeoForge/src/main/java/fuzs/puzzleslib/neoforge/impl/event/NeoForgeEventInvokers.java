@@ -497,10 +497,15 @@ public final class NeoForgeEventInvokers {
                     }
                 });
         INSTANCE.register(TagsUpdatedCallback.class,
-                TagsUpdatedEvent.class,
-                (TagsUpdatedCallback callback, TagsUpdatedEvent event) -> {
-                    callback.onTagsUpdated(event.getLookupProvider(),
-                            event.getUpdateCause() == TagsUpdatedEvent.UpdateCause.CLIENT_PACKET_RECEIVED);
+                TagsUpdatedEvent.ServerDataLoad.class,
+                (TagsUpdatedCallback callback, TagsUpdatedEvent.ServerDataLoad event) -> {
+                    callback.onTagsUpdated(event.getRegistries(), false);
+                },
+                true);
+        INSTANCE.register(ServerResourcesLoadCallback.class,
+                TagsUpdatedEvent.ServerDataLoad.class,
+                (ServerResourcesLoadCallback callback, TagsUpdatedEvent.ServerDataLoad event) -> {
+                    callback.onServerResourcesLoad(event.getServerResources(), event.getRegistries());
                 });
         INSTANCE.register(ExplosionEvents.Start.class,
                 ExplosionEvent.Start.class,
