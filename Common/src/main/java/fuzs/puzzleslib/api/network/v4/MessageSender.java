@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.network.v4;
 
+import fuzs.puzzleslib.api.network.v3.PlayerSet;
 import fuzs.puzzleslib.api.network.v4.message.Message;
 import fuzs.puzzleslib.api.util.v1.EntityHelper;
 import net.minecraft.network.Connection;

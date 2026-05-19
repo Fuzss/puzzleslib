@@ -5,6 +5,8 @@ import fuzs.puzzleslib.api.core.v1.ModContainer;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v3.*;
+import fuzs.puzzleslib.api.network.v4.NetworkingHelper;
+import fuzs.puzzleslib.api.util.v1.EntityHelper;
 import fuzs.puzzleslib.impl.core.Freezable;
 import fuzs.puzzleslib.impl.network.codec.CustomPacketPayloadAdapter;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -17,6 +19,7 @@ import net.minecraft.network.protocol.common.ClientCommonPacketListener;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.IdentityHashMap;
@@ -50,7 +53,13 @@ public abstract class NetworkHandlerRegistryImpl implements NetworkHandler.Build
     @Override
     public <T> void sendMessage(PlayerSet playerSet, ClientboundMessage<T> message) {
         CustomPacketPayload.Type<?> type = this.getMessageType(message);
-        playerSet.broadcast(type, this.toClientboundPacket(message));
+        Packet<?> packet = this.toClientboundPacket(message);
+        playerSet.apply((ServerPlayer serverPlayer) -> {
+            if (NetworkingHelper.hasChannel(serverPlayer.connection, type)
+                    && !EntityHelper.isFakePlayer(serverPlayer)) {
+                serverPlayer.connection.send(packet);
+            }
+        });
     }
 
     @Override

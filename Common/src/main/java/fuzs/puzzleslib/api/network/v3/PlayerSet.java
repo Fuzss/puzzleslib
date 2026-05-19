@@ -1,9 +1,7 @@
 package fuzs.puzzleslib.api.network.v3;
 
-import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ChunkMap;
@@ -19,31 +17,32 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * A distributor for client-bound packets.
  */
+@FunctionalInterface
 public interface PlayerSet {
 
     /**
-     * Send a vanilla packet to clients.
+     * Send a packet to clients.
      *
-     * @param type   the packet type
-     * @param packet the packet to send
+     * @param serverPlayerConsumer the action to apply to all server players
      */
-    void broadcast(CustomPacketPayload.Type<?> type, Packet<?> packet);
+    void apply(Consumer<ServerPlayer> serverPlayerConsumer);
 
     /**
-     * Send message from server to no player.
+     * Send a message from the server to no player.
      */
     static PlayerSet ofNone() {
-        return (CustomPacketPayload.Type<?> type, Packet<?> packet) -> {
+        return (Consumer<ServerPlayer> serverPlayerConsumer) -> {
             // NO-OP
         };
     }
 
     /**
-     * Send message from server to an entity.
+     * Send a message from the server to an entity.
      * <p>
      * When the entity is not a {@link ServerPlayer} no message is sent.
      *
@@ -55,64 +54,76 @@ public interface PlayerSet {
     }
 
     /**
-     * Send message from server to a player.
+     * Send a message from the server to a player.
      *
      * @param serverPlayer player to send to
      */
     static PlayerSet ofPlayer(ServerPlayer serverPlayer) {
         Objects.requireNonNull(serverPlayer, "server player is null");
-        return (CustomPacketPayload.Type<?> type, Packet<?> packet) -> {
-            if (CommonAbstractions.INSTANCE.hasChannel(serverPlayer, type)) {
-                serverPlayer.connection.send(packet);
-            }
+        return (Consumer<ServerPlayer> serverPlayerConsumer) -> {
+            serverPlayerConsumer.accept(serverPlayer);
         };
     }
 
     /**
-     * Send message from server to all players on the server.
+     * Send a message from the server to all players on the server.
      *
      * @param serverPlayer player to exclude from sending to
      */
     static PlayerSet ofOthers(ServerPlayer serverPlayer) {
         Objects.requireNonNull(serverPlayer, "server player is null");
-        return (CustomPacketPayload.Type<?> type, Packet<?> packet) -> {
-            serverPlayer.getServer().getPlayerList().getPlayers().forEach((ServerPlayer currentServerPlayer) -> {
-                if (currentServerPlayer != serverPlayer) {
-                    ofPlayer(currentServerPlayer).broadcast(type, packet);
-                }
-            });
+        return (Consumer<ServerPlayer> serverPlayerConsumer) -> {
+            serverPlayer.level()
+                    .getServer()
+                    .getPlayerList()
+                    .getPlayers()
+                    .forEach((ServerPlayer currentServerPlayer) -> {
+                        if (currentServerPlayer != serverPlayer) {
+                            ofPlayer(currentServerPlayer).apply(serverPlayerConsumer);
+                        }
+                    });
         };
     }
 
     /**
-     * Send message from server to all players on the server.
+     * Send a message from the server to all players on the server.
      *
      * @param minecraftServer server for retrieving the player list
      */
     static PlayerSet ofAll(MinecraftServer minecraftServer) {
-        return (CustomPacketPayload.Type<?> type, Packet<?> packet) -> {
+        return (Consumer<ServerPlayer> serverPlayerConsumer) -> {
             minecraftServer.getPlayerList().getPlayers().forEach((ServerPlayer serverPlayer) -> {
-                ofPlayer(serverPlayer).broadcast(type, packet);
+                ofPlayer(serverPlayer).apply(serverPlayerConsumer);
             });
         };
     }
 
     /**
-     * Send message from server to all players in a level.
+     * Send a message from the server to all players in a level.
+     *
+     * @param level the level
+     */
+    static PlayerSet inLevel(Level level) {
+        Objects.requireNonNull(level, "level is null");
+        return level instanceof ServerLevel serverLevel ? inLevel(serverLevel) : ofNone();
+    }
+
+    /**
+     * Send a message from the server to all players in a level.
      *
      * @param serverLevel the level
      */
     static PlayerSet inLevel(ServerLevel serverLevel) {
         Objects.requireNonNull(serverLevel, "server level is null");
-        return (CustomPacketPayload.Type<?> type, Packet<?> packet) -> {
+        return (Consumer<ServerPlayer> serverPlayerConsumer) -> {
             for (ServerPlayer serverPlayer : serverLevel.players()) {
-                ofPlayer(serverPlayer).broadcast(type, packet);
+                ofPlayer(serverPlayer).apply(serverPlayerConsumer);
             }
         };
     }
 
     /**
-     * Send message from server to all players near a given position.
+     * Send a message from the server to all players near a given position.
      *
      * @param position    source position
      * @param serverLevel the current level
@@ -123,7 +134,7 @@ public interface PlayerSet {
     }
 
     /**
-     * Send message from server to all players near a given position.
+     * Send a message from the server to all players near a given position.
      *
      * @param posX        source position x
      * @param posY        source position y
@@ -135,7 +146,7 @@ public interface PlayerSet {
     }
 
     /**
-     * Send message from server to all players near a given position.
+     * Send a message from the server to all players near a given position.
      * <p>
      * The implementation is copied from
      * {@link net.minecraft.server.players.PlayerList#broadcast(Player, double, double, double, double, ResourceKey,
@@ -150,14 +161,14 @@ public interface PlayerSet {
      */
     static PlayerSet nearPosition(@Nullable ServerPlayer excludePlayer, double posX, double posY, double posZ, double distance, ServerLevel serverLevel) {
         Objects.requireNonNull(serverLevel, "server level is null");
-        return (CustomPacketPayload.Type<?> type, Packet<?> packet) -> {
+        return (Consumer<ServerPlayer> serverPlayerConsumer) -> {
             for (ServerPlayer serverPlayer : serverLevel.getServer().getPlayerList().getPlayers()) {
                 if (serverPlayer != excludePlayer && serverPlayer.level().dimension() == serverLevel.dimension()) {
                     double deltaX = posX - serverPlayer.getX();
                     double deltaY = posY - serverPlayer.getY();
                     double deltaZ = posZ - serverPlayer.getZ();
                     if (deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ < distance * distance) {
-                        ofPlayer(serverPlayer).broadcast(type, packet);
+                        ofPlayer(serverPlayer).apply(serverPlayerConsumer);
                     }
                 }
             }
@@ -165,7 +176,7 @@ public interface PlayerSet {
     }
 
     /**
-     * Send message from server to all players tracking a block entity at a certain block position.
+     * Send a message from the server to all players tracking a block entity at a certain block position.
      *
      * @param blockEntity the block entity a player must track to receive this message
      */
@@ -173,23 +184,22 @@ public interface PlayerSet {
         Objects.requireNonNull(blockEntity, "block entity is null");
         Level level = blockEntity.getLevel();
         Objects.requireNonNull(level, "block entity level is null");
-        return level.isClientSide ? PlayerSet.ofNone() : nearPosition(blockEntity.getBlockPos(), (ServerLevel) level);
+        return level.isClientSide() ? PlayerSet.ofNone() : nearPosition(blockEntity.getBlockPos(), (ServerLevel) level);
     }
 
     /**
-     * Send message from server to all players tracking a chunk.
+     * Send a message from the server to all players tracking a chunk.
      *
      * @param levelChunk the chunk a player must track to receive this message
      */
     static PlayerSet nearChunk(LevelChunk levelChunk) {
         Objects.requireNonNull(levelChunk, "chunk is null");
-        return levelChunk.getLevel().isClientSide ? PlayerSet.ofNone() : nearChunk((ServerLevel) levelChunk.getLevel(),
-                levelChunk.getPos()
-        );
+        return levelChunk.getLevel().isClientSide() ? PlayerSet.ofNone() :
+                nearChunk((ServerLevel) levelChunk.getLevel(), levelChunk.getPos());
     }
 
     /**
-     * Send message from server to all players tracking a chunk.
+     * Send a message from the server to all players tracking a chunk.
      *
      * @param serverLevel the level containing the chunk
      * @param chunkPos    the chunk pos a player must track to receive this message
@@ -197,17 +207,17 @@ public interface PlayerSet {
     static PlayerSet nearChunk(ServerLevel serverLevel, ChunkPos chunkPos) {
         Objects.requireNonNull(serverLevel, "server level is null");
         Objects.requireNonNull(chunkPos, "chunk pos is null");
-        return (CustomPacketPayload.Type<?> type, Packet<?> packet) -> {
+        return (Consumer<ServerPlayer> serverPlayerConsumer) -> {
             serverLevel.getChunkSource().chunkMap.getPlayers(chunkPos, false).forEach((ServerPlayer serverPlayer) -> {
-                ofPlayer(serverPlayer).broadcast(type, packet);
+                ofPlayer(serverPlayer).apply(serverPlayerConsumer);
             });
         };
     }
 
     /**
-     * Send message from server to all players tracking a given entity.
+     * Send a message from the server to all players tracking a given entity.
      * <p>
-     * When the entity is a player it will receive the message as well, otherwise use
+     * When the entity is a player, it will receive the message as well, otherwise use
      * {@link #nearPlayer(ServerPlayer)}.
      * <p>
      * The implementation is copied from
@@ -217,23 +227,22 @@ public interface PlayerSet {
      */
     static PlayerSet nearEntity(Entity entity) {
         Objects.requireNonNull(entity, "entity is null");
-        return entity.getCommandSenderWorld().isClientSide ? PlayerSet.ofNone() :
-                (CustomPacketPayload.Type<?> type, Packet<?> packet) -> {
-                    ChunkMap chunkMap = ((ServerLevel) entity.getCommandSenderWorld()).getChunkSource().chunkMap;
-                    ChunkMap.TrackedEntity trackedEntity = chunkMap.entityMap.get(entity.getId());
-                    if (trackedEntity != null) {
-                        for (ServerPlayerConnection serverPlayerConnection : trackedEntity.seenBy) {
-                            ofPlayer(serverPlayerConnection.getPlayer()).broadcast(type, packet);
-                        }
-                        if (entity instanceof ServerPlayer serverPlayer) {
-                            ofPlayer(serverPlayer).broadcast(type, packet);
-                        }
-                    }
-                };
+        return entity.level().isClientSide() ? PlayerSet.ofNone() : (Consumer<ServerPlayer> serverPlayerConsumer) -> {
+            ChunkMap chunkMap = ((ServerLevel) entity.level()).getChunkSource().chunkMap;
+            ChunkMap.TrackedEntity trackedEntity = chunkMap.entityMap.get(entity.getId());
+            if (trackedEntity != null) {
+                for (ServerPlayerConnection serverPlayerConnection : trackedEntity.seenBy) {
+                    ofPlayer(serverPlayerConnection.getPlayer()).apply(serverPlayerConsumer);
+                }
+                if (entity instanceof ServerPlayer serverPlayer) {
+                    ofPlayer(serverPlayer).apply(serverPlayerConsumer);
+                }
+            }
+        };
     }
 
     /**
-     * Send message from server to all other players tracking a given player.
+     * Send a message from the server to all other players tracking a given player.
      * <p>
      * The player will not receive the message, for that use {@link #nearEntity(Entity)}.
      * <p>
@@ -243,12 +252,12 @@ public interface PlayerSet {
      */
     static PlayerSet nearPlayer(ServerPlayer serverPlayer) {
         Objects.requireNonNull(serverPlayer, "server player is null");
-        return (CustomPacketPayload.Type<?> type, Packet<?> packet) -> {
+        return (Consumer<ServerPlayer> serverPlayerConsumer) -> {
             ChunkMap chunkMap = serverPlayer.serverLevel().getChunkSource().chunkMap;
             ChunkMap.TrackedEntity trackedEntity = chunkMap.entityMap.get(serverPlayer.getId());
             if (trackedEntity != null) {
                 for (ServerPlayerConnection serverPlayerConnection : trackedEntity.seenBy) {
-                    ofPlayer(serverPlayerConnection.getPlayer()).broadcast(type, packet);
+                    ofPlayer(serverPlayerConnection.getPlayer()).apply(serverPlayerConsumer);
                 }
             }
         };

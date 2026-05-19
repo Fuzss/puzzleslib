@@ -4,9 +4,11 @@ import com.google.common.base.Predicates;
 import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.network.v3.PlayerSet;
 import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
@@ -39,7 +41,7 @@ public final class DataAttachmentRegistry {
      * @param <A> attachment value type
      * @return block entity attachment type builder
      */
-    public static <A> Builder<BlockEntity, A> blockEntityBuilder() {
+    public static <A> BlockEntityBuilder<A> blockEntityBuilder() {
         return DataAttachmentRegistryImpl.INSTANCE.getBlockEntityTypeBuilder();
     }
 
@@ -73,7 +75,17 @@ public final class DataAttachmentRegistry {
          * @param defaultValue the default value
          * @return the builder instance
          */
-        Builder<T, A> defaultValue(A defaultValue);
+        default Builder<T, A> defaultValue(A defaultValue) {
+            return this.defaultValue((RegistryAccess registries) -> defaultValue);
+        }
+
+        /**
+         * Set a default value for all attachment holders.
+         *
+         * @param defaultValueProvider the default value provider
+         * @return the builder instance
+         */
+        Builder<T, A> defaultValue(Function<RegistryAccess, A> defaultValueProvider);
 
         /**
          * Allow the attachment type to be serialized.
@@ -82,6 +94,22 @@ public final class DataAttachmentRegistry {
          * @return the builder instance
          */
         Builder<T, A> persistent(Codec<A> codec);
+
+        /**
+         * Automatically synchronise the attachment value with remotes.
+         *
+         * @param streamCodec    the attachment value stream codec
+         * @param targetSelector the remotes to synchronise the attachment value with; the following are recommended:
+         *                       <ul>
+         *                       <li>{@link PlayerSet#ofEntity(Entity)}</li>
+         *                       <li>{@link PlayerSet#nearEntity(Entity)}</li>
+         *                       <li>{@link PlayerSet#nearBlockEntity(BlockEntity)}</li>
+         *                       <li>{@link PlayerSet#nearChunk(LevelChunk)}</li>
+         *                       <li>{@link PlayerSet#inLevel(ServerLevel)}</li>
+         *                       </ul>
+         * @return the builder instance
+         */
+        Builder<T, A> networkSynchronized(StreamCodec<? super RegistryFriendlyByteBuf, A> streamCodec, Function<T, PlayerSet> targetSelector);
 
         /**
          * Build the attachment type.
@@ -103,8 +131,8 @@ public final class DataAttachmentRegistry {
     public interface RegistryBuilder<T, A> extends Builder<T, A> {
 
         @Override
-        default RegistryBuilder<T, A> defaultValue(A defaultValue) {
-            return this.defaultValue(Predicates.alwaysTrue(), defaultValue);
+        default RegistryBuilder<T, A> defaultValue(Function<RegistryAccess, A> defaultValueProvider) {
+            return this.defaultValue(Predicates.alwaysTrue(), defaultValueProvider);
         }
 
         /**
@@ -119,13 +147,24 @@ public final class DataAttachmentRegistry {
         }
 
         /**
-         * Set a default value for the provided attachment holder filter.
+         * Set a default value for the provided holder type.
          *
          * @param defaultFilter the attachment holder filter
          * @param defaultValue  the default value
          * @return the builder instance
          */
-        RegistryBuilder<T, A> defaultValue(Predicate<T> defaultFilter, A defaultValue);
+        default RegistryBuilder<T, A> defaultValue(Predicate<T> defaultFilter, A defaultValue) {
+            return this.defaultValue(defaultFilter, (RegistryAccess registries) -> defaultValue);
+        }
+
+        /**
+         * Set a default value for the provided holder type.
+         *
+         * @param defaultFilter        the attachment holder filter
+         * @param defaultValueProvider the default value provider
+         * @return the builder instance
+         */
+        RegistryBuilder<T, A> defaultValue(Predicate<T> defaultFilter, Function<RegistryAccess, A> defaultValueProvider);
     }
 
     /**
@@ -136,17 +175,27 @@ public final class DataAttachmentRegistry {
     public interface EntityBuilder<A> extends RegistryBuilder<Entity, A> {
 
         @Override
-        EntityBuilder<A> persistent(Codec<A> codec);
-
-        @Override
         default EntityBuilder<A> defaultValue(A defaultValue) {
             return (EntityBuilder<A>) RegistryBuilder.super.defaultValue(defaultValue);
+        }
+
+        @Override
+        default EntityBuilder<A> defaultValue(Function<RegistryAccess, A> defaultValueProvider) {
+            return (EntityBuilder<A>) RegistryBuilder.super.defaultValue(defaultValueProvider);
+        }
+
+        @Override
+        default EntityBuilder<A> defaultValue(Predicate<Entity> defaultFilter, A defaultValue) {
+            return (EntityBuilder<A>) RegistryBuilder.super.defaultValue(defaultFilter, defaultValue);
         }
 
         @Override
         default EntityBuilder<A> defaultValue(Class<? extends Entity> type, A defaultValue) {
             return (EntityBuilder<A>) RegistryBuilder.super.defaultValue(type, defaultValue);
         }
+
+        @Override
+        EntityBuilder<A> defaultValue(Predicate<Entity> defaultFilter, Function<RegistryAccess, A> defaultValueProvider);
 
         /**
          * Set a default value for the provided entity type.
@@ -160,7 +209,7 @@ public final class DataAttachmentRegistry {
         }
 
         @Override
-        EntityBuilder<A> defaultValue(Predicate<Entity> defaultFilter, A defaultValue);
+        EntityBuilder<A> persistent(Codec<A> codec);
 
         /**
          * Automatically synchronize the attachment value with remotes.
@@ -168,18 +217,19 @@ public final class DataAttachmentRegistry {
          * @param streamCodec the attachment value stream codec
          * @return the builder instance
          */
+        @Deprecated
         default EntityBuilder<A> networkSynchronized(StreamCodec<? super RegistryFriendlyByteBuf, A> streamCodec) {
-            return this.networkSynchronized(streamCodec, null);
+            return this.networkSynchronized(streamCodec, PlayerSet::ofEntity);
         }
 
         /**
          * Automatically synchronize the attachment value with remotes.
          *
-         * @param streamCodec            the attachment value stream codec
-         * @param synchronizationTargets the player targets to synchronize the attachment value with
+         * @param streamCodec    the attachment value stream codec
+         * @param targetSelector the player targets to synchronize the attachment value with
          * @return the builder instance
          */
-        EntityBuilder<A> networkSynchronized(StreamCodec<? super RegistryFriendlyByteBuf, A> streamCodec, @Nullable Function<Entity, PlayerSet> synchronizationTargets);
+        EntityBuilder<A> networkSynchronized(StreamCodec<? super RegistryFriendlyByteBuf, A> streamCodec, @Nullable Function<Entity, PlayerSet> targetSelector);
 
         /**
          * Copy the attachment value when the entity dies.
@@ -204,9 +254,22 @@ public final class DataAttachmentRegistry {
         }
 
         @Override
+        default RegistryBuilder<BlockEntity, A> defaultValue(Function<RegistryAccess, A> defaultValueProvider) {
+            return RegistryBuilder.super.defaultValue(defaultValueProvider);
+        }
+
+        @Override
         default BlockEntityBuilder<A> defaultValue(Class<? extends BlockEntity> type, A defaultValue) {
             return (BlockEntityBuilder<A>) RegistryBuilder.super.defaultValue(type, defaultValue);
         }
+
+        @Override
+        default BlockEntityBuilder<A> defaultValue(Predicate<BlockEntity> defaultFilter, A defaultValue) {
+            return (BlockEntityBuilder<A>) RegistryBuilder.super.defaultValue(defaultFilter, defaultValue);
+        }
+
+        @Override
+        RegistryBuilder<BlockEntity, A> defaultValue(Predicate<BlockEntity> defaultFilter, Function<RegistryAccess, A> defaultValueProvider);
 
         /**
          * Set a default value for the provided block entity type.
@@ -220,9 +283,9 @@ public final class DataAttachmentRegistry {
         }
 
         @Override
-        BlockEntityBuilder<A> defaultValue(Predicate<BlockEntity> defaultFilter, A defaultValue);
+        BlockEntityBuilder<A> persistent(Codec<A> codec);
 
         @Override
-        BlockEntityBuilder<A> persistent(Codec<A> codec);
+        BlockEntityBuilder<A> networkSynchronized(StreamCodec<? super RegistryFriendlyByteBuf, A> streamCodec, Function<BlockEntity, PlayerSet> targetSelector);
     }
 }

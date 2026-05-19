@@ -4,9 +4,11 @@ import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings("UnstableApiUsage")
-public record FabricAttachmentTypeAdapter<T, A>(AttachmentType<A> attachmentType) implements AttachmentTypeAdapter<T, A> {
+import java.util.Objects;
+
+public record FabricAttachmentTypeAdapter<T extends AttachmentTarget, A>(AttachmentType<A> attachmentType) implements AttachmentTypeAdapter<T, A> {
 
     @Override
     public ResourceLocation id() {
@@ -15,21 +17,26 @@ public record FabricAttachmentTypeAdapter<T, A>(AttachmentType<A> attachmentType
 
     @Override
     public boolean hasData(T holder) {
-        return ((AttachmentTarget) holder).hasAttached(this.attachmentType);
+        Objects.requireNonNull(holder, "holder is null");
+        return holder.hasAttached(this.attachmentType);
     }
 
     @Override
-    public A getData(T holder) {
-        return ((AttachmentTarget) holder).getAttached(this.attachmentType);
+    public @Nullable A getData(T holder) {
+        Objects.requireNonNull(holder, "holder is null");
+        return holder.getAttached(this.attachmentType);
     }
 
     @Override
-    public A setData(T holder, A value) {
-        return ((AttachmentTarget) holder).setAttached(this.attachmentType, value);
+    public @Nullable A setData(T holder, A value) {
+        Objects.requireNonNull(holder, "holder is null");
+        Objects.requireNonNull(value, "value is null");
+        return holder.setAttached(this.attachmentType, value);
     }
 
     @Override
-    public A removeData(T holder) {
-        return ((AttachmentTarget) holder).removeAttached(this.attachmentType);
+    public @Nullable A removeData(T holder) {
+        Objects.requireNonNull(holder, "holder is null");
+        return holder.removeAttached(this.attachmentType);
     }
 }

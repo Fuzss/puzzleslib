@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Replace internal `ConfigurationScreen` with a custom version which also handles translations among other things
+- Backport attachment syncing
 - Backport updated `ComponentHelper` & `StyleCombiningCharSink`
 
 ### Removed

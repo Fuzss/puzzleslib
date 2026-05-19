@@ -1,16 +1,17 @@
 package fuzs.puzzleslib.impl.attachment;
 
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
-public interface AttachmentTypeAdapter<T, A> {
+public interface AttachmentTypeAdapter<T, V> {
 
     ResourceLocation id();
 
     boolean hasData(T holder);
 
-    A getData(T holder);
+    @Nullable V getData(T holder);
 
-    A setData(T holder, A value);
+    @Nullable V setData(T holder, V value);
 
-    A removeData(T holder);
+    @Nullable V removeData(T holder);
 }
