@@ -1,13 +1,17 @@
 package fuzs.puzzleslib.fabric.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
+import fuzs.puzzleslib.api.event.v1.data.MutableBoolean;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricEntityEvents;
 import fuzs.puzzleslib.fabric.impl.event.CapturedDropsEntity;
+import fuzs.puzzleslib.fabric.impl.event.EntityLoadData;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
@@ -27,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Collection;
 
 @Mixin(Entity.class)
-abstract class EntityFabricMixin implements CapturedDropsEntity {
+abstract class EntityFabricMixin implements CapturedDropsEntity, EntityLoadData {
     @Shadow
     @Nullable
     private Entity vehicle;
@@ -40,9 +44,21 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
     @Unique
     @Nullable
     private Collection<ItemEntity> puzzleslib$capturedDrops;
+    @Unique
+    private boolean puzzleslib$isLoadedFromDisk;
+
+    @Override
+    public boolean puzzleslib$isLoadedFromDisk() {
+        return this.puzzleslib$isLoadedFromDisk;
+    }
+
+    @Override
+    public void puzzleslib$setLoadedFromDisk(boolean isLoadedFromDisk) {
+        this.puzzleslib$isLoadedFromDisk = isLoadedFromDisk;
+    }
 
     @WrapWithCondition(method = "rideTick",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V"))
+                       at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V"))
     public boolean rideTick(Entity entity, @Share("isEntityTickCancelled") LocalBooleanRef isEntityTickCancelled) {
         // avoid using @WrapOperation, so we are not blamed for any overhead from running the entity tick
         EventResult result = FabricEntityEvents.ENTITY_TICK_START.invoker().onStartEntityTick(entity);
@@ -72,7 +88,7 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
 
     @Inject(method = "spawnAtLocation(Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"),
+                     target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"),
             cancellable = true)
     public void spawnAtLocation(CallbackInfoReturnable<ItemEntity> callback, @Local ItemEntity itemEntity) {
         Collection<ItemEntity> capturedDrops = this.puzzleslib$getCapturedDrops();
@@ -120,4 +136,12 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
 
     @Shadow
     public abstract Pose getPose();
+
+    @ModifyReturnValue(method = "isInvulnerableTo", at = @At("RETURN"))
+    protected boolean isInvulnerableTo(boolean isInvulnerableTo, DamageSource damageSource) {
+        MutableBoolean isInvulnerable = MutableBoolean.fromValue(isInvulnerableTo);
+        FabricEntityEvents.ENTITY_DAMAGE_IMMUNITY.invoker()
+                .onEntityDamageImmunity(Entity.class.cast(this), damageSource, isInvulnerable);
+        return isInvulnerable.getAsBoolean();
+    }
 }

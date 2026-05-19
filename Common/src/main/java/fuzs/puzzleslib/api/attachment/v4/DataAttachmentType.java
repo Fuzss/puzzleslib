@@ -18,8 +18,7 @@ public interface DataAttachmentType<T, V> {
      * @param holder the attachment holder
      * @return the attachment value if present, or {@code null}
      */
-    @Nullable
-    V get(T holder);
+    @Nullable V get(T holder);
 
     /**
      * Get the value for the attachment type, if no value is present return the provided default value.
@@ -43,10 +42,18 @@ public interface DataAttachmentType<T, V> {
      * <p>
      * Setting a {@code null} value removes the attachment from the holder.
      *
-     * @param holder   the attachment holder
-     * @param newValue the new attachment value
+     * @param holder the attachment holder
+     * @param value  the new attachment value
      */
-    void set(T holder, @Nullable V newValue);
+    void set(T holder, @Nullable V value);
+
+    /**
+     * Remove the value for the attachment type.
+     *
+     * @param holder the attachment holder
+     * @return the attachment value if present, or {@code null}
+     */
+    @Nullable V remove(T holder);
 
     /**
      * Updates the attachment value on the holder.
@@ -56,5 +63,18 @@ public interface DataAttachmentType<T, V> {
      * @param holder       the attachment holder
      * @param valueUpdater the update operation to apply
      */
-    void update(T holder, UnaryOperator<V> valueUpdater);
+    void apply(T holder, UnaryOperator<V> valueUpdater);
+
+    /**
+     * Updates the attachment value on the holder.
+     * <p>
+     * Keep in mind the incoming value can be {@code null}.
+     *
+     * @param holder       the attachment holder
+     * @param valueUpdater the update operation to apply
+     */
+    @Deprecated
+    default void update(T holder, UnaryOperator<V> valueUpdater) {
+        this.apply(holder, valueUpdater);
+    }
 }

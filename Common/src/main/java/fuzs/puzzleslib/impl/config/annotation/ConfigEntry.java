@@ -58,7 +58,10 @@ public abstract class ConfigEntry<T> {
             List<String> comments = this.getComments(o);
             builder.comment(comments.toArray(String[]::new));
             builder.push(this.getName());
-            ConfigBuilder.build(builder, context, (Class<? extends ConfigCore>) this.field.getType(), this.getDefaultValue(o));
+            ConfigBuilder.build(builder,
+                    context,
+                    (Class<? extends ConfigCore>) this.field.getType(),
+                    this.getDefaultValue(o));
             builder.pop();
         }
     }

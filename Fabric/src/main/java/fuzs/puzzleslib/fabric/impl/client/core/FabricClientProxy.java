@@ -6,6 +6,7 @@ import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
+import fuzs.puzzleslib.fabric.impl.client.config.FabricConfigurationScreen;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricGuiEventHelper;
 import fuzs.puzzleslib.fabric.impl.client.init.FabricItemDisplayOverrides;
@@ -15,7 +16,6 @@ import fuzs.puzzleslib.fabric.impl.core.context.PayloadTypesContextFabricImpl;
 import fuzs.puzzleslib.fabric.mixin.client.accessor.MultiPlayerGameModeFabricAccessor;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import fuzs.puzzleslib.impl.client.init.ItemDisplayOverridesImpl;
-import fuzs.puzzleslib.impl.config.ConfigTranslationsManager;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.impl.network.codec.CustomPacketPayloadAdapter;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -28,6 +28,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
@@ -54,10 +55,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.config.ModConfigs;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 import java.util.Arrays;
@@ -245,15 +242,9 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     }
 
     @Override
-    public void registerConfigurationScreen(String modId) {
-        ConfigScreenFactoryRegistry.INSTANCE.register(modId, ConfigurationScreen::new);
-        ModConfigs.getModConfigs(modId).forEach((ModConfig modConfig) -> {
-            if (modConfig.getSpec() instanceof ModConfigSpec modConfigSpec) {
-                ConfigTranslationsManager.addModConfig(modConfig.getModId(),
-                        modConfig.getType().extension(),
-                        modConfig.getFileName(),
-                        modConfigSpec);
-            }
+    public void registerConfigurationScreen(String modId, String... otherModIds) {
+        ConfigScreenFactoryRegistry.INSTANCE.register(modId, (String string, Screen screen) -> {
+            return new FabricConfigurationScreen(string, screen, otherModIds);
         });
     }
 

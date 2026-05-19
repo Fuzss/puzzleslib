@@ -94,6 +94,12 @@ public final class FabricPlayerEvents {
      */
     public static final Event<PlayerTrackingEvents.Start> START_TRACKING = FabricEventFactory.create(
             PlayerTrackingEvents.Start.class);
+    /**
+     * Called when the player stops sleeping in a bed in
+     * {@link net.minecraft.world.entity.player.Player#stopSleepInBed(boolean, boolean)}.
+     */
+    public static final Event<StopSleepInBedCallback> STOP_SLEEP_IN_BED = FabricEventFactory.create(
+            StopSleepInBedCallback.class);
 
     private FabricPlayerEvents() {
         // NO-OP

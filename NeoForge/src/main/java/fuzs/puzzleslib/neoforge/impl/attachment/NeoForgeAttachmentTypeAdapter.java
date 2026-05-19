@@ -9,7 +9,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 public record NeoForgeAttachmentTypeAdapter<T extends IAttachmentHolder, A>(DeferredHolder<AttachmentType<?>, AttachmentType<A>> attachmentType) implements AttachmentTypeAdapter<T, A> {
 
     @Override
-    public ResourceLocation resourceLocation() {
+    public ResourceLocation id() {
         return this.attachmentType.getKey().location();
     }
 

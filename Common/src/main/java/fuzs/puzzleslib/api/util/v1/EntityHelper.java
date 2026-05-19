@@ -44,6 +44,7 @@ public final class EntityHelper {
      * @param entity the entity
      * @return the spawn type or null if none has been set or the entity is no {@link Mob}
      */
+    @Deprecated
     public static @Nullable MobSpawnType getMobSpawnReason(Entity entity) {
         Objects.requireNonNull(entity, "entity is null");
         return entity instanceof Mob mob ? ProxyImpl.get().getMobSpawnReason(mob) : null;

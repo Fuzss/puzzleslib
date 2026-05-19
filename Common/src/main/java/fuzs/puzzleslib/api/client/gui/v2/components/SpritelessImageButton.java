@@ -23,6 +23,7 @@ import java.util.function.ToIntFunction;
  * <li>Optionally draws the vanilla background texture behind the rendered sprite.</li>
  * </ul>
  */
+@Deprecated
 public class SpritelessImageButton extends Button {
     /**
      * The texture layout used in the old {@link net.minecraft.client.gui.components.ImageButton}.

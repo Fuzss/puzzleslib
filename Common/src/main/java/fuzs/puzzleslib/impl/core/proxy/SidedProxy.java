@@ -55,7 +55,7 @@ public interface SidedProxy extends Proxy {
         return Collections.singletonList(component);
     }
 
-    default void registerConfigurationScreen(String modId) {
+    default void registerConfigurationScreen(String modId, String... otherModIds) {
         // NO-OP
     }
 }

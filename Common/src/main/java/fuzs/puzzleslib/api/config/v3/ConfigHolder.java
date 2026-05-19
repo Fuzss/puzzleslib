@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.config.v3;
 
 import fuzs.puzzleslib.impl.config.ConfigHolderRegistry;
 import fuzs.puzzleslib.impl.core.ModContext;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 
 import java.nio.file.Paths;
 import java.util.function.UnaryOperator;
@@ -62,6 +63,20 @@ public interface ConfigHolder {
      */
     static UnaryOperator<String> getDirectoryNameFactory(String configType, String directory) {
         return (String modId) -> Paths.get(directory, getDefaultNameFactory(configType).apply(modId)).toString();
+    }
+
+    /**
+     * Registers a config screen factory. Will create an empty screen for mods without any config, so registering for
+     * those mods is fine and will not throw an exception.
+     * <p>
+     * Allows for registering a config screen that collects and merges configs from multiple mods. Useful for mods that
+     * have some of their relevant configurations as part of an underlying library.
+     *
+     * @param modId       the mod id to register the config screen for
+     * @param otherModIds optional mod ids to include configs from
+     */
+    static void registerConfigurationScreen(String modId, String... otherModIds) {
+        ProxyImpl.get().registerConfigurationScreen(modId, otherModIds);
     }
 
     /**

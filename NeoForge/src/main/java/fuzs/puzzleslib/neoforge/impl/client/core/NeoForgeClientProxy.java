@@ -7,10 +7,10 @@ import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import fuzs.puzzleslib.impl.client.init.ItemDisplayOverridesImpl;
-import fuzs.puzzleslib.impl.config.ConfigTranslationsManager;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.impl.network.codec.CustomPacketPayloadAdapter;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
+import fuzs.puzzleslib.neoforge.impl.client.config.NeoForgeConfigurationScreen;
 import fuzs.puzzleslib.neoforge.impl.client.event.NeoForgeClientEventInvokers;
 import fuzs.puzzleslib.neoforge.impl.client.init.NeoForgeItemDisplayOverrides;
 import fuzs.puzzleslib.neoforge.impl.client.key.NeoForgeKeyMappingHelper;
@@ -21,6 +21,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.player.LocalPlayer;
@@ -39,13 +40,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.config.ModConfigs;
 import net.neoforged.neoforge.client.ClientHooks;
 import net.neoforged.neoforge.client.extensions.common.IClientMobEffectExtensions;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
@@ -185,16 +182,10 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
     }
 
     @Override
-    public void registerConfigurationScreen(String modId) {
-        ModContainer modContainer = NeoForgeModContainerHelper.getModContainer(modId);
-        modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
-        ModConfigs.getModConfigs(modId).forEach((ModConfig modConfig) -> {
-            if (modConfig.getSpec() instanceof ModConfigSpec modConfigSpec) {
-                ConfigTranslationsManager.addModConfig(modConfig.getModId(),
-                        modConfig.getType().extension(),
-                        modConfig.getFileName(),
-                        modConfigSpec);
-            }
-        });
+    public void registerConfigurationScreen(String modId, String... otherModIds) {
+        NeoForgeModContainerHelper.getModContainer(modId)
+                .registerExtensionPoint(IConfigScreenFactory.class, (ModContainer modContainer, Screen screen) -> {
+                    return new NeoForgeConfigurationScreen(modContainer.getModId(), screen, otherModIds);
+                });
     }
 }

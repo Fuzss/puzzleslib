@@ -3,6 +3,7 @@ package fuzs.puzzleslib.fabric.api.event.v1;
 import fuzs.puzzleslib.api.event.v1.entity.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
 
@@ -16,13 +17,9 @@ public final class FabricEntityEvents {
      * We do not use {@link net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents#ENTITY_LOAD} as it does not
      * allow for preventing the entity from being added.
      */
+    @Deprecated
     public static final Event<ServerEntityLevelEvents.Load> ENTITY_LOAD = FabricEventFactory.createResult(
             ServerEntityLevelEvents.Load.class);
-    /**
-     * Fired when an entity is added to the level on the server after it has just been spawned in.
-     */
-    public static final Event<ServerEntityLevelEvents.Spawn> ENTITY_SPAWN = FabricEventFactory.createResult(
-            ServerEntityLevelEvents.Spawn.class);
     /**
      * Fires when a projectile entity impacts on something, either a block or another entity.
      */
@@ -47,8 +44,7 @@ public final class FabricEntityEvents {
     /**
      * Called after {@link Entity#tick()}.
      */
-    public static final Event<EntityTickEvents.End> ENTITY_TICK_END = FabricEventFactory.create(
-            EntityTickEvents.End.class);
+    public static final Event<EntityTickEvents.End> ENTITY_TICK_END = FabricEventFactory.create(EntityTickEvents.End.class);
     /**
      * Called when the size of an entity changes, usually from switching to a different {@link Pose}.
      */
@@ -59,6 +55,12 @@ public final class FabricEntityEvents {
      */
     public static final Event<EnderPearlTeleportCallback> ENDER_PEARL_TELEPORT = FabricEventFactory.createResult(
             EnderPearlTeleportCallback.class);
+    /**
+     * Runs in {@link Entity#isInvulnerableToBase(DamageSource)} when an entity is attacked to determine if said entity
+     * is invulnerable to the specific damage source.
+     */
+    public static final Event<EntityDamageImmunityCallback> ENTITY_DAMAGE_IMMUNITY = FabricEventFactory.create(
+            EntityDamageImmunityCallback.class);
 
     private FabricEntityEvents() {
         // NO-OP

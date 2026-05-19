@@ -10,6 +10,7 @@ import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.level.ServerLevelAccessor;
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
 public final class ServerEntityLevelEvents {
     public static final EventInvoker<Load> LOAD = EventInvoker.lookup(Load.class);
     public static final EventInvoker<Spawn> SPAWN = EventInvoker.lookup(Spawn.class);

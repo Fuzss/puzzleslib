@@ -1,4 +1,4 @@
 @ApiStatus.Internal
-package fuzs.puzzleslib.impl.config.annotation;
+package fuzs.puzzleslib.neoforge.impl.client.config;
 
 import org.jetbrains.annotations.ApiStatus;

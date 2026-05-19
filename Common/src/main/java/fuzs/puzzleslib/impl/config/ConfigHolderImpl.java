@@ -47,6 +47,7 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder, Freezabl
 
     @Override
     public <T extends ConfigCore> Builder client(Class<T> clazz) {
+        this.isWritableOrThrow();
         // this is necessary to allow safely using client-only classes in the client configs (e.g. certain enums for vanilla game options)
         Supplier<T> supplier = ModLoaderEnvironment.INSTANCE.isClient() ? construct(clazz) : () -> null;
         if (this.configsByClass.put(clazz, this.client(supplier)) != null) {
@@ -57,6 +58,7 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder, Freezabl
 
     @Override
     public <T extends ConfigCore> Builder common(Class<T> clazz) {
+        this.isWritableOrThrow();
         if (this.configsByClass.put(clazz, this.common(construct(clazz))) != null) {
             throw new IllegalStateException("Duplicate registration for common config of type " + clazz);
         }
@@ -65,6 +67,7 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder, Freezabl
 
     @Override
     public <T extends ConfigCore> Builder server(Class<T> clazz) {
+        this.isWritableOrThrow();
         if (this.configsByClass.put(clazz, this.server(construct(clazz))) != null) {
             throw new IllegalStateException("Duplicate registration for server config of type " + clazz);
         }

@@ -79,8 +79,7 @@ public final class CodecExtras {
 
     /**
      * A helper for turning results from {@link Encoder#encode(Object, DynamicOps, Object)} and
-     * {@link Encoder#encodeStart(DynamicOps, Object)} into {@link CompoundTag} when
-     * serializing using {@link NbtOps}.
+     * {@link Encoder#encodeStart(DynamicOps, Object)} into {@link CompoundTag} when serializing using {@link NbtOps}.
      * <p>
      * To be used with {@link Codec#flatMap(Function)}.
      *
@@ -142,13 +141,30 @@ public final class CodecExtras {
     }
 
     /**
-     * Creates a codec from a decoder. The returned codec can only decode, and will throw on any attempt to encode.
+     * Creates a codec from an encoder. The returned codec can only encode and will throw on any attempt to decode.
+     *
+     * @param encoder the encoder
+     * @param <A>     the element type
+     * @return the codec
+     *
+     * @see #decodeOnly(Decoder)
+     */
+    public static <A> Codec<A> encodeOnly(Encoder<A> encoder) {
+        return Codec.of(encoder, Codec.unit(() -> {
+            throw new UnsupportedOperationException("Cannot decode with encode-only codec! Encoder:" + encoder);
+        }), "EncodeOnly[" + encoder + "]");
+    }
+
+    /**
+     * Creates a codec from a decoder. The returned codec can only decode and will throw on any attempt to encode.
      * <p>
      * Copied from {@code net.neoforged.neoforge.common.util.NeoForgeExtraCodecs#decodeOnly}.
      *
      * @param decoder the decoder
      * @param <A>     the element type
      * @return the codec
+     *
+     * @see #encodeOnly(Encoder)
      */
     public static <A> Codec<A> decodeOnly(Decoder<A> decoder) {
         return Codec.of(Codec.unit(() -> {

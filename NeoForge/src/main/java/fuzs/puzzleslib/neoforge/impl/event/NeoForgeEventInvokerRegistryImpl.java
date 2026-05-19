@@ -40,10 +40,7 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.AgeableMob;
-import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -66,6 +63,7 @@ import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.*;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.*;
+import net.neoforged.neoforge.event.entity.EntityEvent;
 import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import net.neoforged.neoforge.event.entity.living.*;
 import net.neoforged.neoforge.event.entity.player.*;
@@ -637,6 +635,44 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                         evt.setCanceled(true);
                     }
                 });
+        // For NeoForge these use the same event, as the chunk access deadlock is fixed by the mod loader itself.
+        INSTANCE.register(ServerEntityEvents.Join.class,
+                EntityJoinLevelEvent.class,
+                (ServerEntityEvents.Join callback, EntityJoinLevelEvent event) -> {
+                    if (!(event.getLevel() instanceof ServerLevel serverLevel)) {
+                        return;
+                    }
+
+                    MobSpawnType spawnType = event.getEntity() instanceof Mob mob ? mob.getSpawnType() : null;
+                    if (callback.onEntityJoin(event.getEntity(), serverLevel, event.loadedFromDisk(), spawnType)
+                            .isInterrupt()) {
+                        event.setCanceled(true);
+                    }
+                });
+        INSTANCE.register(ServerEntityEvents.Load.class,
+                EntityJoinLevelEvent.class,
+                (ServerEntityEvents.Load callback, EntityJoinLevelEvent event) -> {
+                    if (!(event.getLevel() instanceof ServerLevel serverLevel)) {
+                        return;
+                    }
+
+                    boolean removed = event.getEntity().isRemoved();
+                    MobSpawnType spawnType = event.getEntity() instanceof Mob mob ? mob.getSpawnType() : null;
+                    callback.onEntityLoad(event.getEntity(), serverLevel, event.loadedFromDisk(), spawnType);
+                    // Solely marking the entity as removed does nothing with the current event on NeoForge.
+                    if (!removed && event.getEntity().isRemoved()) {
+                        event.setCanceled(true);
+                    }
+                });
+        INSTANCE.register(ServerEntityEvents.Unload.class,
+                EntityLeaveLevelEvent.class,
+                (ServerEntityEvents.Unload callback, EntityLeaveLevelEvent event) -> {
+                    if (!(event.getLevel() instanceof ServerLevel serverLevel)) {
+                        return;
+                    }
+
+                    callback.onEntityUnload(event.getEntity(), serverLevel);
+                });
         INSTANCE.register(ServerEntityLevelEvents.Load.class,
                 EntityJoinLevelEvent.class,
                 (ServerEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
@@ -1054,6 +1090,14 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                             evt.getOldSize());
                     result.ifInterrupt(evt::setNewSize);
                 });
+        INSTANCE.register(RefreshEntityDimensionsCallback.class,
+                EntityEvent.Size.class,
+                (RefreshEntityDimensionsCallback callback, EntityEvent.Size event) -> {
+                    EventResultHolder<EntityDimensions> eventResult = callback.onRefreshEntityDimensions(event.getEntity(),
+                            event.getPose(),
+                            event.getOldSize());
+                    eventResult.ifInterrupt(event::setNewSize);
+                });
         INSTANCE.register(PickProjectileCallback.class,
                 LivingGetProjectileEvent.class,
                 (PickProjectileCallback callback, LivingGetProjectileEvent event) -> {
@@ -1070,6 +1114,20 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                             MutableFloat.fromEvent(event::setAttackDamage, event::getAttackDamage),
                             event.getHitResult());
                     if (eventResult.isInterrupt()) event.setCanceled(true);
+                });
+        INSTANCE.register(StopSleepInBedCallback.class,
+                PlayerWakeUpEvent.class,
+                (StopSleepInBedCallback callback, PlayerWakeUpEvent event) -> {
+                    if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+                        callback.onStopSleepInBed(serverPlayer, !event.wakeImmediately() && !event.updateLevel());
+                    }
+                });
+        INSTANCE.register(EntityDamageImmunityCallback.class,
+                EntityInvulnerabilityCheckEvent.class,
+                (EntityDamageImmunityCallback callback, EntityInvulnerabilityCheckEvent event) -> {
+                    MutableBoolean isInvulnerable = MutableBoolean.fromEvent(event::setInvulnerable,
+                            event::isInvulnerable);
+                    callback.onEntityDamageImmunity(event.getEntity(), event.getSource(), isInvulnerable);
                 });
     }
 

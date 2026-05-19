@@ -41,9 +41,8 @@ public final class BlockConversionHelper {
      */
     public static void setItemForBlock(Block block, Item item) {
         Objects.requireNonNull(block,
-                () -> "block " + (item != null ? "for item '" + BuiltInRegistries.ITEM.getKey(item) + "' " : "") +
-                        "is null"
-        );
+                () -> "block " + (item != null ? "for item '" + BuiltInRegistries.ITEM.getKey(item) + "' " : "")
+                        + "is null");
         Objects.requireNonNull(item, () -> "item for block '" + BuiltInRegistries.BLOCK.getKey(block) + "' is null");
         Item.BY_BLOCK.put(block, item);
         block.item = item;
@@ -58,13 +57,15 @@ public final class BlockConversionHelper {
      */
     public static void setBlockForItem(BlockItem item, Block block) {
         Objects.requireNonNull(item,
-                () -> "item " + (block != null ? "for block '" + BuiltInRegistries.BLOCK.getKey(block) + "' " : "") +
-                        "is null"
-        );
+                () -> "item " + (block != null ? "for block '" + BuiltInRegistries.BLOCK.getKey(block) + "' " : "")
+                        + "is null");
         Objects.requireNonNull(block, () -> "block for item '" + BuiltInRegistries.ITEM.getKey(item) + "' is null");
         Block oldBlock = item.getBlock();
         // block can somehow be null on Forge apparently
-        if (oldBlock != null) oldBlock.item = item;
+        if (oldBlock != null) {
+            oldBlock.item = item;
+        }
+
         item.block = block;
     }
 
@@ -78,9 +79,8 @@ public final class BlockConversionHelper {
     @SuppressWarnings("deprecation")
     public static void copyBoundTags(Block from, Block to) {
         Objects.requireNonNull(from,
-                () -> "source " + (to != null ? "for target '" + BuiltInRegistries.BLOCK.getKey(to) + "' " : "") +
-                        "is null"
-        );
+                () -> "source " + (to != null ? "for target '" + BuiltInRegistries.BLOCK.getKey(to) + "' " : "")
+                        + "is null");
         Objects.requireNonNull(to, () -> "target for source '" + BuiltInRegistries.BLOCK.getKey(from) + "' is null");
         Set<TagKey<Block>> fromTagKeys = from.builtInRegistryHolder().tags().collect(Collectors.toSet());
         Set<TagKey<Block>> toTagKeys = to.builtInRegistryHolder().tags().collect(Collectors.toSet());

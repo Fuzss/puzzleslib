@@ -11,10 +11,8 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
-import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
@@ -25,12 +23,12 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
 
     @Override
     protected <T extends ConfigCore> ConfigDataHolderImpl<T> client(Supplier<T> supplier) {
-        return new NeoForgeConfigDataHolderImpl<>(ModConfig.Type.CLIENT, ModConfig.Type.CLIENT, supplier);
+        return new NeoForgeConfigDataHolderImpl<>(ModConfig.Type.STARTUP, ModConfig.Type.CLIENT, supplier);
     }
 
     @Override
     protected <T extends ConfigCore> ConfigDataHolderImpl<T> common(Supplier<T> supplier) {
-        return new NeoForgeConfigDataHolderImpl<>(ModConfig.Type.COMMON, ModConfig.Type.COMMON, supplier);
+        return new NeoForgeConfigDataHolderImpl<>(ModConfig.Type.STARTUP, ModConfig.Type.COMMON, supplier);
     }
 
     @Override
@@ -40,20 +38,25 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
 
     @Override
     protected void bake(ConfigDataHolderImpl<?> holder, String modId) {
-        Optional<IEventBus> optional = NeoForgeModContainerHelper.getOptionalModEventBus(modId);
-        optional.ifPresent(eventBus -> eventBus.addListener((final ModConfigEvent.Loading evt) -> {
-            ((NeoForgeConfigDataHolderImpl<?>) holder).onModConfig(evt.getConfig(),
-                    ConfigDataHolderImpl.ModConfigEventType.LOADING);
-        }));
-        optional.ifPresent(eventBus -> eventBus.addListener((final ModConfigEvent.Reloading evt) -> {
-            ((NeoForgeConfigDataHolderImpl<?>) holder).onModConfig(evt.getConfig(),
-                    ConfigDataHolderImpl.ModConfigEventType.RELOADING);
-        }));
-        optional.ifPresent(eventBus -> eventBus.addListener((final ModConfigEvent.Unloading evt) -> {
-            ((NeoForgeConfigDataHolderImpl<?>) holder).onModConfig(evt.getConfig(),
-                    ConfigDataHolderImpl.ModConfigEventType.UNLOADING);
-        }));
+        NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent((IEventBus eventBus) -> {
+            this.registerLoadingHandlers(eventBus, holder);
+        });
         ((NeoForgeConfigDataHolderImpl<?>) holder).register(modId);
+    }
+
+    private void registerLoadingHandlers(IEventBus eventBus, ConfigDataHolderImpl<?> holder) {
+        eventBus.addListener((final ModConfigEvent.Loading event) -> {
+            ((NeoForgeConfigDataHolderImpl<?>) holder).onModConfig(event.getConfig(),
+                    ConfigDataHolderImpl.ModConfigEventType.LOADING);
+        });
+        eventBus.addListener((final ModConfigEvent.Reloading event) -> {
+            ((NeoForgeConfigDataHolderImpl<?>) holder).onModConfig(event.getConfig(),
+                    ConfigDataHolderImpl.ModConfigEventType.RELOADING);
+        });
+        eventBus.addListener((final ModConfigEvent.Unloading event) -> {
+            ((NeoForgeConfigDataHolderImpl<?>) holder).onModConfig(event.getConfig(),
+                    ConfigDataHolderImpl.ModConfigEventType.UNLOADING);
+        });
     }
 
     private static class NeoForgeConfigDataHolderImpl<T extends ConfigCore> extends ConfigDataHolderImpl<T> {
@@ -89,12 +92,9 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
             }
         }
 
-        @Override
-        protected ModConfigSpec register(String modId) {
-            ModConfigSpec modConfigSpec = super.register(modId);
+        void register(String modId) {
             ModContainer modContainer = NeoForgeModContainerHelper.getModContainer(modId);
-            modContainer.registerConfig(this.configType, modConfigSpec, this.getFileName());
-            return modConfigSpec;
+            modContainer.registerConfig(this.configType, this.initialize(modId), this.getFileName());
         }
     }
 }

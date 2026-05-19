@@ -30,7 +30,6 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.*;
@@ -71,6 +70,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -450,10 +450,51 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PlayLevelSoundEvents.AtPosition.class, FabricLevelEvents.PLAY_LEVEL_SOUND_AT_POSITION);
         INSTANCE.register(PlayLevelSoundEvents.AtEntity.class, FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY);
         INSTANCE.register(ServerEntityLevelEvents.Load.class, FabricEntityEvents.ENTITY_LOAD);
-        INSTANCE.register(ServerEntityLevelEvents.Spawn.class, FabricEntityEvents.ENTITY_SPAWN);
+        INSTANCE.register(ServerEntityLevelEvents.Spawn.class,
+                FabricEntityEvents.ENTITY_LOAD,
+                (ServerEntityLevelEvents.Spawn callback) -> {
+                    return (Entity entity, ServerLevel level) -> {
+                        boolean isLoadedFromDisk =
+                                entity instanceof EntityLoadData loadData && loadData.puzzleslib$isLoadedFromDisk();
+                        MobSpawnType spawnReason =
+                                entity instanceof SpawnTypeMob mob ? mob.puzzleslib$getSpawnType() : null;
+                        if (!isLoadedFromDisk) {
+                            return callback.onEntitySpawn(entity, level, spawnReason);
+                        } else {
+                            return EventResult.PASS;
+                        }
+                    };
+                });
         INSTANCE.register(ServerEntityLevelEvents.Unload.class,
-                ServerEntityEvents.ENTITY_UNLOAD,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_UNLOAD,
                 (ServerEntityLevelEvents.Unload callback) -> {
+                    return callback::onEntityUnload;
+                });
+        INSTANCE.register(ServerEntityEvents.Join.class,
+                FabricEntityEvents.ENTITY_LOAD,
+                (ServerEntityEvents.Join callback) -> {
+                    return (Entity entity, ServerLevel level) -> {
+                        boolean isLoadedFromDisk =
+                                entity instanceof EntityLoadData loadData && loadData.puzzleslib$isLoadedFromDisk();
+                        MobSpawnType spawnReason =
+                                entity instanceof SpawnTypeMob mob ? mob.puzzleslib$getSpawnType() : null;
+                        return callback.onEntityJoin(entity, level, isLoadedFromDisk, spawnReason);
+                    };
+                });
+        INSTANCE.register(ServerEntityEvents.Load.class,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_LOAD,
+                (ServerEntityEvents.Load callback) -> {
+                    return (Entity entity, ServerLevel level) -> {
+                        boolean isLoadedFromDisk =
+                                entity instanceof EntityLoadData loadData && loadData.puzzleslib$isLoadedFromDisk();
+                        MobSpawnType spawnReason =
+                                entity instanceof SpawnTypeMob mob ? mob.puzzleslib$getSpawnType() : null;
+                        callback.onEntityLoad(entity, level, isLoadedFromDisk, spawnReason);
+                    };
+                });
+        INSTANCE.register(ServerEntityEvents.Unload.class,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_UNLOAD,
+                (ServerEntityEvents.Unload callback) -> {
                     return callback::onEntityUnload;
                 });
         INSTANCE.register(LivingDeathCallback.class, FabricLivingEvents.LIVING_DEATH);
@@ -566,7 +607,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(ServerChunkEvents.Watch.class, FabricLevelEvents.WATCH_CHUNK);
         INSTANCE.register(ServerChunkEvents.Unwatch.class, FabricLevelEvents.UNWATCH_CHUNK);
         INSTANCE.register(LivingEquipmentChangeCallback.class,
-                ServerEntityEvents.EQUIPMENT_CHANGE,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.EQUIPMENT_CHANGE,
                 (LivingEquipmentChangeCallback callback) -> {
                     return callback::onLivingEquipmentChange;
                 });
@@ -615,6 +656,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 },
                 UnaryOperator.identity(),
                 false);
+        INSTANCE.register(StopSleepInBedCallback.class, FabricPlayerEvents.STOP_SLEEP_IN_BED);
+        INSTANCE.register(EntityDamageImmunityCallback.class, FabricEntityEvents.ENTITY_DAMAGE_IMMUNITY);
     }
 
     @Override

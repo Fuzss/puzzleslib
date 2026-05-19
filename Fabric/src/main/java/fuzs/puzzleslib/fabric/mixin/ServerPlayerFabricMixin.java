@@ -34,7 +34,7 @@ abstract class ServerPlayerFabricMixin extends Player implements CapturedDropsEn
 
     @Inject(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"),
+                     target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"),
             cancellable = true)
     public void drop(CallbackInfoReturnable<ItemEntity> callback, @Local ItemEntity itemEntity) {
         Collection<ItemEntity> capturedDrops = this.puzzleslib$getCapturedDrops();
@@ -62,10 +62,16 @@ abstract class ServerPlayerFabricMixin extends Player implements CapturedDropsEn
 
     @Inject(method = "doCloseContainer",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/inventory/InventoryMenu;transferState(Lnet/minecraft/world/inventory/AbstractContainerMenu;)V",
-                    shift = At.Shift.AFTER))
+                     target = "Lnet/minecraft/world/inventory/InventoryMenu;transferState(Lnet/minecraft/world/inventory/AbstractContainerMenu;)V",
+                     shift = At.Shift.AFTER))
     public void doCloseContainer(CallbackInfo callback) {
         FabricPlayerEvents.CONTAINER_CLOSE.invoker()
                 .onContainerClose(ServerPlayer.class.cast(this), this.containerMenu);
+    }
+
+    @Inject(method = "stopSleepInBed", at = @At("HEAD"))
+    public void stopSleepInBed(boolean wakeImmediately, boolean updateLevelForSleepingPlayers, CallbackInfo callback) {
+        FabricPlayerEvents.STOP_SLEEP_IN_BED.invoker()
+                .onStopSleepInBed(ServerPlayer.class.cast(this), !wakeImmediately && !updateLevelForSleepingPlayers);
     }
 }

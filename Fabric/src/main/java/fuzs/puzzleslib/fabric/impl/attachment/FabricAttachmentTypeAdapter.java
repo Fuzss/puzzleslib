@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 public record FabricAttachmentTypeAdapter<T, A>(AttachmentType<A> attachmentType) implements AttachmentTypeAdapter<T, A> {
 
     @Override
-    public ResourceLocation resourceLocation() {
+    public ResourceLocation id() {
         return this.attachmentType.identifier();
     }
 

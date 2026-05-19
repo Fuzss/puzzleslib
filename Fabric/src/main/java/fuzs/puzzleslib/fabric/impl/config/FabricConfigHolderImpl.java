@@ -9,7 +9,6 @@ import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.config.ConfigDataHolderImpl;
 import fuzs.puzzleslib.impl.config.ConfigHolderImpl;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.nio.file.Path;
 import java.util.function.Supplier;
@@ -22,12 +21,12 @@ public class FabricConfigHolderImpl extends ConfigHolderImpl {
 
     @Override
     protected <T extends ConfigCore> ConfigDataHolderImpl<T> client(Supplier<T> supplier) {
-        return new FabricConfigDataHolderImpl<>(ModConfig.Type.CLIENT, ModConfig.Type.CLIENT, supplier);
+        return new FabricConfigDataHolderImpl<>(ModConfig.Type.STARTUP, ModConfig.Type.CLIENT, supplier);
     }
 
     @Override
     protected <T extends ConfigCore> ConfigDataHolderImpl<T> common(Supplier<T> supplier) {
-        return new FabricConfigDataHolderImpl<>(ModConfig.Type.COMMON, ModConfig.Type.COMMON, supplier);
+        return new FabricConfigDataHolderImpl<>(ModConfig.Type.STARTUP, ModConfig.Type.COMMON, supplier);
     }
 
     @Override
@@ -85,11 +84,11 @@ public class FabricConfigHolderImpl extends ConfigHolderImpl {
             }
         }
 
-        @Override
-        protected ModConfigSpec register(String modId) {
-            ModConfigSpec modConfigSpec = super.register(modId);
-            NeoForgeConfigRegistry.INSTANCE.register(modId, this.configType, modConfigSpec, this.getFileName());
-            return modConfigSpec;
+        void register(String modId) {
+            NeoForgeConfigRegistry.INSTANCE.register(modId,
+                    this.configType,
+                    this.initialize(modId),
+                    this.getFileName());
         }
     }
 }
