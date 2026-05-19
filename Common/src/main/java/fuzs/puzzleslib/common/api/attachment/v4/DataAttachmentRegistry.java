@@ -102,19 +102,18 @@ public final class DataAttachmentRegistry {
         /**
          * Automatically synchronise the attachment value with remotes.
          *
-         * @param streamCodec            the attachment value stream codec
-         * @param synchronizationTargets the remotes to synchronise the attachment value with; the following are
-         *                               recommended:
-         *                               <ul>
-         *                               <li>{@link PlayerSet#ofEntity(Entity)}</li>
-         *                               <li>{@link PlayerSet#nearEntity(Entity)}</li>
-         *                               <li>{@link PlayerSet#nearBlockEntity(BlockEntity)}</li>
-         *                               <li>{@link PlayerSet#nearChunk(LevelChunk)}</li>
-         *                               <li>{@link PlayerSet#inLevel(ServerLevel)}</li>
-         *                               </ul>
+         * @param streamCodec    the attachment value stream codec
+         * @param targetSelector the remotes to synchronise the attachment value with; the following are recommended:
+         *                       <ul>
+         *                       <li>{@link PlayerSet#ofEntity(Entity)}</li>
+         *                       <li>{@link PlayerSet#nearEntity(Entity)}</li>
+         *                       <li>{@link PlayerSet#nearBlockEntity(BlockEntity)}</li>
+         *                       <li>{@link PlayerSet#nearChunk(LevelChunk)}</li>
+         *                       <li>{@link PlayerSet#inLevel(ServerLevel)}</li>
+         *                       </ul>
          * @return the builder instance
          */
-        B networkSynchronized(StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec, Function<T, PlayerSet> synchronizationTargets);
+        B networkSynchronized(StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec, Function<T, PlayerSet> targetSelector);
 
         /**
          * Build the attachment type.

@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.fabric.impl.client.config;
+package fuzs.puzzleslib.neoforge.impl.client.config;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.google.common.collect.ImmutableSet;
@@ -30,7 +30,7 @@ import java.util.*;
  * <p>
  * This class is synced between Fabric &amp; NeoForge, as there is no shared config library in Common to build against.
  */
-public class CustomConfigurationScreen extends OptionsSubScreen {
+public class NeoForgeConfigurationScreen extends OptionsSubScreen {
     /**
      * Show server configs last; all else are global configs that are merged under the same section header.
      */
@@ -50,15 +50,15 @@ public class CustomConfigurationScreen extends OptionsSubScreen {
 
     protected final Set<String> modIds;
 
-    public CustomConfigurationScreen(String modId, Screen lastScreen) {
+    public NeoForgeConfigurationScreen(String modId, Screen lastScreen) {
         this(Collections.singleton(modId), lastScreen, getConfigTitleComponent(modId));
     }
 
-    public CustomConfigurationScreen(String modId, Screen lastScreen, String... modIds) {
+    public NeoForgeConfigurationScreen(String modId, Screen lastScreen, String... modIds) {
         this(ImmutableSet.<String>builder().add(modId).add(modIds).build(), lastScreen, getConfigTitleComponent(modId));
     }
 
-    public CustomConfigurationScreen(Set<String> modIds, Screen lastScreen, Component title) {
+    public NeoForgeConfigurationScreen(Set<String> modIds, Screen lastScreen, Component title) {
         super(lastScreen, Minecraft.getInstance().options, title);
         this.modIds = modIds;
     }

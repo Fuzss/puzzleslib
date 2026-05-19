@@ -109,11 +109,7 @@ public final class ComponentHelper {
      */
     public static String getAsString(String text, Style style) {
         if (!style.isEmpty()) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(ComponentHelper.getAsString(style));
-            stringBuilder.append(text);
-            stringBuilder.append(ChatFormatting.RESET);
-            return stringBuilder.toString();
+            return ComponentHelper.getAsString(style) + text + ChatFormatting.RESET;
         } else {
             return text;
         }

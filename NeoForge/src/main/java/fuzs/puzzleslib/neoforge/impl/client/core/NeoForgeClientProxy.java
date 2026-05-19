@@ -8,7 +8,7 @@ import fuzs.puzzleslib.common.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.common.impl.client.core.proxy.ClientProxyImpl;
 import fuzs.puzzleslib.common.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
-import fuzs.puzzleslib.neoforge.impl.client.config.CustomConfigurationScreen;
+import fuzs.puzzleslib.neoforge.impl.client.config.NeoForgeConfigurationScreen;
 import fuzs.puzzleslib.neoforge.impl.client.event.NeoForgeClientEventInvokers;
 import fuzs.puzzleslib.neoforge.impl.client.key.NeoForgeKeyMappingHelper;
 import fuzs.puzzleslib.neoforge.impl.client.renderer.NeoForgeMutableBakedQuad;
@@ -126,7 +126,7 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
     public void registerConfigurationScreen(String modId, String... otherModIds) {
         NeoForgeModContainerHelper.getModContainer(modId)
                 .registerExtensionPoint(IConfigScreenFactory.class, (ModContainer modContainer, Screen screen) -> {
-                    return new CustomConfigurationScreen(modContainer.getModId(), screen, otherModIds);
+                    return new NeoForgeConfigurationScreen(modContainer.getModId(), screen, otherModIds);
                 });
     }
 

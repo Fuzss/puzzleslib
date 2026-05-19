@@ -19,9 +19,12 @@ import java.util.function.Predicate;
 
 public abstract class DataAttachmentBuilder<T, V, B extends DataAttachmentRegistry.Builder<T, V, B>> implements DataAttachmentRegistry.Builder<T, V, B> {
     protected final Map<Predicate<T>, Function<RegistryAccess, V>> defaultValues = new LinkedHashMap<>();
-    @Nullable protected Codec<V> codec;
-    @Nullable protected StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec;
-    @Nullable private Function<T, PlayerSet> synchronizationTargets;
+    @Nullable
+    protected Codec<V> codec;
+    @Nullable
+    protected StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec;
+    @Nullable
+    private Function<T, PlayerSet> synchronizationTargets;
 
     @Override
     public B defaultValue(Function<RegistryAccess, V> defaultValueProvider) {
@@ -38,11 +41,11 @@ public abstract class DataAttachmentBuilder<T, V, B extends DataAttachmentRegist
     }
 
     @Override
-    public B networkSynchronized(StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec, Function<T, PlayerSet> synchronizationTargets) {
+    public B networkSynchronized(StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec, Function<T, PlayerSet> targetSelector) {
         Objects.requireNonNull(streamCodec, "stream codec is null");
-        Objects.requireNonNull(synchronizationTargets, "synchronization targets is null");
+        Objects.requireNonNull(targetSelector, "synchronization targets is null");
         this.streamCodec = streamCodec;
-        this.synchronizationTargets = synchronizationTargets;
+        this.synchronizationTargets = targetSelector;
         return this.getThis();
     }
 

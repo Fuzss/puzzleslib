@@ -6,7 +6,7 @@ import fuzs.puzzleslib.common.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.common.api.client.renderer.v1.model.MutableBakedQuad;
 import fuzs.puzzleslib.common.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
-import fuzs.puzzleslib.fabric.impl.client.config.CustomConfigurationScreen;
+import fuzs.puzzleslib.fabric.impl.client.config.FabricConfigurationScreen;
 import fuzs.puzzleslib.fabric.impl.client.core.context.GuiLayersContextFabricImpl;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.fabric.impl.client.key.FabricKeyMappingHelper;
@@ -190,7 +190,7 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     @Override
     public void registerConfigurationScreen(String modId, String... otherModIds) {
         ConfigScreenFactoryRegistry.INSTANCE.register(modId, (String string, Screen screen) -> {
-            return new CustomConfigurationScreen(string, screen, otherModIds);
+            return new FabricConfigurationScreen(string, screen, otherModIds);
         });
     }
 
