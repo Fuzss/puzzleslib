@@ -10,8 +10,8 @@ import java.util.function.UnaryOperator;
 /**
  * a config holder for holding mod configs there are three different kinds depending on where the data shall be used:
  * CLIENT, COMMON, SERVER this implementation is not limited to three held configs though, as many configs as desired
- * may be added (file names must be different!) instead of retrieving configs via mod config type they are stored by
- * class type
+ * may be added (only the file names must be different) instead of retrieving configs via mod config type they are
+ * stored by class type
  */
 public interface ConfigHolder {
 
@@ -80,7 +80,7 @@ public interface ConfigHolder {
     }
 
     /**
-     * builder interface for registering configs, not needed anymore after initial registration is complete, but no new
+     * builder interface for registering configs, not needed any more after initial registration is complete, but no new
      * instance is created, so we only store the super type {@link ConfigHolder}
      */
     interface Builder extends ConfigHolderRegistry {
@@ -113,11 +113,10 @@ public interface ConfigHolder {
         <T extends ConfigCore> Builder server(Class<T> clazz);
 
         /**
-         * this sets the file name on {@link ConfigDataHolder}, it's only used for storing, since actually it's only
-         * ever need in this class when calling {@link #build}
+         * This sets the file name on {@link ConfigDataHolder}.
          * <p>
-         * by default this is set to {@link #getDefaultNameFactory}, otherwise {@link #getSimpleNameFactory()} and
-         * {@link #getDirectoryNameFactory(String, String)} exist for convenience
+         * By default, this is set to {@link #getDefaultNameFactory}. Furthermore, {@link #getSimpleNameFactory()} and
+         * {@link #getDirectoryNameFactory(String, String)} exist for convenience.
          *
          * @param clazz           config main class
          * @param fileNameFactory file name operator, passed in is the modId

@@ -49,7 +49,7 @@ public final class ContentRegistrationHelper {
     }
 
     /**
-     * Creates and registers a new {@link ContextKeySet}.
+     * Creates and registers a new {@link LootContextParamSet}.
      *
      * @param resourceLocation the resource location for the registry
      * @param builderConsumer  the consumer for configuring the builder

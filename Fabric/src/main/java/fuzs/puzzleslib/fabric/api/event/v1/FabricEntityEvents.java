@@ -56,8 +56,8 @@ public final class FabricEntityEvents {
     public static final Event<EnderPearlTeleportCallback> ENDER_PEARL_TELEPORT = FabricEventFactory.createResult(
             EnderPearlTeleportCallback.class);
     /**
-     * Runs in {@link Entity#isInvulnerableToBase(DamageSource)} when an entity is attacked to determine if said entity
-     * is invulnerable to the specific damage source.
+     * Runs in {@link Entity#isInvulnerableTo(DamageSource)} when an entity is attacked to determine if said entity is
+     * invulnerable to the specific damage source.
      */
     public static final Event<EntityDamageImmunityCallback> ENTITY_DAMAGE_IMMUNITY = FabricEventFactory.create(
             EntityDamageImmunityCallback.class);

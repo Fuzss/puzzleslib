@@ -10,8 +10,8 @@ public interface EntityDamageImmunityCallback {
     EventInvoker<EntityDamageImmunityCallback> EVENT = EventInvoker.lookup(EntityDamageImmunityCallback.class);
 
     /**
-     * Runs in {@link Entity#isInvulnerableToBase(DamageSource)} when an entity is attacked to determine if said entity
-     * is invulnerable to the specific damage source.
+     * Runs in {@link Entity#isInvulnerableTo(DamageSource)} when an entity is attacked to determine if said entity is
+     * invulnerable to the specific damage source.
      *
      * @param entity         the entity
      * @param damageSource   the damage source

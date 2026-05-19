@@ -23,7 +23,8 @@ public final class ClientParticleHelper {
     }
 
     /**
-     * @see ClientLevel#addParticle(ParticleOptions, double, double, double, double, double, double)
+     * @see net.minecraft.client.renderer.LevelRenderer#addParticle(ParticleOptions, double, double, double, double,
+     *         double, double)
      */
     @Nullable
     public static Particle addParticle(ClientLevel clientLevel, ParticleOptions particleOptions, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
@@ -40,8 +41,8 @@ public final class ClientParticleHelper {
     }
 
     /**
-     * @see ClientLevel#addParticle(ParticleOptions, boolean, boolean, double, double, double, double, double,
-     *         double)
+     * @see net.minecraft.client.renderer.LevelRenderer#addParticle(ParticleOptions, boolean, boolean, double,
+     *         double, double, double, double, double)
      */
     @Nullable
     public static Particle addParticle(ClientLevel clientLevel, ParticleOptions particleOptions, boolean forceAlwaysRender, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {

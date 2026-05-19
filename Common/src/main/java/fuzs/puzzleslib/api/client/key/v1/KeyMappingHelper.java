@@ -59,11 +59,12 @@ public interface KeyMappingHelper {
     /**
      * Checks if a key mapping is pressed.
      * <p>
-     * NeoForge replaces the vanilla call to {@link KeyMapping#matches(KeyEvent)} in a few places to account for key
+     * NeoForge replaces the vanilla call to {@link KeyMapping#matches(int, int)} in a few places to account for key
      * activation contexts (game &amp; screen environments).
      *
      * @param keyMapping the key mapping
-     * @param keyEvent   the key event
+     * @param keyCode    the named key code which can be identified by the constants in {@link InputConstants}
+     * @param scanCode   the unique / platform-specific scan code of the keyboard input
      * @return is the key mapping pressed
      */
     static boolean isKeyActiveAndMatches(KeyMapping keyMapping, int keyCode, int scanCode) {
@@ -73,9 +74,9 @@ public interface KeyMappingHelper {
     /**
      * Checks if a key mapping is pressed.
      * <p>
-     * Similar to {@link KeyMapping#matches(KeyEvent)}, but for code points.
+     * Similar to {@link KeyMapping#matches(int, int)}, but for code points.
      * <p>
-     * Useful when working with {@link net.minecraft.client.KeyboardHandler#charTyped(long, CharacterEvent)}.
+     * Useful when working with {@link net.minecraft.client.KeyboardHandler#charTyped(long, int, int)}.
      *
      * @param keyMapping the key mapping
      * @param codePoint  the code point

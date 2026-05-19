@@ -22,7 +22,7 @@ public interface AddLivingEntityRenderLayersCallback {
     void addLivingEntityRenderLayers(EntityType<?> entityType, LivingEntityRenderer<?, ?> entityRenderer, EntityRendererProvider.Context context);
 
     /**
-     * A helper for identifying the model type of {@link AvatarRenderer}.
+     * A helper for identifying the model type of {@link PlayerRenderer}.
      *
      * @param playerRenderer the avatar renderer
      * @return the model type

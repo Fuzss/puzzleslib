@@ -236,7 +236,7 @@ public final class TooltipRenderHelper {
      * @param posX              the position on x-axis; would be mouse cursor x for vanilla
      * @param posY              the position on y-axis; would be mouse cursor y for vanilla
      * @param tooltipComponents components to render in the tooltip
-     * @see GuiGraphics#renderTooltip(Font, List, int, int, ClientTooltipPositioner, ResourceLocation)
+     * @see GuiGraphics#renderTooltipInternal(Font, List, int, int, ClientTooltipPositioner)
      */
     public static void renderTooltipComponents(GuiGraphics guiGraphics, int posX, int posY, List<? extends ClientTooltipComponent> tooltipComponents) {
         renderTooltipComponents(guiGraphics, posX, posY, tooltipComponents, null);

@@ -2,6 +2,10 @@ package fuzs.puzzleslib.api.item.v2;
 
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -100,7 +104,7 @@ public final class ItemHelper {
     /**
      * Creates a style for item names for a rarity.
      * <p>
-     * Alternatively use {@link ItemStack#getStyledHoverName()} where possible.
+     * Alternatively use {@link #getStyledHoverName(ItemStack)} where possible.
      *
      * @param rarity the rarity
      * @return the style for this rarity, apply via {@link net.minecraft.network.chat.MutableComponent#withStyle(Style)}
@@ -109,5 +113,24 @@ public final class ItemHelper {
     public static Style getRarityStyle(Rarity rarity) {
         Objects.requireNonNull(rarity, "rarity is null");
         return ProxyImpl.get().getRarityStyle(rarity);
+    }
+
+    /**
+     * Creates the name component shown as part of the item tooltip.
+     * <p>
+     * Backported from Minecraft 1.21.2.
+     *
+     * @param itemStack the item
+     * @return the hover name component
+     */
+    public Component getStyledHoverName(ItemStack itemStack) {
+        MutableComponent hoverName = Component.empty()
+                .append(itemStack.getHoverName())
+                .withStyle(getRarityStyle(itemStack.getRarity()));
+        if (itemStack.has(DataComponents.CUSTOM_NAME)) {
+            return hoverName.withStyle(ChatFormatting.ITALIC);
+        } else {
+            return hoverName;
+        }
     }
 }

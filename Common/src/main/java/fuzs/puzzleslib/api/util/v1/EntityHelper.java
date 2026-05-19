@@ -36,8 +36,8 @@ public final class EntityHelper {
     }
 
     /**
-     * Retrieves a {@link EntitySpawnReason} from a {@link Mob} if it has been set during
-     * {@link Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, EntitySpawnReason, SpawnGroupData)}.
+     * Retrieves a {@link MobSpawnType} from a {@link Mob} if it has been set during
+     * {@link Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, MobSpawnType, SpawnGroupData)}.
      * <p>
      * Note that the spawn type is saved with the mob, so it persists across chunk and level reloads.
      *

@@ -600,8 +600,8 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a poi type.
      *
-     * @param path  path for new entry
-     * @param block block valid for this poi type
+     * @param path          path for new entry
+     * @param matchingBlock block valid for this poi type
      * @return holder reference
      */
     default Holder.Reference<PoiType> registerPoiType(String path, Holder<Block> matchingBlock) {
@@ -638,8 +638,8 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a poi type.
      *
-     * @param path  path for new entry
-     * @param block block valid for this poi type
+     * @param path          path for new entry
+     * @param matchingBlock block valid for this poi type
      * @return holder reference
      */
     @Deprecated

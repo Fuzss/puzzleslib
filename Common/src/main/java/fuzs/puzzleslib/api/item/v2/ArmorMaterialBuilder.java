@@ -191,8 +191,7 @@ public final class ArmorMaterialBuilder {
     }
 
     /**
-     * @param assetId the location for the equipment model definition file at
-     *                {@code assets/<namespace>/equipment/<path>.json}
+     * @param layers the asset layers
      * @return the builder
      */
     @Deprecated

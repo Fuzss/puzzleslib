@@ -58,7 +58,7 @@ public final class ScreenHelper {
 
     /**
      * Can a mob effect render in the player inventory via
-     * {@link net.minecraft.client.gui.screens.inventory.EffectsInInventory}.
+     * {@link net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen}.
      *
      * @param mobEffect the mob effect
      * @return is rendering permitted

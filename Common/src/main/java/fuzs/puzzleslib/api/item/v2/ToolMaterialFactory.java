@@ -10,7 +10,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 
 /**
- * A class containing factory methods for creating new {@link ToolMaterial} implementations.
+ * A class containing factory methods for creating new {@link Tier} implementations.
  */
 public final class ToolMaterialFactory {
 
@@ -19,7 +19,7 @@ public final class ToolMaterialFactory {
     }
 
     /**
-     * Creates a new {@link ToolMaterial}.
+     * Creates a new {@link Tier}.
      *
      * @param miningLevel       the mining level of the tier, wood / gold is 0, stone is 1, iron is 2, diamond is 3,
      *                          netherite is 4
@@ -31,7 +31,7 @@ public final class ToolMaterialFactory {
      * @param enchantmentValue  enchantment value, wood is 15, gold is 22, stone is 5, iron is 14, diamond is 14,
      *                          netherite is 15
      * @param repairItems       the repair material used in an anvil for restoring item durability
-     * @return the new {@link ToolMaterial}
+     * @return the new {@link Tier}
      */
     public static Tier createToolMaterial(int miningLevel, int itemDurability, float miningSpeed, float attackDamageBonus, int enchantmentValue, TagKey<Item> repairItems) {
         return createToolMaterial(getVanillaMiningLevelBlockTag(miningLevel),
@@ -43,7 +43,7 @@ public final class ToolMaterialFactory {
     }
 
     /**
-     * Creates a new {@link ToolMaterial}.
+     * Creates a new {@link Tier}.
      *
      * @param incorrectBlocksForDrops the mining level of the tier as a block tag
      * @param itemDurability          tool durability for this tier
@@ -55,7 +55,7 @@ public final class ToolMaterialFactory {
      * @param enchantmentValue        enchantment value, wood is 15, gold is 22, stone is 5, iron is 14, diamond is 14,
      *                                netherite is 15
      * @param repairItems             the repair material used in an anvil for restoring item durability
-     * @return the new {@link ToolMaterial}
+     * @return the new {@link Tier}
      */
     public static Tier createToolMaterial(TagKey<Block> incorrectBlocksForDrops, int itemDurability, float miningSpeed, float attackDamageBonus, int enchantmentValue, TagKey<Item> repairItems) {
         return new TierImpl(incorrectBlocksForDrops,
