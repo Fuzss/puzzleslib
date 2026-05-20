@@ -2,7 +2,6 @@ package fuzs.puzzleslib.common.impl.content;
 
 import fuzs.puzzleslib.common.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.common.impl.PuzzlesLib;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.gamerules.GameRules;
 import org.objectweb.asm.Type;
@@ -36,7 +35,6 @@ public class PuzzlesLibDevelopment extends PuzzlesLib implements ModConstructor 
 
     private static void initializeGameRules() {
         GameRules.ADVANCE_TIME.defaultValue = Boolean.FALSE;
-        GameRules.ADVANCE_TIME.defaultValue = Boolean.FALSE;
         GameRules.ADVANCE_WEATHER.defaultValue = Boolean.FALSE;
         GameRules.KEEP_INVENTORY.defaultValue = true;
         GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER.defaultValue = 0;
@@ -68,9 +66,5 @@ public class PuzzlesLibDevelopment extends PuzzlesLib implements ModConstructor 
                         Type.getMethodDescriptor(method));
             }
         }
-    }
-
-    public static Identifier id(String path) {
-        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 }
