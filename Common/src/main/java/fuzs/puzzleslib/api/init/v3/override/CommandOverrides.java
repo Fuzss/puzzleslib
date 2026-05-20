@@ -1,18 +1,21 @@
 package fuzs.puzzleslib.api.init.v3.override;
 
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.entity.ServerEntityLevelEvents;
+import fuzs.puzzleslib.api.event.v1.entity.ServerEntityEvents;
+import fuzs.puzzleslib.api.event.v1.entity.player.PlayerCopyEvents;
 import fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import net.minecraft.core.Holder;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.TickTask;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.MobSpawnType;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -26,7 +29,7 @@ import java.util.function.UnaryOperator;
  */
 @Deprecated
 public final class CommandOverrides {
-    private static final String KEY_PLAYER_SEEN_WORLD = PuzzlesLibMod.id("has_seen_world").toLanguageKey();
+    private static final String KEY_PLAYER_JOINED_WORLD = PuzzlesLibMod.id("has_seen_world").toLanguageKey();
     private static final Map<CommandEnvironment, Collection<String>> COMMAND_OVERRIDES = Maps.newEnumMap(
             CommandEnvironment.class);
 
@@ -72,37 +75,51 @@ public final class CommandOverrides {
     }
 
     @ApiStatus.Internal
-    public static void registerHandlers() {
-        ServerLifecycleEvents.STARTED.register((MinecraftServer server) -> {
-            if (server.overworld().getGameTime() == 0) {
-                executeCommandOverrides(server, CommandEnvironment.SERVER, CommandEnvironment.DEDICATED_SERVER,
-                        UnaryOperator.identity()
-                );
+    public static void registerEventHandlers() {
+        ServerLifecycleEvents.STARTED.register((MinecraftServer minecraftServer) -> {
+            if (minecraftServer.getWorldData().overworldData().getGameTime() == 0 && minecraftServer.getWorldData()
+                    .isAllowCommands()) {
+                executeCommandOverrides(minecraftServer,
+                        CommandEnvironment.SERVER,
+                        CommandEnvironment.DEDICATED_SERVER,
+                        UnaryOperator.identity());
             }
         });
-        ServerEntityLevelEvents.LOAD.register((Entity entity, ServerLevel level) -> {
+        ServerEntityEvents.LOAD.register((Entity entity, ServerLevel serverLevel, boolean isLoadedFromDisk, @Nullable MobSpawnType entitySpawnReason) -> {
             // idea from Serilum's Starter Kit mod
-            if (entity instanceof ServerPlayer serverPlayer && !serverPlayer.getTags().contains(
-                    KEY_PLAYER_SEEN_WORLD)) {
-                serverPlayer.addTag(KEY_PLAYER_SEEN_WORLD);
-                String playerName = serverPlayer.getGameProfile().getName();
-                executeCommandOverrides(serverPlayer.server, CommandEnvironment.PLAYER,
-                        CommandEnvironment.DEDICATED_PLAYER, s -> s.replaceAll("@[sp]", playerName)
-                );
+            if (!isLoadedFromDisk && entity instanceof ServerPlayer serverPlayer && !serverPlayer.getTags()
+                    .contains(KEY_PLAYER_JOINED_WORLD)) {
+                serverPlayer.addTag(KEY_PLAYER_JOINED_WORLD);
+                // do not check if commands are enabled for the world, the option is always off on dedicated servers
+                if (serverLevel.getServer().isDedicatedServer() || serverLevel.getServer()
+                        .getWorldData()
+                        .isAllowCommands()) {
+                    serverLevel.getServer().tell(new TickTask(serverLevel.getServer().getTickCount(), () -> {
+                        String playerName = serverPlayer.getGameProfile().getName();
+                        executeCommandOverrides(serverLevel.getServer(),
+                                CommandEnvironment.PLAYER,
+                                CommandEnvironment.DEDICATED_PLAYER,
+                                (String s) -> s.replaceAll("@[sp]", playerName));
+                    }));
+                }
             }
-            return EventResult.PASS;
+        });
+        PlayerCopyEvents.COPY.register((ServerPlayer originalServerPlayer, ServerPlayer newServerPlayer, boolean originalStillAlive) -> {
+            if (!originalStillAlive) {
+                originalServerPlayer.removeTag(KEY_PLAYER_JOINED_WORLD);
+            }
         });
     }
 
-    private static void executeCommandOverrides(MinecraftServer server, CommandEnvironment commandEnvironment, CommandEnvironment dedicatedCommandEnvironment, UnaryOperator<String> formatter) {
+    private static void executeCommandOverrides(MinecraftServer minecraftServer, CommandEnvironment commandEnvironment, CommandEnvironment dedicatedCommandEnvironment, UnaryOperator<String> formatter) {
         for (String command : COMMAND_OVERRIDES.getOrDefault(commandEnvironment, Collections.emptySet())) {
-            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), formatter.apply(command));
+            minecraftServer.getCommands()
+                    .performPrefixedCommand(minecraftServer.createCommandSourceStack(), formatter.apply(command));
         }
-        if (server instanceof DedicatedServer) {
+        if (minecraftServer instanceof DedicatedServer) {
             for (String command : COMMAND_OVERRIDES.getOrDefault(dedicatedCommandEnvironment, Collections.emptySet())) {
-                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
-                        formatter.apply(command)
-                );
+                minecraftServer.getCommands()
+                        .performPrefixedCommand(minecraftServer.createCommandSourceStack(), formatter.apply(command));
             }
         }
     }

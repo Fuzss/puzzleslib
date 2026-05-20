@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.1.42-1.21.1] - 2025-05-20
+
+### Added
+
+- Add custom `LayerDefinition` from Minecraft 26.1
+
+### Changed
+
+- Backport internal development tools
+
+### Fixed
+
+- Fix custom `PartDefinition` `ClassCastException`
+
 ## [v21.1.41-1.21.1] - 2025-05-19
 
 ### Added

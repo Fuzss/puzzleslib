@@ -3,7 +3,9 @@ package fuzs.puzzleslib.neoforge.impl.client;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.client.PuzzlesLibClient;
+import fuzs.puzzleslib.impl.content.client.PuzzlesLibClientDevelopment;
 import fuzs.puzzleslib.neoforge.impl.client.commands.NeoForgeConfigCommand;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
@@ -18,21 +20,23 @@ public class PuzzlesLibNeoForgeClient {
 
     public PuzzlesLibNeoForgeClient() {
         ClientModConstructor.construct(PuzzlesLib.MOD_ID, PuzzlesLibClient::new);
-        setupDevelopmentEnvironment();
-    }
+        if (ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironmentWithoutDataGeneration(PuzzlesLib.MOD_ID)) {
+            ClientModConstructor.construct(PuzzlesLibMod.id("client/development"), PuzzlesLibClientDevelopment::new);
+        }
 
-    private static void setupDevelopmentEnvironment() {
-        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironmentWithoutDataGeneration(PuzzlesLib.MOD_ID)) return;
         registerEventHandlers(NeoForge.EVENT_BUS);
     }
 
     private static void registerEventHandlers(IEventBus eventBus) {
+        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironmentWithoutDataGeneration(PuzzlesLib.MOD_ID)) {
+            return;
+        }
+
         eventBus.addListener((final RegisterClientCommandsEvent evt) -> {
             NeoForgeConfigCommand.register(evt.getDispatcher(),
                     (CommandSourceStack commandSourceStack, Component component) -> {
                         commandSourceStack.sendSuccess(() -> component, true);
-                    }
-            );
+                    });
         });
     }
 }

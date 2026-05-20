@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.client.renderer.v1.model.geom.builders;
 
+import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.client.renderer.v1.model.geom.ModelPart;
 import fuzs.puzzleslib.api.client.renderer.v1.model.geom.PartPose;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
@@ -22,14 +23,13 @@ public class PartDefinition extends net.minecraft.client.model.geom.builders.Par
     }
 
     public PartDefinition(net.minecraft.client.model.geom.builders.PartDefinition partDefinition) {
-        super(partDefinition.cubes, partDefinition.partPose);
-        this.children.putAll(partDefinition.children);
+        super(partDefinition.cubes, new PartPose(partDefinition.partPose));
+        this.children.putAll(Maps.transformValues(partDefinition.children, PartDefinition::new));
     }
 
     @Override
     public PartDefinition addOrReplaceChild(String name, CubeListBuilder cubes, net.minecraft.client.model.geom.PartPose partPose) {
-        PartDefinition partDefinition = new PartDefinition(cubes.getCubes(),
-                partPose instanceof PartPose ? (PartPose) partPose : new PartPose(partPose));
+        PartDefinition partDefinition = new PartDefinition(cubes.getCubes(), new PartPose(partPose));
         return this.addOrReplaceChild(name, partDefinition);
     }
 
@@ -85,18 +85,11 @@ public class PartDefinition extends net.minecraft.client.model.geom.builders.Par
     public ModelPart bake(int texWidth, int texHeight) {
         Object2ObjectArrayMap<String, ModelPart> object2ObjectArrayMap = this.getChildren()
                 .stream()
-                .collect(
-                        Collectors.toMap(
-                                Entry::getKey,
-                                (Entry<String, PartDefinition> entry) -> {
-                                    return entry.getValue().bake(texWidth, texHeight);
-                                },
-                                (ModelPart oldModelPart, ModelPart modelPartx) -> {
-                                    return oldModelPart;
-                                },
-                                Object2ObjectArrayMap::new
-                        )
-                );
+                .collect(Collectors.toMap(Entry::getKey, (Entry<String, PartDefinition> entry) -> {
+                    return entry.getValue().bake(texWidth, texHeight);
+                }, (ModelPart oldModelPart, ModelPart modelPartx) -> {
+                    return oldModelPart;
+                }, Object2ObjectArrayMap::new));
         List<ModelPart.Cube> list = this.cubes.stream().map((CubeDefinition cube) -> {
             return cube.bake(texWidth, texHeight);
         }).toList();

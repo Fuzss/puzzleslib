@@ -34,51 +34,6 @@ public interface ModelLayerFactory {
      * @param layer the layer name
      * @return the new model layer location
      */
-    @Deprecated
-    default ModelLayerLocation register(String path, String layer) {
-        return this.registerModelLayer(path, layer);
-    }
-
-    /**
-     * Creates a new {@link ModelLayerLocation}, the used layer is <code>main</code>.
-     *
-     * @param path the entity name
-     * @return the new model layer location
-     */
-    @Deprecated
-    default ModelLayerLocation register(String path) {
-        return this.registerModelLayer(path);
-    }
-
-    /**
-     * Creates a new {@link ModelLayerLocation}, the used layer is <code>inner_armor</code>.
-     *
-     * @param path the entity name
-     * @return the new model layer location
-     */
-    @Deprecated
-    default ModelLayerLocation registerInnerArmor(String path) {
-        return this.registerModelLayer(path, "inner_armor");
-    }
-
-    /**
-     * Creates a new {@link ModelLayerLocation}, the used layer is <code>outer_armor</code>.
-     *
-     * @param path the entity name
-     * @return the new model layer location
-     */
-    @Deprecated
-    default ModelLayerLocation registerOuterArmor(String path) {
-        return this.registerModelLayer(path, "outer_armor");
-    }
-
-    /**
-     * Creates a new {@link ModelLayerLocation}.
-     *
-     * @param path  the entity name
-     * @param layer the layer name
-     * @return the new model layer location
-     */
     default ModelLayerLocation registerModelLayer(String path, String layer) {
         ModelLayerLocation modelLayerLocation = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(this.modId(),
                 path), layer);
@@ -110,6 +65,26 @@ public interface ModelLayerFactory {
                 this.registerModelLayer(path, "chestplate"),
                 this.registerModelLayer(path, "leggings"),
                 this.registerModelLayer(path, "boots"));
+    }
+
+    /**
+     * Creates a new {@link ModelLayerLocation}, the used layer is <code>inner_armor</code>.
+     *
+     * @param path the entity name
+     * @return the new model layer location
+     */
+    default ModelLayerLocation registerInnerArmorModelLayer(String path) {
+        return this.registerModelLayer(path, "inner_armor");
+    }
+
+    /**
+     * Creates a new {@link ModelLayerLocation}, the used layer is <code>outer_armor</code>.
+     *
+     * @param path the entity name
+     * @return the new model layer location
+     */
+    default ModelLayerLocation registerOuterArmorModelLayer(String path) {
+        return this.registerModelLayer(path, "outer_armor");
     }
 
     /**
@@ -170,5 +145,50 @@ public interface ModelLayerFactory {
      */
     default ModelLayerLocation createHangingSignModelName(WoodType woodType) {
         return this.registerModelLayer("hanging_sign/" + woodType.name());
+    }
+
+    /**
+     * Creates a new {@link ModelLayerLocation}.
+     *
+     * @param path  the entity name
+     * @param layer the layer name
+     * @return the new model layer location
+     */
+    @Deprecated
+    default ModelLayerLocation register(String path, String layer) {
+        return this.registerModelLayer(path, layer);
+    }
+
+    /**
+     * Creates a new {@link ModelLayerLocation}, the used layer is <code>main</code>.
+     *
+     * @param path the entity name
+     * @return the new model layer location
+     */
+    @Deprecated
+    default ModelLayerLocation register(String path) {
+        return this.registerModelLayer(path);
+    }
+
+    /**
+     * Creates a new {@link ModelLayerLocation}, the used layer is <code>inner_armor</code>.
+     *
+     * @param path the entity name
+     * @return the new model layer location
+     */
+    @Deprecated
+    default ModelLayerLocation registerInnerArmor(String path) {
+        return this.registerInnerArmorModelLayer(path);
+    }
+
+    /**
+     * Creates a new {@link ModelLayerLocation}, the used layer is <code>outer_armor</code>.
+     *
+     * @param path the entity name
+     * @return the new model layer location
+     */
+    @Deprecated
+    default ModelLayerLocation registerOuterArmor(String path) {
+        return this.registerOuterArmorModelLayer(path);
     }
 }

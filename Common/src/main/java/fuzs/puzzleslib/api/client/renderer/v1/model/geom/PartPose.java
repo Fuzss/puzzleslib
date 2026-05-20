@@ -18,7 +18,15 @@ public class PartPose extends net.minecraft.client.model.geom.PartPose {
     }
 
     public PartPose(net.minecraft.client.model.geom.PartPose partPose) {
-        this(partPose.x, partPose.y, partPose.z, partPose.xRot, partPose.yRot, partPose.zRot, 1.0F, 1.0F, 1.0F);
+        this(partPose.x,
+                partPose.y,
+                partPose.z,
+                partPose.xRot,
+                partPose.yRot,
+                partPose.zRot,
+                partPose instanceof PartPose pose ? pose.xScale : 1.0F,
+                partPose instanceof PartPose pose ? pose.yScale : 1.0F,
+                partPose instanceof PartPose pose ? pose.zScale : 1.0F);
     }
 
     public static PartPose offset(float x, float y, float z) {
