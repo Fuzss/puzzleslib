@@ -14,15 +14,20 @@ import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.Nullable;
 
@@ -78,52 +83,169 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
         return jsonElement;
     }
 
+    @Deprecated
     public static String getItemName(Ingredient ingredient) {
         return getItemName(Arrays.stream(ingredient.getItems()).map(ItemStack::getItem).toArray(ItemLike[]::new));
     }
 
+    @Deprecated
     public static String getItemName(ItemLike... items) {
         Preconditions.checkState(items.length > 0, "items is empty");
         return Arrays.stream(items).map(RecipeProvider::getItemName).collect(Collectors.joining("_or_"));
     }
 
+    @Deprecated
     public static String getConversionRecipeName(ItemLike result, Ingredient ingredient) {
-        return getConversionRecipeName(result, Arrays.stream(ingredient.getItems())
-                .map(ItemStack::getItem)
-                .toArray(ItemLike[]::new));
+        return getConversionRecipeName(result,
+                Arrays.stream(ingredient.getItems()).map(ItemStack::getItem).toArray(ItemLike[]::new));
     }
 
+    @Deprecated
     public static String getConversionRecipeName(ItemLike result, ItemLike... items) {
         Preconditions.checkState(items.length > 0, "items is empty");
         return getItemName(result) + "_from_" + getItemName(items);
     }
 
+    @Deprecated
     public static String getHasName(Ingredient ingredient) {
         return getHasName(Arrays.stream(ingredient.getItems()).map(ItemStack::getItem).toArray(ItemLike[]::new));
     }
 
+    @Deprecated
     public static String getHasName(ItemLike... items) {
         Preconditions.checkState(items.length > 0, "items is empty");
         return "has_" + getItemName(items);
     }
 
+    @Deprecated
     public static Criterion<InventoryChangeTrigger.TriggerInstance> has(Ingredient ingredient) {
         return has(Arrays.stream(ingredient.getItems()).map(ItemStack::getItem).toArray(ItemLike[]::new));
     }
 
+    @Deprecated
     public static Criterion<InventoryChangeTrigger.TriggerInstance> has(ItemLike... items) {
         Preconditions.checkState(items.length > 0, "items is empty");
         return inventoryTrigger(ItemPredicate.Builder.item().of(items).build());
     }
 
+    @Deprecated
     public static void stonecutterResultFromBase(RecipeOutput recipeOutput, RecipeCategory category, ItemLike result, Ingredient material) {
         stonecutterResultFromBase(recipeOutput, category, result, material, 1);
     }
 
+    @Deprecated
     public static void stonecutterResultFromBase(RecipeOutput recipeOutput, RecipeCategory category, ItemLike result, Ingredient material, int resultCount) {
-        SingleItemRecipeBuilder.stonecutting(material, category, result, resultCount).unlockedBy(getHasName(material),
-                has(material)
-        ).save(recipeOutput, getConversionRecipeName(result, material) + "_stonecutting");
+        SingleItemRecipeBuilder.stonecutting(material, category, result, resultCount)
+                .unlockedBy(getHasName(material), has(material))
+                .save(recipeOutput, getConversionRecipeName(result, material) + "_stonecutting");
+    }
+
+    public void stair(RecipeOutput output, RecipeCategory recipeCategory, ItemLike resultItem, ItemLike ingredientItem) {
+        this.stairBuilder(recipeCategory, resultItem, Ingredient.of(ingredientItem))
+                .unlockedBy(getHasName(ingredientItem), has(ingredientItem))
+                .save(output);
+    }
+
+    public RecipeBuilder stairBuilder(RecipeCategory recipeCategory, ItemLike resultItem, Ingredient ingredient) {
+        return ShapedRecipeBuilder.shaped(recipeCategory, resultItem, 4)
+                .define('#', ingredient)
+                .pattern("#  ")
+                .pattern("## ")
+                .pattern("###");
+    }
+
+    public void metalCooking(RecipeOutput output, ItemLike resultItem, ItemLike ingredientItem, float experience) {
+        this.metalCooking(output, resultItem, ingredientItem, experience, 200);
+    }
+
+    public void metalCooking(RecipeOutput output, ItemLike resultItem, ItemLike ingredientItem, float experience, int baseCookingTime) {
+        SimpleCookingRecipeBuilder.smelting(Ingredient.of(ingredientItem),
+                RecipeCategory.MISC,
+                resultItem,
+                experience,
+                baseCookingTime).unlockedBy(getHasName(ingredientItem), has(ingredientItem)).save(output);
+        SimpleCookingRecipeBuilder.blasting(Ingredient.of(ingredientItem),
+                        RecipeCategory.MISC,
+                        resultItem,
+                        experience,
+                        baseCookingTime / 2)
+                .unlockedBy(getHasName(ingredientItem), has(ingredientItem))
+                .save(output, getBlastingRecipeName(resultItem));
+    }
+
+    public void foodCooking(RecipeOutput output, ItemLike resultItem, ItemLike ingredientItem) {
+        this.foodCooking(output, resultItem, ingredientItem, 0.35F, 200);
+    }
+
+    public void foodCooking(RecipeOutput output, ItemLike resultItem, ItemLike ingredientItem, float experienceReward, int baseCookingTime) {
+        SimpleCookingRecipeBuilder.smelting(Ingredient.of(ingredientItem),
+                RecipeCategory.FOOD,
+                resultItem,
+                experienceReward,
+                baseCookingTime).unlockedBy(getHasName(ingredientItem), has(ingredientItem)).save(output);
+        SimpleCookingRecipeBuilder.smoking(Ingredient.of(ingredientItem),
+                        RecipeCategory.FOOD,
+                        resultItem,
+                        experienceReward,
+                        baseCookingTime / 2)
+                .unlockedBy(getHasName(ingredientItem), has(ingredientItem))
+                .save(output, getCraftingMethodRecipeName(resultItem, RecipeSerializer.SMOKING_RECIPE));
+        SimpleCookingRecipeBuilder.campfireCooking(Ingredient.of(ingredientItem),
+                        RecipeCategory.FOOD,
+                        resultItem,
+                        experienceReward,
+                        baseCookingTime * 3)
+                .unlockedBy(getHasName(ingredientItem), has(ingredientItem))
+                .save(output, getCraftingMethodRecipeName(resultItem, RecipeSerializer.CAMPFIRE_COOKING_RECIPE));
+    }
+
+    public RecipeBuilder stonecutterResultFromBaseBuilder(RecipeCategory recipeCategory, ItemLike resultItem, Ingredient ingredient) {
+        return this.stonecutterResultFromBaseBuilder(recipeCategory, resultItem, ingredient, 1);
+    }
+
+    public RecipeBuilder stonecutterResultFromBaseBuilder(RecipeCategory recipeCategory, ItemLike resultItem, Ingredient ingredient, int count) {
+        return SingleItemRecipeBuilder.stonecutting(ingredient, recipeCategory, resultItem, count);
+    }
+
+    public void smithing(RecipeOutput output, RecipeCategory recipeCategory, ItemLike resultItem, ItemLike templateItem, ItemLike baseItem, ItemLike materialItem) {
+        SmithingTransformRecipeBuilder.smithing(Ingredient.of(templateItem),
+                        Ingredient.of(baseItem),
+                        Ingredient.of(materialItem),
+                        recipeCategory,
+                        resultItem.asItem())
+                .unlocks(getHasName(materialItem), has(materialItem))
+                .save(output, getSmithingRecipeName(resultItem));
+    }
+
+    public void waxing(RecipeOutput output, ItemLike resultItem, ItemLike ingredientItem) {
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, resultItem)
+                .requires(ingredientItem)
+                .requires(Items.HONEYCOMB)
+                .group(getItemName(resultItem))
+                .unlockedBy(getHasName(ingredientItem), has(ingredientItem))
+                .save(output, getConversionRecipeName(resultItem, Items.HONEYCOMB));
+    }
+
+    public static String getCraftingMethodRecipeName(ItemLike resultItem, RecipeSerializer<?> recipeSerializer) {
+        ResourceLocation identifier = BuiltInRegistries.RECIPE_SERIALIZER.getKey(recipeSerializer);
+        Objects.requireNonNull(identifier, "identifier is null");
+        return getCraftingMethodRecipeName(resultItem, identifier.getPath());
+    }
+
+    public static String getCraftingMethodRecipeName(ItemLike resultItem, String craftingMethod) {
+        return getItemName(resultItem) + "_from_" + craftingMethod;
+    }
+
+    public static String getStonecuttingRecipeName(ItemLike resultItem, ItemLike material) {
+        return getConversionRecipeName(resultItem, material) + "_stonecutting";
+    }
+
+    public static String getSmithingRecipeName(ItemLike resultItem) {
+        return getItemName(resultItem) + "_smithing";
+    }
+
+    public static String getHasName(TagKey<Item> tagKey) {
+        return "has_" + tagKey.location().getPath();
     }
 
     @Override
@@ -162,24 +284,26 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
             // relocate all recipes to the mod id, so they do not depend on the item namespace which would
             // place e.g. new recipes for vanilla items in 'minecraft' which is not desired
             location = ResourceLocationHelper.fromNamespaceAndPath(AbstractRecipeProvider.this.modId,
-                    location.getPath()
-            );
+                    location.getPath());
             if (!this.generatedRecipes.add(location)) {
                 throw new IllegalStateException("Duplicate recipe " + location);
             } else {
-                this.completableFutures.add(DataProvider.saveStable(this.output, this.registries, Recipe.CODEC, recipe,
-                        AbstractRecipeProvider.this.recipePathProvider.json(location)
-                ));
+                this.completableFutures.add(DataProvider.saveStable(this.output,
+                        this.registries,
+                        Recipe.CODEC,
+                        recipe,
+                        AbstractRecipeProvider.this.recipePathProvider.json(location)));
                 if (advancement != null) {
                     RegistryOps<JsonElement> registryOps = this.registries.createSerializationContext(JsonOps.INSTANCE);
                     JsonElement jsonElement = Advancement.CODEC.encodeStart(registryOps, advancement.value())
                             .getOrThrow();
                     jsonElement = searchAndReplaceValue(jsonElement, oldLocation, location);
                     ResourceLocation advancementLocation = ResourceLocationHelper.fromNamespaceAndPath(
-                            AbstractRecipeProvider.this.modId, advancement.id().getPath());
-                    this.completableFutures.add(DataProvider.saveStable(this.output, jsonElement,
-                            AbstractRecipeProvider.this.advancementPathProvider.json(advancementLocation)
-                    ));
+                            AbstractRecipeProvider.this.modId,
+                            advancement.id().getPath());
+                    this.completableFutures.add(DataProvider.saveStable(this.output,
+                            jsonElement,
+                            AbstractRecipeProvider.this.advancementPathProvider.json(advancementLocation)));
                 }
             }
         }
