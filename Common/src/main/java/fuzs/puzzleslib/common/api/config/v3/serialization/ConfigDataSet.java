@@ -35,7 +35,7 @@ public interface ConfigDataSet<T> extends Collection<T> {
      * @return builder backed by a registry
      */
     static <T> ConfigDataSet<T> from(ResourceKey<? extends Registry<? super T>> registryKey, String... values) {
-        return from(KeyedValueProvider.registryEntries(registryKey), values);
+        return from(KeyedValueProvider.values(registryKey), values);
     }
 
     /**
@@ -55,7 +55,7 @@ public interface ConfigDataSet<T> extends Collection<T> {
      * @return builder backed by a registry
      */
     static <T> ConfigDataSet<T> from(ResourceKey<? extends Registry<? super T>> registryKey, List<String> values, Class<?>... types) {
-        return from(KeyedValueProvider.registryEntries(registryKey), values, types);
+        return from(KeyedValueProvider.values(registryKey), values, types);
     }
 
     /**
@@ -74,7 +74,7 @@ public interface ConfigDataSet<T> extends Collection<T> {
      * @return builder backed by a registry
      */
     static <T> ConfigDataSet<T> from(ResourceKey<? extends Registry<? super T>> registryKey, List<String> values, BiPredicate<Integer, Object> filter, Class<?>... types) {
-        return from(KeyedValueProvider.registryEntries(registryKey), values, filter, types);
+        return from(KeyedValueProvider.values(registryKey), values, filter, types);
     }
 
     /**

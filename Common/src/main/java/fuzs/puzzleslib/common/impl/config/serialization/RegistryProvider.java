@@ -17,8 +17,8 @@ public record RegistryProvider<T>(Registry<T> registry) implements KeyedValuePro
     }
 
     @Override
-    public Optional<T> getValue(Identifier name) {
-        return this.registry.getOptional(name);
+    public Optional<T> getValue(Identifier id) {
+        return this.registry.getOptional(id);
     }
 
     @Override

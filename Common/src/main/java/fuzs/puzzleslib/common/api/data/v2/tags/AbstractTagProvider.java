@@ -3,9 +3,9 @@ package fuzs.puzzleslib.common.api.data.v2.tags;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fuzs.puzzleslib.common.api.config.v3.serialization.KeyedValueProvider;
 import fuzs.puzzleslib.common.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.common.api.init.v3.family.BlockSetVariant;
-import fuzs.puzzleslib.common.api.init.v3.registry.LookupHelper;
 import fuzs.puzzleslib.common.api.init.v3.tags.TagFactory;
 import fuzs.puzzleslib.common.api.util.v1.CodecExtras;
 import fuzs.puzzleslib.common.impl.core.proxy.ProxyImpl;
@@ -21,16 +21,15 @@ import net.minecraft.tags.*;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import org.jetbrains.annotations.ApiStatus;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 
+/**
+ * TODO purge all the mod id fields from providers where not required
+ */
 public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
+    private static final TagBuilder STATIC_TAG_BUILDER = TagBuilder.create();
     /**
      * A custom {@link Codec} for {@link TagFile} which adds both NeoForge and Fabric remove fields.
      * <p>
@@ -139,7 +138,10 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     }
 
     public AbstractTagProvider(ResourceKey<? extends Registry<T>> registryKey, String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
-        super(packOutput, registryKey, registries);
+        super(packOutput, registryKey, registries, CompletableFuture.completedFuture((TagKey<T> tagKey) -> {
+            return Objects.equals(tagKey.location().getNamespace(), modId) ? Optional.empty() :
+                    Optional.of(STATIC_TAG_BUILDER);
+        }));
         this.modId = modId;
     }
 
@@ -172,7 +174,7 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
      */
     public AbstractTagAppender<T> tag(TagKey<T> tag) {
         TagBuilder builder = this.getOrCreateRawBuilder(tag);
-        return createTagAppender(builder, this.registryKey);
+        return KeyedValueProvider.tags(builder, this.registryKey);
     }
 
     /**
@@ -181,7 +183,7 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     public AbstractTagAppender<T> tag(TagKey<T> tag, boolean replace) {
         TagBuilder builder = this.getOrCreateRawBuilder(tag);
         builder.setReplace(replace);
-        return createTagAppender(builder, this.registryKey);
+        return KeyedValueProvider.tags(builder, this.registryKey);
     }
 
     public final void generateFor(Map<BlockSetVariant, Holder.Reference<T>> variants, Map<BlockSetVariant, TagKey<T>> variantTags) {
@@ -191,15 +193,5 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
                 this.tag(tag).add(holder);
             }
         });
-    }
-
-    @ApiStatus.Internal
-    public static <T> AbstractTagAppender<T> createTagAppender(TagBuilder tagBuilder, ResourceKey<? extends Registry<? super T>> registryKey) {
-        Optional<Registry<T>> optional = LookupHelper.getRegistry(registryKey);
-        Function<T, ResourceKey<T>> keyExtractor = optional.isPresent() ?
-                (T t) -> optional.flatMap((Registry<T> registry) -> registry.getResourceKey(t)).orElseThrow(() -> {
-                    return new IllegalStateException("Missing value in " + registryKey + ": " + t);
-                }) : null;
-        return ProxyImpl.get().getTagAppender(tagBuilder, keyExtractor);
     }
 }
