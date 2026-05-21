@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.data.v2.tags;
 
 import fuzs.puzzleslib.api.config.v3.serialization.KeyedValueProvider;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
+import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import fuzs.puzzleslib.impl.data.SortingTagBuilder;
@@ -39,7 +40,7 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
                     Optional.of(STATIC_TAG_BUILDER);
         }));
         this.modId = modId;
-        this.registry = RegistryHelper.findNullableBuiltInRegistry(registryKey);
+        this.registry = LookupHelper.getRegistry(registryKey).orElse(null);
         this.keyExtractor =
                 this.registry != null ? (T t) -> RegistryHelper.getResourceKeyOrThrow(this.registry, t) : null;
     }
@@ -68,17 +69,12 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
         return this.tag(TagKey.create(this.registryKey, id), replace);
     }
 
-    /**
-     * @see net.minecraft.data.tags.KeyTagProvider#tag(TagKey)
-     */
+    @Override
     public fuzs.puzzleslib.api.data.v3.tags.AbstractTagAppender<T> tag(TagKey<T> tag) {
         TagBuilder builder = this.getOrCreateRawBuilder(tag);
         return KeyedValueProvider.tags(builder, this.registryKey);
     }
 
-    /**
-     * @see net.minecraft.data.tags.KeyTagProvider#tag(TagKey, boolean)
-     */
     public fuzs.puzzleslib.api.data.v3.tags.AbstractTagAppender<T> tag(TagKey<T> tag, boolean replace) {
         TagBuilder builder = this.getOrCreateRawBuilder(tag);
         ProxyImpl.get().setTagBuilderReplace(builder, replace);
