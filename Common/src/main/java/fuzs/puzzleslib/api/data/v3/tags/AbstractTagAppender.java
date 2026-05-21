@@ -25,6 +25,18 @@ public abstract class AbstractTagAppender<T> extends TagsProvider.TagAppender<T>
         this.keyExtractor = keyExtractor;
     }
 
+    @Deprecated
+    @Override
+    public AbstractTagAppender<T> add(ResourceKey<T> key) {
+        return this.addKey(key);
+    }
+
+    @Deprecated
+    @Override
+    public AbstractTagAppender<T> add(ResourceKey<T>... keys) {
+        return this.addKey(keys);
+    }
+
     public AbstractTagAppender<T> add(ResourceLocation id) {
         this.tagBuilder.addElement(id);
         return this;

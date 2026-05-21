@@ -14,6 +14,7 @@ transitive-accessible   class   net/minecraft/client/particle/ParticleEngine$Spr
 transitive-accessible   field   net/minecraft/client/renderer/entity/EntityRenderDispatcher renderers   Ljava/util/Map;
 transitive-accessible	class	net/minecraft/data/tags/TagsProvider$TagAppender
 transitive-accessible	class	net/minecraft/data/tags/IntrinsicHolderTagsProvider$IntrinsicTagAppender
+extendable  method  net/minecraft/data/tags/TagsProvider$TagAppender	add	(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/data/tags/TagsProvider$TagAppender;
 extendable  method  net/minecraft/client/gui/components/Tooltip <init>  (Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/Component;)V
 accessible  field   net/minecraft/client/gui/components/Tooltip cachedTooltip   Ljava/util/List;
 accessible  field   net/minecraft/client/gui/components/Tooltip splitWithLanguage   Lnet/minecraft/locale/Language;
