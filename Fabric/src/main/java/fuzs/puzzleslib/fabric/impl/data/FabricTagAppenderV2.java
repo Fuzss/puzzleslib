@@ -2,7 +2,6 @@ package fuzs.puzzleslib.fabric.impl.data;
 
 import com.google.common.collect.ImmutableList;
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
-import net.fabricmc.fabric.impl.datagen.FabricTagBuilder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagBuilder;
@@ -13,18 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-public final class FabricTagAppender<T> extends AbstractTagAppender<T> {
+public final class FabricTagAppenderV2<T> extends AbstractTagAppender<T> {
     private final List<TagEntry> removeEntries = new ArrayList<>();
 
-    public FabricTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
+    public FabricTagAppenderV2(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
         super(tagBuilder, keyExtractor);
-    }
-
-    @SuppressWarnings("UnstableApiUsage")
-    @Override
-    public AbstractTagAppender<T> setReplace(boolean replace) {
-        ((FabricTagBuilder) this.tagBuilder).fabric_setReplace(replace);
-        return this;
     }
 
     @Override

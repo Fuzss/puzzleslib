@@ -31,7 +31,9 @@ public interface FactoriesProxy {
 
     CombinedIngredients getCombinedIngredients();
 
-    <T> AbstractTagAppender<T> getTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor);
+    <T> AbstractTagAppender<T> getTagAppenderV2(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor);
+
+    <T> fuzs.puzzleslib.api.data.v3.tags.AbstractTagAppender<T> getTagAppenderV3(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor);
 
     DataAttachmentRegistryImpl getDataAttachmentRegistry();
 }

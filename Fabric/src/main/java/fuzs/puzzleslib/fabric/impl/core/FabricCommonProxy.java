@@ -14,7 +14,8 @@ import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
 import fuzs.puzzleslib.fabric.impl.attachment.FabricDataAttachmentRegistryImpl;
 import fuzs.puzzleslib.fabric.impl.core.context.PayloadTypesContextFabricImpl;
-import fuzs.puzzleslib.fabric.impl.data.FabricTagAppender;
+import fuzs.puzzleslib.fabric.impl.data.FabricTagAppenderV2;
+import fuzs.puzzleslib.fabric.impl.data.FabricTagAppenderV3;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventInvokerRegistryImpl;
 import fuzs.puzzleslib.fabric.impl.event.SpawnTypeMob;
 import fuzs.puzzleslib.fabric.impl.init.FabricGameRulesFactory;
@@ -33,6 +34,7 @@ import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.fabricmc.fabric.impl.datagen.FabricTagBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.network.Connection;
@@ -180,6 +182,12 @@ public class FabricCommonProxy implements FabricProxy {
         return itemStack.canBeEnchantedWith(enchantment, EnchantingContext.PRIMARY);
     }
 
+    @SuppressWarnings("UnstableApiUsage")
+    @Override
+    public void setTagBuilderReplace(TagBuilder builder, boolean isReplace) {
+        ((FabricTagBuilder) builder).fabric_setReplace(isReplace);
+    }
+
     @Override
     public boolean onExplosionStart(Level level, Explosion explosion) {
         return FabricLevelEvents.EXPLOSION_START.invoker().onExplosionStart(level, explosion).isInterrupt();
@@ -304,8 +312,13 @@ public class FabricCommonProxy implements FabricProxy {
     }
 
     @Override
-    public <T> AbstractTagAppender<T> getTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
-        return new FabricTagAppender<>(tagBuilder, keyExtractor);
+    public <T> AbstractTagAppender<T> getTagAppenderV2(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
+        return new FabricTagAppenderV2<>(tagBuilder, keyExtractor);
+    }
+
+    @Override
+    public <T> fuzs.puzzleslib.api.data.v3.tags.AbstractTagAppender<T> getTagAppenderV3(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
+        return new FabricTagAppenderV3<>(tagBuilder, keyExtractor);
     }
 
     @Override

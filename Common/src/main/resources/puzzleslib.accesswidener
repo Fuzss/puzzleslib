@@ -243,6 +243,7 @@ transitive-accessible   method  net/minecraft/client/renderer/entity/LivingEntit
 transitive-accessible   field   net/minecraft/client/model/PlayerModel  slim    Z
 accessible	field	net/minecraft/data/tags/TagsProvider	builders	Ljava/util/Map;
 accessible	field	net/minecraft/tags/TagEntry	id  Lnet/minecraft/resources/ResourceLocation;
+accessible  field   net/minecraft/tags/TagEntry tag Z
 transitive-accessible   method  net/minecraft/world/entity/LivingEntity shouldDropLoot  ()Z
 accessible  field   net/minecraft/server/packs/repository/PackRepository    sources Ljava/util/Set;
 mutable field   net/minecraft/server/packs/repository/PackRepository    sources Ljava/util/Set;

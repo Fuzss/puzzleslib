@@ -1,10 +1,12 @@
 package fuzs.puzzleslib.api.config.v3.serialization;
 
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
+import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
 import fuzs.puzzleslib.impl.config.serialization.EnumProvider;
 import fuzs.puzzleslib.impl.config.serialization.RegistryProvider;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
+import fuzs.puzzleslib.impl.data.SortingTagBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -80,11 +82,42 @@ public interface KeyedValueProvider<T> {
      * @param <T>         the type of values
      * @return the tag appender
      */
+    @Deprecated
     static <T> AbstractTagAppender<T> tagAppender(ResourceKey<? extends Registry<? super T>> registryKey) {
         Registry<T> registry = RegistryHelper.findNullableBuiltInRegistry(registryKey);
         Function<T, ResourceKey<T>> keyExtractor =
                 registry != null ? (T t) -> RegistryHelper.getResourceKeyOrThrow(registry, t) : null;
-        return ProxyImpl.get().getTagAppender(new TagBuilder(), keyExtractor);
+        return ProxyImpl.get().getTagAppenderV2(new SortingTagBuilder(), keyExtractor);
+    }
+
+    /**
+     * Creates an {@link AbstractTagAppender} instance that can be converted to a string list by calling
+     * {@link AbstractTagAppender#asStringList()}.
+     *
+     * @param registryKey the registry to get entry keys from
+     * @param <T>         the type of values
+     * @return the tag appender
+     */
+    static <T> fuzs.puzzleslib.api.data.v3.tags.AbstractTagAppender<T> tags(ResourceKey<? extends Registry<? super T>> registryKey) {
+        return tags(new SortingTagBuilder(), registryKey);
+    }
+
+    /**
+     * Creates an {@link AbstractTagAppender} instance that can be converted to a string list by calling
+     * {@link AbstractTagAppender#asStringList()}.
+     *
+     * @param tagBuilder  the tag builder
+     * @param registryKey the registry to get entry keys from
+     * @param <T>         the type of values
+     * @return the tag appender
+     */
+    static <T> fuzs.puzzleslib.api.data.v3.tags.AbstractTagAppender<T> tags(TagBuilder tagBuilder, ResourceKey<? extends Registry<? super T>> registryKey) {
+        Optional<Registry<T>> optional = LookupHelper.getRegistry(registryKey);
+        Function<T, ResourceKey<T>> keyExtractor = optional.isPresent() ?
+                (T t) -> optional.flatMap((Registry<T> registry) -> registry.getResourceKey(t)).orElseThrow(() -> {
+                    return new IllegalStateException("Missing value in " + registryKey + ": " + t);
+                }) : null;
+        return ProxyImpl.get().getTagAppenderV3(tagBuilder, keyExtractor);
     }
 
     /**

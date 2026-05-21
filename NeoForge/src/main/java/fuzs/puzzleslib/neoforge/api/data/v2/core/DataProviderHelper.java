@@ -13,12 +13,11 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.nio.file.Path;
-import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -43,17 +42,6 @@ public final class DataProviderHelper {
     }
 
     /**
-     * Registers factories for multiple {@link DataProvider} instances to be run during data-gen, which is when
-     * {@link GatherDataEvent} fires.
-     *
-     * @param modId                 the current mod id
-     * @param dataProviderFactories all data provider factories to run
-     */
-    public static void registerDataProviders(String modId, NeoForgeDataProviderContext.LegacyFactory... dataProviderFactories) {
-        registerDataProviders(modId, new RegistrySetBuilder(), dataProviderFactories);
-    }
-
-    /**
      * Register {@link DataProvider DataProviders} for a built-in pack bundled with the mod to be run during data
      * generation via {@link GatherDataEvent}.
      * <ul>
@@ -61,12 +49,12 @@ public final class DataProviderHelper {
      *     <li>Resource pack path: {@code assets/<modId>/resourcepacks/<path>}</li>
      * </ul>
      *
-     * @param resourceLocation      the resource location
+     * @param identifier            the identifier
      * @param packType              the pack type
      * @param dataProviderFactories the data provider factories to run
      */
-    public static void registerDataProviders(ResourceLocation resourceLocation, PackType packType, NeoForgeDataProviderContext.Factory... dataProviderFactories) {
-        registerDataProviders(resourceLocation, packType, new RegistrySetBuilder(), dataProviderFactories);
+    public static void registerDataProviders(ResourceLocation identifier, PackType packType, NeoForgeDataProviderContext.Factory... dataProviderFactories) {
+        registerDataProviders(identifier, packType, new RegistrySetBuilder(), dataProviderFactories);
     }
 
     /**
@@ -88,25 +76,6 @@ public final class DataProviderHelper {
     }
 
     /**
-     * Registers factories for multiple {@link DataProvider} instances to be run during data-gen, which is when
-     * {@link GatherDataEvent} fires.
-     *
-     * @param modId                 the current mod id
-     * @param registrySetBuilder    the optional registry set builder
-     * @param dataProviderFactories all data provider factories to run
-     */
-    public static void registerDataProviders(String modId, RegistrySetBuilder registrySetBuilder, NeoForgeDataProviderContext.LegacyFactory... dataProviderFactories) {
-        registerDataProviders(modId,
-                registrySetBuilder,
-                dataProviderFactories,
-                (NeoForgeDataProviderContext.LegacyFactory factory) -> {
-                    return (GatherDataEvent evt, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) -> {
-                        return factory.apply(evt, modId);
-                    };
-                });
-    }
-
-    /**
      * Register {@link DataProvider DataProviders} for a built-in pack bundled with the mod to be run during data
      * generation via {@link GatherDataEvent}.
      * <ul>
@@ -114,13 +83,13 @@ public final class DataProviderHelper {
      *     <li>Resource pack path: {@code assets/<modId>/resourcepacks/<path>}</li>
      * </ul>
      *
-     * @param resourceLocation      the resource location
+     * @param identifier            the identifier
      * @param packType              the pack type
      * @param registrySetBuilder    the optional registry set builder
      * @param dataProviderFactories the data provider factories to run
      */
-    public static void registerDataProviders(ResourceLocation resourceLocation, PackType packType, RegistrySetBuilder registrySetBuilder, NeoForgeDataProviderContext.Factory... dataProviderFactories) {
-        registerDataProviders(resourceLocation,
+    public static void registerDataProviders(ResourceLocation identifier, PackType packType, RegistrySetBuilder registrySetBuilder, NeoForgeDataProviderContext.Factory... dataProviderFactories) {
+        registerDataProviders(identifier,
                 packType,
                 registrySetBuilder,
                 ArrayUtils.add(dataProviderFactories, (NeoForgeDataProviderContext context) -> {
@@ -134,7 +103,10 @@ public final class DataProviderHelper {
     }
 
     private static <T> void registerDataProviders(String modId, RegistrySetBuilder registrySetBuilder, T[] dataProviderFactories, Function<T, Factory> factoryConverter) {
-        if (!ModLoaderEnvironment.INSTANCE.isDataGeneration()) return;
+        if (!ModLoaderEnvironment.INSTANCE.isDataGeneration()) {
+            return;
+        }
+
         NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent((IEventBus eventBus) -> {
             eventBus.addListener((final GatherDataEvent event) -> {
                 addDataProviders(event,
@@ -142,64 +114,62 @@ public final class DataProviderHelper {
                         dataProviderFactories,
                         factoryConverter,
                         event.getGenerator().getPackOutput(),
-                        (DataProvider dataProvider) -> event.getGenerator().addProvider(true, dataProvider));
+                        event::addProvider);
             });
         });
     }
 
-    private static <T> void registerDataProviders(ResourceLocation resourceLocation, PackType packType, RegistrySetBuilder registrySetBuilder, T[] dataProviderFactories, Function<T, Factory> factoryConverter) {
-        if (!ModLoaderEnvironment.INSTANCE.isDataGeneration()) return;
-        NeoForgeModContainerHelper.getOptionalModEventBus(resourceLocation.getNamespace())
-                .ifPresent((IEventBus eventBus) -> {
-                    eventBus.addListener((final GatherDataEvent event) -> {
-                        Path path = event.getGenerator().getPackOutput().getOutputFolder();
-                        PackOutput packOutput = new PackOutput(event.getGenerator()
-                                .getPackOutput()
-                                .getOutputFolder()
-                                .resolve(packType.getDirectory())
-                                .resolve(resourceLocation.getNamespace())
-                                .resolve(packType == PackType.CLIENT_RESOURCES ? "resourcepacks" : "datapacks")
-                                .resolve(resourceLocation.getPath()));
-                        DataGenerator.PackGenerator packGenerator = event.getGenerator().new PackGenerator(true,
-                                resourceLocation.toString(),
-                                event.getGenerator()
-                                        .getPackOutput(path.relativize(packOutput.getOutputFolder()).toString()));
-                        addDataProviders(event,
-                                registrySetBuilder,
-                                dataProviderFactories,
-                                factoryConverter,
-                                packOutput,
-                                (DataProvider dataProvider) -> {
-                                    packGenerator.addProvider((PackOutput packOutputX) -> dataProvider);
-                                });
-                    });
-                });
+    private static <T> void registerDataProviders(ResourceLocation identifier, PackType packType, RegistrySetBuilder registrySetBuilder, T[] dataProviderFactories, Function<T, Factory> factoryConverter) {
+        if (!ModLoaderEnvironment.INSTANCE.isDataGeneration()) {
+            return;
+        }
+
+        NeoForgeModContainerHelper.getOptionalModEventBus(identifier.getNamespace()).ifPresent((IEventBus eventBus) -> {
+            eventBus.addListener((final GatherDataEvent event) -> {
+                Path path = event.getGenerator().getPackOutput().getOutputFolder();
+                PackOutput packOutput = new PackOutput(event.getGenerator()
+                        .getPackOutput()
+                        .getOutputFolder()
+                        .resolve(packType.getDirectory())
+                        .resolve(identifier.getNamespace())
+                        .resolve(packType == PackType.CLIENT_RESOURCES ? "resourcepacks" : "datapacks")
+                        .resolve(identifier.getPath()));
+                DataGenerator.PackGenerator packGenerator = event.getGenerator()
+                        .getPackGenerator(true,
+                                identifier.toString(),
+                                path.relativize(packOutput.getOutputFolder()).toString());
+                addDataProviders(event,
+                        registrySetBuilder,
+                        dataProviderFactories,
+                        factoryConverter,
+                        packOutput,
+                        (DataProvider dataProvider) -> {
+                            packGenerator.addProvider((PackOutput packOutputX) -> dataProvider);
+                        });
+            });
+        });
     }
 
     private static <T> void addDataProviders(GatherDataEvent event, RegistrySetBuilder registrySetBuilder, T[] dataProviderFactories, Function<T, Factory> factoryConverter, PackOutput packOutput, Consumer<DataProvider> dataProviderConsumer) {
-        CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
         if (!registrySetBuilder.getEntryKeys().isEmpty()) {
-            lookupProvider = event.getGenerator()
-                    .addProvider(true,
-                            new DatapackBuiltinEntriesProvider(event.getGenerator().getPackOutput(),
-                                    lookupProvider,
-                                    registrySetBuilder,
-                                    Collections.singleton(event.getModContainer().getModId())))
-                    .getRegistryProvider();
+            // This generates for all namespaces.
+            event.createDatapackRegistryObjects(registrySetBuilder, (Set<String>) null);
         }
+
+        CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
         for (T dataProviderFactory : dataProviderFactories) {
             DataProvider dataProvider = factoryConverter.apply(dataProviderFactory)
                     .apply(event, packOutput, lookupProvider);
             if (dataProvider instanceof RegistriesDataProvider registriesDataProvider) {
                 lookupProvider = registriesDataProvider.getRegistries();
             }
+
             dataProviderConsumer.accept(dataProvider);
         }
     }
 
     @FunctionalInterface
     private interface Factory {
-
         DataProvider apply(GatherDataEvent event, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider);
     }
 }

@@ -14,6 +14,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackCompatibility;
+import net.minecraft.tags.TagBuilder;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
@@ -64,6 +65,8 @@ public interface ProxyImpl extends SidedProxy, FactoriesProxy, NetworkingProxy, 
     float getEnchantPowerBonus(BlockState blockState, Level level, BlockPos blockPos);
 
     boolean canApplyAtEnchantingTable(Holder<Enchantment> enchantment, ItemStack itemStack);
+
+    void setTagBuilderReplace(TagBuilder builder, boolean isReplace);
 
     @Deprecated
     boolean onExplosionStart(Level level, Explosion explosion);

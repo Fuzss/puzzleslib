@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.data.v2.tags;
 
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-@SuppressWarnings({"unchecked", "UnusedReturnValue"})
+@Deprecated
 public abstract class AbstractTagAppender<T> {
     protected final TagBuilder tagBuilder;
     @Nullable
@@ -23,7 +24,10 @@ public abstract class AbstractTagAppender<T> {
         this.keyExtractor = keyExtractor;
     }
 
-    public abstract AbstractTagAppender<T> setReplace(boolean replace);
+    public AbstractTagAppender<T> setReplace(boolean replace) {
+        ProxyImpl.get().setTagBuilderReplace(this.tagBuilder, replace);
+        return this;
+    }
 
     public AbstractTagAppender<T> setReplace() {
         return this.setReplace(true);

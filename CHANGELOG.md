@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.1.44-1.21.1] - 2025-05-21
+
+### Added
+
+- Backport updated `AbstractTagAppender`
+
+### Fixed
+
+- Fix tag generation failing when including tags from other namespaces
+
 ## [v21.1.43-1.21.1] - 2025-05-21
 
 ### Added

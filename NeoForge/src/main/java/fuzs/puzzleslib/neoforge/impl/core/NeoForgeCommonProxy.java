@@ -15,7 +15,8 @@ import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.impl.network.codec.CustomPacketPayloadAdapter;
 import fuzs.puzzleslib.neoforge.impl.attachment.NeoForgeDataAttachmentRegistryImpl;
 import fuzs.puzzleslib.neoforge.impl.core.context.PayloadTypesContextNeoForgeImpl;
-import fuzs.puzzleslib.neoforge.impl.data.NeoForgeTagAppender;
+import fuzs.puzzleslib.neoforge.impl.data.NeoForgeTagAppenderV2;
+import fuzs.puzzleslib.neoforge.impl.data.NeoForgeTagAppenderV3;
 import fuzs.puzzleslib.neoforge.impl.event.ForwardingLootPoolBuilder;
 import fuzs.puzzleslib.neoforge.impl.event.ForwardingLootTableBuilder;
 import fuzs.puzzleslib.neoforge.impl.event.NeoForgeEventInvokerRegistryImpl;
@@ -152,6 +153,11 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     }
 
     @Override
+    public void setTagBuilderReplace(TagBuilder builder, boolean isReplace) {
+        builder.replace(isReplace);
+    }
+
+    @Override
     public boolean onExplosionStart(Level level, Explosion explosion) {
         return EventHooks.onExplosionStart(level, explosion);
     }
@@ -251,8 +257,13 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     }
 
     @Override
-    public <T> AbstractTagAppender<T> getTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
-        return new NeoForgeTagAppender<>(tagBuilder, keyExtractor);
+    public <T> AbstractTagAppender<T> getTagAppenderV2(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
+        return new NeoForgeTagAppenderV2<>(tagBuilder, keyExtractor);
+    }
+
+    @Override
+    public <T> fuzs.puzzleslib.api.data.v3.tags.AbstractTagAppender<T> getTagAppenderV3(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
+        return new NeoForgeTagAppenderV3<>(tagBuilder, keyExtractor);
     }
 
     @Override
