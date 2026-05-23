@@ -25,7 +25,7 @@ public class LayerDefinition extends net.minecraft.client.model.geom.builders.La
         return new LayerDefinition(transformer.apply(this.mesh), this.material);
     }
 
-    public static LayerDefinition create(MeshDefinition mesh, int texWidth, int texHeight) {
+    public static LayerDefinition create(net.minecraft.client.model.geom.builders.MeshDefinition mesh, int texWidth, int texHeight) {
         return new LayerDefinition(mesh, new MaterialDefinition(texWidth, texHeight));
     }
 }
