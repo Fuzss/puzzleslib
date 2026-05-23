@@ -18,20 +18,20 @@ public record BuiltinModelItemRendererContextFabricImpl(String modId,
                                                         List<ResourceManagerReloadListener> dynamicRenderers) implements BuiltinModelItemRendererContext {
 
     @Override
-    public void registerItemRenderer(Item item, BuiltinItemRenderer renderer) {
+    public void registerItemRenderer(Item item, BuiltinItemRenderer itemRenderer) {
         Objects.requireNonNull(item, "item is null");
-        Objects.requireNonNull(renderer, "renderer is null");
-        BuiltinItemRendererRegistry.INSTANCE.register(item, renderer::renderByItem);
+        Objects.requireNonNull(itemRenderer, "renderer is null");
+        BuiltinItemRendererRegistry.INSTANCE.register(item, itemRenderer::renderByItem);
     }
 
     @Override
-    public void registerItemRenderer(Item item, ReloadingBuiltInItemRenderer renderer) {
-        this.registerItemRenderer(item, (BuiltinItemRenderer) renderer);
+    public void registerItemRenderer(Item item, ReloadingBuiltInItemRenderer itemRenderer) {
+        this.registerItemRenderer(item, (BuiltinItemRenderer) itemRenderer);
         // store this to enable listening to resource reloads
         String itemName = BuiltInRegistries.ITEM.getKey(item).getPath();
         ResourceLocation resourceLocation = ResourceLocationHelper.fromNamespaceAndPath(this.modId,
                 itemName + "_built_in_model_renderer");
         this.dynamicRenderers.add(ForwardingReloadListenerHelper.fromResourceManagerReloadListener(resourceLocation,
-                renderer));
+                itemRenderer));
     }
 }

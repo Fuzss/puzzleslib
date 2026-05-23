@@ -28,7 +28,7 @@ public record BuiltinModelItemRendererContextNeoForgeImpl(BiConsumer<IClientItem
                                                           List<ResourceManagerReloadListener> dynamicRenderers) implements BuiltinModelItemRendererContext {
 
     @Override
-    public void registerItemRenderer(Item item, BuiltinItemRenderer renderer) {
+    public void registerItemRenderer(Item item, BuiltinItemRenderer itemRenderer) {
         // copied from Forge, supposed to break data gen otherwise
         if (DatagenModLoader.isRunningDataGen()) {
             return;
@@ -36,20 +36,20 @@ public record BuiltinModelItemRendererContextNeoForgeImpl(BiConsumer<IClientItem
 
         // Do not check for ContentRegistrationFlags#DYNAMIC_RENDERERS being properly set,
         // as not every built-in item renderer needs to reload.
-        Objects.requireNonNull(renderer, "renderer is null");
+        Objects.requireNonNull(itemRenderer, "renderer is null");
         Objects.requireNonNull(item, "item is null");
-        this.consumer.accept(new ClientItemExtensionsImpl(renderer), item);
+        this.consumer.accept(new ClientItemExtensionsImpl(itemRenderer), item);
     }
 
     @Override
-    public void registerItemRenderer(Item item, ReloadingBuiltInItemRenderer renderer) {
-        this.registerItemRenderer(item, (BuiltinItemRenderer) renderer);
+    public void registerItemRenderer(Item item, ReloadingBuiltInItemRenderer itemRenderer) {
+        this.registerItemRenderer(item, (BuiltinItemRenderer) itemRenderer);
         // store this to enable listening to resource reloads
         String itemName = BuiltInRegistries.ITEM.getKey(item).getPath();
         ResourceLocation resourceLocation = ResourceLocationHelper.fromNamespaceAndPath(this.modId,
                 itemName + "_built_in_model_renderer");
         this.dynamicRenderers.add(ForwardingReloadListenerHelper.fromResourceManagerReloadListener(resourceLocation,
-                renderer));
+                itemRenderer));
     }
 
     private static class ClientItemExtensionsImpl implements IClientItemExtensions {
