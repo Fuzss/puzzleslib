@@ -63,8 +63,7 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
                 modConstructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShaderContextNeoForgeImpl(event::register));
             });
             eventBus.addListener((final EntityRenderersEvent.CreateSkullModels event) -> {
-                modConstructor.onRegisterSkullRenderers(new SkullRenderersContextNeoForgeImpl(event.getEntityModelSet(),
-                        event::registerSkullModel));
+                modConstructor.onRegisterSkullRenderers(new SkullRenderersContextNeoForgeImpl(event));
             });
             eventBus.addListener((final RegisterClientReloadListenersEvent event) -> {
                 if (contentRegistrationFlags.contains(ContentRegistrationFlags.DYNAMIC_RENDERERS)) {

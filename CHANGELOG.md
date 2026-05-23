@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.1.45-1.21.1] - 2025-05-23
+
+### Added
+
+- Backport `ModelAndTexture` from Minecraft 26.1
+- Backport `ClientAsset` from Minecraft 26.1
+- Backport `LateBoundIdMapper` from Minecraft 26.1
+- Backport `SpecialModelRenderer` from Minecraft 26.1
+- Backport some codecs in `CodecExtras` from Minecraft 26.1
+
+### Fixed
+
+- Make sure our custom `LayerDefinition` stores a custom `MeshDefinition`, not the vanilla variant
+
 ## [v21.1.44-1.21.1] - 2025-05-21
 
 ### Added

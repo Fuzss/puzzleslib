@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
-import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContext;
 import fuzs.puzzleslib.api.client.init.v1.BuiltinItemRenderer;
@@ -16,7 +15,6 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.data.loading.DatagenModLoader;
 import org.jetbrains.annotations.Nullable;
@@ -30,30 +28,28 @@ public record BuiltinModelItemRendererContextNeoForgeImpl(BiConsumer<IClientItem
                                                           List<ResourceManagerReloadListener> dynamicRenderers) implements BuiltinModelItemRendererContext {
 
     @Override
-    public void registerItemRenderer(BuiltinItemRenderer renderer, ItemLike... items) {
+    public void registerItemRenderer(Item item, BuiltinItemRenderer renderer) {
         // copied from Forge, supposed to break data gen otherwise
-        if (DatagenModLoader.isRunningDataGen()) return;
-        // do not check for ContentRegistrationFlags#DYNAMIC_RENDERERS being properly set as not every built-in item renderer needs to reload
-        Objects.requireNonNull(renderer, "renderer is null");
-        Objects.requireNonNull(items, "items is null");
-        Preconditions.checkState(items.length > 0, "items is empty");
-        IClientItemExtensions clientItemExtensions = new ClientItemExtensionsImpl(renderer);
-        for (ItemLike item : items) {
-            Objects.requireNonNull(item, "item is null");
-            this.consumer.accept(clientItemExtensions, item.asItem());
+        if (DatagenModLoader.isRunningDataGen()) {
+            return;
         }
+
+        // Do not check for ContentRegistrationFlags#DYNAMIC_RENDERERS being properly set,
+        // as not every built-in item renderer needs to reload.
+        Objects.requireNonNull(renderer, "renderer is null");
+        Objects.requireNonNull(item, "item is null");
+        this.consumer.accept(new ClientItemExtensionsImpl(renderer), item);
     }
 
     @Override
-    public void registerItemRenderer(ReloadingBuiltInItemRenderer renderer, ItemLike... items) {
-        this.registerItemRenderer((BuiltinItemRenderer) renderer, items);
+    public void registerItemRenderer(Item item, ReloadingBuiltInItemRenderer renderer) {
+        this.registerItemRenderer(item, (BuiltinItemRenderer) renderer);
         // store this to enable listening to resource reloads
-        String itemName = BuiltInRegistries.ITEM.getKey(items[0].asItem()).getPath();
+        String itemName = BuiltInRegistries.ITEM.getKey(item).getPath();
         ResourceLocation resourceLocation = ResourceLocationHelper.fromNamespaceAndPath(this.modId,
-                itemName + "_built_in_model_renderer"
-        );
-        this.dynamicRenderers.add(
-                ForwardingReloadListenerHelper.fromResourceManagerReloadListener(resourceLocation, renderer));
+                itemName + "_built_in_model_renderer");
+        this.dynamicRenderers.add(ForwardingReloadListenerHelper.fromResourceManagerReloadListener(resourceLocation,
+                renderer));
     }
 
     private static class ClientItemExtensionsImpl implements IClientItemExtensions {
@@ -69,14 +65,17 @@ public record BuiltinModelItemRendererContextNeoForgeImpl(BiConsumer<IClientItem
         public BlockEntityWithoutLevelRenderer getCustomRenderer() {
             if (this.blockEntityRenderer == null) {
                 Minecraft minecraft = Minecraft.getInstance();
-                return this.blockEntityRenderer = new BlockEntityWithoutLevelRenderer(
-                        minecraft.getBlockEntityRenderDispatcher(), minecraft.getEntityModels()) {
+                return this.blockEntityRenderer = new BlockEntityWithoutLevelRenderer(minecraft.getBlockEntityRenderDispatcher(),
+                        minecraft.getEntityModels()) {
 
                     @Override
                     public void renderByItem(ItemStack itemStack, ItemDisplayContext displayContext, PoseStack matrices, MultiBufferSource buffer, int packedLight, int packedOverlay) {
-                        ClientItemExtensionsImpl.this.itemRenderer.renderByItem(itemStack, displayContext, matrices,
-                                buffer, packedLight, packedOverlay
-                        );
+                        ClientItemExtensionsImpl.this.itemRenderer.renderByItem(itemStack,
+                                displayContext,
+                                matrices,
+                                buffer,
+                                packedLight,
+                                packedOverlay);
                     }
                 };
             } else {
