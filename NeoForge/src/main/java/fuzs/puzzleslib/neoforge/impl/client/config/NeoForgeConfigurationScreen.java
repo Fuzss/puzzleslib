@@ -66,7 +66,7 @@ public class NeoForgeConfigurationScreen extends OptionsSubScreen {
     @Override
     protected void addOptions() {
         boolean hasSectionHeader = false;
-        List<ModConfig> modConfigs = new ArrayList<>();
+        List<Optional<ModConfig>> modConfigs = new ArrayList<>();
         for (ModConfig.Type type : CONFIG_TYPE_DISPLAY_ORDER) {
             // We combine all global config types under the same header, while only server configs get their own.
             if (type == ModConfig.Type.SERVER) {
@@ -96,17 +96,21 @@ public class NeoForgeConfigurationScreen extends OptionsSubScreen {
                     if (tooltip != null) {
                         button.setTooltip(Tooltip.create(tooltip));
                         button.active = false;
+                        modConfigs.add(Optional.empty());
+                    } else {
+                        modConfigs.add(Optional.of(modConfig));
                     }
 
                     this.list.addSmall(button, null);
-                    modConfigs.add(modConfig);
                 }
             }
         }
 
         // When there is only one config, go to that config screen directly.
         if (modConfigs.size() == 1) {
-            this.openModConfigScreen(modConfigs.getFirst(), this.lastScreen);
+            modConfigs.getFirst().ifPresent((ModConfig modConfig) -> {
+                this.openModConfigScreen(modConfig, this.lastScreen);
+            });
         }
     }
 
