@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [v26.1.9-mc26.1.x] - 2026-05-24
 
+### Changed
+
+- Make registry syncing more lenient for vanilla clients on Fabric
+
 ### Fixed
 
 - Fix crash when trying to open a config screen for a config which is not loaded

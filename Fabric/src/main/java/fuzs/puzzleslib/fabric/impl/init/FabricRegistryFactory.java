@@ -15,26 +15,20 @@ public final class FabricRegistryFactory implements RegistryFactory {
     @Override
     public <T> Registry<T> create(ResourceKey<Registry<T>> registryKey, @Nullable Identifier defaultKey) {
         Objects.requireNonNull(registryKey, "registry key is null");
-        FabricRegistryBuilder<T, ? extends Registry<T>> builder;
-        if (defaultKey != null) {
-            builder = FabricRegistryBuilder.createDefaulted(registryKey, defaultKey);
-        } else {
-            builder = FabricRegistryBuilder.create(registryKey);
-        }
-
-        return builder.attribute(RegistryAttribute.OPTIONAL).buildAndRegister();
+        return this.builder(registryKey, defaultKey).buildAndRegister();
     }
 
     @Override
     public <T> Registry<T> createSynced(ResourceKey<Registry<T>> registryKey, @Nullable Identifier defaultKey) {
         Objects.requireNonNull(registryKey, "registry key is null");
-        FabricRegistryBuilder<T, ? extends Registry<T>> builder;
-        if (defaultKey != null) {
-            builder = FabricRegistryBuilder.createDefaulted(registryKey, defaultKey);
-        } else {
-            builder = FabricRegistryBuilder.create(registryKey);
-        }
+        return this.builder(registryKey, defaultKey).attribute(RegistryAttribute.SYNCED).buildAndRegister();
+    }
 
-        return builder.attribute(RegistryAttribute.OPTIONAL).attribute(RegistryAttribute.SYNCED).buildAndRegister();
+    private <T> FabricRegistryBuilder<T, ? extends Registry<T>> builder(ResourceKey<Registry<T>> registryKey, @Nullable Identifier defaultKey) {
+        if (defaultKey != null) {
+            return FabricRegistryBuilder.createDefaulted(registryKey, defaultKey).attribute(RegistryAttribute.OPTIONAL);
+        } else {
+            return FabricRegistryBuilder.create(registryKey).attribute(RegistryAttribute.OPTIONAL);
+        }
     }
 }
