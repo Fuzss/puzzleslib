@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractRecipeProvider extends RecipeProvider {
     /**
-     * @see #generateFor(BlockSetFamily, Map)
+     * @see #generateFor(RecipeOutput, BlockSetFamily, Map)
      */
     public static final Map<BlockSetVariant, FamilyRecipeProvider> VARIANT_STONE_PROVIDERS = ImmutableMap.<BlockSetVariant, FamilyRecipeProvider>builder()
             .put(BlockSetVariant.CHISELED, FamilyRecipeProvider.stonecutting())
