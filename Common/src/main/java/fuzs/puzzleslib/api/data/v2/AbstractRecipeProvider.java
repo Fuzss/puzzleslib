@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.data.v2;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -8,13 +9,17 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.JsonOps;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
+import fuzs.puzzleslib.api.init.v3.family.BlockSetFamily;
+import fuzs.puzzleslib.api.init.v3.family.BlockSetVariant;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.BlockFamily;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -22,6 +27,7 @@ import net.minecraft.data.recipes.*;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -36,6 +42,18 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public abstract class AbstractRecipeProvider extends RecipeProvider {
+    /**
+     * @see #generateFor(BlockSetFamily, Map)
+     */
+    public static final Map<BlockSetVariant, FamilyRecipeProvider> VARIANT_STONE_PROVIDERS = ImmutableMap.<BlockSetVariant, FamilyRecipeProvider>builder()
+            .put(BlockSetVariant.CHISELED, FamilyRecipeProvider.stonecutting())
+            .put(BlockSetVariant.CUT, FamilyRecipeProvider.stonecutting())
+            .put(BlockSetVariant.SLAB, FamilyRecipeProvider.stonecutting(2))
+            .put(BlockSetVariant.STAIRS, FamilyRecipeProvider.stonecutting())
+            .put(BlockSetVariant.POLISHED, FamilyRecipeProvider.stonecutting())
+            .put(BlockSetVariant.WALL, FamilyRecipeProvider.stonecutting())
+            .build();
+
     protected final String modId;
 
     public AbstractRecipeProvider(DataProviderContext context) {
@@ -138,6 +156,30 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
         SingleItemRecipeBuilder.stonecutting(material, category, result, resultCount)
                 .unlockedBy(getHasName(material), has(material))
                 .save(recipeOutput, getConversionRecipeName(result, material) + "_stonecutting");
+    }
+
+    public void generateFor(RecipeOutput recipeOutput, BlockSetFamily blockSetFamily, Map<BlockSetVariant, FamilyRecipeProvider> variants) {
+        BlockFamily blockFamily = blockSetFamily.getBlockFamily();
+        generateRecipes(recipeOutput, blockFamily, FeatureFlags.DEFAULT_FLAGS);
+        if (blockFamily.shouldGenerateRecipe()) {
+            blockSetFamily.getItemVariants().forEach((BlockSetVariant variant, Holder.Reference<Item> holder) -> {
+                FamilyRecipeProvider recipeProvider = variants.get(variant);
+                if (recipeProvider != null) {
+                    ItemLike baseBlock;
+                    if (variant.toVanilla() != null) {
+                        baseBlock = getBaseBlock(blockFamily, variant.toVanilla());
+                    } else {
+                        baseBlock = blockSetFamily.getBaseBlock().value();
+                    }
+
+                    recipeProvider.create(recipeOutput,
+                            holder.value(),
+                            baseBlock,
+                            blockFamily.getRecipeGroupPrefix(),
+                            blockFamily.getRecipeUnlockedBy());
+                }
+            });
+        }
     }
 
     public void stair(RecipeOutput output, RecipeCategory recipeCategory, ItemLike resultItem, ItemLike ingredientItem) {
@@ -261,6 +303,26 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
     }
 
     public abstract void addRecipes(RecipeOutput recipeOutput);
+
+    @FunctionalInterface
+    public interface FamilyRecipeProvider {
+        void create(RecipeOutput recipeOutput, ItemLike result, ItemLike input, Optional<String> recipeGroupPrefix, Optional<String> recipeUnlockedBy);
+
+        static FamilyRecipeProvider stonecutting() {
+            return stonecutting(1);
+        }
+
+        static FamilyRecipeProvider stonecutting(int count) {
+            return (RecipeOutput recipeOutput, ItemLike result, ItemLike input, Optional<String> recipeGroupPrefix, Optional<String> recipeUnlockedBy) -> {
+                SingleItemRecipeBuilder recipeBuilder = SingleItemRecipeBuilder.stonecutting(Ingredient.of(input),
+                        RecipeCategory.BUILDING_BLOCKS,
+                        result,
+                        count);
+                recipeBuilder.unlockedBy(recipeUnlockedBy.orElseGet(() -> getHasName(input)), has(input));
+                recipeBuilder.save(recipeOutput, getStonecuttingRecipeName(result, input));
+            };
+        }
+    }
 
     public class IdentifiableRecipeOutput implements RecipeOutput {
         private final CachedOutput output;

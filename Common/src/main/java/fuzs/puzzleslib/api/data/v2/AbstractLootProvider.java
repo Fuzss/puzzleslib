@@ -1,12 +1,16 @@
 package fuzs.puzzleslib.api.data.v2;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import com.mojang.serialization.Lifecycle;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
+import fuzs.puzzleslib.api.init.v3.family.BlockSetFamily;
+import fuzs.puzzleslib.api.init.v3.family.BlockSetVariant;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.Util;
 import net.minecraft.core.*;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.CachedOutput;
@@ -25,10 +29,14 @@ import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.RandomSupport;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
+import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.ValidationContext;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.functions.CopyComponentsFunction;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;
@@ -45,6 +53,32 @@ public final class AbstractLootProvider {
     }
 
     public static abstract class Blocks extends BlockLootSubProvider implements LootTableDataProvider {
+        /**
+         * @see #generateFor(BlockSetFamily, Map)
+         */
+        public static final Map<BlockSetVariant, BiConsumer<AbstractLootProvider.Blocks, Block>> VARIANT_PROVIDERS = ImmutableMap.<BlockSetVariant, BiConsumer<AbstractLootProvider.Blocks, Block>>builder()
+                .put(BlockSetVariant.CHISELED, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.CRACKED, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.POLISHED, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.CUT, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.MOSAIC, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.STAIRS, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.SLAB, (AbstractLootProvider.Blocks provider, Block block) -> {
+                    provider.add(block, provider::createSlabItemTable);
+                })
+                .put(BlockSetVariant.WALL, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.FENCE, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.FENCE_GATE, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.DOOR, (AbstractLootProvider.Blocks provider, Block block) -> {
+                    provider.add(block, provider::createDoorTable);
+                })
+                .put(BlockSetVariant.TRAPDOOR, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.BUTTON, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.PRESSURE_PLATE, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.SIGN, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.HANGING_SIGN, BlockLootSubProvider::dropSelf)
+                .build();
+
         private final Set<ResourceKey<LootTable>> skipValidation = new HashSet<>();
         private final PackOutput.PathProvider pathProvider;
         private final CompletableFuture<HolderLookup.Provider> registries;
@@ -96,8 +130,8 @@ public final class AbstractLootProvider {
                     if (builder != null) {
                         consumer.accept(resourceKey, builder);
                     } else if (!this.skipValidationFor(resourceKey)) {
-                        throw new IllegalStateException(
-                                "Missing loot table '%s' for '%s'".formatted(resourceKey, holder.key().location()));
+                        throw new IllegalStateException("Missing loot table '%s' for '%s'".formatted(resourceKey,
+                                holder.key().location()));
                     }
                 }
             });
@@ -147,9 +181,30 @@ public final class AbstractLootProvider {
             this.add(block, this::createNameableBlockEntityTable);
         }
 
+        public LootTable.Builder createHeadDrop(Block block) {
+            // explosion condition is not applied on purpose; all vanilla heads are explosion-resistant
+            return LootTable.lootTable()
+                    .withPool(LootPool.lootPool()
+                            .setRolls(ConstantValue.exactly(1.0F))
+                            .add(LootItem.lootTableItem(block)
+                                    .apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
+                                            .include(DataComponents.NOTE_BLOCK_SOUND)
+                                            .include(DataComponents.CUSTOM_NAME)))
+                            .unwrap());
+        }
+
+        public final void generateFor(BlockSetFamily blockSetFamily, Map<BlockSetVariant, BiConsumer<AbstractLootProvider.Blocks, Block>> variants) {
+            blockSetFamily.getBlockVariants().forEach((BlockSetVariant variant, Holder.Reference<Block> block) -> {
+                BiConsumer<AbstractLootProvider.Blocks, Block> provider = variants.get(variant);
+                if (provider != null) {
+                    provider.accept(this, block.value());
+                }
+            });
+        }
+
         protected Stream<Holder.Reference<Block>> getRegistryEntries() {
-            return BuiltInRegistries.BLOCK.holders().filter(
-                    holder -> holder.key().location().getNamespace().equals(this.modId));
+            return BuiltInRegistries.BLOCK.holders()
+                    .filter(holder -> holder.key().location().getNamespace().equals(this.modId));
         }
     }
 
@@ -202,20 +257,20 @@ public final class AbstractLootProvider {
                 Map<ResourceKey<LootTable>, LootTable.Builder> map = this.map.remove(entityType);
                 if (this.canHaveLootTable(entityType)) {
                     ResourceKey<LootTable> resourceKey = entityType.getDefaultLootTable();
-                    if (!resourceKey.equals(BuiltInLootTables.EMPTY) && !this.skipValidationFor(resourceKey) &&
-                            (map == null || !map.containsKey(resourceKey))) {
-                        throw new IllegalStateException(
-                                String.format(Locale.ROOT, "Missing loot table '%s' for '%s'", resourceKey,
-                                        holder.key().location()
-                                ));
+                    if (!resourceKey.equals(BuiltInLootTables.EMPTY) && !this.skipValidationFor(resourceKey) && (
+                            map == null || !map.containsKey(resourceKey))) {
+                        throw new IllegalStateException(String.format(Locale.ROOT,
+                                "Missing loot table '%s' for '%s'",
+                                resourceKey,
+                                holder.key().location()));
                     }
                     if (map != null) {
                         map.forEach((resourceLocation, builder) -> {
                             if (!lootTables.add(resourceLocation)) {
-                                throw new IllegalStateException(
-                                        String.format(Locale.ROOT, "Duplicate loot table '%s' for '%s'",
-                                                resourceLocation, holder.key().location()
-                                        ));
+                                throw new IllegalStateException(String.format(Locale.ROOT,
+                                        "Duplicate loot table '%s' for '%s'",
+                                        resourceLocation,
+                                        holder.key().location()));
                             } else {
                                 consumer.accept(resourceLocation, builder);
                             }
@@ -228,8 +283,8 @@ public final class AbstractLootProvider {
                                     .stream()
                                     .map(ResourceKey::location)
                                     .map(ResourceLocation::toString)
-                                    .collect(Collectors.joining(",")), holder.key().location()
-                    ));
+                                    .collect(Collectors.joining(",")),
+                            holder.key().location()));
                 }
             });
             if (!this.map.isEmpty()) {
@@ -276,8 +331,8 @@ public final class AbstractLootProvider {
         }
 
         protected Stream<Holder.Reference<EntityType<?>>> getRegistryEntries() {
-            return BuiltInRegistries.ENTITY_TYPE.holders().filter(
-                    holder -> holder.key().location().getNamespace().equals(this.modId));
+            return BuiltInRegistries.ENTITY_TYPE.holders()
+                    .filter(holder -> holder.key().location().getNamespace().equals(this.modId));
         }
     }
 
@@ -369,21 +424,21 @@ public final class AbstractLootProvider {
         boolean skipValidationFor(ResourceKey<LootTable> resourceKey);
 
         default CompletableFuture<?> run(CachedOutput output, HolderLookup.Provider registries) {
-            DefaultedMappedRegistry<LootTable> registry = new DefaultedMappedRegistry<>("empty", Registries.LOOT_TABLE,
-                    Lifecycle.experimental(), false
-            );
+            DefaultedMappedRegistry<LootTable> registry = new DefaultedMappedRegistry<>("empty",
+                    Registries.LOOT_TABLE,
+                    Lifecycle.experimental(),
+                    false);
             ResourceKey<LootTable> defaultKey = ResourceKey.create(Registries.LOOT_TABLE, registry.getDefaultKey());
             registry.register(defaultKey, LootTable.EMPTY, RegistrationInfo.BUILT_IN);
             Map<RandomSupport.Seed128bit, ResourceLocation> seeds = new Object2ObjectOpenHashMap<>();
             this.generate((ResourceKey<LootTable> resourceKey, LootTable.Builder builder) -> {
                 ResourceLocation resourceLocation = resourceKey.location();
                 ResourceLocation oldResourceLocation = seeds.put(RandomSequence.seedForKey(resourceLocation),
-                        resourceLocation
-                );
+                        resourceLocation);
                 if (oldResourceLocation != null) {
                     Util.logAndPauseIfInIde(
-                            "Loot table random sequence seed collision on " + oldResourceLocation + " and " +
-                                    resourceKey);
+                            "Loot table random sequence seed collision on " + oldResourceLocation + " and "
+                                    + resourceKey);
                 }
 
                 builder.setRandomSequence(resourceLocation);
@@ -394,24 +449,27 @@ public final class AbstractLootProvider {
             registry.freeze();
             this.validate(registry);
 
-            return CompletableFuture.allOf(registry.entrySet().stream().filter(
-                    (Map.Entry<ResourceKey<LootTable>, LootTable> entry) -> {
+            return CompletableFuture.allOf(registry.entrySet()
+                    .stream()
+                    .filter((Map.Entry<ResourceKey<LootTable>, LootTable> entry) -> {
                         return entry.getKey() != defaultKey;
-                    }).map((Map.Entry<ResourceKey<LootTable>, LootTable> entry) -> {
-                ResourceKey<LootTable> resourceKey = entry.getKey();
-                LootTable lootTable = entry.getValue();
-                Path path = this.pathProvider().json(resourceKey.location());
-                return DataProvider.saveStable(output, registries, LootTable.DIRECT_CODEC, lootTable, path);
-            }).toArray(CompletableFuture[]::new));
+                    })
+                    .map((Map.Entry<ResourceKey<LootTable>, LootTable> entry) -> {
+                        ResourceKey<LootTable> resourceKey = entry.getKey();
+                        LootTable lootTable = entry.getValue();
+                        Path path = this.pathProvider().json(resourceKey.location());
+                        return DataProvider.saveStable(output, registries, LootTable.DIRECT_CODEC, lootTable, path);
+                    })
+                    .toArray(CompletableFuture[]::new));
         }
 
         default void validate(Registry<LootTable> registry) {
             ProblemReporter.Collector collector = new ProblemReporter.Collector();
             HolderGetter.Provider registries = new RegistryAccess.ImmutableRegistryAccess(List.of(registry)).freeze()
                     .asGetterLookup();
-            ValidationContext validationContext = new ValidationContext(collector, LootContextParamSets.ALL_PARAMS,
-                    registries
-            );
+            ValidationContext validationContext = new ValidationContext(collector,
+                    LootContextParamSets.ALL_PARAMS,
+                    registries);
 
             registry.holders().forEach((Holder.Reference<LootTable> holder) -> {
                 this.validate(holder, validationContext);
@@ -428,8 +486,9 @@ public final class AbstractLootProvider {
 
         default void validate(Holder.Reference<LootTable> holder, ValidationContext validationContext) {
             if (!this.skipValidationFor(holder.key())) {
-                holder.value().validate(validationContext.setParams(holder.value().getParamSet())
-                        .enterElement("{" + holder.key().location() + "}", holder.key()));
+                holder.value()
+                        .validate(validationContext.setParams(holder.value().getParamSet())
+                                .enterElement("{" + holder.key().location() + "}", holder.key()));
             }
         }
     }

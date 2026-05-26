@@ -35,6 +35,7 @@ import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
 import net.minecraft.client.multiplayer.ClientConfigurationPacketListenerImpl;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -209,6 +210,11 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     @Override
     public BakedModel getBakedModel(ModelManager modelManager, ResourceLocation resourceLocation) {
         return modelManager.getModel(resourceLocation);
+    }
+
+    @Override
+    public RenderType getRenderType(Block block) {
+        return ItemBlockRenderTypes.getChunkRenderType(block.defaultBlockState());
     }
 
     @Override

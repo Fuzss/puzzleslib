@@ -40,6 +40,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import net.neoforged.neoforge.client.ClientHooks;
 import net.neoforged.neoforge.client.extensions.common.IClientMobEffectExtensions;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
@@ -149,6 +150,12 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
     @Override
     public BakedModel getBakedModel(ModelManager modelManager, ResourceLocation resourceLocation) {
         return modelManager.getModel(ModelResourceLocation.standalone(resourceLocation));
+    }
+
+    @Override
+    public RenderType getRenderType(Block block) {
+        ChunkRenderTypeSet renderTypes = ItemBlockRenderTypes.getRenderLayers(block.defaultBlockState());
+        return renderTypes.isEmpty() ? RenderType.solid() : renderTypes.iterator().next();
     }
 
     @Override

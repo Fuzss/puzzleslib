@@ -64,6 +64,8 @@ public interface ClientProxyImpl extends ProxyImpl {
 
     BakedModel getBakedModel(ModelManager modelManager, ResourceLocation resourceLocation);
 
+    RenderType getRenderType(Block block);
+
     void registerRenderType(Block block, RenderType renderType);
 
     void registerRenderType(Fluid fluid, RenderType renderType);

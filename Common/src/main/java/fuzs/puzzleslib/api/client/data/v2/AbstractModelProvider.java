@@ -1,11 +1,16 @@
 package fuzs.puzzleslib.api.client.data.v2;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
+import fuzs.puzzleslib.api.init.v3.family.BlockSetFamily;
+import fuzs.puzzleslib.api.init.v3.family.BlockSetVariant;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.BlockFamily;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -23,6 +28,18 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.*;
 
 public abstract class AbstractModelProvider implements DataProvider {
+    /**
+     * @see #generateForItems(ItemModelGenerators, BlockSetFamily, Map)
+     */
+    public static final Map<BlockSetVariant, BiConsumer<ItemModelGenerators, Item>> VARIANT_WOOD_ITEM_PROVIDERS = ImmutableMap.<BlockSetVariant, BiConsumer<ItemModelGenerators, Item>>builder()
+            .put(BlockSetVariant.BOAT, (ItemModelGenerators itemModelGenerators, Item item) -> {
+                itemModelGenerators.generateFlatItem(item, ModelTemplates.FLAT_ITEM);
+            })
+            .put(BlockSetVariant.CHEST_BOAT, (ItemModelGenerators itemModelGenerators, Item item) -> {
+                itemModelGenerators.generateFlatItem(item, ModelTemplates.FLAT_ITEM);
+            })
+            .build();
+
     public static final String BLOCK_PATH = "block";
     public static final String ITEM_PATH = "item";
     public static final ModelTemplate SPAWN_EGG = ModelTemplates.createItem("template_spawn_egg");
@@ -42,12 +59,66 @@ public abstract class AbstractModelProvider implements DataProvider {
         this.modelPathProvider = packOutput.createPathProvider(PackOutput.Target.RESOURCE_PACK, "models");
     }
 
+    /**
+     * @see #generateForBlocks(BlockModelGenerators, BlockSetFamily, Map)
+     */
+    public static Map<BlockSetVariant, BiConsumer<BlockModelGenerators, Block>> createVariantWoodBlockProviders(BlockSetFamily blockSetFamily, Block strippedBlock) {
+        return ImmutableMap.<BlockSetVariant, BiConsumer<BlockModelGenerators, Block>>builder()
+                .put(BlockSetVariant.HANGING_SIGN, (BlockModelGenerators blockModelGenerators, Block block) -> {
+                    Holder.Reference<Block> wallHangingSign = blockSetFamily.getBlock(BlockSetVariant.WALL_HANGING_SIGN);
+                    Objects.requireNonNull(wallHangingSign, "wall hanging sign is null");
+                    blockModelGenerators.createHangingSign(strippedBlock, block, wallHangingSign.value());
+                })
+                .build();
+    }
+
     public void addBlockModels(BlockModelGenerators builder) {
         // NO-OP
     }
 
     public void addItemModels(ItemModelGenerators builder) {
         // NO-OP
+    }
+
+    /**
+     * @see BlockModelGenerators#family(Block)
+     */
+    public void generateForBlocks(BlockModelGenerators blockModelGenerators, BlockSetFamily blockSetFamily, Map<BlockSetVariant, BiConsumer<BlockModelGenerators, Block>> variants) {
+        this.generateForBlocks(blockModelGenerators,
+                blockSetFamily,
+                variants,
+                TexturedModel.CUBE.get(blockSetFamily.getBaseBlock().value()));
+    }
+
+    /**
+     * @see BlockModelGenerators#family(Block)
+     */
+    public void generateForBlocks(BlockModelGenerators blockModelGenerators, BlockSetFamily blockSetFamily, Map<BlockSetVariant, BiConsumer<BlockModelGenerators, Block>> variants, TexturedModel texturedModel) {
+        BlockFamily blockFamily = blockSetFamily.getBlockFamily();
+        if (blockFamily.shouldGenerateModel()) {
+            BlockModelGenerators.BlockFamilyProvider familyProvider = blockModelGenerators.new BlockFamilyProvider(
+                    texturedModel.getMapping());
+            familyProvider.fullBlock = texturedModel.getTemplate().getDefaultModelLocation(blockFamily.getBaseBlock());
+            familyProvider.generateFor(blockFamily);
+            blockSetFamily.getBlockVariants().forEach((BlockSetVariant variant, Holder.Reference<Block> holder) -> {
+                BiConsumer<BlockModelGenerators, Block> modelProvider = variants.get(variant);
+                if (modelProvider != null) {
+                    modelProvider.accept(blockModelGenerators, holder.value());
+                }
+            });
+        }
+    }
+
+    public void generateForItems(ItemModelGenerators itemModelGenerators, BlockSetFamily blockSetFamily, Map<BlockSetVariant, BiConsumer<ItemModelGenerators, Item>> variants) {
+        BlockFamily blockFamily = blockSetFamily.getBlockFamily();
+        if (blockFamily.shouldGenerateModel()) {
+            blockSetFamily.getItemVariants().forEach((BlockSetVariant variant, Holder.Reference<Item> holder) -> {
+                BiConsumer<ItemModelGenerators, Item> modelProvider = variants.get(variant);
+                if (modelProvider != null) {
+                    modelProvider.accept(itemModelGenerators, holder.value());
+                }
+            });
+        }
     }
 
     protected boolean skipValidation() {
@@ -84,8 +155,8 @@ public abstract class AbstractModelProvider implements DataProvider {
         List<Block> missingBlocks;
         if (!this.skipValidation()) {
             missingBlocks = BuiltInRegistries.BLOCK.entrySet().stream().filter(entry -> {
-                return entry.getKey().location().getNamespace().equals(this.modId) && !generators.containsKey(
-                        entry.getValue());
+                return entry.getKey().location().getNamespace().equals(this.modId)
+                        && !generators.containsKey(entry.getValue());
             }).map(Map.Entry::getValue).filter(Predicate.not(this.skipValidation::contains)).toList();
         } else {
             missingBlocks = Collections.emptyList();
@@ -96,16 +167,15 @@ public abstract class AbstractModelProvider implements DataProvider {
             BuiltInRegistries.BLOCK.entrySet().forEach(entry -> {
                 Item item = Item.BY_BLOCK.get(entry.getValue());
                 if (item != null) {
-                    if (!entry.getKey().location().getNamespace().equals(this.modId) || skippedAutoModels.contains(
-                            item)) {
+                    if (!entry.getKey().location().getNamespace().equals(this.modId)
+                            || skippedAutoModels.contains(item)) {
                         return;
                     }
 
                     ResourceLocation resourcelocation = ModelLocationUtils.getModelLocation(item);
                     if (!models.containsKey(resourcelocation)) {
                         models.put(resourcelocation,
-                                new DelegatedModel(ModelLocationUtils.getModelLocation(entry.getValue()))
-                        );
+                                new DelegatedModel(ModelLocationUtils.getModelLocation(entry.getValue())));
                     }
                 }
             });
@@ -195,9 +265,9 @@ public abstract class AbstractModelProvider implements DataProvider {
     }
 
     public static ModelTemplate createBlockModelTemplate(ResourceLocation blockModelLocation, String suffix, TextureSlot... requiredSlots) {
-        return new ModelTemplate(Optional.of(decorateBlockModelLocation(blockModelLocation)), Optional.of(suffix),
-                requiredSlots
-        );
+        return new ModelTemplate(Optional.of(decorateBlockModelLocation(blockModelLocation)),
+                Optional.of(suffix),
+                requiredSlots);
     }
 
     public static ModelTemplate createItemModelTemplate(ResourceLocation itemModelLocation, TextureSlot... requiredSlots) {
@@ -205,20 +275,21 @@ public abstract class AbstractModelProvider implements DataProvider {
     }
 
     public static ModelTemplate createItemModelTemplate(ResourceLocation itemModelLocation, String suffix, TextureSlot... requiredSlots) {
-        return new ModelTemplate(Optional.of(decorateItemModelLocation(itemModelLocation)), Optional.of(suffix),
-                requiredSlots
-        );
+        return new ModelTemplate(Optional.of(decorateItemModelLocation(itemModelLocation)),
+                Optional.of(suffix),
+                requiredSlots);
     }
 
     public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
         return modelTemplate.create(decorateItemModelLocation(resourceLocation),
-                TextureMapping.layer0(decorateItemModelLocation(resourceLocation)), modelOutput
-        );
+                TextureMapping.layer0(decorateItemModelLocation(resourceLocation)),
+                modelOutput);
     }
 
     public static ResourceLocation generateFlatItem(Item item, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput, ModelTemplate.JsonFactory factory) {
-        return modelTemplate.create(ModelLocationUtils.getModelLocation(item), TextureMapping.layer0(item), modelOutput,
-                factory
-        );
+        return modelTemplate.create(ModelLocationUtils.getModelLocation(item),
+                TextureMapping.layer0(item),
+                modelOutput,
+                factory);
     }
 }

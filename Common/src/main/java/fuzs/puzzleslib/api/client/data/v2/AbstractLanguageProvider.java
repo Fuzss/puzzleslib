@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
+import fuzs.puzzleslib.api.init.v3.family.BlockSetFamily;
+import fuzs.puzzleslib.api.init.v3.family.BlockSetVariant;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.core.Holder;
@@ -41,12 +43,45 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 
 public abstract class AbstractLanguageProvider implements DataProvider {
+    /**
+     * @see #generateFor(BiConsumer, Map, Map, String)
+     */
+    public static final Map<BlockSetVariant, UnaryOperator<String>> VARIANT_BLOCK_NAMES = ImmutableMap.<BlockSetVariant, UnaryOperator<String>>builder()
+            .put(BlockSetVariant.CHISELED, (String baseName) -> "Chiseled " + baseName)
+            .put(BlockSetVariant.CRACKED, (String baseName) -> "Cracked " + baseName)
+            .put(BlockSetVariant.POLISHED, (String baseName) -> "Polished " + baseName)
+            .put(BlockSetVariant.CUT, (String baseName) -> "Cut " + baseName)
+            .put(BlockSetVariant.MOSAIC, (String baseName) -> baseName + " Mosaic")
+            .put(BlockSetVariant.STAIRS, (String baseName) -> baseName + " Stairs")
+            .put(BlockSetVariant.SLAB, (String baseName) -> baseName + " Slab")
+            .put(BlockSetVariant.WALL, (String baseName) -> baseName + " Wall")
+            .put(BlockSetVariant.FENCE, (String baseName) -> baseName + " Fence")
+            .put(BlockSetVariant.FENCE_GATE, (String baseName) -> baseName + " Fence Gate")
+            .put(BlockSetVariant.DOOR, (String baseName) -> baseName + " Door")
+            .put(BlockSetVariant.TRAPDOOR, (String baseName) -> baseName + " Trapdoor")
+            .put(BlockSetVariant.BUTTON, (String baseName) -> baseName + " Button")
+            .put(BlockSetVariant.PRESSURE_PLATE, (String baseName) -> baseName + " Pressure Plate")
+            .put(BlockSetVariant.SIGN, (String baseName) -> baseName + " Sign")
+            .put(BlockSetVariant.HANGING_SIGN, (String baseName) -> baseName + " Hanging Sign")
+            .build();
+    /**
+     * @see #generateFor(BiConsumer, Map, Map, String)
+     */
+    public static final Map<BlockSetVariant, UnaryOperator<String>> VARIANT_ITEM_NAMES = ImmutableMap.<BlockSetVariant, UnaryOperator<String>>builder()
+            .put(BlockSetVariant.BOAT, (String baseName) -> baseName + " Boat")
+            .put(BlockSetVariant.CHEST_BOAT, (String baseName) -> baseName + " Chest Boat")
+            .build();
+    /**
+     * @see #generateFor(BiConsumer, Map, Map, String)
+     */
+    public static final Map<BlockSetVariant, UnaryOperator<String>> VARIANT_ENTITY_NAMES = ImmutableMap.<BlockSetVariant, UnaryOperator<String>>builder()
+            .put(BlockSetVariant.BOAT, (String baseName) -> baseName + " Boat")
+            .put(BlockSetVariant.CHEST_BOAT, (String baseName) -> baseName + " Chest Boat")
+            .build();
+
     protected final String languageCode;
     protected final String modId;
     protected final PackOutput.PathProvider pathProvider;
@@ -70,6 +105,21 @@ public abstract class AbstractLanguageProvider implements DataProvider {
     }
 
     public abstract void addTranslations(TranslationBuilder translationBuilder);
+
+    public void generateFor(TranslationBuilder translationBuilder, BlockSetFamily blockSetFamily, String baseName) {
+        this.generateFor(translationBuilder::add, blockSetFamily.getBlockVariants(), VARIANT_BLOCK_NAMES, baseName);
+        this.generateFor(translationBuilder::add, blockSetFamily.getItemVariants(), VARIANT_ITEM_NAMES, baseName);
+        this.generateFor(translationBuilder::add, blockSetFamily.getEntityVariants(), VARIANT_ENTITY_NAMES, baseName);
+    }
+
+    public <T> void generateFor(BiConsumer<T, String> translationConsumer, Map<BlockSetVariant, Holder.Reference<T>> variants, Map<BlockSetVariant, UnaryOperator<String>> variantNames, String baseName) {
+        variants.forEach((BlockSetVariant variant, Holder.Reference<T> holder) -> {
+            UnaryOperator<String> variantName = variantNames.get(variant);
+            if (variantName != null) {
+                translationConsumer.accept(holder.value(), variantName.apply(baseName));
+            }
+        });
+    }
 
     @Override
     public CompletableFuture<?> run(CachedOutput cachedOutput) {

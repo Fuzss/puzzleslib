@@ -12,7 +12,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
@@ -124,7 +123,7 @@ public interface ClientAbstractions {
      * @return the render type
      */
     default RenderType getRenderType(Fluid fluid) {
-        return ItemBlockRenderTypes.getRenderLayer(fluid.defaultFluidState());
+        return RenderTypeHelper.getRenderType(fluid);
     }
 
     /**
@@ -136,7 +135,7 @@ public interface ClientAbstractions {
      * @param renderType the render type
      */
     default void registerRenderType(Block block, RenderType renderType) {
-        ClientProxyImpl.get().registerRenderType(block, renderType);
+        RenderTypeHelper.registerRenderType(block, renderType);
     }
 
     /**
@@ -148,7 +147,7 @@ public interface ClientAbstractions {
      * @param renderType the render type
      */
     default void registerRenderType(Fluid fluid, RenderType renderType) {
-        ClientProxyImpl.get().registerRenderType(fluid, renderType);
+        RenderTypeHelper.registerRenderType(fluid, renderType);
     }
 
     /**
