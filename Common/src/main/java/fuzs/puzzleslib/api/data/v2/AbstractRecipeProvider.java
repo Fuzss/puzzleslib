@@ -35,6 +35,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -99,6 +100,28 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
             }
         }
         return jsonElement;
+    }
+
+    /**
+     * @see #generateFor(RecipeOutput, BlockSetFamily, Map)
+     */
+    public static Map<BlockSetVariant, FamilyRecipeProvider> createVariantWoodProviders(BlockSetFamily blockSetFamily, Block strippedBlock) {
+        return ImmutableMap.<BlockSetVariant, FamilyRecipeProvider>builder()
+                .put(BlockSetVariant.HANGING_SIGN,
+                        (RecipeOutput recipeOutput, ItemLike result, ItemLike input, Optional<String> recipeGroupPrefix, Optional<String> recipeUnlockedBy) -> {
+                            hangingSign(recipeOutput, result, strippedBlock);
+                        })
+                .put(BlockSetVariant.BOAT,
+                        (RecipeOutput recipeOutput, ItemLike result, ItemLike input, Optional<String> recipeGroupPrefix, Optional<String> recipeUnlockedBy) -> {
+                            woodenBoat(recipeOutput, result, input);
+                        })
+                .put(BlockSetVariant.CHEST_BOAT,
+                        (RecipeOutput recipeOutput, ItemLike result, ItemLike input, Optional<String> recipeGroupPrefix, Optional<String> recipeUnlockedBy) -> {
+                            Holder.Reference<Item> boatItem = blockSetFamily.getItem(BlockSetVariant.BOAT);
+                            Objects.requireNonNull(boatItem, "boat item is null");
+                            chestBoat(recipeOutput, result, boatItem.value());
+                        })
+                .build();
     }
 
     @Deprecated

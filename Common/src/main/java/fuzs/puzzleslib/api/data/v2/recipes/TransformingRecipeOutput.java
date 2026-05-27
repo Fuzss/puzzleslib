@@ -15,6 +15,10 @@ import java.util.function.UnaryOperator;
 public record TransformingRecipeOutput(RecipeOutput recipeOutput,
                                        UnaryOperator<Recipe<?>> operator) implements RecipeOutput {
 
+    static RecipeOutput transformed(RecipeOutput recipeOutput, UnaryOperator<Recipe<?>> operator) {
+        return new TransformingRecipeOutput(recipeOutput, operator);
+    }
+
     @Override
     public void accept(ResourceLocation resourceLocation, Recipe<?> recipe, @Nullable AdvancementHolder advancement) {
         this.recipeOutput.accept(resourceLocation, this.operator().apply(recipe), advancement);
