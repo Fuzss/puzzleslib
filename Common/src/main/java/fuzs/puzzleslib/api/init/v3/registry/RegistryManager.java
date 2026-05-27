@@ -155,6 +155,20 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     }
 
     /**
+     * Register a block.
+     *
+     * @param path  path for new entry
+     * @param entry supplier for entry to register
+     * @return holder reference
+     */
+    @Deprecated
+    default Holder.Reference<Block> registerBlock(String path, Supplier<Block> entry) {
+        return this.registerBlock(path,
+                (BlockBehaviour.Properties properties) -> entry.get(),
+                BlockBehaviour.Properties::of);
+    }
+
+    /**
      * Register an item.
      *
      * @param path path for new entry
@@ -195,7 +209,21 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return holder reference
      */
     default Holder.Reference<Item> registerItem(String path, Function<Item.Properties, Item> factory, Supplier<Item.Properties> itemPropertiesSupplier) {
-        return this.register(Registries.ITEM, path, () -> factory.apply(itemPropertiesSupplier.get()));
+        return this.register(Registries.ITEM, path, () -> {
+            return factory.apply(itemPropertiesSupplier.get());
+        });
+    }
+
+    /**
+     * Register an item.
+     *
+     * @param path  path for new entry
+     * @param entry supplier for entry to register
+     * @return holder reference
+     */
+    @Deprecated
+    default Holder.Reference<Item> registerItem(String path, Supplier<Item> entry) {
+        return this.registerItem(path, (Item.Properties properties) -> entry.get());
     }
 
     /**
@@ -247,39 +275,15 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     }
 
     /**
-     * Register a block.
-     *
-     * @param path  path for new entry
-     * @param entry supplier for entry to register
-     * @return holder reference
-     */
-    @Deprecated
-    default Holder.Reference<Block> registerBlock(String path, Supplier<Block> entry) {
-        return this.register(Registries.BLOCK, path, entry);
-    }
-
-    /**
-     * Register an item.
-     *
-     * @param path  path for new entry
-     * @param entry supplier for entry to register
-     * @return holder reference
-     */
-    @Deprecated
-    default Holder.Reference<Item> registerItem(String path, Supplier<Item> entry) {
-        return this.register(Registries.ITEM, path, entry);
-    }
-
-    /**
      * Registers a block item for a block.
      *
-     * @param blockReference reference for block to register item variant for
+     * @param block          reference for block to register item variant for
      * @param itemProperties properties for item
      * @return holder reference
      */
     @Deprecated
-    default Holder.Reference<Item> registerBlockItem(Holder<Block> blockReference, Item.Properties itemProperties) {
-        return this.registerBlockItem(blockReference, () -> itemProperties);
+    default Holder.Reference<Item> registerBlockItem(Holder<Block> block, Item.Properties itemProperties) {
+        return this.registerBlockItem(block, () -> itemProperties);
     }
 
     /**

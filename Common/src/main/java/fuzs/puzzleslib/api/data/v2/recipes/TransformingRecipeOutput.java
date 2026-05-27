@@ -15,7 +15,7 @@ import java.util.function.UnaryOperator;
 public record TransformingRecipeOutput(RecipeOutput recipeOutput,
                                        UnaryOperator<Recipe<?>> operator) implements RecipeOutput {
 
-    static RecipeOutput transformed(RecipeOutput recipeOutput, UnaryOperator<Recipe<?>> operator) {
+    public static RecipeOutput transformed(RecipeOutput recipeOutput, UnaryOperator<Recipe<?>> operator) {
         return new TransformingRecipeOutput(recipeOutput, operator);
     }
 
