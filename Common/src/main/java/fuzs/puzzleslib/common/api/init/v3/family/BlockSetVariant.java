@@ -227,7 +227,7 @@ public interface BlockSetVariant extends StringRepresentable {
                     context.getRegistries()
                             .registerBlockItem(hangingSignHolder,
                                     (Block block, Item.Properties properties) -> new HangingSignItem(block,
-                                            context.getBlock(this).value(),
+                                            context.getBlock(WALL_HANGING_SIGN).value(),
                                             properties),
                                     () -> new Item.Properties().stacksTo(16)));
         }
