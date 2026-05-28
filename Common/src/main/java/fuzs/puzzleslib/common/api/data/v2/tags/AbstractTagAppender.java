@@ -24,17 +24,6 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
         this.keyExtractor = keyExtractor;
     }
 
-    @Deprecated(forRemoval = true)
-    public AbstractTagAppender<T> setReplace(boolean replace) {
-        this.tagBuilder.setReplace(replace);
-        return this;
-    }
-
-    @Deprecated(forRemoval = true)
-    public AbstractTagAppender<T> setReplace() {
-        return this.setReplace(true);
-    }
-
     public AbstractTagAppender<T> add(Identifier id) {
         this.tagBuilder.addElement(id);
         return this;

@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.api.client.event.v1;
 
-import fuzs.puzzleslib.common.api.client.event.v1.entity.ClientEntityLevelEvents;
+import fuzs.puzzleslib.common.api.client.event.v1.entity.ClientEntityEvents;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
 
@@ -11,8 +11,8 @@ public final class FabricClientEntityEvents {
      * We do not use {@link net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents#ENTITY_LOAD} as it does
      * not allow for preventing the entity from being added.
      */
-    public static final Event<ClientEntityLevelEvents.Load> ENTITY_LOAD = FabricEventFactory.createResult(
-            ClientEntityLevelEvents.Load.class);
+    public static final Event<ClientEntityEvents.Load> ENTITY_LOAD = FabricEventFactory.createResult(
+            ClientEntityEvents.Load.class);
 
     private FabricClientEntityEvents() {
         // NO-OP

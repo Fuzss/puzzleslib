@@ -116,6 +116,7 @@ public final class HSV {
             hue = hue / 6.0F; // Convert range from [0,360] to [0,1]
             if (hue < 0.0F) hue += 1.0F; // Ensure hue is non-negative
         }
+
         // Calculate Saturation (S)
         float saturation = max == 0.0F ? 0.0F : delta / max;
         // Calculate Value (V) - Also called Brightness (B)

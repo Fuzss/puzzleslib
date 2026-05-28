@@ -21,13 +21,11 @@ import net.minecraft.tags.*;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * TODO purge all the mod id fields from providers where not required
- */
 public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     private static final TagBuilder STATIC_TAG_BUILDER = TagBuilder.create();
     /**
@@ -35,6 +33,7 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
      * <p>
      * The respective codecs for those fields are directly copied from the corresponding loader.
      */
+    @ApiStatus.Internal
     public static final Codec<TagFile> TAG_FILE_CODEC = CodecExtras.encodeOnly(RecordCodecBuilder.create((RecordCodecBuilder.Instance<TagFile> instance) -> instance.group(
                     TagEntry.CODEC.listOf().fieldOf("values").forGetter(TagFile::entries),
                     Codec.BOOL.optionalFieldOf("replace", false).forGetter(TagFile::replace),
@@ -131,8 +130,6 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
             .put(BlockSetVariant.CHEST_BOAT, TagFactory.COMMON.registerEntityTypeTag("boats"))
             .build();
 
-    protected final String modId;
-
     public AbstractTagProvider(ResourceKey<? extends Registry<T>> registryKey, DataProviderContext context) {
         this(registryKey, context.getModId(), context.getPackOutput(), context.getRegistries());
     }
@@ -142,7 +139,6 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
             return Objects.equals(tagKey.location().getNamespace(), modId) ? Optional.empty() :
                     Optional.of(STATIC_TAG_BUILDER);
         }));
-        this.modId = modId;
     }
 
     @Override

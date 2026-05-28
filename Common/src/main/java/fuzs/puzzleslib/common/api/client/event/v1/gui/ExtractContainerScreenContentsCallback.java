@@ -4,13 +4,10 @@ import fuzs.puzzleslib.common.api.event.v1.core.EventInvoker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 
-/**
- * TODO rename to ExtractContainerScreenContentsCallback, also update method name to onExtractContainerScreenContents
- */
 @FunctionalInterface
-public interface RenderContainerScreenContentsCallback {
-    EventInvoker<RenderContainerScreenContentsCallback> EVENT = EventInvoker.lookup(
-            RenderContainerScreenContentsCallback.class);
+public interface ExtractContainerScreenContentsCallback {
+    EventInvoker<ExtractContainerScreenContentsCallback> EVENT = EventInvoker.lookup(
+            ExtractContainerScreenContentsCallback.class);
 
     /**
      * Called for {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen}, after the screen
@@ -22,5 +19,5 @@ public interface RenderContainerScreenContentsCallback {
      * @param mouseX      the x-position of the mouse
      * @param mouseY      the y-position of the mouse
      */
-    void onRenderContainerScreenContents(AbstractContainerScreen<?> screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY);
+    void onExtractContainerScreenContents(AbstractContainerScreen<?> screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY);
 }

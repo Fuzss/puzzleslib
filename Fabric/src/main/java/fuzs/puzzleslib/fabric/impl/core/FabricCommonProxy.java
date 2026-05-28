@@ -18,7 +18,6 @@ import fuzs.puzzleslib.fabric.impl.attachment.FabricDataAttachmentRegistryImpl;
 import fuzs.puzzleslib.fabric.impl.core.context.PayloadTypesContextFabricImpl;
 import fuzs.puzzleslib.fabric.impl.data.FabricTagAppender;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventInvokers;
-import fuzs.puzzleslib.fabric.impl.event.SpawnReasonMob;
 import fuzs.puzzleslib.fabric.impl.init.FabricRegistryFactory;
 import fuzs.puzzleslib.fabric.impl.item.FabricToolTypeHelper;
 import fuzs.puzzleslib.fabric.impl.item.crafting.FabricCombinedIngredients;
@@ -64,7 +63,9 @@ import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagFile;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Inventory;
@@ -323,11 +324,6 @@ public class FabricCommonProxy implements FabricProxy {
     @Override
     public boolean canEquip(ItemStack itemStack, EquipmentSlot equipmentSlot, LivingEntity livingEntity) {
         return equipmentSlot == livingEntity.getEquipmentSlotForItem(itemStack);
-    }
-
-    @Override
-    public @Nullable EntitySpawnReason getMobSpawnReason(Mob mob) {
-        return ((SpawnReasonMob) mob).puzzleslib$getSpawnReason();
     }
 
     @Override

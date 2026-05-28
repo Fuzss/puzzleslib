@@ -20,7 +20,7 @@ public final class ItemComponentsContextFabricImpl implements ItemComponentsCont
     private final List<Consumer<DefaultItemComponentEvents.ModifyContext>> itemComponentPatches = new ArrayList<>();
 
     @Override
-    public void registerItemComponentsPatch(Item item, InitializerV2 initializer) {
+    public void registerItemComponentsPatch(Item item, Initializer initializer) {
         Objects.requireNonNull(item, "item is null");
         Objects.requireNonNull(initializer, "initializer is null");
         this.registerIfNecessary();
@@ -33,7 +33,7 @@ public final class ItemComponentsContextFabricImpl implements ItemComponentsCont
     }
 
     @Override
-    public void registerItemComponentsPatch(Predicate<Item> itemPredicate, InitializerV2 initializer) {
+    public void registerItemComponentsPatch(Predicate<Item> itemPredicate, Initializer initializer) {
         Objects.requireNonNull(itemPredicate, "item predicate is null");
         Objects.requireNonNull(initializer, "initializer is null");
         this.registerIfNecessary();

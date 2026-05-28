@@ -3,10 +3,10 @@ package fuzs.puzzleslib.common.api.util.v1;
 import fuzs.puzzleslib.common.impl.core.proxy.ProxyImpl;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ServerLevelAccessor;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
@@ -33,21 +33,6 @@ public final class EntityHelper {
         Objects.requireNonNull(equipmentSlot, "equipment slot is null");
         Objects.requireNonNull(livingEntity, "living entity is null");
         return ProxyImpl.get().canEquip(itemStack, equipmentSlot, livingEntity);
-    }
-
-    /**
-     * Retrieves a {@link EntitySpawnReason} from a {@link Mob} if it has been set during
-     * {@link Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, EntitySpawnReason, SpawnGroupData)}.
-     * <p>
-     * Note that the spawn type is saved with the mob, so it persists across chunk and level reloads.
-     *
-     * @param entity the entity
-     * @return the spawn type or null if none has been set or the entity is no {@link Mob}
-     */
-    @Deprecated(forRemoval = true)
-    public static @Nullable EntitySpawnReason getMobSpawnReason(Entity entity) {
-        Objects.requireNonNull(entity, "entity is null");
-        return entity instanceof Mob mob ? ProxyImpl.get().getMobSpawnReason(mob) : null;
     }
 
     /**

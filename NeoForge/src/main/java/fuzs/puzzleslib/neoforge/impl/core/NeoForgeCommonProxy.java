@@ -55,7 +55,9 @@ import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagFile;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
@@ -300,11 +302,6 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     @Override
     public boolean canEquip(ItemStack itemStack, EquipmentSlot equipmentSlot, LivingEntity livingEntity) {
         return itemStack.canEquip(equipmentSlot, livingEntity);
-    }
-
-    @Override
-    public @Nullable EntitySpawnReason getMobSpawnReason(Mob mob) {
-        return mob.getSpawnType();
     }
 
     @Override

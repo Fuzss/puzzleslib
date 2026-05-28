@@ -2,7 +2,7 @@ package fuzs.puzzleslib.neoforge.impl.client.event;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import fuzs.puzzleslib.common.api.client.event.v1.*;
-import fuzs.puzzleslib.common.api.client.event.v1.entity.ClientEntityLevelEvents;
+import fuzs.puzzleslib.common.api.client.event.v1.entity.ClientEntityEvents;
 import fuzs.puzzleslib.common.api.client.event.v1.entity.player.*;
 import fuzs.puzzleslib.common.api.client.event.v1.gui.*;
 import fuzs.puzzleslib.common.api.client.event.v1.level.ClientChunkEvents;
@@ -15,7 +15,6 @@ import fuzs.puzzleslib.common.api.event.v1.data.MutableBoolean;
 import fuzs.puzzleslib.common.api.event.v1.data.MutableFloat;
 import fuzs.puzzleslib.common.api.event.v1.data.MutableInt;
 import fuzs.puzzleslib.common.api.event.v1.data.MutableValue;
-import fuzs.puzzleslib.common.api.event.v1.server.TagsUpdatedCallback;
 import fuzs.puzzleslib.common.impl.client.event.ScreenButtonList;
 import fuzs.puzzleslib.common.impl.event.data.DefaultedFloat;
 import net.minecraft.client.Minecraft;
@@ -79,12 +78,6 @@ public final class NeoForgeClientEventInvokers {
     }
 
     public static void registerLoadingHandlers() {
-        INSTANCE.register(TagsUpdatedCallback.class,
-                TagsUpdatedEvent.ClientPacketReceived.class,
-                (TagsUpdatedCallback callback, TagsUpdatedEvent.ClientPacketReceived event) -> {
-                    callback.onTagsUpdated(event.getRegistries(), true);
-                },
-                true);
         INSTANCE.register(ClientTagsUpdatedCallback.class,
                 TagsUpdatedEvent.ClientPacketReceived.class,
                 (ClientTagsUpdatedCallback callback, TagsUpdatedEvent.ClientPacketReceived event) -> {
@@ -396,10 +389,10 @@ public final class NeoForgeClientEventInvokers {
                 (callback, event) -> {
                     callback.onAfterCharacterType(event.getScreen(), event.getCharacterEvent());
                 });
-        INSTANCE.register(RenderContainerScreenContentsCallback.class,
+        INSTANCE.register(ExtractContainerScreenContentsCallback.class,
                 ContainerScreenEvent.Render.Foreground.class,
-                (RenderContainerScreenContentsCallback callback, ContainerScreenEvent.Render.Foreground event) -> {
-                    callback.onRenderContainerScreenContents(event.getContainerScreen(),
+                (ExtractContainerScreenContentsCallback callback, ContainerScreenEvent.Render.Foreground event) -> {
+                    callback.onExtractContainerScreenContents(event.getContainerScreen(),
                             event.getGuiGraphics(),
                             event.getMouseX(),
                             event.getMouseY());
@@ -411,9 +404,9 @@ public final class NeoForgeClientEventInvokers {
                     MutableInt posY = MutableInt.fromEvent(event::setPosY, event::getPosY);
                     callback.onRenderChatPanel(event.getGuiGraphics(), event.getPartialTick(), posX, posY);
                 });
-        INSTANCE.register(ClientEntityLevelEvents.Load.class,
+        INSTANCE.register(ClientEntityEvents.Load.class,
                 EntityJoinLevelEvent.class,
-                (ClientEntityLevelEvents.Load callback, EntityJoinLevelEvent event) -> {
+                (ClientEntityEvents.Load callback, EntityJoinLevelEvent event) -> {
                     if (!(event.getLevel() instanceof ClientLevel clientLevel)) {
                         return;
                     }
@@ -423,9 +416,9 @@ public final class NeoForgeClientEventInvokers {
                         event.setCanceled(true);
                     }
                 });
-        INSTANCE.register(ClientEntityLevelEvents.Unload.class,
+        INSTANCE.register(ClientEntityEvents.Unload.class,
                 EntityLeaveLevelEvent.class,
-                (ClientEntityLevelEvents.Unload callback, EntityLeaveLevelEvent event) -> {
+                (ClientEntityEvents.Unload callback, EntityLeaveLevelEvent event) -> {
                     if (!(event.getLevel() instanceof ClientLevel clientLevel)) {
                         return;
                     }
@@ -463,23 +456,6 @@ public final class NeoForgeClientEventInvokers {
                 InputEvent.MouseButton.Pre.class,
                 (ClientInputEvents.MouseClick callback, InputEvent.MouseButton.Pre event) -> {
                     EventResult eventResult = callback.onMouseClick(event.getMouseButtonInfo(), event.getAction());
-                    if (eventResult.isInterrupt()) {
-                        event.setCanceled(true);
-                    }
-                });
-        INSTANCE.register(ClientInputEvents.MouseScroll.class,
-                InputEvent.MouseScrollingEvent.class,
-                (ClientInputEvents.MouseScroll callback, InputEvent.MouseScrollingEvent event) -> {
-                    // Only handle scrolling in the inventory to mirror Fabric.
-                    if (Minecraft.getInstance().player.isSpectator()) {
-                        return;
-                    }
-
-                    EventResult eventResult = callback.onMouseScroll(event.isLeftDown(),
-                            event.isMiddleDown(),
-                            event.isRightDown(),
-                            event.getScrollDeltaX(),
-                            event.getScrollDeltaY());
                     if (eventResult.isInterrupt()) {
                         event.setCanceled(true);
                     }

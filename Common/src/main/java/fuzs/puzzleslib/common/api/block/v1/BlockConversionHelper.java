@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.common.api.block.v1;
 
-import fuzs.puzzleslib.common.api.event.v1.server.TagsUpdatedCallback;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -31,7 +30,7 @@ public final class BlockConversionHelper {
      * <p>
      * The id property is also set on the new instance.
      *
-     * @param block            the original block
+     * @param block      the original block
      * @param identifier the id for the new block
      * @return the new block properties instance
      */
@@ -55,7 +54,8 @@ public final class BlockConversionHelper {
 
     /**
      * Allows for updating the stored {@link Item} on a {@link Block}.
-     * <p>Note that the implementation is not restricted to {@link BlockItem}.
+     * <p>
+     * Note that the implementation is not restricted to {@link BlockItem}.
      *
      * @param block the block to set the new item for
      * @param item  the new item
@@ -71,7 +71,8 @@ public final class BlockConversionHelper {
 
     /**
      * Allows for updating the stored {@link Block} on a {@link BlockItem}.
-     * <p>Useful for switching the corresponding block implementation without the need to modify the original block.
+     * <p>
+     * Useful for switching the corresponding block implementation without the need to modify the original block.
      *
      * @param item  the block item to set the new block for
      * @param block the new block
@@ -91,8 +92,10 @@ public final class BlockConversionHelper {
     }
 
     /**
-     * Allows for copying tags bound to one block to another.
-     * <p>Ideally called after tags have been updated like in {@link TagsUpdatedCallback}.
+     * Allows for copying tags bound from one block to another.
+     * <p>
+     * Ideally called after tags have been updated like in
+     * {@link fuzs.puzzleslib.common.api.event.v1.server.ServerResourcesLoadCallback}.
      *
      * @param from the source block to copy tags from
      * @param to   the target block to copy tags to

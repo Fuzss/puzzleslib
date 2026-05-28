@@ -32,33 +32,8 @@ public interface KeyedValueProvider<T> {
      * @param <T>         the type of value
      * @return the provider
      */
-    @Deprecated(forRemoval = true)
-    static <T> KeyedValueProvider<T> registryEntries(ResourceKey<? extends Registry<? super T>> registryKey) {
-        return values(registryKey);
-    }
-
-    /**
-     * Create a new provider backed by a registry.
-     *
-     * @param registryKey key for retrieving backing registry
-     * @param <T>         the type of value
-     * @return the provider
-     */
     static <T> KeyedValueProvider<T> values(ResourceKey<? extends Registry<? super T>> registryKey) {
         return new RegistryProvider<>(registryKey);
-    }
-
-    /**
-     * Creates an {@link AbstractTagAppender} instance that can be converted to a string list by calling
-     * {@link AbstractTagAppender#asStringList()}.
-     *
-     * @param registryKey the registry to get entry keys from
-     * @param <T>         the type of values
-     * @return the tag appender
-     */
-    @Deprecated(forRemoval = true)
-    static <T> AbstractTagAppender<T> tagAppender(ResourceKey<? extends Registry<? super T>> registryKey) {
-        return tags(registryKey);
     }
 
     /**

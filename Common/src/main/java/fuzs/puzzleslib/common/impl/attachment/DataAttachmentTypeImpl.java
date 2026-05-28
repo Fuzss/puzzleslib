@@ -64,14 +64,7 @@ public final class DataAttachmentTypeImpl<T, V> implements DataAttachmentType<T,
     }
 
     @Override
-    public void set(T holder, @Nullable V value) {
-        this.setWithReturn(holder, value);
-    }
-
-    /**
-     * TODO this should become the default set method when the return type is fixed
-     */
-    private @Nullable V setWithReturn(T holder, @Nullable V value) {
+    public @Nullable V set(T holder, @Nullable V value) {
         V oldValue = this.attachmentType.hasData(holder) ? this.attachmentType.getData(holder) : null;
         if (!Objects.equals(oldValue, value)) {
             // Do not support setting null values as Fabric does not.
@@ -88,7 +81,7 @@ public final class DataAttachmentTypeImpl<T, V> implements DataAttachmentType<T,
 
     @Override
     public @Nullable V remove(T holder) {
-        return this.setWithReturn(holder, null);
+        return this.set(holder, null);
     }
 
     @Override

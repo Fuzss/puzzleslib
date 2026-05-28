@@ -5,14 +5,11 @@ import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
 
-/**
- * TODO rename to ClientEntityEvents
- */
-public final class ClientEntityLevelEvents {
+public final class ClientEntityEvents {
     public static final EventInvoker<Load> LOAD = EventInvoker.lookup(Load.class);
     public static final EventInvoker<Unload> UNLOAD = EventInvoker.lookup(Unload.class);
 
-    private ClientEntityLevelEvents() {
+    private ClientEntityEvents() {
         // NO-OP
     }
 

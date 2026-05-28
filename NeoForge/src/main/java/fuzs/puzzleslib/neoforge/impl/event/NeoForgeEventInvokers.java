@@ -496,12 +496,6 @@ public final class NeoForgeEventInvokers {
                         event.setBlocked(true);
                     }
                 });
-        INSTANCE.register(TagsUpdatedCallback.class,
-                TagsUpdatedEvent.ServerDataLoad.class,
-                (TagsUpdatedCallback callback, TagsUpdatedEvent.ServerDataLoad event) -> {
-                    callback.onTagsUpdated(event.getRegistries(), false);
-                },
-                true);
         INSTANCE.register(ServerResourcesLoadCallback.class,
                 TagsUpdatedEvent.ServerDataLoad.class,
                 (ServerResourcesLoadCallback callback, TagsUpdatedEvent.ServerDataLoad event) -> {
@@ -625,31 +619,6 @@ public final class NeoForgeEventInvokers {
         INSTANCE.register(ServerEntityEvents.Unload.class,
                 EntityLeaveLevelEvent.class,
                 (ServerEntityEvents.Unload callback, EntityLeaveLevelEvent event) -> {
-                    if (!(event.getLevel() instanceof ServerLevel serverLevel)) {
-                        return;
-                    }
-
-                    callback.onEntityUnload(event.getEntity(), serverLevel);
-                });
-        INSTANCE.register(ServerEntityLevelEvents.Load.class,
-                EntityJoinLevelEvent.class,
-                (ServerEntityLevelEvents.Load callback, EntityJoinLevelEvent event) -> {
-                    if (!(event.getLevel() instanceof ServerLevel serverLevel)) {
-                        return;
-                    }
-
-                    if (callback.onEntityLoad(event.getEntity(), serverLevel, !event.loadedFromDisk()).isInterrupt()) {
-                        if (event.getEntity() instanceof Player) {
-                            // we do not support players as it isn't as straight-forward to implement for the server player on Fabric
-                            throw new UnsupportedOperationException("Cannot prevent player from loading in!");
-                        } else {
-                            event.setCanceled(true);
-                        }
-                    }
-                });
-        INSTANCE.register(ServerEntityLevelEvents.Unload.class,
-                EntityLeaveLevelEvent.class,
-                (ServerEntityLevelEvents.Unload callback, EntityLeaveLevelEvent event) -> {
                     if (!(event.getLevel() instanceof ServerLevel serverLevel)) {
                         return;
                     }

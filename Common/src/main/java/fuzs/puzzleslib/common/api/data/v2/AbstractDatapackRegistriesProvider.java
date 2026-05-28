@@ -92,7 +92,6 @@ public abstract class AbstractDatapackRegistriesProvider extends RegistriesDatap
 
     @FunctionalInterface
     public interface RegistryBoostrapConsumer {
-
         <T> void add(ResourceKey<? extends Registry<T>> key, RegistrySetBuilder.RegistryBootstrap<T> bootstrap);
     }
 }

@@ -118,11 +118,6 @@ public final class FabricEventInvokers {
     }
 
     public static void registerEventHandlers() {
-        INSTANCE.register(TagsUpdatedCallback.class,
-                CommonLifecycleEvents.TAGS_LOADED,
-                (TagsUpdatedCallback callback) -> {
-                    return callback::onTagsUpdated;
-                });
         INSTANCE.register(ServerResourcesLoadCallback.class,
                 CommonLifecycleEvents.TAGS_LOADED,
                 (ServerResourcesLoadCallback callback) -> {
@@ -320,24 +315,6 @@ public final class FabricEventInvokers {
         INSTANCE.register(ServerEntityEvents.Unload.class,
                 net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_UNLOAD,
                 (ServerEntityEvents.Unload callback) -> {
-                    return callback::onEntityUnload;
-                });
-        INSTANCE.register(ServerEntityLevelEvents.Load.class,
-                net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ALLOW_LOAD,
-                (ServerEntityLevelEvents.Load callback) -> {
-                    return (Entity entity, ServerLevel level, @Nullable EntitySpawnReason spawnReason, boolean isLoadedFromDisk) -> {
-                        EventResult eventResult = callback.onEntityLoad(entity, level, !isLoadedFromDisk);
-                        if (eventResult.isInterrupt() && entity instanceof Player) {
-                            // We do not support players as it isn't as straight-forward to implement for the server player on Fabric.
-                            throw new UnsupportedOperationException("Cannot prevent player from loading in!");
-                        } else {
-                            return eventResult.isPass();
-                        }
-                    };
-                });
-        INSTANCE.register(ServerEntityLevelEvents.Unload.class,
-                net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_UNLOAD,
-                (ServerEntityLevelEvents.Unload callback) -> {
                     return callback::onEntityUnload;
                 });
         INSTANCE.register(LivingDeathCallback.class, FabricLivingEvents.LIVING_DEATH);
