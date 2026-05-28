@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.1.50-1.21.1] - 2025-05-28
+
+### Changed
+
+- Support registering stripple blocks without an `axis` property on Fabric
+
 ## [v21.1.49-1.21.1] - 2025-05-27
 
 ### Fixed

@@ -8,6 +8,7 @@
     "AbstractHorseFabricMixin",
     "AnimalFabricMixin",
     "AnvilMenuFabricMixin",
+    "AxeItemFabricMixin",
     "BlockEntityFabricMixin",
     "BlockFabricMixin",
     "BoneMealItemFabricMixin",

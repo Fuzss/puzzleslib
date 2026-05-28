@@ -7,11 +7,28 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.apache.commons.lang3.math.Fraction;
 
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 public final class GameplayContentContextFabricImpl implements GameplayContentContext {
+    /**
+     * @see net.minecraft.world.item.AxeItem#STRIPPABLES
+     */
+    private static final Map<Block, Block> STRIPPABLES_WITHOUT_AXIS = new IdentityHashMap<>();
+
+    /**
+     * @see net.minecraft.world.item.AxeItem#getStripped(BlockState)
+     */
+    public static Optional<BlockState> getStripped(BlockState state) {
+        return Optional.ofNullable(STRIPPABLES_WITHOUT_AXIS.get(state.getBlock()))
+                .map((Block block) -> block.withPropertiesOf(state));
+    }
 
     @Override
     public void registerFuel(Holder<? extends ItemLike> fuelItem, Fraction fuelValue) {
@@ -42,7 +59,17 @@ public final class GameplayContentContextFabricImpl implements GameplayContentCo
     public void registerStrippable(Holder<Block> unstrippedBlock, Holder<Block> strippedBlock) {
         Objects.requireNonNull(unstrippedBlock, "unstripped block is null");
         Objects.requireNonNull(strippedBlock, "stripped block is null");
-        StrippableBlockRegistry.register(unstrippedBlock.value(), strippedBlock.value());
+        // Fabric does not support registering strippable blocks without an axis property in 1.21.1.
+        if (this.hasAxisProperty(unstrippedBlock.value()) && this.hasAxisProperty(strippedBlock.value())) {
+            StrippableBlockRegistry.register(unstrippedBlock.value(), strippedBlock.value());
+        } else {
+            // We add these to our own map, as values from the vanilla map are used to copy the axis property directly.
+            STRIPPABLES_WITHOUT_AXIS.put(unstrippedBlock.value(), strippedBlock.value());
+        }
+    }
+
+    private boolean hasAxisProperty(Block block) {
+        return block.getStateDefinition().getProperties().contains(BlockStateProperties.AXIS);
     }
 
     @Override
