@@ -22,6 +22,9 @@ public final class DataPackRegistriesContextFabricImpl implements DataPackRegist
         Objects.requireNonNull(registryKey, "registry key is null");
         Objects.requireNonNull(codec, "codec is null");
         Objects.requireNonNull(networkCodec, "network codec is null");
-        DynamicRegistries.registerSynced(registryKey, codec, networkCodec);
+        DynamicRegistries.registerSynced(registryKey,
+                codec,
+                networkCodec,
+                DynamicRegistries.SyncOption.SKIP_WHEN_EMPTY);
     }
 }
