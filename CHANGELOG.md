@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v26.1.9-mc26.1.x] - 2026-05-27
+## [v26.1.9-mc26.1.x] - 2026-05-30
 
 ### Changed
 
@@ -13,11 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fix wrong sign type being passed to the `BlockSetVariant#HANGING_SIGN` item
-
-### Fixed
-
 - Fix crash when trying to open a config screen for a config which is not loaded
+- Fix wrong sign type being passed to the `BlockSetVariant#HANGING_SIGN` item
 
 ## [v26.1.8-mc26.1.x] - 2026-05-17
 
