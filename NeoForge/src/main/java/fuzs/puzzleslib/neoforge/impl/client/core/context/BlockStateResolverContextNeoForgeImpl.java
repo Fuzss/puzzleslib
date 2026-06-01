@@ -28,7 +28,10 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.event.ModelEvent;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.*;
@@ -60,7 +63,7 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
                     event.getModelBakery().sprites,
                     event.getModelBakery().playerSkinRenderCache,
                     unbakedBlockStateModels,
-                    Collections.emptyMap(),
+                    new HashMap<>(),
                     this.resolvedModels,
                     this.missingModel);
         };
@@ -68,7 +71,7 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
 
     @Override
     public void registerBlockStateResolver(Block block, Consumer<BiConsumer<BlockState, BlockStateModel.UnbakedRoot>> blockStateConsumer) {
-        ModelDiscovery modelDiscovery = new ModelDiscovery(Collections.emptyMap(), this.missingModel.wrapped());
+        ModelDiscovery modelDiscovery = new ModelDiscovery(new HashMap<>(), this.missingModel.wrapped());
         modelDiscovery.uncachedResolver = (Object object) -> {
             Identifier resourcelocation = (Identifier) object;
             ResolvedModel resolvedModel = this.resolvedModels.get(resourcelocation);
