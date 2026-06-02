@@ -439,12 +439,10 @@ public final class NeoForgeEventInvokers {
         INSTANCE.register(LivingHurtCallback.class,
                 LivingDamageEvent.Pre.class,
                 (LivingHurtCallback callback, LivingDamageEvent.Pre event) -> {
-                    MutableFloat damageAmount = MutableFloat.fromEvent(event.getContainer()::setNewDamage,
-                            event.getContainer()::getNewDamage);
-                    if (callback.onLivingHurt(event.getEntity(), event.getContainer().getSource(), damageAmount)
-                            .isInterrupt()) {
+                    MutableFloat damageAmount = MutableFloat.fromEvent(event::setNewDamage, event::getNewDamage);
+                    if (callback.onLivingHurt(event.getEntity(), event.getSource(), damageAmount).isInterrupt()) {
                         // this effectively cancels the event
-                        event.getContainer().setNewDamage(0.0F);
+                        event.setNewDamage(0.0F);
                     }
                 });
         INSTANCE.register(UseItemEvents.Start.class,
