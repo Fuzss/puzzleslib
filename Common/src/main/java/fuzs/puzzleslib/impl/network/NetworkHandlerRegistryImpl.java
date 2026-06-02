@@ -1,12 +1,10 @@
 package fuzs.puzzleslib.impl.network;
 
-import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
 import fuzs.puzzleslib.api.core.v1.ModContainer;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v3.*;
 import fuzs.puzzleslib.api.network.v4.NetworkingHelper;
-import fuzs.puzzleslib.api.util.v1.EntityHelper;
 import fuzs.puzzleslib.impl.core.Freezable;
 import fuzs.puzzleslib.impl.network.codec.CustomPacketPayloadAdapter;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -55,8 +53,7 @@ public abstract class NetworkHandlerRegistryImpl implements NetworkHandler.Build
         CustomPacketPayload.Type<?> type = this.getMessageType(message);
         Packet<?> packet = this.toClientboundPacket(message);
         playerSet.apply((ServerPlayer serverPlayer) -> {
-            if (NetworkingHelper.hasChannel(serverPlayer.connection, type)
-                    && !EntityHelper.isFakePlayer(serverPlayer)) {
+            if (NetworkingHelper.hasChannel(serverPlayer.connection, type)) {
                 serverPlayer.connection.send(packet);
             }
         });
@@ -64,10 +61,10 @@ public abstract class NetworkHandlerRegistryImpl implements NetworkHandler.Build
 
     @Override
     public <T> void sendMessage(ServerboundMessage<T> message) {
-        ClientPacketListener clientPacketListener = Proxy.INSTANCE.getClientPacketListener();
+        ClientPacketListener packetListener = Proxy.INSTANCE.getClientPacketListener();
         CustomPacketPayload.Type<?> type = this.getMessageType(message);
-        if (ClientAbstractions.INSTANCE.hasChannel(clientPacketListener, type)) {
-            clientPacketListener.send(this.toServerboundPacket(message));
+        if (NetworkingHelper.hasChannel(packetListener, type)) {
+            packetListener.send(this.toServerboundPacket(message));
         }
     }
 
