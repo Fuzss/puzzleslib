@@ -178,8 +178,8 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
 
     @Override
     public boolean hasChannel(PacketListener packetListener, CustomPacketPayload.Type<?> type) {
-        return packetListener instanceof ICommonPacketListener commonPacketListener && commonPacketListener.hasChannel(
-                type);
+        return packetListener instanceof ICommonPacketListener commonPacketListener
+                && commonPacketListener.getConnection().isConnected() && commonPacketListener.hasChannel(type);
     }
 
     @Override

@@ -19,6 +19,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * A distributor for client-bound packets.
@@ -37,9 +38,7 @@ public interface PlayerSet {
      * Send a message from the server to no player.
      */
     static PlayerSet ofNone() {
-        return (Consumer<ServerPlayer> serverPlayerConsumer) -> {
-            // NO-OP
-        };
+        return Function.identity()::apply;
     }
 
     /**
