@@ -5,6 +5,7 @@ import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.model.*;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.special.ChestSpecialRenderer;
+import net.minecraft.client.renderer.special.ShieldSpecialRenderer;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.resources.Identifier;
@@ -105,11 +106,10 @@ public final class ItemModelGenerationHelper {
      * @see ItemModelGenerators#generateGoatHorn(Item)
      */
     public static void generateHorn(Item item, ItemModelGenerators itemModelGenerators) {
-        ItemModel.Unbaked baseModel = ItemModelUtils.plainModel(itemModelGenerators.createFlatItemModel(item, HORN));
-        ItemModel.Unbaked tootingModel = ItemModelUtils.plainModel(createFlatItemModel(ModelLocationHelper.getItemModel(
-                item,
+        ItemModel.Unbaked normal = ItemModelUtils.plainModel(itemModelGenerators.createFlatItemModel(item, HORN));
+        ItemModel.Unbaked tooting = ItemModelUtils.plainModel(createFlatItemModel(ModelLocationHelper.getItemModel(item,
                 "_tooting"), ModelLocationHelper.getItemTexture(item), TOOTING_HORN, itemModelGenerators.modelOutput));
-        itemModelGenerators.generateBooleanDispatch(item, ItemModelUtils.isUsingItem(), tootingModel, baseModel);
+        itemModelGenerators.generateBooleanDispatch(item, ItemModelUtils.isUsingItem(), tooting, normal);
     }
 
     /**
@@ -125,34 +125,38 @@ public final class ItemModelGenerationHelper {
     /**
      * @see ItemModelGenerators#generateShield(Item)
      */
-    public static void generateShield(Item item, Block particleBlock, Supplier<SpecialModelRenderer.Unbaked> specialModelSupplier, ItemModelGenerators itemModelGenerators) {
-        Identifier baseModel = SHIELD_MODEL_TEMPLATE.create(ModelLocationHelper.getItemModel(item),
+    public static void generateShield(Item item, Block particleBlock, Supplier<SpecialModelRenderer.Unbaked<?>> specialModelSupplier, ItemModelGenerators itemModelGenerators) {
+        Identifier normalModel = SHIELD_MODEL_TEMPLATE.create(ModelLocationHelper.getItemModel(item),
                 TextureMapping.particle(particleBlock),
                 itemModelGenerators.modelOutput);
         Identifier blockingModel = SHIELD_BLOCKING_MODEL_TEMPLATE.create(ModelLocationHelper.getItemModel(item,
                 "_blocking"), TextureMapping.particle(particleBlock), itemModelGenerators.modelOutput);
-        ItemModel.Unbaked unbaked = ItemModelUtils.specialModel(baseModel, specialModelSupplier.get());
-        ItemModel.Unbaked unbaked2 = ItemModelUtils.specialModel(blockingModel, specialModelSupplier.get());
-        itemModelGenerators.generateBooleanDispatch(item, ItemModelUtils.isUsingItem(), unbaked2, unbaked);
+        ItemModel.Unbaked normal = ItemModelUtils.specialModel(normalModel, specialModelSupplier.get());
+        ItemModel.Unbaked blocking = ItemModelUtils.specialModel(blockingModel, specialModelSupplier.get());
+        itemModelGenerators.itemModelOutput.accept(item,
+                ItemModelUtils.conditional(ShieldSpecialRenderer.DEFAULT_TRANSFORMATION,
+                        ItemModelUtils.isUsingItem(),
+                        blocking,
+                        normal));
     }
 
     /**
      * @see BlockModelGenerators#createChest(Block, Block, Identifier, boolean)
      */
-    public static void generateChest(Block chestBlock, Block particleBlock, Identifier itemTexture, boolean useGiftTexture, Function<Identifier, SpecialModelRenderer.Unbaked> unbakedRendererFactory, BlockModelGenerators blockModelGenerators) {
+    public static void generateChest(Block chestBlock, Block particleBlock, Identifier itemTexture, boolean useGiftTexture, Function<Identifier, SpecialModelRenderer.Unbaked<?>> unbakedRendererFactory, BlockModelGenerators blockModelGenerators) {
         blockModelGenerators.createParticleOnlyBlock(chestBlock, particleBlock);
-        Item item = chestBlock.asItem();
-        Identifier identifier = ModelTemplates.CHEST_INVENTORY.create(item,
+        Item chestItem = chestBlock.asItem();
+        Identifier itemModelBase = ModelTemplates.CHEST_INVENTORY.create(chestItem,
                 TextureMapping.particle(particleBlock),
                 blockModelGenerators.modelOutput);
-        ItemModel.Unbaked itemModel = ItemModelUtils.specialModel(identifier,
+        ItemModel.Unbaked baseModel = ItemModelUtils.specialModel(itemModelBase,
                 unbakedRendererFactory.apply(itemTexture));
         if (useGiftTexture) {
-            ItemModel.Unbaked unbaked2 = ItemModelUtils.specialModel(identifier,
+            ItemModel.Unbaked giftModel = ItemModelUtils.specialModel(itemModelBase,
                     new ChestSpecialRenderer.Unbaked(ChestSpecialRenderer.CHRISTMAS.single()));
-            blockModelGenerators.itemModelOutput.accept(item, ItemModelUtils.isXmas(unbaked2, itemModel));
+            blockModelGenerators.itemModelOutput.accept(chestItem, ItemModelUtils.isXmas(giftModel, baseModel));
         } else {
-            blockModelGenerators.itemModelOutput.accept(item, itemModel);
+            blockModelGenerators.itemModelOutput.accept(chestItem, baseModel);
         }
     }
 }
