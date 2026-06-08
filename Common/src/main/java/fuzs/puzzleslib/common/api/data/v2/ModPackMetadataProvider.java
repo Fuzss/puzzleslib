@@ -7,8 +7,8 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.metadata.PackMetadataGenerator;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.metadata.pack.PackFormat;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
-import net.minecraft.util.InclusiveRange;
 
 public final class ModPackMetadataProvider extends PackMetadataGenerator {
 
@@ -27,8 +27,9 @@ public final class ModPackMetadataProvider extends PackMetadataGenerator {
     public ModPackMetadataProvider(PackType packType, String modId, PackOutput packOutput) {
         super(packOutput);
         Component component = PackResourcesHelper.getPackDescription(modId);
+        // Set only the major version here to stay compatible across different minor Minecraft versions.
         this.add(PackMetadataSection.forPackType(packType),
                 new PackMetadataSection(component,
-                        new InclusiveRange<>(DetectedVersion.BUILT_IN.packVersion(packType))));
+                        PackFormat.of(DetectedVersion.BUILT_IN.packVersion(packType).major()).minorRange()));
     }
 }
