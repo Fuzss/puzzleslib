@@ -94,9 +94,18 @@ public abstract class AbstractModelProvider implements DataProvider {
 
     private BlockModelGenerators setupBlockModelGenerators(BlockModelGenerators blockModelGenerators) {
         // Make all these mutable, so it is possible to add our own entries.
-        BlockModelGenerators.NON_ORIENTABLE_TRAPDOOR = new ArrayList<>(BlockModelGenerators.NON_ORIENTABLE_TRAPDOOR);
-        BlockModelGenerators.FULL_BLOCK_MODEL_CUSTOM_GENERATORS = new HashMap<>(BlockModelGenerators.FULL_BLOCK_MODEL_CUSTOM_GENERATORS);
-        BlockModelGenerators.TEXTURED_MODELS = new HashMap<>(BlockModelGenerators.TEXTURED_MODELS);
+        if (!(BlockModelGenerators.NON_ORIENTABLE_TRAPDOOR instanceof ArrayList<?>)) {
+            BlockModelGenerators.NON_ORIENTABLE_TRAPDOOR = new ArrayList<>(BlockModelGenerators.NON_ORIENTABLE_TRAPDOOR);
+        }
+
+        if (!(BlockModelGenerators.FULL_BLOCK_MODEL_CUSTOM_GENERATORS instanceof HashMap<?, ?>)) {
+            BlockModelGenerators.FULL_BLOCK_MODEL_CUSTOM_GENERATORS = new HashMap<>(BlockModelGenerators.FULL_BLOCK_MODEL_CUSTOM_GENERATORS);
+        }
+
+        if (!(BlockModelGenerators.TEXTURED_MODELS instanceof HashMap<?, ?>)) {
+            BlockModelGenerators.TEXTURED_MODELS = new HashMap<>(BlockModelGenerators.TEXTURED_MODELS);
+        }
+
         return blockModelGenerators;
     }
 
@@ -123,22 +132,23 @@ public abstract class AbstractModelProvider implements DataProvider {
     /**
      * @see BlockModelGenerators#family(Block)
      */
-    public void generateForBlocks(BlockModelGenerators blockModelGenerators, BlockSetFamily blockSetFamily, Map<BlockSetVariant, BiConsumer<BlockModelGenerators, Block>> variants) {
-        this.generateForBlocks(blockModelGenerators,
-                blockSetFamily,
-                variants,
-                TexturedModel.CUBE.get(blockSetFamily.getBaseBlock().value()));
+    public void generateForBlocks(BlockModelGenerators blockModelGenerators, BlockSetFamily blockSetFamily) {
+        this.generateForBlocks(blockModelGenerators, blockSetFamily, Collections.emptyMap());
     }
 
     /**
+     * Similar to a method patched in by NeoForge.
+     *
      * @see BlockModelGenerators#family(Block)
      */
-    public void generateForBlocks(BlockModelGenerators blockModelGenerators, BlockSetFamily blockSetFamily, Map<BlockSetVariant, BiConsumer<BlockModelGenerators, Block>> variants, TexturedModel texturedModel) {
+    public void generateForBlocks(BlockModelGenerators blockModelGenerators, BlockSetFamily blockSetFamily, Map<BlockSetVariant, BiConsumer<BlockModelGenerators, Block>> variants) {
         BlockFamily blockFamily = blockSetFamily.getBlockFamily();
         if (blockFamily.shouldGenerateModel()) {
-            BlockModelGenerators.BlockFamilyProvider familyProvider = blockModelGenerators.new BlockFamilyProvider(
-                    texturedModel.getMapping());
-            familyProvider.fullBlock = BlockModelGenerators.plainModel(texturedModel.getTemplate()
+            Block baseBlock = blockSetFamily.getBaseBlock().value();
+            TexturedModel model = BlockModelGenerators.TEXTURED_MODELS.getOrDefault(baseBlock,
+                    TexturedModel.CUBE.get(baseBlock));
+            BlockModelGenerators.BlockFamilyProvider familyProvider = blockModelGenerators.new BlockFamilyProvider(model.getMapping());
+            familyProvider.fullBlock = BlockModelGenerators.plainModel(model.getTemplate()
                     .getDefaultModelLocation(blockFamily.getBaseBlock()));
             familyProvider.generateFor(blockFamily);
             blockSetFamily.getBlockVariants().forEach((BlockSetVariant variant, Holder.Reference<Block> holder) -> {

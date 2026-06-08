@@ -10,6 +10,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.WoodType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -23,17 +24,21 @@ public final class BlockSetFamilyRegistrar implements BlockSetFamily, BlockSetFa
     private final Map<BlockSetVariant, Holder.Reference<Block>> blockVariants = new LinkedHashMap<>();
     private final Map<BlockSetVariant, Holder.Reference<Item>> itemVariants = new LinkedHashMap<>();
     private final Map<BlockSetVariant, Holder.Reference<EntityType<?>>> entityVariants = new LinkedHashMap<>();
+    private final Map<BlockSetVariant, Holder.Reference<Block>> blockVariantsView = Collections.unmodifiableMap(this.blockVariants);
+    private final Map<BlockSetVariant, Holder.Reference<Item>> itemVariantsView = Collections.unmodifiableMap(this.itemVariants);
+    private final Map<BlockSetVariant, Holder.Reference<EntityType<?>>> entityVariantsView = Collections.unmodifiableMap(
+            this.entityVariants);
     private final RegistryManager registries;
     private final Holder.Reference<Block> baseBlock;
-    private final String basePath;
+    private final String baseName;
     private final BlockSetType blockSetType;
     private final WoodType woodType;
     private Consumer<BlockFamily.Builder> blockFamilyConsumer = Function.identity()::apply;
 
-    public BlockSetFamilyRegistrar(RegistryManager registries, Holder.Reference<Block> baseBlock, String basePath, BlockSetType blockSetType, WoodType woodType) {
+    public BlockSetFamilyRegistrar(RegistryManager registries, Holder.Reference<Block> baseBlock, String baseName, BlockSetType blockSetType, WoodType woodType) {
         this.registries = registries;
         this.baseBlock = baseBlock;
-        this.basePath = basePath;
+        this.baseName = baseName;
         this.blockSetType = blockSetType;
         this.woodType = woodType;
     }
@@ -74,22 +79,22 @@ public final class BlockSetFamilyRegistrar implements BlockSetFamily, BlockSetFa
 
     @Override
     public Map<BlockSetVariant, Holder.Reference<Block>> getBlockVariants() {
-        return Collections.unmodifiableMap(this.blockVariants);
+        return this.blockVariantsView;
     }
 
     @Override
     public Map<BlockSetVariant, Holder.Reference<Item>> getItemVariants() {
-        return Collections.unmodifiableMap(this.itemVariants);
+        return this.itemVariantsView;
     }
 
     @Override
     public Map<BlockSetVariant, Holder.Reference<EntityType<?>>> getEntityVariants() {
-        return Collections.unmodifiableMap(this.entityVariants);
+        return this.entityVariantsView;
     }
 
     @Override
-    public String getName(UnaryOperator<String> name) {
-        return name.apply(this.basePath);
+    public String getName(UnaryOperator<String> name, @Nullable String baseNameOverride) {
+        return Objects.requireNonNullElseGet(baseNameOverride, () -> name.apply(this.baseName));
     }
 
     @Override
@@ -98,27 +103,33 @@ public final class BlockSetFamilyRegistrar implements BlockSetFamily, BlockSetFa
     }
 
     @Override
-    public void registerBlock(BlockSetVariant variant, Holder.Reference<Block> holder) {
+    public Writable registerBlock(BlockSetVariant variant, Holder.Reference<Block> holder) {
         Objects.requireNonNull(holder, "holder is null");
         if (this.blockVariants.put(variant, holder) != null) {
             throw new IllegalStateException(variant + " already present");
         }
+
+        return this;
     }
 
     @Override
-    public void registerItem(BlockSetVariant variant, Holder.Reference<Item> holder) {
+    public Writable registerItem(BlockSetVariant variant, Holder.Reference<Item> holder) {
         Objects.requireNonNull(holder, "holder is null");
         if (this.itemVariants.put(variant, holder) != null) {
             throw new IllegalStateException(variant + " already present");
         }
+
+        return this;
     }
 
     @Override
-    public void registerEntityType(BlockSetVariant variant, Holder.Reference<EntityType<?>> holder) {
+    public Writable registerEntityType(BlockSetVariant variant, Holder.Reference<EntityType<?>> holder) {
         Objects.requireNonNull(holder, "holder is null");
         if (this.entityVariants.put(variant, holder) != null) {
             throw new IllegalStateException(variant + " already present");
         }
+
+        return this;
     }
 
     @Override

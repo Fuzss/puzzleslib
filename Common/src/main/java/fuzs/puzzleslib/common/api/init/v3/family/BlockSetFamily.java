@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.WoodType;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
 
@@ -67,28 +68,34 @@ public interface BlockSetFamily {
                 return new BoatDispenseItemBehavior((EntityType<? extends AbstractBoat>) holder.value());
             });
 
-    static Writable base(RegistryManager registries, Holder.Reference<Block> baseBlock, String basePath) {
-        BlockSetType blockSetType = new BlockSetType(registries.makeKey(basePath).toString());
-        WoodType woodType = new WoodType(registries.makeKey(basePath).toString(), blockSetType);
-        return new BlockSetFamilyRegistrar(registries, baseBlock, basePath, blockSetType, woodType);
+    static Writable base(RegistryManager registries, Holder.Reference<Block> baseBlock, String baseName) {
+        BlockSetType blockSetType = new BlockSetType(registries.makeKey(baseName).toString());
+        WoodType woodType = new WoodType(registries.makeKey(baseName).toString(), blockSetType);
+        return new BlockSetFamilyRegistrar(registries, baseBlock, baseName, blockSetType, woodType);
     }
 
-    static Writable any(RegistryManager registries, Holder.Reference<Block> baseBlock, String basePath) {
-        return base(registries, baseBlock, basePath).generateFor(BlockSetVariant.STAIRS)
+    static Writable any(RegistryManager registries, Holder.Reference<Block> baseBlock, String baseName) {
+        return base(registries,
+                baseBlock,
+                baseName).configureBlockFamily(BlockFamily.Builder::generateStonecutterRecipe)
+                .generateFor(BlockSetVariant.STAIRS)
                 .generateFor(BlockSetVariant.SLAB)
                 .generateFor(BlockSetVariant.WALL);
     }
 
-    static Writable metal(RegistryManager registries, Holder.Reference<Block> baseBlock, String basePath) {
-        return base(registries, baseBlock, basePath).generateFor(BlockSetVariant.STAIRS)
+    static Writable metal(RegistryManager registries, Holder.Reference<Block> baseBlock, String baseName) {
+        return base(registries,
+                baseBlock,
+                baseName).configureBlockFamily(BlockFamily.Builder::generateStonecutterRecipe)
+                .generateFor(BlockSetVariant.STAIRS)
                 .generateFor(BlockSetVariant.SLAB)
                 .generateFor(BlockSetVariant.DOOR)
                 .generateFor(BlockSetVariant.TRAPDOOR)
                 .generateFor(BlockSetVariant.PRESSURE_PLATE);
     }
 
-    static Writable wooden(RegistryManager registries, Holder.Reference<Block> baseBlock, String basePath) {
-        return base(registries, baseBlock, basePath).configureBlockFamily((BlockFamily.Builder blockFamily) -> {
+    static Writable wooden(RegistryManager registries, Holder.Reference<Block> baseBlock, String baseName) {
+        return base(registries, baseBlock, baseName).configureBlockFamily((BlockFamily.Builder blockFamily) -> {
                     blockFamily.recipeGroupPrefix("wooden").recipeUnlockedBy("has_planks");
                 })
                 .generateFor(BlockSetVariant.STAIRS)
@@ -165,28 +172,28 @@ public interface BlockSetFamily {
     }
 
     interface Writable extends BlockSetFamily {
+        Writable registerBlock(BlockSetVariant variant, Holder.Reference<Block> holder);
+
+        Writable registerItem(BlockSetVariant variant, Holder.Reference<Item> holder);
+
+        Writable registerEntityType(BlockSetVariant variant, Holder.Reference<EntityType<?>> holder);
+
         Writable generateFor(BlockSetVariant variant);
 
         Writable configureBlockFamily(Consumer<BlockFamily.Builder> blockFamilyConsumer);
     }
 
-    interface Context extends BlockSetFamily {
-        String getName(UnaryOperator<String> name);
+    interface Context extends BlockSetFamily.Writable {
+        String getName(UnaryOperator<String> name, @Nullable String baseNameOverride);
 
-        default String getNameWithPrefix(String prefix) {
-            return this.getName((String string) -> prefix + "_" + string);
+        default String getNameWithPrefix(String prefix, @Nullable String baseNameOverride) {
+            return this.getName((String baseName) -> prefix + "_" + baseName, baseNameOverride);
         }
 
-        default String getNameWithSuffix(String suffix) {
-            return this.getName((String string) -> string + "_" + suffix);
+        default String getNameWithSuffix(String suffix, @Nullable String baseNameOverride) {
+            return this.getName((String baseName) -> baseName + "_" + suffix, baseNameOverride);
         }
 
         RegistryManager getRegistries();
-
-        void registerBlock(BlockSetVariant variant, Holder.Reference<Block> holder);
-
-        void registerItem(BlockSetVariant variant, Holder.Reference<Item> holder);
-
-        void registerEntityType(BlockSetVariant variant, Holder.Reference<EntityType<?>> holder);
     }
 }

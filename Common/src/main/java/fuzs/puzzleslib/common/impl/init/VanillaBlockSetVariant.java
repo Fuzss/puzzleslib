@@ -4,6 +4,7 @@ import fuzs.puzzleslib.common.api.init.v3.family.BlockSetFamily;
 import fuzs.puzzleslib.common.api.init.v3.family.BlockSetVariant;
 import net.minecraft.data.BlockFamily;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -55,11 +56,13 @@ public abstract class VanillaBlockSetVariant implements BlockSetVariant {
         }
 
         @Override
-        public void generateFor(BlockSetFamily.Context context) {
+        public void generateFor(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
             context.registerBlock(this,
-                    context.getRegistries().registerBlock(context.getNameWithPrefix(this.getSerializedName()), () -> {
-                        return BlockBehaviour.Properties.ofFullCopy(context.getBaseBlock().value());
-                    }));
+                    context.getRegistries()
+                            .registerBlock(context.getNameWithPrefix(this.getSerializedName(), baseNameOverride),
+                                    () -> {
+                                        return BlockBehaviour.Properties.ofFullCopy(context.getBaseBlock().value());
+                                    }));
             context.registerItem(this, context.getRegistries().registerBlockItem(context.getBlock(this)));
         }
     }
