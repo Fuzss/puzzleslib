@@ -25,22 +25,21 @@ public final class CreativeModeTabHelper {
     }
 
     public static Component getTitle(Identifier identifier) {
-        String translationKey = "itemGroup.%s.%s".formatted(identifier.getNamespace(),
-                identifier.getPath());
+        String translationKey = "itemGroup.%s.%s".formatted(identifier.getNamespace(), identifier.getPath());
         return Component.translatable(translationKey);
     }
 
     public static CreativeModeTab.DisplayItemsGenerator getDisplayItems(String modId) {
-        return (CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) -> {
-            generateItemTypes(modId, itemDisplayParameters, output);
-            generateEnchantmentBookTypes(modId, itemDisplayParameters, output);
-            generatePotionEffectTypes(modId, itemDisplayParameters, output);
-            generatePaintingTypes(modId, itemDisplayParameters, output);
+        return (CreativeModeTab.ItemDisplayParameters parameters, CreativeModeTab.Output output) -> {
+            generateItemTypes(modId, parameters, output);
+            generateEnchantmentBookTypes(modId, parameters, output);
+            generatePotionEffectTypes(modId, parameters, output);
+            generatePaintingTypes(modId, parameters, output);
         };
     }
 
-    public static void generateItemTypes(String modId, CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) {
-        itemDisplayParameters.holders().lookup(Registries.ITEM).ifPresent(registryLookup -> {
+    public static void generateItemTypes(String modId, CreativeModeTab.ItemDisplayParameters parameters, CreativeModeTab.Output output) {
+        parameters.holders().lookup(Registries.ITEM).ifPresent(registryLookup -> {
             registryLookup.listElements()
                     .filter((Holder.Reference<Item> holder) -> holder.key().identifier().getNamespace().equals(modId))
                     .map(ItemStack::new)
@@ -49,8 +48,8 @@ public final class CreativeModeTabHelper {
         });
     }
 
-    public static void generateEnchantmentBookTypes(String modId, CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) {
-        itemDisplayParameters.holders().lookup(Registries.ENCHANTMENT).ifPresent(registryLookup -> {
+    public static void generateEnchantmentBookTypes(String modId, CreativeModeTab.ItemDisplayParameters parameters, CreativeModeTab.Output output) {
+        parameters.holders().lookup(Registries.ENCHANTMENT).ifPresent(registryLookup -> {
             CreativeModeTabs.generateEnchantmentBookTypesOnlyMaxLevel((ItemStack itemStack, CreativeModeTab.TabVisibility tabVisibility) -> {
                 if (itemStack.getOrDefault(DataComponents.STORED_ENCHANTMENTS, ItemEnchantments.EMPTY)
                         .keySet()
@@ -67,8 +66,8 @@ public final class CreativeModeTabHelper {
         });
     }
 
-    public static void generatePotionEffectTypes(String modId, CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) {
-        itemDisplayParameters.holders().lookup(Registries.POTION).ifPresent(registryLookup -> {
+    public static void generatePotionEffectTypes(String modId, CreativeModeTab.ItemDisplayParameters parameters, CreativeModeTab.Output output) {
+        parameters.holders().lookup(Registries.POTION).ifPresent(registryLookup -> {
             for (Item item : POTION_ITEMS) {
                 CreativeModeTabs.generatePotionEffectTypes((ItemStack itemStack, CreativeModeTab.TabVisibility tabVisibility) -> {
                             if (itemStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY)
@@ -84,16 +83,16 @@ public final class CreativeModeTabHelper {
                         registryLookup,
                         item,
                         CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS,
-                        itemDisplayParameters.enabledFeatures());
+                        parameters.enabledFeatures());
             }
         });
     }
 
-    public static void generatePaintingTypes(String modId, CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) {
-        itemDisplayParameters.holders()
+    public static void generatePaintingTypes(String modId, CreativeModeTab.ItemDisplayParameters parameters, CreativeModeTab.Output output) {
+        parameters.holders()
                 .lookup(Registries.PAINTING_VARIANT)
                 .ifPresent(registryLookup -> CreativeModeTabs.generatePresetPaintings(output,
-                        itemDisplayParameters.holders(),
+                        parameters.holders(),
                         registryLookup,
                         (Holder<PaintingVariant> holder) -> holder.unwrapKey()
                                 .map(ResourceKey::identifier)

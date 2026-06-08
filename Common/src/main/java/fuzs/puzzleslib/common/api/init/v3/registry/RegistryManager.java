@@ -8,7 +8,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import fuzs.puzzleslib.common.api.core.v1.util.EnvironmentAwareBuilder;
 import fuzs.puzzleslib.common.impl.core.ModContext;
-import fuzs.puzzleslib.common.impl.item.CreativeModeTabHelper;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.BlockPos;
@@ -274,34 +273,32 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return the holder reference
      */
     default Holder.Reference<CreativeModeTab> registerCreativeModeTab(Supplier<ItemStack> iconSupplier) {
-        Identifier identifier = this.makeKey("main");
-        return this.registerCreativeModeTab(identifier.getPath(),
-                iconSupplier,
-                CreativeModeTabHelper.getDisplayItems(identifier.getNamespace()),
-                false);
+        return this.registerCreativeModeTab(iconSupplier, UnaryOperator.identity());
     }
 
     /**
      * Register a creative mode tab.
      *
      * @param iconSupplier the tab icon item stack
-     * @param displayItems the display items generator
+     * @param displayItems the display items generating all registered items; allows for overriding item order by
+     *                     passing individual items beforehand
      * @return the holder reference
      */
-    default Holder.Reference<CreativeModeTab> registerCreativeModeTab(Supplier<ItemStack> iconSupplier, CreativeModeTab.DisplayItemsGenerator displayItems) {
+    default Holder.Reference<CreativeModeTab> registerCreativeModeTab(Supplier<ItemStack> iconSupplier, UnaryOperator<CreativeModeTab.DisplayItemsGenerator> displayItems) {
         return this.registerCreativeModeTab("main", iconSupplier, displayItems, false);
     }
 
     /**
      * Register a creative mode tab.
      *
-     * @param path          the registered name
-     * @param iconSupplier  the tab icon item stack
-     * @param displayItems  the display items generator
-     * @param withSearchBar should the tab include a search bar (only supported for NeoForge)
+     * @param path         the registered name
+     * @param iconSupplier the tab icon item stack
+     * @param displayItems the display items generating all registered items; allows for overriding item order by
+     *                     passing individual items beforehand
+     * @param hasSearchBar should the tab include a search bar (only supported for NeoForge)
      * @return the holder reference
      */
-    Holder.Reference<CreativeModeTab> registerCreativeModeTab(String path, Supplier<ItemStack> iconSupplier, CreativeModeTab.DisplayItemsGenerator displayItems, boolean withSearchBar);
+    Holder.Reference<CreativeModeTab> registerCreativeModeTab(String path, Supplier<ItemStack> iconSupplier, UnaryOperator<CreativeModeTab.DisplayItemsGenerator> displayItems, boolean hasSearchBar);
 
     /**
      * Register a data component type.
