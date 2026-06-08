@@ -1,7 +1,10 @@
 {
   "pack": {
     "description": "Resources for Puzzles Lib",
-    "max_format": 101,
+    "max_format": [
+      101,
+      1
+    ],
     "min_format": [
       101,
       1
