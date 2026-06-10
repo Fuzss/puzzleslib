@@ -1,8 +1,9 @@
 package fuzs.puzzleslib.fabric.impl.client.core;
 
 import fuzs.puzzleslib.common.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.fabric.impl.client.core.context.*;
+import fuzs.puzzleslib.common.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.common.impl.core.context.ModConstructorImpl;
+import fuzs.puzzleslib.fabric.impl.client.core.context.*;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.minecraft.client.Minecraft;
 
@@ -19,7 +20,9 @@ public final class FabricClientModConstructor implements ModConstructorImpl<Clie
         modConstructor.onRegisterParticleProviders(new ParticleProvidersContextFabricImpl());
         modConstructor.onRegisterMenuScreens(new MenuScreensContextFabricImpl());
         modConstructor.onRegisterLayerDefinitions(new LayerDefinitionsContextFabricImpl());
-        modConstructor.onRegisterBlockStateResolver(new BlockStateResolverContextFabricImpl());
+        LoadCompleteCallback.EVENT.register(() -> {
+            modConstructor.onRegisterBlockStateResolver(new BlockStateResolverContextFabricImpl());
+        });
         modConstructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShadersContextFabricImpl());
         modConstructor.onRegisterBuiltInBlockModels(new BuiltInBlockModelsContextFabricImpl());
         modConstructor.onRegisterSkullRenderers(new SkullRenderersContextFabricImpl());
