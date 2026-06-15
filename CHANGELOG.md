@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v26.1.11-mc26.1.x] - 2026-06-15
+
+### Fixed
+
+- Fix `ModPackMetadataProvider` generating invalid metadata
+
 ## [v26.1.10-mc26.1.x] - 2026-06-10
 
 ### Added
@@ -18,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix error when installed together with the [Cucumber Library](https://modrinth.com/mod/cucumber) mod
+- Fix `NetworkingHelper::hasChannel` not checking `Connection::isConnected` on NeoForge
 
 ## [v26.1.9-mc26.1.x] - 2026-05-30
 
@@ -47,7 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fix breaking the Do a Barrel Roll mod
+- Fix breaking the [Do a Barrel Roll](https://modrinth.com/mod/do-a-barrel-roll) mod
 - Fix `TransmuteShapedRecipeBuilder` still using `ItemStack` instead of `ItemStackTemplate`
 
 ## [v26.1.6-mc26.1.x] - 2026-05-06
@@ -70,7 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fix crash with the Do a Barrel Roll mod
+- Fix crash with the [Do a Barrel Roll](https://modrinth.com/mod/do-a-barrel-roll) mod
 
 ## [v26.1.4-mc26.1.x] - 2026-04-30
 
