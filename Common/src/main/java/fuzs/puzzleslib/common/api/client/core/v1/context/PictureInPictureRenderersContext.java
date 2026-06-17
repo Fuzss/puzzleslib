@@ -1,10 +1,9 @@
 package fuzs.puzzleslib.common.api.client.core.v1.context;
 
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Register renderers for custom gui elements, like an entity or the enchanting table book.
@@ -16,9 +15,9 @@ import java.util.function.Function;
 public interface PictureInPictureRenderersContext {
 
     /**
-     * @param renderStateClazz                the render state class type
-     * @param pictureInPictureRendererFactory the factory for the custom renderer
-     * @param <T>                             the supported render state
+     * @param renderStateClazz the render state class type
+     * @param rendererFactory  the factory for the custom renderer
+     * @param <T>              the supported render state
      */
-    <T extends PictureInPictureRenderState> void registerPictureInPictureRenderer(Class<T> renderStateClazz, Function<MultiBufferSource.BufferSource, PictureInPictureRenderer<T>> pictureInPictureRendererFactory);
+    <T extends PictureInPictureRenderState> void registerPictureInPictureRenderer(Class<T> renderStateClazz, Supplier<PictureInPictureRenderer<T>> rendererFactory);
 }

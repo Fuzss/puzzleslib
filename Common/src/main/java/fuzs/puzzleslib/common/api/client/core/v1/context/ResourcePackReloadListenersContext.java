@@ -5,7 +5,6 @@ import net.minecraft.client.gui.font.FontManager;
 import net.minecraft.client.particle.ParticleResources;
 import net.minecraft.client.renderer.CloudRenderer;
 import net.minecraft.client.renderer.GpuWarnlistManager;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.ShaderManager;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -89,9 +88,9 @@ public interface ResourcePackReloadListenersContext {
      */
     Identifier WAYPOINT_STYLES = Identifier.withDefaultNamespace("waypoint_styles");
     /**
-     * The {@link LevelRenderer} reload listener.
+     * The {@link net.minecraft.client.renderer.extract.LevelExtractor} reload listener.
      */
-    Identifier LEVEL_RENDERER = Identifier.withDefaultNamespace("level_renderer");
+    Identifier LEVEL_EXTRACTOR = Identifier.withDefaultNamespace("level_extractor");
     /**
      * The {@link CloudRenderer} reload listener.
      */

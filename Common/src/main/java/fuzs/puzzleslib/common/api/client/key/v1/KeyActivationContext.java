@@ -39,9 +39,9 @@ public enum KeyActivationContext {
      * @return is the activation context able to trigger the key binding
      */
     public boolean isSupportedEnvironment() {
-        if (this.isScreenContext && Minecraft.getInstance().screen != null) {
+        if (this.isScreenContext && Minecraft.getInstance().gui.screen() != null) {
             return true;
-        } else if (this.isGameContext && Minecraft.getInstance().screen == null) {
+        } else if (this.isGameContext && Minecraft.getInstance().gui.screen() == null) {
             return true;
         } else {
             return false;

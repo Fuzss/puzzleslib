@@ -5,8 +5,8 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricRendererEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.ScreenEffectRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.sprite.SpriteGetter;
 import net.minecraft.world.level.block.Blocks;
@@ -25,36 +25,36 @@ abstract class ScreenEffectRendererFabricMixin {
     @Final
     private SpriteGetter sprites;
 
-    @WrapWithCondition(method = "renderScreenEffect",
+    @WrapWithCondition(method = "submit",
                        at = @At(value = "INVOKE",
-                                target = "Lnet/minecraft/client/renderer/ScreenEffectRenderer;renderTex(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V"))
-    public boolean renderScreenEffect(TextureAtlasSprite textureAtlasSprite, PoseStack poseStack, MultiBufferSource bufferSource, @Local BlockState blockState) {
+                                target = "Lnet/minecraft/client/renderer/ScreenEffectRenderer;submitBlockSprite(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V"))
+    public boolean submit(TextureAtlasSprite textureAtlasSprite, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int color, @Local BlockState blockState) {
         return FabricRendererEvents.RENDER_BLOCK_OVERLAY.invoker()
-                .onRenderBlockOverlay(this.minecraft.player, poseStack, bufferSource, blockState, this.sprites)
+                .onRenderBlockOverlay(this.minecraft.player, poseStack, submitNodeCollector, blockState, this.sprites)
                 .isPass();
     }
 
-    @WrapWithCondition(method = "renderScreenEffect",
+    @WrapWithCondition(method = "submit",
                        at = @At(value = "INVOKE",
-                                target = "Lnet/minecraft/client/renderer/ScreenEffectRenderer;renderWater(Lnet/minecraft/client/Minecraft;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V"))
-    public boolean renderScreenEffect(Minecraft minecraft, PoseStack poseStack, MultiBufferSource bufferSource) {
+                                target = "Lnet/minecraft/client/renderer/ScreenEffectRenderer;submitWater(Lnet/minecraft/client/Minecraft;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;)V"))
+    public boolean submit(Minecraft minecraft, PoseStack poseStack, SubmitNodeCollector submitNodeCollector) {
         return FabricRendererEvents.RENDER_BLOCK_OVERLAY.invoker()
                 .onRenderBlockOverlay(minecraft.player,
                         poseStack,
-                        bufferSource,
+                        submitNodeCollector,
                         Blocks.WATER.defaultBlockState(),
                         this.sprites)
                 .isPass();
     }
 
-    @WrapWithCondition(method = "renderScreenEffect",
+    @WrapWithCondition(method = "submit",
                        at = @At(value = "INVOKE",
-                                target = "Lnet/minecraft/client/renderer/ScreenEffectRenderer;renderFire(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V"))
-    public boolean renderScreenEffect(PoseStack poseStack, MultiBufferSource bufferSource, TextureAtlasSprite textureAtlasSprite) {
+                                target = "Lnet/minecraft/client/renderer/ScreenEffectRenderer;submitFire(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V"))
+    public boolean submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, TextureAtlasSprite textureAtlasSprite) {
         return FabricRendererEvents.RENDER_BLOCK_OVERLAY.invoker()
                 .onRenderBlockOverlay(this.minecraft.player,
                         poseStack,
-                        bufferSource,
+                        submitNodeCollector,
                         Blocks.FIRE.defaultBlockState(),
                         this.sprites)
                 .isPass();

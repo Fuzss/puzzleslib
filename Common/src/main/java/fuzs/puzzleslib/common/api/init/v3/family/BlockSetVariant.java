@@ -19,91 +19,163 @@ import net.minecraft.world.level.material.PushReaction;
 import org.jspecify.annotations.Nullable;
 
 public interface BlockSetVariant extends StringRepresentable {
-    BlockSetVariant CHISELED = new VanillaBlockSetVariant.Direct(BlockFamily.Variant.CHISELED,
+    BlockSetVariant CHISELED = new VanillaBlockSetVariant.Prefix(BlockFamily.Variant.CHISELED,
             BlockFamily.Builder::chiseled);
-    BlockSetVariant CRACKED = new VanillaBlockSetVariant.Direct(BlockFamily.Variant.CRACKED,
+    BlockSetVariant CRACKED = new VanillaBlockSetVariant.Prefix(BlockFamily.Variant.CRACKED,
             BlockFamily.Builder::cracked);
-    BlockSetVariant POLISHED = new VanillaBlockSetVariant.Direct(BlockFamily.Variant.POLISHED,
+    BlockSetVariant CUT = new VanillaBlockSetVariant.Prefix(BlockFamily.Variant.CUT, BlockFamily.Builder::cut);
+    BlockSetVariant MOSAIC = new VanillaBlockSetVariant.Suffix(BlockFamily.Variant.MOSAIC, BlockFamily.Builder::mosaic);
+    BlockSetVariant POLISHED = new VanillaBlockSetVariant.Prefix(BlockFamily.Variant.POLISHED,
             BlockFamily.Builder::polished);
-    BlockSetVariant CUT = new VanillaBlockSetVariant.Direct(BlockFamily.Variant.CUT, BlockFamily.Builder::cut);
-    BlockSetVariant MOSAIC = new VanillaBlockSetVariant.Direct(BlockFamily.Variant.MOSAIC, BlockFamily.Builder::mosaic);
-    BlockSetVariant STAIRS = new VanillaBlockSetVariant(BlockFamily.Variant.STAIRS, BlockFamily.Builder::stairs) {
+    BlockSetVariant BRICKS = new VanillaBlockSetVariant.Suffix(BlockFamily.Variant.BRICKS, BlockFamily.Builder::bricks);
+    BlockSetVariant COBBLED = new VanillaBlockSetVariant.Prefix(BlockFamily.Variant.COBBLED,
+            BlockFamily.Builder::cobbled);
+    BlockSetVariant TILES = new VanillaBlockSetVariant.Suffix(BlockFamily.Variant.TILES, BlockFamily.Builder::tiles);
+    BlockSetVariant PILLAR = new VanillaBlockSetVariant.Suffix(BlockFamily.Variant.PILLAR,
+            BlockFamily.Builder::pillar) {
+        @Override
+        public void registerBlock(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
+            context.registerBlock(this,
+                    context.getRegistries()
+                            .registerBlock(this.getName(context, this.getSerializedName(), baseNameOverride),
+                                    RotatedPillarBlock::new,
+                                    () -> {
+                                        return BlockBehaviour.Properties.ofFullCopy(context.getBaseBlock().value());
+                                    }));
+        }
+    };
+    BlockSetVariant LOG = new VanillaBlockSetVariant.Suffix(BlockFamily.Variant.LOG, BlockFamily.Builder::log) {
+        @Override
+        public void registerBlock(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
+            context.registerBlock(this,
+                    context.getRegistries()
+                            .registerBlock(this.getName(context, this.getSerializedName(), baseNameOverride),
+                                    RotatedPillarBlock::new,
+                                    () -> {
+                                        return BlockBehaviour.Properties.ofFullCopy(context.getBaseBlock().value())
+                                                .strength(2.0F);
+                                    }));
+        }
+    };
+    BlockSetVariant WOOD = new StandaloneBlockSetVariant("wood") {
         @Override
         public void generateFor(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
             context.registerBlock(this,
                     context.getRegistries()
                             .registerBlock(context.getNameWithSuffix(this.getSerializedName(), baseNameOverride),
+                                    RotatedPillarBlock::new,
+                                    () -> {
+                                        return BlockBehaviour.Properties.ofFullCopy(context.getBaseBlock().value())
+                                                .strength(2.0F);
+                                    }));
+            context.registerItem(this, context.getRegistries().registerBlockItem(context.getBlock(this)));
+        }
+    };
+    BlockSetVariant STRIPPED_LOG = new VanillaBlockSetVariant(BlockFamily.Variant.STRIPPED_LOG,
+            BlockFamily.Builder::strippedLog) {
+        @Override
+        public void registerBlock(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
+            context.registerBlock(this,
+                    context.getRegistries()
+                            .registerBlock(this.getName(context, this.getSerializedName(), baseNameOverride),
+                                    RotatedPillarBlock::new,
+                                    () -> {
+                                        return BlockBehaviour.Properties.ofFullCopy(context.getBaseBlock().value())
+                                                .strength(2.0F);
+                                    }));
+        }
+
+        @Override
+        public String getName(BlockSetFamily.Context context, String variantName, @Nullable String baseNameOverride) {
+            return context.getName((String baseName) -> "stripped_" + baseName + "_log", baseNameOverride);
+        }
+    };
+    BlockSetVariant STRIPPED_WOOD = new StandaloneBlockSetVariant("stripped_wood") {
+        @Override
+        public void generateFor(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
+            context.registerBlock(this,
+                    context.getRegistries()
+                            .registerBlock(context.getName((String baseName) -> "stripped_" + baseName + "_wood",
+                                    baseNameOverride), RotatedPillarBlock::new, () -> {
+                                return BlockBehaviour.Properties.ofFullCopy(context.getBaseBlock().value())
+                                        .strength(2.0F);
+                            }));
+            context.registerItem(this, context.getRegistries().registerBlockItem(context.getBlock(this)));
+        }
+    };
+    BlockSetVariant STAIRS = new VanillaBlockSetVariant.Suffix(BlockFamily.Variant.STAIRS,
+            BlockFamily.Builder::stairs) {
+        @Override
+        public void registerBlock(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
+            context.registerBlock(this,
+                    context.getRegistries()
+                            .registerBlock(this.getName(context, this.getSerializedName(), baseNameOverride),
                                     (BlockBehaviour.Properties properties) -> new StairBlock(context.getBaseBlock()
                                             .value()
                                             .defaultBlockState(), properties),
                                     () -> {
                                         return BlockBehaviour.Properties.ofLegacyCopy(context.getBaseBlock().value());
                                     }));
-            context.registerItem(this, context.getRegistries().registerBlockItem(context.getBlock(this)));
         }
     };
-    BlockSetVariant SLAB = new VanillaBlockSetVariant(BlockFamily.Variant.SLAB, BlockFamily.Builder::slab) {
+    BlockSetVariant SLAB = new VanillaBlockSetVariant.Suffix(BlockFamily.Variant.SLAB, BlockFamily.Builder::slab) {
         @Override
-        public void generateFor(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
+        public void registerBlock(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
             context.registerBlock(this,
                     context.getRegistries()
-                            .registerBlock(context.getNameWithSuffix(this.getSerializedName(), baseNameOverride),
+                            .registerBlock(this.getName(context, this.getSerializedName(), baseNameOverride),
                                     SlabBlock::new,
                                     () -> {
                                         return BlockBehaviour.Properties.ofFullCopy(context.getBaseBlock().value());
                                     }));
-            context.registerItem(this, context.getRegistries().registerBlockItem(context.getBlock(this)));
         }
     };
-    BlockSetVariant WALL = new VanillaBlockSetVariant(BlockFamily.Variant.WALL, BlockFamily.Builder::wall) {
+    BlockSetVariant WALL = new VanillaBlockSetVariant.Suffix(BlockFamily.Variant.WALL, BlockFamily.Builder::wall) {
         @Override
-        public void generateFor(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
+        public void registerBlock(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
             context.registerBlock(this,
                     context.getRegistries()
-                            .registerBlock(context.getNameWithSuffix(this.getSerializedName(), baseNameOverride),
+                            .registerBlock(this.getName(context, this.getSerializedName(), baseNameOverride),
                                     WallBlock::new,
                                     () -> {
                                         return BlockBehaviour.Properties.ofLegacyCopy(context.getBaseBlock().value())
                                                 .forceSolidOn();
                                     }));
-            context.registerItem(this, context.getRegistries().registerBlockItem(context.getBlock(this)));
         }
     };
-    BlockSetVariant FENCE = new VanillaBlockSetVariant(BlockFamily.Variant.FENCE, BlockFamily.Builder::fence) {
+    BlockSetVariant FENCE = new VanillaBlockSetVariant.Suffix(BlockFamily.Variant.FENCE, BlockFamily.Builder::fence) {
         @Override
-        public void generateFor(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
+        public void registerBlock(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
             context.registerBlock(this,
                     context.getRegistries()
-                            .registerBlock(context.getNameWithSuffix(this.getSerializedName(), baseNameOverride),
+                            .registerBlock(this.getName(context, this.getSerializedName(), baseNameOverride),
                                     FenceBlock::new,
                                     () -> {
                                         return BlockBehaviour.Properties.ofFullCopy(context.getBaseBlock().value());
                                     }));
-            context.registerItem(this, context.getRegistries().registerBlockItem(context.getBlock(this)));
         }
     };
-    BlockSetVariant FENCE_GATE = new VanillaBlockSetVariant(BlockFamily.Variant.FENCE_GATE,
+    BlockSetVariant FENCE_GATE = new VanillaBlockSetVariant.Suffix(BlockFamily.Variant.FENCE_GATE,
             BlockFamily.Builder::fenceGate) {
         @Override
-        public void generateFor(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
+        public void registerBlock(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
             context.registerBlock(this,
                     context.getRegistries()
-                            .registerBlock(context.getNameWithSuffix(this.getSerializedName(), baseNameOverride),
+                            .registerBlock(this.getName(context, this.getSerializedName(), baseNameOverride),
                                     (BlockBehaviour.Properties properties) -> new FenceGateBlock(context.getWoodType(),
                                             properties),
                                     () -> {
                                         return BlockBehaviour.Properties.ofFullCopy(context.getBaseBlock().value())
                                                 .forceSolidOn();
                                     }));
-            context.registerItem(this, context.getRegistries().registerBlockItem(context.getBlock(this)));
         }
     };
-    BlockSetVariant DOOR = new VanillaBlockSetVariant(BlockFamily.Variant.DOOR, BlockFamily.Builder::door) {
+    BlockSetVariant DOOR = new VanillaBlockSetVariant.Suffix(BlockFamily.Variant.DOOR, BlockFamily.Builder::door) {
         @Override
-        public void generateFor(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
+        public void registerBlock(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
             context.registerBlock(this,
                     context.getRegistries()
-                            .registerBlock(context.getNameWithSuffix(this.getSerializedName(), baseNameOverride),
+                            .registerBlock(this.getName(context, this.getSerializedName(), baseNameOverride),
                                     (BlockBehaviour.Properties properties) -> new DoorBlock(context.getBlockSetType(),
                                             properties),
                                     () -> {
@@ -111,16 +183,21 @@ public interface BlockSetVariant extends StringRepresentable {
                                                 .noOcclusion()
                                                 .pushReaction(PushReaction.DESTROY);
                                     }));
+        }
+
+        @Override
+        public void registerItem(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
             context.registerItem(this,
                     context.getRegistries().registerBlockItem(context.getBlock(this), DoubleHighBlockItem::new));
         }
     };
-    BlockSetVariant TRAPDOOR = new VanillaBlockSetVariant(BlockFamily.Variant.TRAPDOOR, BlockFamily.Builder::trapdoor) {
+    BlockSetVariant TRAPDOOR = new VanillaBlockSetVariant.Suffix(BlockFamily.Variant.TRAPDOOR,
+            BlockFamily.Builder::trapdoor) {
         @Override
-        public void generateFor(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
+        public void registerBlock(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
             context.registerBlock(this,
                     context.getRegistries()
-                            .registerBlock(context.getNameWithSuffix(this.getSerializedName(), baseNameOverride),
+                            .registerBlock(this.getName(context, this.getSerializedName(), baseNameOverride),
                                     (BlockBehaviour.Properties properties) -> new TrapDoorBlock(context.getBlockSetType(),
                                             properties),
                                     () -> {
@@ -128,15 +205,15 @@ public interface BlockSetVariant extends StringRepresentable {
                                                 .noOcclusion()
                                                 .isValidSpawn(Blocks::never);
                                     }));
-            context.registerItem(this, context.getRegistries().registerBlockItem(context.getBlock(this)));
         }
     };
-    BlockSetVariant BUTTON = new VanillaBlockSetVariant(BlockFamily.Variant.BUTTON, BlockFamily.Builder::button) {
+    BlockSetVariant BUTTON = new VanillaBlockSetVariant.Suffix(BlockFamily.Variant.BUTTON,
+            BlockFamily.Builder::button) {
         @Override
-        public void generateFor(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
+        public void registerBlock(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
             context.registerBlock(this,
                     context.getRegistries()
-                            .registerBlock(context.getNameWithSuffix(this.getSerializedName(), baseNameOverride),
+                            .registerBlock(this.getName(context, this.getSerializedName(), baseNameOverride),
                                     (BlockBehaviour.Properties properties) -> new ButtonBlock(context.getBlockSetType(),
                                             30,
                                             properties),
@@ -145,16 +222,15 @@ public interface BlockSetVariant extends StringRepresentable {
                                                 .noCollision()
                                                 .pushReaction(PushReaction.DESTROY);
                                     }));
-            context.registerItem(this, context.getRegistries().registerBlockItem(context.getBlock(this)));
         }
     };
-    BlockSetVariant PRESSURE_PLATE = new VanillaBlockSetVariant(BlockFamily.Variant.PRESSURE_PLATE,
+    BlockSetVariant PRESSURE_PLATE = new VanillaBlockSetVariant.Suffix(BlockFamily.Variant.PRESSURE_PLATE,
             BlockFamily.Builder::pressurePlate) {
         @Override
-        public void generateFor(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
+        public void registerBlock(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
             context.registerBlock(this,
                     context.getRegistries()
-                            .registerBlock(context.getNameWithSuffix(this.getSerializedName(), baseNameOverride),
+                            .registerBlock(this.getName(context, this.getSerializedName(), baseNameOverride),
                                     (BlockBehaviour.Properties properties) -> new PressurePlateBlock(context.getBlockSetType(),
                                             properties),
                                     () -> {
@@ -163,7 +239,6 @@ public interface BlockSetVariant extends StringRepresentable {
                                                 .noCollision()
                                                 .pushReaction(PushReaction.DESTROY);
                                     }));
-            context.registerItem(this, context.getRegistries().registerBlockItem(context.getBlock(this)));
         }
     };
     BlockSetVariant SIGN = new StandaloneBlockSetVariant(BlockFamily.Variant.SIGN) {
@@ -208,7 +283,7 @@ public interface BlockSetVariant extends StringRepresentable {
             throw new UnsupportedOperationException();
         }
     };
-    BlockSetVariant HANGING_SIGN = new StandaloneBlockSetVariant("hanging_sign") {
+    BlockSetVariant HANGING_SIGN = new StandaloneBlockSetVariant(BlockFamily.Variant.HANGING_SIGN) {
         @Override
         public void generateFor(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
             context.registerBlock(this,
@@ -244,7 +319,7 @@ public interface BlockSetVariant extends StringRepresentable {
                                     () -> new Item.Properties().stacksTo(16)));
         }
     };
-    BlockSetVariant WALL_HANGING_SIGN = new StandaloneBlockSetVariant("wall_hanging_sign") {
+    BlockSetVariant WALL_HANGING_SIGN = new StandaloneBlockSetVariant(BlockFamily.Variant.WALL_HANGING_SIGN) {
         @Override
         public void generateFor(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
             throw new UnsupportedOperationException();

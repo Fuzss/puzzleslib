@@ -24,8 +24,9 @@ public final class GsonEnumHelper {
     public static <T extends Enum<T>> T convertToEnum(String enumName, Class<T> clazz) {
         try {
             return Enum.valueOf(clazz, enumName);
-        } catch (IllegalArgumentException e) {
-            throw new JsonSyntaxException("Unable to deserialize enum value" + enumName + "of type " + clazz, e);
+        } catch (IllegalArgumentException exception) {
+            throw new JsonSyntaxException("Unable to deserialize enum value" + enumName + "of type " + clazz,
+                    exception);
         }
     }
 
@@ -52,7 +53,8 @@ public final class GsonEnumHelper {
      * @param jsonObject the {@link JsonObject} to get the value from
      * @param key        the json value key
      * @param clazz      the enum type class
-     * @param fallback   fallback value in case <code>key</code> is not present of the string value found for <code>key</code> is not found in the enum
+     * @param fallback   fallback value in case <code>key</code> is not present of the string value found for
+     *                   <code>key</code> is not found in the enum
      * @param <T>        the enum type
      * @return the enum value or <code>fallback</code>
      */

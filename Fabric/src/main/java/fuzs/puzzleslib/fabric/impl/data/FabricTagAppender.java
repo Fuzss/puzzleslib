@@ -3,19 +3,16 @@ package fuzs.puzzleslib.fabric.impl.data;
 import fuzs.puzzleslib.common.api.data.v2.tags.AbstractTagAppender;
 import net.fabricmc.fabric.impl.datagen.TagBuilderHooks;
 import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagBuilder;
 import net.minecraft.tags.TagEntry;
-import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 public final class FabricTagAppender<T> extends AbstractTagAppender<T> {
 
-    public FabricTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
-        super(tagBuilder, keyExtractor);
+    public FabricTagAppender(TagBuilder tagBuilder) {
+        super(tagBuilder);
     }
 
     @SuppressWarnings("UnstableApiUsage")

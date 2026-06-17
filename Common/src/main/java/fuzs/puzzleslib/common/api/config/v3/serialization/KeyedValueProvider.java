@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.common.api.config.v3.serialization;
 
 import fuzs.puzzleslib.common.api.data.v2.tags.AbstractTagAppender;
-import fuzs.puzzleslib.common.api.init.v3.registry.LookupHelper;
 import fuzs.puzzleslib.common.impl.config.serialization.RegistryProvider;
 import fuzs.puzzleslib.common.impl.core.proxy.ProxyImpl;
 import fuzs.puzzleslib.common.impl.data.SortingTagBuilder;
@@ -14,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,12 +38,11 @@ public interface KeyedValueProvider<T> {
      * Creates an {@link AbstractTagAppender} instance that can be converted to a string list by calling
      * {@link AbstractTagAppender#asStringList()}.
      *
-     * @param registryKey the registry to get entry keys from
      * @param <T>         the type of values
      * @return the tag appender
      */
-    static <T> AbstractTagAppender<T> tags(ResourceKey<? extends Registry<? super T>> registryKey) {
-        return tags(new SortingTagBuilder(), registryKey);
+    static <T> AbstractTagAppender<T> tags() {
+        return tags(new SortingTagBuilder());
     }
 
     /**
@@ -53,17 +50,11 @@ public interface KeyedValueProvider<T> {
      * {@link AbstractTagAppender#asStringList()}.
      *
      * @param tagBuilder  the tag builder
-     * @param registryKey the registry to get entry keys from
      * @param <T>         the type of values
      * @return the tag appender
      */
-    static <T> AbstractTagAppender<T> tags(TagBuilder tagBuilder, ResourceKey<? extends Registry<? super T>> registryKey) {
-        Optional<Registry<T>> optional = LookupHelper.getRegistry(registryKey);
-        Function<T, ResourceKey<T>> keyExtractor = optional.isPresent() ?
-                (T t) -> optional.flatMap((Registry<T> registry) -> registry.getResourceKey(t)).orElseThrow(() -> {
-                    return new IllegalStateException("Missing value in " + registryKey + ": " + t);
-                }) : null;
-        return ProxyImpl.get().getTagAppender(tagBuilder, keyExtractor);
+    static <T> AbstractTagAppender<T> tags(TagBuilder tagBuilder) {
+        return ProxyImpl.get().getTagAppender(tagBuilder);
     }
 
     /**

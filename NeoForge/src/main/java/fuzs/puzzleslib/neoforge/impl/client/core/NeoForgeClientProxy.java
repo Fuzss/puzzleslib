@@ -132,11 +132,11 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
 
     @Override
     public int getLeftStatusBarHeight(Identifier identifier) {
-        return Minecraft.getInstance().gui.leftHeight;
+        return Minecraft.getInstance().gui.hud.leftHeight;
     }
 
     @Override
     public int getRightStatusBarHeight(Identifier identifier) {
-        return Minecraft.getInstance().gui.rightHeight;
+        return Minecraft.getInstance().gui.hud.rightHeight;
     }
 }

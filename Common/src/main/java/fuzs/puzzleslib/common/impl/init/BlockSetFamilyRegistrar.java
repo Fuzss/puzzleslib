@@ -73,6 +73,12 @@ public final class BlockSetFamilyRegistrar implements BlockSetFamily, BlockSetFa
                     this.getBlock(BlockSetVariant.WALL_SIGN).value());
         }
 
+        if (this.getBlockVariants().containsKey(BlockSetVariant.HANGING_SIGN) && this.getBlockVariants()
+                .containsKey(BlockSetVariant.WALL_HANGING_SIGN)) {
+            blockFamily.hangingSign(this.getBlock(BlockSetVariant.HANGING_SIGN).value(),
+                    this.getBlock(BlockSetVariant.WALL_HANGING_SIGN).value());
+        }
+
         this.blockFamilyConsumer.accept(blockFamily);
         return blockFamily.getFamily();
     }

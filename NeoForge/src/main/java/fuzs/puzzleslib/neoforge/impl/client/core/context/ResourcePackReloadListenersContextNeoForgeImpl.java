@@ -29,7 +29,7 @@ public record ResourcePackReloadListenersContextNeoForgeImpl(AddClientReloadList
             .put(BLOCK_ENTITY_RENDERER, VanillaClientListeners.BLOCK_ENTITY_RENDERER)
             .put(PARTICLE_RESOURCES, VanillaClientListeners.PARTICLE_RESOURCES)
             .put(WAYPOINT_STYLES, VanillaClientListeners.WAYPOINT_STYLES)
-            .put(LEVEL_RENDERER, VanillaClientListeners.LEVEL_RENDERER)
+            .put(LEVEL_EXTRACTOR, VanillaClientListeners.LEVEL_EXTRACTOR)
             .put(CLOUD_RENDERER, VanillaClientListeners.CLOUD_RENDERER)
             .put(GPU_WARNLIST, VanillaClientListeners.GPU_WARNLIST)
             .put(REGIONAL_COMPLIANCES, VanillaClientListeners.REGIONAL_COMPLIANCES)

@@ -44,19 +44,6 @@ import java.util.function.Consumer;
 public abstract class AbstractRecipeProvider extends RecipeProvider implements DataProvider {
     private static final RegistryAccess REGISTRY_ACCESS = RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY);
     private static final RecipeOutput RECIPE_OUTPUT = ProxyImpl.get().getThrowingRecipeOutput();
-    /**
-     * @see RecipeProvider#STONECUTTER_RECIPE_BUILDERS
-     * @see #generateFor(BlockSetFamily, Map)
-     */
-    @Deprecated
-    public static final Map<BlockSetVariant, FamilyRecipeProvider> VARIANT_STONE_PROVIDERS = ImmutableMap.<BlockSetVariant, FamilyRecipeProvider>builder()
-            .put(BlockSetVariant.CHISELED, FamilyRecipeProvider.stonecutting())
-            .put(BlockSetVariant.CUT, FamilyRecipeProvider.stonecutting())
-            .put(BlockSetVariant.SLAB, FamilyRecipeProvider.stonecutting(RecipeCategory.BUILDING_BLOCKS, 2))
-            .put(BlockSetVariant.STAIRS, FamilyRecipeProvider.stonecutting())
-            .put(BlockSetVariant.POLISHED, FamilyRecipeProvider.stonecutting())
-            .put(BlockSetVariant.WALL, FamilyRecipeProvider.stonecutting(RecipeCategory.DECORATIONS, 1))
-            .build();
 
     private final String modId;
     private final PackOutput packOutput;
@@ -112,14 +99,10 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
     }
 
     /**
-     * @see #generateFor(BlockSetFamily, Map)
+     * @see #generateFor(BlockSetFamily, Map, Map)
      */
     public static Map<BlockSetVariant, FamilyRecipeProvider> createVariantWoodProviders(BlockSetFamily blockSetFamily, Block strippedBlock) {
         return ImmutableMap.<BlockSetVariant, FamilyRecipeProvider>builder()
-                .put(BlockSetVariant.HANGING_SIGN,
-                        (RecipeProvider recipeProvider, ItemLike result, ItemLike input, Optional<String> recipeGroupPrefix, Optional<String> recipeUnlockedBy) -> {
-                            recipeProvider.hangingSign(result, strippedBlock);
-                        })
                 .put(BlockSetVariant.SHELF,
                         (RecipeProvider recipeProvider, ItemLike result, ItemLike input, Optional<String> recipeGroupPrefix, Optional<String> recipeUnlockedBy) -> {
                             recipeProvider.shelf(result, strippedBlock);

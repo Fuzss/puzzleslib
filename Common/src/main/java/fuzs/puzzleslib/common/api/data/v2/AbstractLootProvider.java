@@ -58,9 +58,17 @@ public final class AbstractLootProvider {
         public static final Map<BlockSetVariant, BiConsumer<AbstractLootProvider.Blocks, Block>> VARIANT_PROVIDERS = ImmutableMap.<BlockSetVariant, BiConsumer<AbstractLootProvider.Blocks, Block>>builder()
                 .put(BlockSetVariant.CHISELED, BlockLootSubProvider::dropSelf)
                 .put(BlockSetVariant.CRACKED, BlockLootSubProvider::dropSelf)
-                .put(BlockSetVariant.POLISHED, BlockLootSubProvider::dropSelf)
                 .put(BlockSetVariant.CUT, BlockLootSubProvider::dropSelf)
                 .put(BlockSetVariant.MOSAIC, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.POLISHED, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.BRICKS, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.COBBLED, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.TILES, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.PILLAR, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.LOG, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.WOOD, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.STRIPPED_LOG, BlockLootSubProvider::dropSelf)
+                .put(BlockSetVariant.STRIPPED_WOOD, BlockLootSubProvider::dropSelf)
                 .put(BlockSetVariant.STAIRS, BlockLootSubProvider::dropSelf)
                 .put(BlockSetVariant.SLAB, (AbstractLootProvider.Blocks provider, Block block) -> {
                     provider.add(block, provider::createSlabItemTable);

@@ -65,11 +65,6 @@ public abstract class AbstractModelProvider implements DataProvider {
      */
     public static Map<BlockSetVariant, BiConsumer<BlockModelGenerators, Block>> createVariantWoodBlockProviders(BlockSetFamily blockSetFamily, Block strippedBlock) {
         return ImmutableMap.<BlockSetVariant, BiConsumer<BlockModelGenerators, Block>>builder()
-                .put(BlockSetVariant.HANGING_SIGN, (BlockModelGenerators blockModelGenerators, Block block) -> {
-                    Holder.Reference<Block> wallHangingSign = blockSetFamily.getBlock(BlockSetVariant.WALL_HANGING_SIGN);
-                    Objects.requireNonNull(wallHangingSign, "wall hanging sign is null");
-                    blockModelGenerators.createHangingSign(strippedBlock, block, wallHangingSign.value());
-                })
                 .put(BlockSetVariant.SHELF, (BlockModelGenerators blockModelGenerators, Block block) -> {
                     blockModelGenerators.createShelf(block, strippedBlock);
                 })

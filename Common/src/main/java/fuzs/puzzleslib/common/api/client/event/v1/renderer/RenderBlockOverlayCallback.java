@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.common.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.resources.model.sprite.SpriteGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -21,16 +21,16 @@ public interface RenderBlockOverlayCallback {
      *     <li>any solid block when the player is inside it and the vision is obstructed</li>
      * </ul>
      *
-     * @param player       the local client player the overlay is rendering for
-     * @param poseStack    the current pose stack
-     * @param bufferSource the buffer source
-     * @param blockState   the block state the overlay originates from, will be {@link Block#defaultBlockState()} for
-     *                     fire and water overlays
-     * @param sprites      the sprite set
+     * @param player              the local client player the overlay is rendering for
+     * @param poseStack           the current pose stack
+     * @param submitNodeCollector the submit node collector
+     * @param blockState          the block state the overlay originates from, will be {@link Block#defaultBlockState()}
+     *                            for fire and water overlays
+     * @param sprites             the sprite set
      * @return <ul>
-     *                      <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the overlay from rendering</li>
-     *                      <li>{@link EventResult#PASS PASS} to allow the overlay to render</li>
-     *                 </ul>
+     *                              <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the overlay from rendering</li>
+     *                              <li>{@link EventResult#PASS PASS} to allow the overlay to render</li>
+     *                         </ul>
      */
-    EventResult onRenderBlockOverlay(LocalPlayer player, PoseStack poseStack, MultiBufferSource bufferSource, BlockState blockState, SpriteGetter sprites);
+    EventResult onRenderBlockOverlay(LocalPlayer player, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, BlockState blockState, SpriteGetter sprites);
 }

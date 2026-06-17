@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -217,16 +218,18 @@ public final class ComponentHelper {
             return;
         }
 
-        // colour must be added before formatting
+        // Color must be added before formatting.
         if (style.getColor() != null) {
-            ChatFormatting color = ChatFormatting.getByName(style.getColor().serialize());
-
-            if (color != null) {
+            String valueName = style.getColor().serialize().toUpperCase(Locale.ROOT);
+            try {
+                ChatFormatting color = ChatFormatting.valueOf(valueName);
                 chatFormattingConsumer.accept(color);
+            } catch (IllegalArgumentException exception) {
+                // NO-OP
             }
         }
 
-        // multiple formatting codes may exist at the same time
+        // Multiple formatting codes may exist at the same time.
         if (style.isBold()) {
             chatFormattingConsumer.accept(ChatFormatting.BOLD);
         }
@@ -253,7 +256,7 @@ public final class ComponentHelper {
      * {@link Style#applyFormat(ChatFormatting)} would for a more compact and versatile style object.
      *
      * @param style the style
-     * @return the sanitised style
+     * @return the sanitized style
      */
     public static Style sanitizeLegacyFormat(Style style) {
         Objects.requireNonNull(style, "style is null");

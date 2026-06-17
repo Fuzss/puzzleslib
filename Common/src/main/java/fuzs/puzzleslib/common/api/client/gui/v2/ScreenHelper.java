@@ -53,7 +53,7 @@ public final class ScreenHelper {
         MouseHandler mouseHandler = Minecraft.getInstance().mouseHandler;
         if (mouseHandler.lastClick == null) {
             return false;
-        } else if (mouseHandler.lastClick.screen() != Minecraft.getInstance().screen) {
+        } else if (mouseHandler.lastClick.screen() != Minecraft.getInstance().gui.screen()) {
             return false;
         } else if (mouseHandler.lastClickButton != mouseButtonEvent.button()) {
             return false;

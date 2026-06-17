@@ -29,7 +29,8 @@ public final class ClientParticleHelper {
      * @see net.minecraft.client.multiplayer.ClientLevel#addParticle(ParticleOptions, double, double, double, double,
      *         double, double)
      */
-    @Nullable public static Particle addParticle(ClientLevel clientLevel, ParticleOptions particleOptions, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+    @Nullable
+    public static Particle addParticle(ClientLevel clientLevel, ParticleOptions particleOptions, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
         return addParticle(clientLevel,
                 particleOptions,
                 particleOptions.getType().getOverrideLimiter(),
@@ -46,7 +47,8 @@ public final class ClientParticleHelper {
      * @see net.minecraft.client.multiplayer.ClientLevel#addParticle(ParticleOptions, boolean, boolean, double,
      *         double, double, double, double, double)
      */
-    @Nullable public static Particle addParticle(ClientLevel clientLevel, ParticleOptions particleOptions, boolean forceAlwaysRender, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+    @Nullable
+    public static Particle addParticle(ClientLevel clientLevel, ParticleOptions particleOptions, boolean forceAlwaysRender, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
         return addParticle(clientLevel,
                 particleOptions,
                 particleOptions.getType().getOverrideLimiter() || forceAlwaysRender,
@@ -63,7 +65,8 @@ public final class ClientParticleHelper {
      * @see net.minecraft.client.multiplayer.ClientLevel#addAlwaysVisibleParticle(ParticleOptions, double, double,
      *         double, double, double, double)
      */
-    @Nullable public static Particle addAlwaysVisibleParticle(ClientLevel clientLevel, ParticleOptions particleOptions, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+    @Nullable
+    public static Particle addAlwaysVisibleParticle(ClientLevel clientLevel, ParticleOptions particleOptions, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
         return addParticle(clientLevel, particleOptions, false, true, x, y, z, xSpeed, ySpeed, zSpeed);
     }
 
@@ -71,7 +74,8 @@ public final class ClientParticleHelper {
      * @see net.minecraft.client.multiplayer.ClientLevel#addAlwaysVisibleParticle(ParticleOptions, boolean, double,
      *         double, double, double, double, double)
      */
-    @Nullable public static Particle addAlwaysVisibleParticle(ClientLevel clientLevel, ParticleOptions particleOptions, boolean ignoreRange, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+    @Nullable
+    public static Particle addAlwaysVisibleParticle(ClientLevel clientLevel, ParticleOptions particleOptions, boolean ignoreRange, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
         return addParticle(clientLevel,
                 particleOptions,
                 particleOptions.getType().getOverrideLimiter() || ignoreRange,
@@ -88,9 +92,10 @@ public final class ClientParticleHelper {
      * @see net.minecraft.client.multiplayer.ClientLevel#doAddParticle(ParticleOptions, boolean, boolean, double,
      *         double, double, double, double, double)
      */
-    @Nullable public static Particle addParticle(ClientLevel clientLevel, ParticleOptions particleOptions, boolean force, boolean decreased, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+    @Nullable
+    public static Particle addParticle(ClientLevel clientLevel, ParticleOptions particleOptions, boolean force, boolean decreased, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
         try {
-            Camera camera = clientLevel.minecraft.gameRenderer.getMainCamera();
+            Camera camera = clientLevel.minecraft.gameRenderer.mainCamera();
             ParticleStatus particleStatus = clientLevel.calculateParticleLevel(decreased);
             if (force) {
                 return clientLevel.minecraft.particleEngine.createParticle(particleOptions,

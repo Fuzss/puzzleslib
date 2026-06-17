@@ -158,13 +158,6 @@ public interface ClientModConstructor {
     }
 
     /**
-     * @param context register new render buffers to {@link net.minecraft.client.renderer.RenderBuffers}
-     */
-    default void onRegisterRenderBuffers(RenderBuffersContext context) {
-        // NO-OP
-    }
-
-    /**
      * @param context register new render pipelines to {@link net.minecraft.client.renderer.RenderPipelines}
      */
     default void onRegisterRenderPipelines(RenderPipelinesContext context) {

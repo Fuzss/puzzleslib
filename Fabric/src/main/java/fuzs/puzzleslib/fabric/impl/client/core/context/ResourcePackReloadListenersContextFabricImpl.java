@@ -29,7 +29,7 @@ public final class ResourcePackReloadListenersContextFabricImpl implements Resou
             .put(BLOCK_ENTITY_RENDERER, ResourceReloaderKeys.Client.BLOCK_ENTITY_RENDER_DISPATCHER)
             .put(PARTICLE_RESOURCES, ResourceReloaderKeys.Client.PARTICLES)
             .put(WAYPOINT_STYLES, ResourceReloaderKeys.Client.WAYPOINT_STYLE)
-            .put(LEVEL_RENDERER, ResourceReloaderKeys.BEFORE_VANILLA)
+            .put(LEVEL_EXTRACTOR, ResourceReloaderKeys.BEFORE_VANILLA)
             .put(CLOUD_RENDERER, ResourceReloaderKeys.Client.CLOUD_RENDERER)
             .put(GPU_WARNLIST, ResourceReloaderKeys.BEFORE_VANILLA)
             .put(REGIONAL_COMPLIANCES, ResourceReloaderKeys.BEFORE_VANILLA)

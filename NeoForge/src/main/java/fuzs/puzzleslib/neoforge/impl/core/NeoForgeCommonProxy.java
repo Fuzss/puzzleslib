@@ -83,7 +83,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 public class NeoForgeCommonProxy implements NeoForgeProxy {
@@ -240,8 +239,8 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     }
 
     @Override
-    public <T> AbstractTagAppender<T> getTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
-        return new NeoForgeTagAppender<>(tagBuilder, keyExtractor);
+    public <T> AbstractTagAppender<T> getTagAppender(TagBuilder tagBuilder) {
+        return new NeoForgeTagAppender<>(tagBuilder);
     }
 
     @Override

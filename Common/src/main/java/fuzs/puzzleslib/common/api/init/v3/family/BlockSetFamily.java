@@ -15,6 +15,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import org.jetbrains.annotations.Nullable;
@@ -32,19 +33,27 @@ public interface BlockSetFamily {
      * @see #registerFor(BiConsumer, Map)
      */
     Map<BlockSetVariant, Holder<BlockEntityType<?>>> VARIANT_BLOCK_ENTITY_TYPE = ImmutableMap.of(BlockSetVariant.SIGN,
-            BuiltInRegistries.BLOCK_ENTITY_TYPE.wrapAsHolder(BlockEntityType.SIGN),
+            BuiltInRegistries.BLOCK_ENTITY_TYPE.wrapAsHolder(BlockEntityTypes.SIGN),
             BlockSetVariant.WALL_SIGN,
-            BuiltInRegistries.BLOCK_ENTITY_TYPE.wrapAsHolder(BlockEntityType.SIGN),
+            BuiltInRegistries.BLOCK_ENTITY_TYPE.wrapAsHolder(BlockEntityTypes.SIGN),
             BlockSetVariant.HANGING_SIGN,
-            BuiltInRegistries.BLOCK_ENTITY_TYPE.wrapAsHolder(BlockEntityType.HANGING_SIGN),
+            BuiltInRegistries.BLOCK_ENTITY_TYPE.wrapAsHolder(BlockEntityTypes.HANGING_SIGN),
             BlockSetVariant.WALL_HANGING_SIGN,
-            BuiltInRegistries.BLOCK_ENTITY_TYPE.wrapAsHolder(BlockEntityType.HANGING_SIGN),
+            BuiltInRegistries.BLOCK_ENTITY_TYPE.wrapAsHolder(BlockEntityTypes.HANGING_SIGN),
             BlockSetVariant.SHELF,
-            BuiltInRegistries.BLOCK_ENTITY_TYPE.wrapAsHolder(BlockEntityType.SHELF));
+            BuiltInRegistries.BLOCK_ENTITY_TYPE.wrapAsHolder(BlockEntityTypes.SHELF));
     /**
      * @see #registerFor(GameplayContentContext, Map)
      */
-    Map<BlockSetVariant, Vector2ic> VARIANT_WOODEN_FLAMMABLE = ImmutableMap.of(BlockSetVariant.STAIRS,
+    Map<BlockSetVariant, Vector2ic> VARIANT_WOODEN_FLAMMABLE = ImmutableMap.of(BlockSetVariant.LOG,
+            new Vector2i(5, 5),
+            BlockSetVariant.WOOD,
+            new Vector2i(5, 5),
+            BlockSetVariant.STRIPPED_LOG,
+            new Vector2i(5, 5),
+            BlockSetVariant.STRIPPED_WOOD,
+            new Vector2i(5, 5),
+            BlockSetVariant.STAIRS,
             new Vector2i(5, 20),
             BlockSetVariant.SLAB,
             new Vector2i(5, 20),
@@ -98,6 +107,10 @@ public interface BlockSetFamily {
         return base(registries, baseBlock, baseName).configureBlockFamily((BlockFamily.Builder blockFamily) -> {
                     blockFamily.recipeGroupPrefix("wooden").recipeUnlockedBy("has_planks");
                 })
+                .generateFor(BlockSetVariant.LOG)
+                .generateFor(BlockSetVariant.WOOD)
+                .generateFor(BlockSetVariant.STRIPPED_LOG)
+                .generateFor(BlockSetVariant.STRIPPED_WOOD)
                 .generateFor(BlockSetVariant.STAIRS)
                 .generateFor(BlockSetVariant.SLAB)
                 .generateFor(BlockSetVariant.FENCE)

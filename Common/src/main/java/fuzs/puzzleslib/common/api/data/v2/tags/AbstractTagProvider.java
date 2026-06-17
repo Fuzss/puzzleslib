@@ -48,16 +48,16 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
      * @see #generateFor(Map, Map)
      */
     public static final Map<BlockSetVariant, TagKey<Block>> VARIANT_BLOCK_TAGS = ImmutableMap.<BlockSetVariant, TagKey<Block>>builder()
-            .put(BlockSetVariant.BUTTON, BlockTags.BUTTONS)
-            .put(BlockSetVariant.DOOR, BlockTags.DOORS)
-            .put(BlockSetVariant.FENCE, BlockTags.FENCES)
-            .put(BlockSetVariant.FENCE_GATE, BlockTags.FENCE_GATES)
+            .put(BlockSetVariant.BUTTON, BlockItemTags.BUTTONS.block())
+            .put(BlockSetVariant.DOOR, BlockItemTags.DOORS.block())
+            .put(BlockSetVariant.FENCE, BlockItemTags.FENCES.block())
+            .put(BlockSetVariant.FENCE_GATE, BlockItemTags.FENCE_GATES.block())
             .put(BlockSetVariant.SIGN, BlockTags.STANDING_SIGNS)
-            .put(BlockSetVariant.SLAB, BlockTags.SLABS)
-            .put(BlockSetVariant.STAIRS, BlockTags.STAIRS)
+            .put(BlockSetVariant.SLAB, BlockItemTags.SLABS.block())
+            .put(BlockSetVariant.STAIRS, BlockItemTags.STAIRS.block())
             .put(BlockSetVariant.PRESSURE_PLATE, BlockTags.PRESSURE_PLATES)
-            .put(BlockSetVariant.TRAPDOOR, BlockTags.TRAPDOORS)
-            .put(BlockSetVariant.WALL, BlockTags.WALLS)
+            .put(BlockSetVariant.TRAPDOOR, BlockItemTags.TRAPDOORS.block())
+            .put(BlockSetVariant.WALL, BlockItemTags.WALLS.block())
             .put(BlockSetVariant.WALL_SIGN, BlockTags.WALL_SIGNS)
             .put(BlockSetVariant.HANGING_SIGN, BlockTags.CEILING_HANGING_SIGNS)
             .put(BlockSetVariant.WALL_HANGING_SIGN, BlockTags.WALL_HANGING_SIGNS)
@@ -67,7 +67,7 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
      */
     public static final Map<BlockSetVariant, TagKey<Block>> VARIANT_STONE_BLOCK_TAGS = ImmutableMap.<BlockSetVariant, TagKey<Block>>builder()
             .putAll(VARIANT_BLOCK_TAGS)
-            .put(BlockSetVariant.BUTTON, BlockTags.STONE_BUTTONS)
+            .put(BlockSetVariant.BUTTON, BlockItemTags.STONE_BUTTONS.block())
             .put(BlockSetVariant.PRESSURE_PLATE, BlockTags.STONE_PRESSURE_PLATES)
             .buildKeepingLast();
     /**
@@ -75,29 +75,33 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
      */
     public static final Map<BlockSetVariant, TagKey<Block>> VARIANT_WOODEN_BLOCK_TAGS = ImmutableMap.<BlockSetVariant, TagKey<Block>>builder()
             .putAll(VARIANT_BLOCK_TAGS)
-            .put(BlockSetVariant.BUTTON, BlockTags.WOODEN_BUTTONS)
-            .put(BlockSetVariant.DOOR, BlockTags.WOODEN_DOORS)
-            .put(BlockSetVariant.FENCE, BlockTags.WOODEN_FENCES)
-            .put(BlockSetVariant.SLAB, BlockTags.WOODEN_SLABS)
-            .put(BlockSetVariant.STAIRS, BlockTags.WOODEN_STAIRS)
-            .put(BlockSetVariant.PRESSURE_PLATE, BlockTags.WOODEN_PRESSURE_PLATES)
-            .put(BlockSetVariant.TRAPDOOR, BlockTags.WOODEN_TRAPDOORS)
-            .put(BlockSetVariant.SHELF, BlockTags.WOODEN_SHELVES)
+            .put(BlockSetVariant.LOG, TagFactory.COMMON.registerBlockTag("natural_logs"))
+            .put(BlockSetVariant.WOOD, TagFactory.COMMON.registerBlockTag("natural_woods"))
+            .put(BlockSetVariant.STRIPPED_LOG, TagFactory.COMMON.registerBlockTag("stripped_logs"))
+            .put(BlockSetVariant.STRIPPED_WOOD, TagFactory.COMMON.registerBlockTag("stripped_woods"))
+            .put(BlockSetVariant.BUTTON, BlockItemTags.WOODEN_BUTTONS.block())
+            .put(BlockSetVariant.DOOR, BlockItemTags.WOODEN_DOORS.block())
+            .put(BlockSetVariant.FENCE, BlockItemTags.WOODEN_FENCES.block())
+            .put(BlockSetVariant.SLAB, BlockItemTags.WOODEN_SLABS.block())
+            .put(BlockSetVariant.STAIRS, BlockItemTags.WOODEN_STAIRS.block())
+            .put(BlockSetVariant.PRESSURE_PLATE, BlockItemTags.WOODEN_PRESSURE_PLATES.block())
+            .put(BlockSetVariant.TRAPDOOR, BlockItemTags.WOODEN_TRAPDOORS.block())
+            .put(BlockSetVariant.SHELF, BlockItemTags.WOODEN_SHELVES.block())
             .buildKeepingLast();
     /**
      * @see #generateFor(Map, Map)
      */
     public static final Map<BlockSetVariant, TagKey<Item>> VARIANT_ITEM_TAGS = ImmutableMap.<BlockSetVariant, TagKey<Item>>builder()
-            .put(BlockSetVariant.BUTTON, ItemTags.BUTTONS)
-            .put(BlockSetVariant.DOOR, ItemTags.DOORS)
-            .put(BlockSetVariant.FENCE, ItemTags.FENCES)
-            .put(BlockSetVariant.FENCE_GATE, ItemTags.FENCE_GATES)
-            .put(BlockSetVariant.SLAB, ItemTags.SLABS)
-            .put(BlockSetVariant.STAIRS, ItemTags.STAIRS)
-            .put(BlockSetVariant.TRAPDOOR, ItemTags.TRAPDOORS)
-            .put(BlockSetVariant.WALL, ItemTags.WALLS)
-            .put(BlockSetVariant.SIGN, ItemTags.SIGNS)
-            .put(BlockSetVariant.HANGING_SIGN, ItemTags.HANGING_SIGNS)
+            .put(BlockSetVariant.BUTTON, BlockItemTags.BUTTONS.item())
+            .put(BlockSetVariant.DOOR, BlockItemTags.DOORS.item())
+            .put(BlockSetVariant.FENCE, BlockItemTags.FENCES.item())
+            .put(BlockSetVariant.FENCE_GATE, BlockItemTags.FENCE_GATES.item())
+            .put(BlockSetVariant.SLAB, BlockItemTags.SLABS.item())
+            .put(BlockSetVariant.STAIRS, BlockItemTags.STAIRS.item())
+            .put(BlockSetVariant.TRAPDOOR, BlockItemTags.TRAPDOORS.item())
+            .put(BlockSetVariant.WALL, BlockItemTags.WALLS.item())
+            .put(BlockSetVariant.SIGN, BlockItemTags.SIGNS.item())
+            .put(BlockSetVariant.HANGING_SIGN, BlockItemTags.HANGING_SIGNS.item())
             .put(BlockSetVariant.BOAT, ItemTags.BOATS)
             .put(BlockSetVariant.CHEST_BOAT, ItemTags.CHEST_BOATS)
             .build();
@@ -106,21 +110,25 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
      */
     public static final Map<BlockSetVariant, TagKey<Item>> VARIANT_STONE_ITEM_TAGS = ImmutableMap.<BlockSetVariant, TagKey<Item>>builder()
             .putAll(VARIANT_ITEM_TAGS)
-            .put(BlockSetVariant.BUTTON, ItemTags.STONE_BUTTONS)
+            .put(BlockSetVariant.BUTTON, BlockItemTags.STONE_BUTTONS.item())
             .buildKeepingLast();
     /**
      * @see #generateFor(Map, Map)
      */
     public static final Map<BlockSetVariant, TagKey<Item>> VARIANT_WOODEN_ITEM_TAGS = ImmutableMap.<BlockSetVariant, TagKey<Item>>builder()
             .putAll(VARIANT_ITEM_TAGS)
-            .put(BlockSetVariant.BUTTON, ItemTags.WOODEN_BUTTONS)
-            .put(BlockSetVariant.DOOR, ItemTags.WOODEN_DOORS)
-            .put(BlockSetVariant.FENCE, ItemTags.WOODEN_FENCES)
-            .put(BlockSetVariant.SLAB, ItemTags.WOODEN_SLABS)
-            .put(BlockSetVariant.STAIRS, ItemTags.WOODEN_STAIRS)
-            .put(BlockSetVariant.PRESSURE_PLATE, ItemTags.WOODEN_PRESSURE_PLATES)
-            .put(BlockSetVariant.TRAPDOOR, ItemTags.WOODEN_TRAPDOORS)
-            .put(BlockSetVariant.SHELF, ItemTags.WOODEN_SHELVES)
+            .put(BlockSetVariant.LOG, TagFactory.COMMON.registerItemTag("natural_logs"))
+            .put(BlockSetVariant.WOOD, TagFactory.COMMON.registerItemTag("natural_woods"))
+            .put(BlockSetVariant.STRIPPED_LOG, TagFactory.COMMON.registerItemTag("stripped_logs"))
+            .put(BlockSetVariant.STRIPPED_WOOD, TagFactory.COMMON.registerItemTag("stripped_woods"))
+            .put(BlockSetVariant.BUTTON, BlockItemTags.WOODEN_BUTTONS.item())
+            .put(BlockSetVariant.DOOR, BlockItemTags.WOODEN_DOORS.item())
+            .put(BlockSetVariant.FENCE, BlockItemTags.WOODEN_FENCES.item())
+            .put(BlockSetVariant.SLAB, BlockItemTags.WOODEN_SLABS.item())
+            .put(BlockSetVariant.STAIRS, BlockItemTags.WOODEN_STAIRS.item())
+            .put(BlockSetVariant.PRESSURE_PLATE, BlockItemTags.WOODEN_PRESSURE_PLATES.item())
+            .put(BlockSetVariant.TRAPDOOR, BlockItemTags.WOODEN_TRAPDOORS.item())
+            .put(BlockSetVariant.SHELF, BlockItemTags.WOODEN_SHELVES.item())
             .buildKeepingLast();
     /**
      * @see #generateFor(Map, Map)
@@ -165,21 +173,17 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
         return this.tag(TagKey.create(this.registryKey, id), replace);
     }
 
-    /**
-     * @see net.minecraft.data.tags.KeyTagProvider#tag(TagKey)
-     */
+    @Override
     public AbstractTagAppender<T> tag(TagKey<T> tag) {
         TagBuilder builder = this.getOrCreateRawBuilder(tag);
-        return KeyedValueProvider.tags(builder, this.registryKey);
+        return KeyedValueProvider.tags(builder);
     }
 
-    /**
-     * @see net.minecraft.data.tags.KeyTagProvider#tag(TagKey, boolean)
-     */
+    @Override
     public AbstractTagAppender<T> tag(TagKey<T> tag, boolean replace) {
         TagBuilder builder = this.getOrCreateRawBuilder(tag);
         builder.setReplace(replace);
-        return KeyedValueProvider.tags(builder, this.registryKey);
+        return KeyedValueProvider.tags(builder);
     }
 
     public final void generateFor(Map<BlockSetVariant, Holder.Reference<T>> variants, Map<BlockSetVariant, TagKey<T>> variantTags) {

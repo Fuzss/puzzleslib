@@ -82,8 +82,7 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
                 modConstructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShadersContextNeoForgeImpl(event));
             });
             eventBus.addListener((final RegisterBlockModelsEvent event) -> {
-                modConstructor.onRegisterBuiltInBlockModels(new BuiltInBlockModelsContextNeoForgeImpl(
-                        event));
+                modConstructor.onRegisterBuiltInBlockModels(new BuiltInBlockModelsContextNeoForgeImpl(event));
             });
             eventBus.addListener((final EntityRenderersEvent.CreateSkullModels event) -> {
                 modConstructor.onRegisterSkullRenderers(new SkullRenderersContextNeoForgeImpl(event));
@@ -98,9 +97,6 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
                 if (event.getPackType() == PackType.CLIENT_RESOURCES) {
                     modConstructor.onAddResourcePackFinders(new ResourcePackSourcesContextNeoForgeImpl(event));
                 }
-            });
-            eventBus.addListener((final RegisterRenderBuffersEvent event) -> {
-                modConstructor.onRegisterRenderBuffers(new RenderBuffersContextNeoForgeImpl(event));
             });
             eventBus.addListener((final RegisterRenderPipelinesEvent event) -> {
                 modConstructor.onRegisterRenderPipelines(new RenderPipelinesContextNeoForgeImpl(event));

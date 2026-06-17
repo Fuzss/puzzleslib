@@ -37,6 +37,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.PlayerModelType;
@@ -141,12 +142,14 @@ public final class NeoForgeClientEventInvokers {
                     for (PlayerModelType playerModelType : PlayerModelType.values()) {
                         AvatarRenderer<?> playerRenderer = event.getPlayerRenderer(playerModelType);
                         if (playerRenderer != null) {
-                            callback.addLivingEntityRenderLayers(EntityType.PLAYER, playerRenderer, event.getContext());
+                            callback.addLivingEntityRenderLayers(EntityTypes.PLAYER,
+                                    playerRenderer,
+                                    event.getContext());
                         }
 
                         AvatarRenderer<?> mannequinRenderer = event.getMannequinRenderer(playerModelType);
                         if (mannequinRenderer != null) {
-                            callback.addLivingEntityRenderLayers(EntityType.MANNEQUIN,
+                            callback.addLivingEntityRenderLayers(EntityTypes.MANNEQUIN,
                                     mannequinRenderer,
                                     event.getContext());
                         }
@@ -689,7 +692,7 @@ public final class NeoForgeClientEventInvokers {
                 (RenderBlockOverlayCallback callback, RenderBlockScreenEffectEvent event) -> {
                     EventResult eventResult = callback.onRenderBlockOverlay((LocalPlayer) event.getPlayer(),
                             event.getPoseStack(),
-                            event.getBufferSource(),
+                            event.getSubmitNodeCollector(),
                             event.getBlockState(),
                             event.getSprites());
                     if (eventResult.isInterrupt()) {
@@ -761,7 +764,7 @@ public final class NeoForgeClientEventInvokers {
                 ToastAddEvent.class,
                 (AddToastCallback callback, ToastAddEvent event) -> {
                     Minecraft minecraft = Minecraft.getInstance();
-                    EventResult eventResult = callback.onAddToast(minecraft.getToastManager(), event.getToast());
+                    EventResult eventResult = callback.onAddToast(minecraft.gui.toastManager(), event.getToast());
                     if (eventResult.isInterrupt()) {
                         event.setCanceled(true);
                     }
@@ -798,7 +801,7 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(ExtractLevelRenderStateCallback.class,
                 ExtractLevelRenderStateEvent.class,
                 (ExtractLevelRenderStateCallback callback, ExtractLevelRenderStateEvent event) -> {
-                    callback.onExtractLevelRenderState(event.getLevelRenderer(),
+                    callback.onExtractLevelRenderState(event.getLevelExtractor(),
                             event.getRenderState(),
                             event.getLevel(),
                             event.getCamera(),

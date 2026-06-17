@@ -19,6 +19,26 @@ public abstract class VanillaBlockSetVariant implements BlockSetVariant {
     }
 
     @Override
+    public final void generateFor(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
+        this.registerBlock(context, baseNameOverride);
+        this.registerItem(context, baseNameOverride);
+    }
+
+    public void registerBlock(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
+        context.registerBlock(this,
+                context.getRegistries()
+                        .registerBlock(this.getName(context, this.getSerializedName(), baseNameOverride), () -> {
+                            return BlockBehaviour.Properties.ofFullCopy(context.getBaseBlock().value());
+                        }));
+    }
+
+    public void registerItem(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
+        context.registerItem(this, context.getRegistries().registerBlockItem(context.getBlock(this)));
+    }
+
+    public abstract String getName(BlockSetFamily.Context context, String variantName, @Nullable String baseNameOverride);
+
+    @Override
     public BlockFamily.Variant toVanilla() {
         return this.variant;
     }
@@ -49,21 +69,27 @@ public abstract class VanillaBlockSetVariant implements BlockSetVariant {
         return Objects.hash(this.getSerializedName());
     }
 
-    public static class Direct extends VanillaBlockSetVariant {
+    public static class Prefix extends VanillaBlockSetVariant {
 
-        public Direct(BlockFamily.Variant variant, BiConsumer<BlockFamily.Builder, net.minecraft.world.level.block.Block> variantBuilder) {
+        public Prefix(BlockFamily.Variant variant, BiConsumer<BlockFamily.Builder, net.minecraft.world.level.block.Block> variantBuilder) {
             super(variant, variantBuilder);
         }
 
         @Override
-        public void generateFor(BlockSetFamily.Context context, @Nullable String baseNameOverride) {
-            context.registerBlock(this,
-                    context.getRegistries()
-                            .registerBlock(context.getNameWithPrefix(this.getSerializedName(), baseNameOverride),
-                                    () -> {
-                                        return BlockBehaviour.Properties.ofFullCopy(context.getBaseBlock().value());
-                                    }));
-            context.registerItem(this, context.getRegistries().registerBlockItem(context.getBlock(this)));
+        public String getName(BlockSetFamily.Context context, String variantName, @Nullable String baseNameOverride) {
+            return context.getNameWithPrefix(variantName, baseNameOverride);
+        }
+    }
+
+    public static class Suffix extends VanillaBlockSetVariant {
+
+        public Suffix(BlockFamily.Variant variant, BiConsumer<BlockFamily.Builder, net.minecraft.world.level.block.Block> variantBuilder) {
+            super(variant, variantBuilder);
+        }
+
+        @Override
+        public String getName(BlockSetFamily.Context context, String variantName, @Nullable String baseNameOverride) {
+            return context.getNameWithSuffix(variantName, baseNameOverride);
         }
     }
 }

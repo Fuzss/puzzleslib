@@ -12,14 +12,11 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagBuilder;
 import net.minecraft.world.item.crafting.Recipe;
-import org.jspecify.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 public interface FactoriesProxy {
@@ -34,7 +31,7 @@ public interface FactoriesProxy {
 
     CombinedIngredients getCombinedIngredients();
 
-    <T> AbstractTagAppender<T> getTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor);
+    <T> AbstractTagAppender<T> getTagAppender(TagBuilder tagBuilder);
 
     DataAttachmentRegistryImpl getDataAttachmentRegistry();
 

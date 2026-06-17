@@ -8,20 +8,14 @@ import net.minecraft.tags.TagBuilder;
 import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ExtraCodecs;
-import org.jspecify.annotations.Nullable;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
 
-public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
+public abstract class AbstractTagAppender<T> implements TagAppender<T> {
     protected final TagBuilder tagBuilder;
-    @Nullable
-    private final Function<T, ResourceKey<T>> keyExtractor;
 
-    public AbstractTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
+    public AbstractTagAppender(TagBuilder tagBuilder) {
         this.tagBuilder = tagBuilder;
-        this.keyExtractor = keyExtractor;
     }
 
     public AbstractTagAppender<T> add(Identifier id) {
@@ -37,36 +31,23 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
         return this;
     }
 
-    public AbstractTagAppender<T> addKey(ResourceKey<? extends T> key) {
+    @Override
+    public AbstractTagAppender<T> add(ResourceKey<T> key) {
         return this.add(key.identifier());
     }
 
-    @SafeVarargs
-    public final AbstractTagAppender<T> addKey(ResourceKey<? extends T>... keys) {
-        for (ResourceKey<? extends T> key : keys) {
-            this.addKey(key);
-        }
-
-        return this;
-    }
-
     @Override
-    public AbstractTagAppender<T> add(T value) {
-        return this.addKey(this.keyExtractor().apply(value));
-    }
-
     @SafeVarargs
-    @Override
-    public final AbstractTagAppender<T> add(T... values) {
-        for (T value : values) {
-            this.add(value);
+    public final AbstractTagAppender<T> add(ResourceKey<T>... keys) {
+        for (ResourceKey<T> key : keys) {
+            this.add(key);
         }
 
         return this;
     }
 
     public AbstractTagAppender<T> add(Holder.Reference<? extends T> holder) {
-        return this.addKey(holder.key());
+        return this.add((ResourceKey<T>) holder.key());
     }
 
     @SafeVarargs
@@ -103,35 +84,22 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
         return this;
     }
 
-    public AbstractTagAppender<T> addOptionalKey(ResourceKey<? extends T> key) {
+    @Override
+    public AbstractTagAppender<T> addOptional(ResourceKey<T> key) {
         return this.addOptional(key.identifier());
     }
 
     @SafeVarargs
-    public final AbstractTagAppender<T> addOptionalKey(ResourceKey<? extends T>... keys) {
-        for (ResourceKey<? extends T> key : keys) {
-            this.addOptionalKey(key);
-        }
-
-        return this;
-    }
-
-    @Override
-    public AbstractTagAppender<T> addOptional(T value) {
-        return this.addOptionalKey(this.keyExtractor().apply(value));
-    }
-
-    @SafeVarargs
-    public final AbstractTagAppender<T> addOptional(T... values) {
-        for (T value : values) {
-            this.addOptional(value);
+    public final AbstractTagAppender<T> addOptional(ResourceKey<T>... keys) {
+        for (ResourceKey<T> key : keys) {
+            this.addOptional(key);
         }
 
         return this;
     }
 
     public AbstractTagAppender<T> addOptional(Holder.Reference<? extends T> holder) {
-        return this.addOptionalKey(holder.key());
+        return this.addOptional((ResourceKey<T>) holder.key());
     }
 
     @SafeVarargs
@@ -219,34 +187,21 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
         return this;
     }
 
-    public AbstractTagAppender<T> removeKey(ResourceKey<? extends T> key) {
+    public AbstractTagAppender<T> remove(ResourceKey<T> key) {
         return this.remove(key.identifier());
     }
 
     @SafeVarargs
-    public final AbstractTagAppender<T> removeKey(ResourceKey<? extends T>... keys) {
-        for (ResourceKey<? extends T> key : keys) {
-            this.removeKey(key);
-        }
-
-        return this;
-    }
-
-    public AbstractTagAppender<T> remove(T value) {
-        return this.removeKey(this.keyExtractor().apply(value));
-    }
-
-    @SafeVarargs
-    public final AbstractTagAppender<T> remove(T... values) {
-        for (T value : values) {
-            this.remove(value);
+    public final AbstractTagAppender<T> remove(ResourceKey<T>... keys) {
+        for (ResourceKey<T> key : keys) {
+            this.remove(key);
         }
 
         return this;
     }
 
     public AbstractTagAppender<T> remove(Holder.Reference<? extends T> holder) {
-        return this.removeKey(holder.key());
+        return this.remove((ResourceKey<T>) holder.key());
     }
 
     @SafeVarargs
@@ -280,34 +235,21 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
         return this;
     }
 
-    public AbstractTagAppender<T> removeOptionalKey(ResourceKey<? extends T> key) {
+    public AbstractTagAppender<T> removeOptional(ResourceKey<T> key) {
         return this.removeOptional(key.identifier());
     }
 
     @SafeVarargs
-    public final AbstractTagAppender<T> removeOptionalKey(ResourceKey<? extends T>... keys) {
-        for (ResourceKey<? extends T> key : keys) {
-            this.removeOptionalKey(key);
-        }
-
-        return this;
-    }
-
-    public AbstractTagAppender<T> removeOptional(T value) {
-        return this.removeOptionalKey(this.keyExtractor().apply(value));
-    }
-
-    @SafeVarargs
-    public final AbstractTagAppender<T> removeOptional(T... values) {
-        for (T value : values) {
-            this.removeOptional(value);
+    public final AbstractTagAppender<T> removeOptional(ResourceKey<T>... keys) {
+        for (ResourceKey<T> key : keys) {
+            this.removeOptional(key);
         }
 
         return this;
     }
 
     public AbstractTagAppender<T> removeOptional(Holder.Reference<? extends T> holder) {
-        return this.removeOptionalKey(holder.key());
+        return this.removeOptional((ResourceKey<T>) holder.key());
     }
 
     @SafeVarargs
@@ -375,11 +317,6 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
         }
 
         return this;
-    }
-
-    private Function<T, ResourceKey<T>> keyExtractor() {
-        Objects.requireNonNull(this.keyExtractor, "key extractor is null");
-        return this.keyExtractor;
     }
 
     public abstract List<String> asStringList();

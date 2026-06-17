@@ -18,6 +18,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.debug.DebugScreenEntries;
 import net.minecraft.client.gui.components.debug.DebugScreenEntryStatus;
@@ -36,6 +37,8 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.contents.PlainTextContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.storage.LevelSummary;
@@ -47,7 +50,10 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 public class PuzzlesLibClientDevelopment implements ClientModConstructor {
@@ -94,10 +100,14 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
         });
         ScreenEvents.beforeInit(TitleScreen.class)
                 .register((TitleScreen screen, int screenWidth, int screenHeight, List<AbstractWidget> widgets) -> {
-                    if (screen.minecraft.getOverlay() instanceof LoadingOverlay loadingOverlay
+                    if (screen.minecraft.gui.overlay() instanceof LoadingOverlay loadingOverlay
                             && loadingOverlay.fadeOutStart != 0L) {
                         loadingOverlay.fadeOutStart = 0L;
                     }
+                });
+        ScreenEvents.afterInit(TitleScreen.class)
+                .register((TitleScreen screen, int screenWidth, int screenHeight, List<AbstractWidget> widgets, UnaryOperator<AbstractWidget> addWidget, Consumer<AbstractWidget> removeWidget) -> {
+                    getButton(widgets, "TW").ifPresent(removeWidget);
                 });
         AddToastCallback.EVENT.register((ToastManager toastManager, Toast toast) -> {
             if (toast instanceof SystemToast systemToast
@@ -141,6 +151,22 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
                             && mouseButtonEvent.button() == InputConstants.MOUSE_BUTTON_LEFT && screen.getFocused()
                             .mouseDragged(mouseButtonEvent, dragX, dragY) ? EventResult.INTERRUPT : EventResult.PASS;
                 });
+    }
+
+    private static Optional<AbstractWidget> getButton(List<? extends GuiEventListener> widgets, String buttonText) {
+        for (GuiEventListener widget : widgets) {
+            if (widget instanceof Button button) {
+                if (button.getMessage().getContents() instanceof TranslatableContents contents && contents.getKey()
+                        .equals(buttonText)) {
+                    return Optional.of(button);
+                } else if (button.getMessage().getContents() instanceof PlainTextContents.LiteralContents(String text)
+                        && text.equals(buttonText)) {
+                    return Optional.of(button);
+                }
+            }
+        }
+
+        return Optional.empty();
     }
 
     @Override
@@ -235,8 +261,9 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
                 Objective objective = scoreboard.getDisplayObjective(DisplaySlot.LIST);
                 if (minecraft.options.keyPlayerList.isDown() && minecraft.isLocalServer()
                         && minecraft.player.connection.getListedOnlinePlayers().size() <= 1 && objective == null) {
-                    minecraft.gui.tabList.setVisible(true);
-                    minecraft.gui.tabList.extractRenderState(guiGraphics, guiGraphics.guiWidth(), scoreboard, null);
+                    minecraft.gui.hud.getTabList().setVisible(true);
+                    minecraft.gui.hud.getTabList()
+                            .extractRenderState(guiGraphics, guiGraphics.guiWidth(), scoreboard, null);
                 } else {
                     layer.extractRenderState(guiGraphics, deltaTracker);
                 }

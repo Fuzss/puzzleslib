@@ -88,7 +88,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 public class FabricCommonProxy implements FabricProxy {
@@ -270,8 +269,8 @@ public class FabricCommonProxy implements FabricProxy {
     }
 
     @Override
-    public <T> AbstractTagAppender<T> getTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
-        return new FabricTagAppender<>(tagBuilder, keyExtractor);
+    public <T> AbstractTagAppender<T> getTagAppender(TagBuilder tagBuilder) {
+        return new FabricTagAppender<>(tagBuilder);
     }
 
     @Override

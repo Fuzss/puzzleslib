@@ -25,19 +25,19 @@ public final class SubmitLivingEntityEvents {
          * <p>
          * This allows for completely taking over rendering as a whole.
          *
-         * @param <T>            the entity type
-         * @param <S>            the render state type
-         * @param <M>            the entity model type
-         * @param renderState    the entity render state
-         * @param entityRenderer the living entity renderer
-         * @param poseStack      the pose stack
-         * @param nodeCollector  the submit node collector
+         * @param <T>                 the entity type
+         * @param <S>                 the render state type
+         * @param <M>                 the entity model type
+         * @param renderState         the entity render state
+         * @param entityRenderer      the living entity renderer
+         * @param poseStack           the pose stack
+         * @param submitNodeCollector the submit node collector
          * @return <ul>
          *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the player model from rendering, this allows for taking over complete player rendering</li>
          *         <li>{@link EventResult#PASS PASS} to allow the player model to render</li>
          *         </ul>
          */
-        <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> EventResult onBeforeSubmitLivingEntity(S renderState, LivingEntityRenderer<T, S, M> entityRenderer, PoseStack poseStack, SubmitNodeCollector nodeCollector);
+        <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> EventResult onBeforeSubmitLivingEntity(S renderState, LivingEntityRenderer<T, S, M> entityRenderer, PoseStack poseStack, SubmitNodeCollector submitNodeCollector);
     }
 
     @FunctionalInterface
@@ -46,14 +46,14 @@ public final class SubmitLivingEntityEvents {
         /**
          * Called after a living entity model is submitted for rendering.
          *
-         * @param <T>            the entity type
-         * @param <S>            the render state type
-         * @param <M>            the entity model type
-         * @param renderState    the entity render state
-         * @param entityRenderer the living entity renderer
-         * @param poseStack      the pose stack
-         * @param nodeCollector  the submit node collector
+         * @param <T>                 the entity type
+         * @param <S>                 the render state type
+         * @param <M>                 the entity model type
+         * @param renderState         the entity render state
+         * @param entityRenderer      the living entity renderer
+         * @param poseStack           the pose stack
+         * @param submitNodeCollector the submit node collector
          */
-        <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> void onAfterSubmitLivingEntity(S renderState, LivingEntityRenderer<T, S, M> entityRenderer, PoseStack poseStack, SubmitNodeCollector nodeCollector);
+        <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> void onAfterSubmitLivingEntity(S renderState, LivingEntityRenderer<T, S, M> entityRenderer, PoseStack poseStack, SubmitNodeCollector submitNodeCollector);
     }
 }
