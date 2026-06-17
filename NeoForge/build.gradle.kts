@@ -10,6 +10,6 @@ multiloader {
         mixin("MenuProviderWithDataNeoForgeMixin")
         accessor("BiomeSpecialEffectsBuilderNeoForgeAccessor", "EntityNeoForgeAccessor", "PackNeoForgeAccessor")
         clientMixin("MouseHandlerNeoForgeMixin")
-        clientAccessor("RegisterKeyMappingsEventNeoForgeAccessor")
+        clientAccessor("BrandingControlAccessor", "RegisterKeyMappingsEventNeoForgeAccessor")
     }
 }

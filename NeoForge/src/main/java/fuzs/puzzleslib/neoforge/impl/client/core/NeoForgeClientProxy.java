@@ -22,7 +22,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.resources.Identifier;
@@ -30,7 +29,6 @@ import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.state.properties.WoodType;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.neoforge.client.ClientHooks;
 import net.neoforged.neoforge.client.extensions.common.IClientMobEffectExtensions;
@@ -115,11 +113,6 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
     @Override
     public boolean isEffectVisibleInGui(MobEffectInstance mobEffect) {
         return IClientMobEffectExtensions.of(mobEffect).isVisibleInGui(mobEffect);
-    }
-
-    @Override
-    public void registerWoodType(WoodType woodType) {
-        Sheets.addWoodType(woodType);
     }
 
     @Override

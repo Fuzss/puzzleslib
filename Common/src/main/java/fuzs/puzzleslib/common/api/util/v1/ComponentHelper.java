@@ -1,13 +1,15 @@
 package fuzs.puzzleslib.common.api.util.v1;
 
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.util.FormattedCharSequence;
 
 import java.util.HashSet;
-import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -22,6 +24,28 @@ import java.util.function.Consumer;
  * {@link Style} object.
  */
 public final class ComponentHelper {
+    /**
+     * @see TextColor#NAMED_COLORS
+     * @see TextColor#fromLegacyFormat(ChatFormatting)
+     */
+    public static final Map<TextColor, ChatFormatting> COLORS = ImmutableMap.<TextColor, ChatFormatting>builder()
+            .put(TextColor.BLACK, ChatFormatting.BLACK)
+            .put(TextColor.DARK_BLUE, ChatFormatting.DARK_BLUE)
+            .put(TextColor.DARK_GREEN, ChatFormatting.DARK_GREEN)
+            .put(TextColor.DARK_AQUA, ChatFormatting.DARK_AQUA)
+            .put(TextColor.DARK_RED, ChatFormatting.DARK_RED)
+            .put(TextColor.DARK_PURPLE, ChatFormatting.DARK_PURPLE)
+            .put(TextColor.GOLD, ChatFormatting.GOLD)
+            .put(TextColor.GRAY, ChatFormatting.GRAY)
+            .put(TextColor.DARK_GRAY, ChatFormatting.DARK_GRAY)
+            .put(TextColor.BLUE, ChatFormatting.BLUE)
+            .put(TextColor.GREEN, ChatFormatting.GREEN)
+            .put(TextColor.AQUA, ChatFormatting.AQUA)
+            .put(TextColor.RED, ChatFormatting.RED)
+            .put(TextColor.LIGHT_PURPLE, ChatFormatting.LIGHT_PURPLE)
+            .put(TextColor.YELLOW, ChatFormatting.YELLOW)
+            .put(TextColor.WHITE, ChatFormatting.WHITE)
+            .build();
 
     private ComponentHelper() {
         // NO-OP
@@ -219,14 +243,9 @@ public final class ComponentHelper {
         }
 
         // Color must be added before formatting.
-        if (style.getColor() != null) {
-            String valueName = style.getColor().serialize().toUpperCase(Locale.ROOT);
-            try {
-                ChatFormatting color = ChatFormatting.valueOf(valueName);
-                chatFormattingConsumer.accept(color);
-            } catch (IllegalArgumentException exception) {
-                // NO-OP
-            }
+        ChatFormatting color = COLORS.get(style.getColor());
+        if (color != null) {
+            chatFormattingConsumer.accept(color);
         }
 
         // Multiple formatting codes may exist at the same time.

@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import fuzs.puzzleslib.common.api.client.core.v1.context.GuiLayersContext;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.Hud;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
@@ -47,71 +47,71 @@ public record GuiLayersContextNeoForgeImpl(RegisterGuiLayersEvent event) impleme
             .build();
 
     @Override
-    public void registerGuiLayer(Identifier identifier, GuiLayersContext.Layer guiLayer) {
-        Objects.requireNonNull(identifier, "identifier is null");
+    public void registerGuiLayer(Identifier id, GuiLayersContext.Layer guiLayer) {
+        Objects.requireNonNull(id, "identifier is null");
         Objects.requireNonNull(guiLayer, "gui layer is null");
-        this.event.registerAboveAll(identifier, guiLayer::extractRenderState);
+        this.event.registerAboveAll(id, guiLayer::extractRenderState);
     }
 
     @Override
-    public void registerGuiLayer(Identifier identifier, Identifier otherResourceLocation, GuiLayersContext.Layer guiLayer) {
-        Objects.requireNonNull(identifier, "identifier is null");
+    public void registerGuiLayer(Identifier id, Identifier otherResourceLocation, GuiLayersContext.Layer guiLayer) {
+        Objects.requireNonNull(id, "identifier is null");
         Objects.requireNonNull(otherResourceLocation, "other identifier is null");
         Objects.requireNonNull(guiLayer, "gui layer is null");
         // only check for vanilla layers, it simplifies the implementation and is all we need
-        if (VANILLA_GUI_LAYERS.containsKey(identifier)) {
-            this.event.registerAbove(VANILLA_GUI_LAYERS.get(identifier), otherResourceLocation, guiLayer::extractRenderState);
+        if (VANILLA_GUI_LAYERS.containsKey(id)) {
+            this.event.registerAbove(VANILLA_GUI_LAYERS.get(id), otherResourceLocation, guiLayer::extractRenderState);
         } else if (VANILLA_GUI_LAYERS.containsKey(otherResourceLocation)) {
-            this.event.registerBelow(VANILLA_GUI_LAYERS.get(otherResourceLocation), identifier, guiLayer::extractRenderState);
+            this.event.registerBelow(VANILLA_GUI_LAYERS.get(otherResourceLocation), id, guiLayer::extractRenderState);
         } else {
-            throw new RuntimeException("Unknown gui layers: " + identifier + ", " + otherResourceLocation);
+            throw new RuntimeException("Unknown gui layers: " + id + ", " + otherResourceLocation);
         }
     }
 
     @Override
-    public void replaceGuiLayer(Identifier identifier, UnaryOperator<GuiLayersContext.Layer> guiLayerFactory) {
-        Objects.requireNonNull(identifier, "identifier is null");
+    public void replaceGuiLayer(Identifier id, UnaryOperator<GuiLayersContext.Layer> guiLayerFactory) {
+        Objects.requireNonNull(id, "identifier is null");
         Objects.requireNonNull(guiLayerFactory, "gui layer factory is null");
         // only check for vanilla layers, it simplifies the implementation and is all we need
-        if (VANILLA_GUI_LAYERS.containsKey(identifier)) {
-            identifier = VANILLA_GUI_LAYERS.get(identifier);
-            boolean isSleepOverlay = identifier.equals(VanillaGuiLayers.SLEEP_OVERLAY);
-            this.event.wrapLayer(identifier, (GuiLayer guiLayer) -> {
+        if (VANILLA_GUI_LAYERS.containsKey(id)) {
+            id = VANILLA_GUI_LAYERS.get(id);
+            boolean isSleepOverlay = id.equals(VanillaGuiLayers.SLEEP_OVERLAY);
+            this.event.wrapLayer(id, (GuiLayer guiLayer) -> {
                 return (GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker) -> {
                     // render condition is not inherited from the parent, add it back manually,
                     // since all are known for vanilla layers
-                    if (isSleepOverlay || !Minecraft.getInstance().options.hideGui) {
+                    if (isSleepOverlay || !Minecraft.getInstance().gui.hud.isHidden()) {
                         guiLayerFactory.apply(guiLayer::render).extractRenderState(guiGraphics, deltaTracker);
                     }
                 };
             });
         } else {
-            throw new RuntimeException("Unknown gui layer: " + identifier);
+            throw new RuntimeException("Unknown gui layer: " + id);
         }
     }
 
     @Override
-    public void addLeftStatusBarHeightProvider(Identifier identifier, ToIntFunction<Player> heightProvider) {
-        this.addStatusBarHeight(identifier, heightProvider, (Gui gui, Integer height) -> {
-            gui.leftHeight += height;
+    public void addLeftStatusBarHeightProvider(Identifier id, ToIntFunction<Player> heightProvider) {
+        this.addStatusBarHeight(id, heightProvider, (Hud hud, Integer height) -> {
+            hud.leftHeight += height;
         });
     }
 
     @Override
-    public void addRightStatusBarHeightProvider(Identifier identifier, ToIntFunction<Player> heightProvider) {
-        this.addStatusBarHeight(identifier, heightProvider, (Gui gui, Integer height) -> {
-            gui.rightHeight += height;
+    public void addRightStatusBarHeightProvider(Identifier id, ToIntFunction<Player> heightProvider) {
+        this.addStatusBarHeight(id, heightProvider, (Hud hud, Integer height) -> {
+            hud.rightHeight += height;
         });
     }
 
-    private void addStatusBarHeight(Identifier identifier, ToIntFunction<Player> heightProvider, BiConsumer<Gui, Integer> heightConsumer) {
+    private void addStatusBarHeight(Identifier identifier, ToIntFunction<Player> heightProvider, BiConsumer<Hud, Integer> heightConsumer) {
         Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(heightProvider, "height provider is null");
         NeoForge.EVENT_BUS.addListener((final RenderGuiLayerEvent.Post event) -> {
             if (event.getName().equals(identifier)) {
-                Gui gui = Minecraft.getInstance().gui;
-                if (gui.getCameraPlayer() != null) {
-                    heightConsumer.accept(gui, heightProvider.applyAsInt(gui.getCameraPlayer()));
+                Hud hud = Minecraft.getInstance().gui.hud;
+                if (hud.getCameraPlayer() != null) {
+                    heightConsumer.accept(hud, heightProvider.applyAsInt(hud.getCameraPlayer()));
                 }
             }
         });

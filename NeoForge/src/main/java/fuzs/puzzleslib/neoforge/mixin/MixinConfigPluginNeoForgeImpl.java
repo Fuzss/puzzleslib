@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Set;
 
 public class MixinConfigPluginNeoForgeImpl implements IMixinConfigPlugin {
-    private static final Collection<String> DEVELOPMENT_MIXINS = ImmutableSet.of();
+    private static final Collection<String> DEVELOPMENT_MIXINS = ImmutableSet.of(
+            "client.accessor.BrandingControlAccessor");
 
     @Override
     public void onLoad(String mixinPackage) {

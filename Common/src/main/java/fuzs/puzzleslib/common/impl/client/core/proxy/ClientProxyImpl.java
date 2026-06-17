@@ -25,7 +25,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.properties.WoodType;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
@@ -56,8 +55,6 @@ public interface ClientProxyImpl extends ProxyImpl {
     boolean isEffectVisibleInInventory(MobEffectInstance mobEffect);
 
     boolean isEffectVisibleInGui(MobEffectInstance mobEffect);
-
-    void registerWoodType(WoodType woodType);
 
     int getLeftStatusBarHeight(Identifier identifier);
 

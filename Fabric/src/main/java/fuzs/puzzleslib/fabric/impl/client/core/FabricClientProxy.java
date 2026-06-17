@@ -5,6 +5,8 @@ import fuzs.puzzleslib.common.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.common.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.common.api.client.renderer.v1.model.MutableBakedQuad;
 import fuzs.puzzleslib.common.api.core.v1.context.PayloadTypesContext;
+import fuzs.puzzleslib.common.impl.client.core.proxy.ClientProxyImpl;
+import fuzs.puzzleslib.common.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import fuzs.puzzleslib.fabric.impl.client.config.FabricConfigurationScreen;
 import fuzs.puzzleslib.fabric.impl.client.core.context.GuiLayersContextFabricImpl;
@@ -12,9 +14,6 @@ import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.fabric.impl.client.key.FabricKeyMappingHelper;
 import fuzs.puzzleslib.fabric.impl.core.FabricCommonProxy;
 import fuzs.puzzleslib.fabric.impl.core.context.PayloadTypesContextFabricImpl;
-import fuzs.puzzleslib.common.impl.client.core.proxy.ClientProxyImpl;
-import fuzs.puzzleslib.common.impl.core.context.ModConstructorImpl;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.ClientTooltipComponentCallback;
@@ -29,7 +28,6 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.*;
-import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.BlockPos;
@@ -44,7 +42,6 @@ import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.properties.WoodType;
 import org.jspecify.annotations.Nullable;
 
 import java.util.IdentityHashMap;
@@ -175,16 +172,6 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     @Override
     public boolean isEffectVisibleInGui(MobEffectInstance mobEffect) {
         return true;
-    }
-
-    @Override
-    public void registerWoodType(WoodType woodType) {
-        // This might register fine, but if another mod loads the Sheets class too early, it will be missing.
-        // Also, wrap this in the event, so we ourselves do not load the Sheets class too early.
-        ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft minecraft) -> {
-            Sheets.SIGN_SPRITES.put(woodType, Sheets.createSignSprite(woodType));
-            Sheets.HANGING_SIGN_SPRITES.put(woodType, Sheets.createHangingSignSprite(woodType));
-        });
     }
 
     @Override

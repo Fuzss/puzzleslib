@@ -116,7 +116,7 @@ public class FabricConfigurationScreen extends OptionsSubScreen {
 
     protected void openModConfigScreen(ModConfig modConfig, Screen lastScreen) {
         Component component = getConfigTitleComponent(modConfig.getModId());
-        this.minecraft.setScreen(new CustomConfigurationSectionScreen(lastScreen,
+        this.minecraft.gui.setScreen(new CustomConfigurationSectionScreen(lastScreen,
                 modConfig.getType(),
                 modConfig,
                 component));
@@ -128,8 +128,8 @@ public class FabricConfigurationScreen extends OptionsSubScreen {
     protected Component getTooltipComponent(ModConfig.Type type, ModConfig modConfig) {
         if (!((ModConfigSpec) modConfig.getSpec()).isLoaded()) {
             return ConfigurationScreen.TOOLTIP_CANNOT_EDIT_NOT_LOADED;
-        } else if (type == ModConfig.Type.SERVER && this.minecraft.getCurrentServer() != null
-                && !this.minecraft.isSingleplayer()) {
+        } else if (type == ModConfig.Type.SERVER && this.minecraft.getCurrentServer() != null && (
+                !this.minecraft.hasSingleplayerServer() || !this.minecraft.getSingleplayerServer().isPublished())) {
             return ConfigurationScreen.TOOLTIP_CANNOT_EDIT_THIS_WHILE_ONLINE;
         } else if (type == ModConfig.Type.SERVER && this.minecraft.hasSingleplayerServer()
                 && this.minecraft.getSingleplayerServer().isPublished()) {
@@ -278,11 +278,11 @@ public class FabricConfigurationScreen extends OptionsSubScreen {
         }
 
         private void openConfirmScreen(Component title, Component message) {
-            this.minecraft.setScreen(new ConfirmScreen((boolean hasConfirmed) -> {
+            this.minecraft.gui.setScreen(new ConfirmScreen((boolean hasConfirmed) -> {
                 if (hasConfirmed) {
                     super.onClose();
                 } else {
-                    this.minecraft.setScreen(this);
+                    this.minecraft.gui.setScreen(this);
                 }
             }, title, message, CommonComponents.GUI_CONTINUE, CommonComponents.GUI_BACK));
         }
@@ -296,7 +296,8 @@ public class FabricConfigurationScreen extends OptionsSubScreen {
                 return new Element(this.getTranslationComponent(key).append(CommonComponents.ELLIPSIS),
                         this.getTooltipComponent(key, null),
                         Button.builder(EDIT_COMPONENT,
-                                        (Button button) -> this.minecraft.setScreen(new CustomConfigurationSectionScreen(this.context,
+                                        (Button button) -> this.minecraft.gui.setScreen(new CustomConfigurationSectionScreen(
+                                                this.context,
                                                 this,
                                                 subconfig.valueMap(),
                                                 key,
@@ -314,7 +315,7 @@ public class FabricConfigurationScreen extends OptionsSubScreen {
             return new Element(this.getTranslationComponent(key).append(CommonComponents.ELLIPSIS),
                     this.getTooltipComponent(key, null),
                     Button.builder(EDIT_COMPONENT,
-                                    button -> this.minecraft.setScreen(new CustomConfigurationListScreen<>(Context.list(this.context,
+                                    button -> this.minecraft.gui.setScreen(new CustomConfigurationListScreen<>(Context.list(this.context,
                                             this),
                                             key,
                                             Component.translatable(CRUMB,
