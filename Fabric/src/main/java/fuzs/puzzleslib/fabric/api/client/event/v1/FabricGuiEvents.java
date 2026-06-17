@@ -3,8 +3,10 @@ package fuzs.puzzleslib.fabric.api.client.event.v1;
 import fuzs.puzzleslib.common.api.client.event.v1.gui.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.toasts.Toast;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 
 public final class FabricGuiEvents {
@@ -22,9 +24,9 @@ public final class FabricGuiEvents {
     public static final Event<PrepareInventoryMobEffectsCallback> INVENTORY_MOB_EFFECTS = FabricEventFactory.createResult(
             PrepareInventoryMobEffectsCallback.class);
     /**
-     * Called just before a new screen is set to {@link net.minecraft.client.Minecraft#screen} in
-     * {@link net.minecraft.client.Minecraft#setScreen}, allows for exchanging the new screen with a different one, or
-     * can prevent a new screen from opening, effectively forcing the old screen to remain.
+     * Called just before a new screen is set to {@link Gui#screen()} in {@link Gui#setScreen(Screen)}, allows for
+     * exchanging the new screen with a different one, or can prevent a new screen from opening, by returning the
+     * original screen (which will be initialized once again).
      */
     public static final Event<ScreenOpeningCallback> SCREEN_OPENING = FabricEventFactory.createResultHolder(
             ScreenOpeningCallback.class);

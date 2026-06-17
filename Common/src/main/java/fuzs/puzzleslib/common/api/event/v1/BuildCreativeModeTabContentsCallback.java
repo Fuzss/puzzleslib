@@ -1,12 +1,13 @@
 package fuzs.puzzleslib.common.api.event.v1;
 
-import fuzs.puzzleslib.common.api.init.v3.registry.RegistryManager;
 import fuzs.puzzleslib.common.api.event.v1.core.EventInvoker;
+import fuzs.puzzleslib.common.api.init.v3.registry.RegistryManager;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
 
 import java.util.Objects;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 @FunctionalInterface
 public interface BuildCreativeModeTabContentsCallback {
@@ -21,8 +22,7 @@ public interface BuildCreativeModeTabContentsCallback {
      * supported.
      * <p>
      * For creating brand-new creative mode tabs see
-     * {@link RegistryManager#registerCreativeModeTab(String, Supplier,
-     * CreativeModeTab.DisplayItemsGenerator, boolean)}.
+     * {@link RegistryManager#registerCreativeModeTab(String, Supplier, UnaryOperator, boolean)}.
      *
      * @param creativeModeTab       the creative mode tab instance
      * @param itemDisplayParameters the item display parameters

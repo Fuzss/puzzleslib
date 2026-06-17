@@ -4,8 +4,6 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.ArmorModelSet;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.block.HangingSignBlock;
-import net.minecraft.world.level.block.state.properties.WoodType;
 
 /**
  * A helper class for creating {@link ModelLayerLocation ModelLayerLocations} with a provided namespace.
@@ -75,42 +73,5 @@ public interface ModelLayerFactory {
                 this.registerModelLayer(path, "chestplate"),
                 this.registerModelLayer(path, "leggings"),
                 this.registerModelLayer(path, "boots"));
-    }
-
-    /**
-     * Creates a new {@link ModelLayerLocation} for a standing sign; the used layer is {@code main}.
-     *
-     * @param woodType the wood type
-     * @return the new model layer location
-     *
-     * @see ModelLayers#createStandingSignModelName(WoodType)
-     */
-    default ModelLayerLocation createStandingSignModelName(WoodType woodType) {
-        return this.registerModelLayer("sign/standing/" + woodType.name());
-    }
-
-    /**
-     * Creates a new {@link ModelLayerLocation} for a wall sign; the used layer is {@code main}.
-     *
-     * @param woodType the wood type
-     * @return the new model layer location
-     *
-     * @see ModelLayers#createWallSignModelName(WoodType)
-     */
-    default ModelLayerLocation createWallSignModelName(WoodType woodType) {
-        return this.registerModelLayer("sign/wall/" + woodType.name());
-    }
-
-    /**
-     * Creates a new {@link ModelLayerLocation} for a hanging sign; the used layer is {@code main}.
-     *
-     * @param woodType       the wood type
-     * @param attachmentType the attachment type
-     * @return the new model layer location
-     *
-     * @see ModelLayers#createHangingSignModelName(WoodType, HangingSignBlock.Attachment)
-     */
-    default ModelLayerLocation createHangingSignModelName(WoodType woodType, HangingSignBlock.Attachment attachmentType) {
-        return this.registerModelLayer("hanging_sign/" + woodType.name() + "/" + attachmentType.getSerializedName());
     }
 }

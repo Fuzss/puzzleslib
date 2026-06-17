@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.common.api.client.key.v1;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 
@@ -13,14 +14,13 @@ public enum KeyActivationContext {
      */
     UNIVERSAL(true, true),
     /**
-     * A key mapping that is processed when the game is running without a screen being open in
-     * {@link net.minecraft.client.Minecraft#screen}.
+     * A key mapping that is processed when the game is running without a screen being open in {@link Gui#screen()}.
      * <p>
      * These keys are usually processed in {@link Minecraft#tick()} and corresponding events.
      */
     GAME(false, true),
     /**
-     * A key mapping that is processed when a screen is open in {@link Minecraft#screen}
+     * A key mapping that is processed when a screen is open in {@link Gui#screen()}
      * <p>
      * These keys are usually processed in {@link net.minecraft.client.gui.screens.Screen#keyPressed(KeyEvent)} and
      * {@link net.minecraft.client.gui.screens.Screen#mouseClicked(MouseButtonEvent, boolean)}.

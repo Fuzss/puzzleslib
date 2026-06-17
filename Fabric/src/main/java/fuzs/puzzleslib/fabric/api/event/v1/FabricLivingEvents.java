@@ -80,8 +80,9 @@ public final class FabricLivingEvents {
      */
     public static final Event<AnimalTameCallback> ANIMAL_TAME = FabricEventFactory.createResult(AnimalTameCallback.class);
     /**
-     * Called before an entity is knocked-back in {@link LivingEntity#knockback(double, double, double)}, allows for
-     * preventing the knock-back.
+     * Called before an entity is knocked-back in
+     * {@link LivingEntity#knockback(double, double, double, DamageSource, float, boolean)}, allows for preventing the
+     * knock-back.
      */
     public static final Event<LivingKnockBackCallback> LIVING_KNOCK_BACK = FabricEventFactory.createResult(
             LivingKnockBackCallback.class);

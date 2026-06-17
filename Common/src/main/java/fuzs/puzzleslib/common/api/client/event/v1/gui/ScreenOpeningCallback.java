@@ -2,6 +2,7 @@ package fuzs.puzzleslib.common.api.client.event.v1.gui;
 
 import fuzs.puzzleslib.common.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.common.api.event.v1.core.EventResultHolder;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.screens.Screen;
 import org.jspecify.annotations.Nullable;
 
@@ -10,9 +11,9 @@ public interface ScreenOpeningCallback {
     EventInvoker<ScreenOpeningCallback> EVENT = EventInvoker.lookup(ScreenOpeningCallback.class);
 
     /**
-     * Called just before a new screen is set to {@link net.minecraft.client.Minecraft#screen} in
-     * {@link net.minecraft.client.Minecraft#setScreen}, allows for exchanging the new screen with a different one, or
-     * can prevent a new screen from opening, by returning the original screen (which will be initialised once again).
+     * Called just before a new screen is set to {@link Gui#screen()} in {@link Gui#setScreen(Screen)}, allows for
+     * exchanging the new screen with a different one, or can prevent a new screen from opening, by returning the
+     * original screen (which will be initialized once again).
      *
      * @param oldScreen the screen that is being removed, which may be {@code null} when opening the screen from
      *                  {@link net.minecraft.client.gui.Gui}, like {@link net.minecraft.client.gui.screens.PauseScreen}

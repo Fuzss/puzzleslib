@@ -67,7 +67,8 @@ public abstract class RegistryManagerImpl implements RegistryManager, Freezable 
     protected abstract <T> Holder.Reference<T> getHolderReference(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier, boolean skipRegistration);
 
     /**
-     * @see CreativeModeTab.ItemDisplayBuilder#accept(ItemStack, CreativeModeTab.TabVisibility)
+     * @see net.minecraft.world.item.CreativeModeTab.ItemDisplayBuilder#accept(ItemStack,
+     *         CreativeModeTab.TabVisibility)
      */
     @Override
     public Holder.Reference<CreativeModeTab> registerCreativeModeTab(String path, Supplier<ItemStack> iconSupplier, UnaryOperator<CreativeModeTab.DisplayItemsGenerator> displayItems, boolean hasSearchBar) {

@@ -3,7 +3,6 @@ package fuzs.puzzleslib.common.api.client.event.v1.gui;
 import fuzs.puzzleslib.common.api.client.core.v1.context.GuiLayersContext;
 import fuzs.puzzleslib.common.api.event.v1.core.EventInvoker;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public final class RenderGuiEvents {
@@ -18,7 +17,8 @@ public final class RenderGuiEvents {
     public interface Before {
 
         /**
-         * Called at the beginning of {@link Gui#extractRenderState(GuiGraphicsExtractor, DeltaTracker)}, before vanilla
+         * Called at the beginning of
+         * {@link net.minecraft.client.gui.Hud#extractRenderState(GuiGraphicsExtractor, DeltaTracker)}, before vanilla
          * has drawn any gui elements.
          * <p>
          * For rendering additional elements on the screen use {@link GuiLayersContext}.
@@ -34,8 +34,9 @@ public final class RenderGuiEvents {
     public interface After {
 
         /**
-         * Called at the end of {@link Gui#extractRenderState(GuiGraphicsExtractor, DeltaTracker)}, after vanilla has
-         * drawn all gui elements.
+         * Called at the end of
+         * {@link net.minecraft.client.gui.Hud#extractRenderState(GuiGraphicsExtractor, DeltaTracker)}, after vanilla
+         * has drawn all gui elements.
          * <p>
          * For rendering additional elements on the screen use {@link GuiLayersContext}.
          *
