@@ -46,10 +46,10 @@ abstract class ChatListenerFabricMixin {
                         target = "Lnet/minecraft/client/gui/components/ChatComponent;addPlayerMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V"),
                require = 2)
     public Component showMessageToPlayer(Component component, @Local(argsOnly = true) ChatType.Bound boundChatType, @Local(
-            argsOnly = true) PlayerChatMessage playerChatMessage, @Cancellable CallbackInfoReturnable<Boolean> callback) {
+            argsOnly = true) PlayerChatMessage message, @Cancellable CallbackInfoReturnable<Boolean> callback) {
         MutableValue<Component> chatMessage = MutableValue.fromValue(component);
         EventResult result = FabricClientEvents.CHAT_MESSAGE_RECEIVED.invoker()
-                .onChatMessageReceived(chatMessage, boundChatType, playerChatMessage, false);
+                .onChatMessageReceived(chatMessage, boundChatType, message, false);
         if (result.isInterrupt()) {
             callback.setReturnValue(true);
         }
@@ -58,19 +58,19 @@ abstract class ChatListenerFabricMixin {
     }
 
     @ModifyVariable(method = "handleSystemMessage", at = @At("HEAD"), argsOnly = true)
-    public Component handleSystemMessage(Component component, @Local(argsOnly = true) boolean isOverlay, @Cancellable CallbackInfo callback) {
+    public Component handleSystemMessage(Component message, @Local(argsOnly = true) boolean remote, @Cancellable CallbackInfo callback) {
         if (!this.minecraft.options.hideMatchedNames().get()
-                || !this.minecraft.isBlocked(this.guessChatUUID(component))) {
-            MutableValue<Component> chatMessage = MutableValue.fromValue(component);
+                || !this.minecraft.isBlocked(this.guessChatUUID(message))) {
+            MutableValue<Component> chatMessage = MutableValue.fromValue(message);
             EventResult result = FabricClientEvents.CHAT_MESSAGE_RECEIVED.invoker()
-                    .onChatMessageReceived(chatMessage, null, null, isOverlay);
+                    .onChatMessageReceived(chatMessage, null, null, remote);
             if (result.isInterrupt()) {
                 callback.cancel();
             }
 
             return chatMessage.get();
         } else {
-            return component;
+            return message;
         }
     }
 

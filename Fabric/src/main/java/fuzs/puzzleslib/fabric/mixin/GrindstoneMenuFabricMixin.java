@@ -4,9 +4,9 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.common.api.event.v1.data.MutableInt;
 import fuzs.puzzleslib.common.api.event.v1.data.MutableValue;
+import fuzs.puzzleslib.common.impl.event.EventImplHelper;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import fuzs.puzzleslib.fabric.impl.event.GrindstoneExperienceHolder;
-import fuzs.puzzleslib.common.impl.event.EventImplHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -26,19 +26,17 @@ import java.util.OptionalInt;
 abstract class GrindstoneMenuFabricMixin extends AbstractContainerMenu implements GrindstoneExperienceHolder {
     @Shadow
     @Final
-    Container repairSlots;
-    @Unique private OptionalInt puzzleslib$experiencePointReward = OptionalInt.empty();
+    private Container repairSlots;
+    @Unique
+    private OptionalInt puzzleslib$experiencePointReward = OptionalInt.empty();
 
     protected GrindstoneMenuFabricMixin(@Nullable MenuType<?> menuType, int containerId) {
         super(menuType, containerId);
     }
 
-    @ModifyExpressionValue(
-            method = "createResult", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/world/inventory/GrindstoneMenu;computeResult(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/ItemStack;"
-    )
-    )
+    @ModifyExpressionValue(method = "createResult",
+                           at = @At(value = "INVOKE",
+                                    target = "Lnet/minecraft/world/inventory/GrindstoneMenu;computeResult(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/ItemStack;"))
     private ItemStack createResult(ItemStack itemStack) {
         Player player = EventImplHelper.getPlayerFromContainerMenu(this);
         if (player != null) {

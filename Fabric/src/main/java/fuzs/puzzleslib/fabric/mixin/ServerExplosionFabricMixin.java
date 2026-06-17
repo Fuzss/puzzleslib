@@ -20,19 +20,22 @@ abstract class ServerExplosionFabricMixin {
     @Shadow
     @Final
     private ServerLevel level;
-    @Unique private List<BlockPos> puzzleslib$explodedPositions;
+    @Unique
+    private List<BlockPos> puzzleslib$explodedPositions;
 
     @ModifyVariable(method = "explode", at = @At("STORE"), ordinal = 0)
-    public List<BlockPos> explode(List<BlockPos> explodedPositions) {
-        return this.puzzleslib$explodedPositions = explodedPositions;
+    public List<BlockPos> explode(List<BlockPos> toBlow) {
+        return this.puzzleslib$explodedPositions = toBlow;
     }
 
     @ModifyVariable(method = "hurtEntities", at = @At("STORE"), ordinal = 0, require = 0)
-    public List<Entity> hurtEntities(List<Entity> hurtEntities) {
+    public List<Entity> hurtEntities(List<Entity> entities) {
         Objects.requireNonNull(this.puzzleslib$explodedPositions, "exploded positions is null");
-        FabricLevelEvents.EXPLOSION_DETONATE.invoker().onExplosionDetonate(this.level, ServerExplosion.class.cast(this),
-                this.puzzleslib$explodedPositions, hurtEntities
-        );
-        return hurtEntities;
+        FabricLevelEvents.EXPLOSION_DETONATE.invoker()
+                .onExplosionDetonate(this.level,
+                        ServerExplosion.class.cast(this),
+                        this.puzzleslib$explodedPositions,
+                        entities);
+        return entities;
     }
 }

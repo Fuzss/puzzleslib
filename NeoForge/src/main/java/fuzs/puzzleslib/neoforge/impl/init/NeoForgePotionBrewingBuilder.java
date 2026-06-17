@@ -11,10 +11,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.Objects;
 
-/**
- * We do not use Forge's {@link net.neoforged.neoforge.common.brewing.BrewingRecipeRegistry}, as recipes added there are
- * not fully supported by recipe viewer mods such as JEI.
- */
 public record NeoForgePotionBrewingBuilder(PotionBrewing.Builder builder) implements RegisterPotionBrewingMixesCallback.Builder {
 
     @Override

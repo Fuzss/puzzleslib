@@ -3,11 +3,11 @@ package fuzs.puzzleslib.fabric.mixin;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Cancellable;
 import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.common.impl.event.data.DefaultedFloat;
+import fuzs.puzzleslib.common.impl.event.data.DefaultedValue;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
-import fuzs.puzzleslib.common.impl.event.data.DefaultedFloat;
-import fuzs.puzzleslib.common.impl.event.data.DefaultedValue;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -45,7 +45,7 @@ abstract class PlayerFabricMixin extends LivingEntity {
     }
 
     @Inject(method = "drop", at = @At(value = "HEAD"), cancellable = true)
-    public void drop(ItemStack itemStack, boolean includeThrowerName, CallbackInfoReturnable<ItemEntity> callback) {
+    public void drop(ItemStack itemStack, boolean thrownFromHand, CallbackInfoReturnable<ItemEntity> callback) {
         if (!ServerPlayer.class.isInstance(this)) {
             return;
         }
@@ -58,10 +58,10 @@ abstract class PlayerFabricMixin extends LivingEntity {
     }
 
     @ModifyReturnValue(method = "getDestroySpeed", at = @At("TAIL"))
-    public float getDestroySpeed(float destroySpeed, BlockState blockState) {
+    public float getDestroySpeed(float destroySpeed, BlockState state) {
         DefaultedFloat defaultedFloat = DefaultedFloat.fromValue(destroySpeed);
         if (FabricPlayerEvents.CALCULATE_BLOCK_BREAK_SPEED.invoker()
-                .onCalculateBlockBreakSpeed(Player.class.cast(this), blockState, defaultedFloat)
+                .onCalculateBlockBreakSpeed(Player.class.cast(this), state, defaultedFloat)
                 .isInterrupt()) {
             defaultedFloat.accept(-1.0F);
         }
@@ -70,39 +70,34 @@ abstract class PlayerFabricMixin extends LivingEntity {
     }
 
     @Inject(method = "die", at = @At("HEAD"), cancellable = true)
-    public void die(DamageSource damageSource, CallbackInfo callback) {
+    public void die(DamageSource source, CallbackInfo callback) {
         // this will fire twice for players, since the die method calls super on LivingEntity, where this is hooked in again
         // Forge has it implemented like this, so let's leave it for now for parity
         // can't easily filter out the second call on Forge unfortunately
-        EventResult result = FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(this, damageSource);
+        EventResult result = FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(this, source);
         if (result.isInterrupt()) {
             callback.cancel();
         }
     }
 
     @ModifyVariable(method = "actuallyHurt", at = @At("HEAD"), ordinal = 0, argsOnly = true)
-    protected float actuallyHurt(float damageAmount, ServerLevel serverLevel, DamageSource damageSource, @Cancellable CallbackInfo callback) {
-        if (!this.isInvulnerableTo(serverLevel, damageSource)) {
+    protected float actuallyHurt(float dmg, ServerLevel level, DamageSource source, @Cancellable CallbackInfo callback) {
+        if (!this.isInvulnerableTo(level, source)) {
             MutableBoolean cancelInjection = new MutableBoolean();
-            damageAmount = FabricEventImplHelper.onLivingHurt(this,
-                    serverLevel,
-                    damageSource,
-                    damageAmount,
-                    cancelInjection);
+            dmg = FabricEventImplHelper.onLivingHurt(this, level, source, dmg, cancelInjection);
             if (cancelInjection.booleanValue()) {
                 callback.cancel();
             }
         }
 
-        return damageAmount;
+        return dmg;
     }
 
     @ModifyReturnValue(method = "getProjectile", at = @At("RETURN"))
-    public ItemStack getProjectile(ItemStack projectileItemStack, ItemStack weaponItemStack) {
-        if (weaponItemStack.getItem() instanceof ProjectileWeaponItem) {
+    public ItemStack getProjectile(ItemStack projectileItemStack, ItemStack heldWeapon) {
+        if (heldWeapon.getItem() instanceof ProjectileWeaponItem) {
             DefaultedValue<ItemStack> projectileItemStackValue = DefaultedValue.fromValue(projectileItemStack);
-            FabricLivingEvents.PICK_PROJECTILE.invoker()
-                    .onPickProjectile(this, weaponItemStack, projectileItemStackValue);
+            FabricLivingEvents.PICK_PROJECTILE.invoker().onPickProjectile(this, heldWeapon, projectileItemStackValue);
             return projectileItemStackValue.getAsOptional().orElse(projectileItemStack);
         } else {
             return projectileItemStack;

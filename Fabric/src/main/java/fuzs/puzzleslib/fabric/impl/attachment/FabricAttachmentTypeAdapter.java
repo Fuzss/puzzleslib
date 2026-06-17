@@ -8,6 +8,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
+@SuppressWarnings("NonExtendableApiUsage")
 public record FabricAttachmentTypeAdapter<T extends AttachmentTarget, A>(AttachmentType<A> attachmentType) implements AttachmentTypeAdapter<T, A> {
 
     @Override

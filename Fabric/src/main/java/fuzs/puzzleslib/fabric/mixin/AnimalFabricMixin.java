@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.common.api.event.v1.data.MutableValue;
+import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityType;
@@ -21,9 +21,11 @@ abstract class AnimalFabricMixin extends AgeableMob {
     }
 
     @ModifyVariable(method = "spawnChildFromBreeding", at = @At("STORE"))
-    public AgeableMob spawnChildFromBreeding(@Nullable AgeableMob child, ServerLevel serverLevel, Animal partner) {
-        MutableValue<AgeableMob> defaultedChild = MutableValue.fromValue(child);
-        if (FabricLivingEvents.BABY_ENTITY_SPAWN.invoker().onBabyEntitySpawn(this, partner, defaultedChild).isInterrupt()) {
+    public AgeableMob spawnChildFromBreeding(@Nullable AgeableMob offspring, ServerLevel level, Animal partner) {
+        MutableValue<AgeableMob> defaultedChild = MutableValue.fromValue(offspring);
+        if (FabricLivingEvents.BABY_ENTITY_SPAWN.invoker()
+                .onBabyEntitySpawn(this, partner, defaultedChild)
+                .isInterrupt()) {
             this.setAge(6000);
             partner.setAge(6000);
             this.resetLove();

@@ -26,13 +26,13 @@ abstract class MobFabricMixin extends LivingEntity {
     }
 
     @Inject(method = "setTarget", at = @At("HEAD"), cancellable = true)
-    public void setTarget(@Nullable LivingEntity livingEntity, CallbackInfo callback) {
-        DefaultedValue<LivingEntity> target = DefaultedValue.fromValue(livingEntity);
-        EventResult result = FabricLivingEvents.LIVING_CHANGE_TARGET.invoker().onLivingChangeTarget(this, target);
+    public void setTarget(@Nullable LivingEntity target, CallbackInfo callback) {
+        DefaultedValue<LivingEntity> targetValue = DefaultedValue.fromValue(target);
+        EventResult result = FabricLivingEvents.LIVING_CHANGE_TARGET.invoker().onLivingChangeTarget(this, targetValue);
         if (result.isInterrupt()) {
             callback.cancel();
-        } else if (target.getAsOptional().isPresent()) {
-            this.target = target.get();
+        } else if (targetValue.getAsOptional().isPresent()) {
+            this.target = targetValue.get();
             callback.cancel();
         }
     }

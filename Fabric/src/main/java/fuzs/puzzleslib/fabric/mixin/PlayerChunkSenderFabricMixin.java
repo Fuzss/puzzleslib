@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 abstract class PlayerChunkSenderFabricMixin {
 
     @Inject(method = "sendChunk", at = @At("TAIL"))
-    private static void sendChunk(ServerGamePacketListenerImpl packetListener, ServerLevel level, LevelChunk chunk, CallbackInfo callback) {
-        FabricLevelEvents.WATCH_CHUNK.invoker().onChunkWatch(packetListener.getPlayer(), chunk, level);
+    private static void sendChunk(ServerGamePacketListenerImpl connection, ServerLevel level, LevelChunk chunk, CallbackInfo callback) {
+        FabricLevelEvents.WATCH_CHUNK.invoker().onChunkWatch(connection.getPlayer(), chunk, level);
     }
 }

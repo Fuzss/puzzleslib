@@ -18,7 +18,7 @@ abstract class PackRepositoryFabricMixin {
     public Set<RepositorySource> sources;
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    public void init(RepositorySource[] repositorySources, CallbackInfo callback) {
+    public void init(RepositorySource[] sources, CallbackInfo callback) {
         // same implementation as Fabric Api to hook into server pack repository whenever a new one is created,
         // client resource packs can be handled much simpler since the repository is only ever created once
         for (RepositorySource repositorySource : this.sources) {

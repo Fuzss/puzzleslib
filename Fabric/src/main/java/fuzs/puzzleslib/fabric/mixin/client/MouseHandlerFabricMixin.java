@@ -14,7 +14,7 @@ abstract class MouseHandlerFabricMixin {
 
     @Inject(method = "onButton",
             at = @At(value = "INVOKE",
-                     target = "Lnet/minecraft/client/Minecraft;getOverlay()Lnet/minecraft/client/gui/screens/Overlay;",
+                     target = "Lnet/minecraft/client/gui/Gui;overlay()Lnet/minecraft/client/gui/screens/Overlay;",
                      ordinal = 0),
             cancellable = true)
     private void onButton(long handle, MouseButtonInfo rawButtonInfo, int action, CallbackInfo callback) {

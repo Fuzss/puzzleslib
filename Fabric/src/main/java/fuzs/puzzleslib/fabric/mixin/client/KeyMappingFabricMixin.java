@@ -15,7 +15,9 @@ import java.util.Objects;
 
 @Mixin(KeyMapping.class)
 abstract class KeyMappingFabricMixin implements ActivationContextKeyMapping {
-    @Nullable @Unique private KeyActivationContext puzzleslib$keyActivationContext;
+    @Nullable
+    @Unique
+    private KeyActivationContext puzzleslib$keyActivationContext;
 
     @Inject(method = "isDown", at = @At("HEAD"), cancellable = true)
     public void isDown(CallbackInfoReturnable<Boolean> callback) {
@@ -24,8 +26,8 @@ abstract class KeyMappingFabricMixin implements ActivationContextKeyMapping {
         }
     }
 
-    @Inject(method = "matches", at = @At("HEAD"), cancellable = true)
-    public void matches(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> callback) {
+    @Inject(method = "matches(Lnet/minecraft/client/input/KeyEvent;)Z", at = @At("HEAD"), cancellable = true)
+    public void matches(KeyEvent event, CallbackInfoReturnable<Boolean> callback) {
         if (!this.puzzleslib$getKeyActivationContext().isSupportedEnvironment()) {
             callback.setReturnValue(false);
         }

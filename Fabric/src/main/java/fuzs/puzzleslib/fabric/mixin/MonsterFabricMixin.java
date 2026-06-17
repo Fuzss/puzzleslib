@@ -20,11 +20,10 @@ abstract class MonsterFabricMixin extends PathfinderMob {
     }
 
     @ModifyReturnValue(method = "getProjectile", at = @At("RETURN"))
-    public ItemStack getProjectile(ItemStack projectileItemStack, ItemStack weaponItemStack) {
-        if (weaponItemStack.getItem() instanceof ProjectileWeaponItem) {
+    public ItemStack getProjectile(ItemStack projectileItemStack, ItemStack heldWeapon) {
+        if (heldWeapon.getItem() instanceof ProjectileWeaponItem) {
             DefaultedValue<ItemStack> projectileItemStackValue = DefaultedValue.fromValue(projectileItemStack);
-            FabricLivingEvents.PICK_PROJECTILE.invoker()
-                    .onPickProjectile(this, weaponItemStack, projectileItemStackValue);
+            FabricLivingEvents.PICK_PROJECTILE.invoker().onPickProjectile(this, heldWeapon, projectileItemStackValue);
             return projectileItemStackValue.getAsOptional().orElse(projectileItemStack);
         } else {
             return projectileItemStack;

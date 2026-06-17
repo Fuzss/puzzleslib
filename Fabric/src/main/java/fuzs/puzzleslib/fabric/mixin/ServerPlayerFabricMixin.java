@@ -34,29 +34,29 @@ abstract class ServerPlayerFabricMixin extends Player implements CapturedDropsEn
             at = @At(value = "INVOKE",
                      target = "Lnet/minecraft/server/level/ServerPlayer;drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;"),
             cancellable = true)
-    public void drop(CallbackInfo callback, @Local ItemStack itemStack) {
+    public void drop(CallbackInfo callback, @Local ItemStack removed) {
         EventResult eventResult = FabricPlayerEvents.ITEM_TOSS.invoker()
-                .onItemToss(ServerPlayer.class.cast(this), itemStack);
+                .onItemToss(ServerPlayer.class.cast(this), removed);
         if (eventResult.isInterrupt()) {
             callback.cancel();
         }
     }
 
     @Inject(method = "die", at = @At("HEAD"), cancellable = true)
-    public void die(DamageSource damageSource, CallbackInfo callback) {
-        EventResult eventResult = FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(this, damageSource);
+    public void die(DamageSource source, CallbackInfo callback) {
+        EventResult eventResult = FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(this, source);
         if (eventResult.isInterrupt()) {
             callback.cancel();
         }
     }
 
     @Inject(method = "openMenu", at = @At("TAIL"))
-    public void openMenu(@Nullable MenuProvider menu, CallbackInfoReturnable<OptionalInt> callback) {
+    public void openMenu(@Nullable MenuProvider provider, CallbackInfoReturnable<OptionalInt> callback) {
         FabricPlayerEvents.CONTAINER_OPEN.invoker().onContainerOpen(ServerPlayer.class.cast(this), this.containerMenu);
     }
 
     @Inject(method = "openHorseInventory", at = @At("TAIL"))
-    public void openHorseInventory(AbstractHorse horse, Container inventory, CallbackInfo callback) {
+    public void openHorseInventory(AbstractHorse horse, Container container, CallbackInfo callback) {
         FabricPlayerEvents.CONTAINER_OPEN.invoker().onContainerOpen(ServerPlayer.class.cast(this), this.containerMenu);
     }
 
@@ -70,8 +70,8 @@ abstract class ServerPlayerFabricMixin extends Player implements CapturedDropsEn
     }
 
     @Inject(method = "stopSleepInBed", at = @At("HEAD"))
-    public void stopSleepInBed(boolean wakeImmediately, boolean updateLevelForSleepingPlayers, CallbackInfo callback) {
+    public void stopSleepInBed(boolean forcefulWakeUp, boolean updateLevelList, CallbackInfo callback) {
         FabricPlayerEvents.STOP_SLEEP_IN_BED.invoker()
-                .onStopSleepInBed(ServerPlayer.class.cast(this), !wakeImmediately && !updateLevelForSleepingPlayers);
+                .onStopSleepInBed(ServerPlayer.class.cast(this), !forcefulWakeUp && !updateLevelList);
     }
 }

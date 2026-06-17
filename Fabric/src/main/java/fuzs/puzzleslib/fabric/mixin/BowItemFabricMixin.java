@@ -21,17 +21,16 @@ abstract class BowItemFabricMixin extends ProjectileWeaponItem {
     }
 
     @ModifyVariable(method = "releaseUsing", at = @At("STORE"), ordinal = 1)
-    public int releaseUsing(int chargeValue, ItemStack bow, Level level, LivingEntity livingEntity, int timeCharged, @Local(
-            ordinal = 1
-    ) ItemStack ammo) {
-        DefaultedInt charge = DefaultedInt.fromValue(this.getUseDuration(bow, livingEntity) - timeCharged);
+    public int releaseUsing(int timeHeld, ItemStack itemStack, Level level, LivingEntity entity, int remainingTime, @Local(
+            ordinal = 1) ItemStack projectile) {
+        DefaultedInt charge = DefaultedInt.fromValue(this.getUseDuration(itemStack, entity) - remainingTime);
         if (FabricPlayerEvents.ARROW_LOOSE.invoker()
-                .onArrowLoose((Player) livingEntity, bow, level, charge, !ammo.isEmpty())
+                .onArrowLoose((Player) entity, itemStack, level, charge, !projectile.isEmpty())
                 .isInterrupt()) {
             // returning zero will effectively cancel the method as it won't process for a charge too low
             return 0;
         } else {
-            return charge.getAsOptionalInt().orElse(chargeValue);
+            return charge.getAsOptionalInt().orElse(timeHeld);
         }
     }
 }

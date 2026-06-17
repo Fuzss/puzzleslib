@@ -19,8 +19,8 @@ abstract class ParrotFabricMixin extends ShoulderRidingEntity {
     }
 
     @ModifyExpressionValue(method = "mobInteract",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/util/RandomSource;nextInt(I)I"))
-    public int mobInteract(int intValue, Player player, InteractionHand interactionHand) {
+                           at = @At(value = "INVOKE", target = "Lnet/minecraft/util/RandomSource;nextInt(I)I"))
+    public int mobInteract(int intValue, Player player, InteractionHand hand) {
         return FabricEventImplHelper.onAnimalTame(this, player, intValue);
     }
 }

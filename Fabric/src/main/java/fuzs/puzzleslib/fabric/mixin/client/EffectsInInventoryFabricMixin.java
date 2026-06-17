@@ -42,11 +42,11 @@ abstract class EffectsInInventoryFabricMixin {
     @WrapOperation(method = "extractRenderState",
                    at = @At(value = "INVOKE",
                             target = "Lnet/minecraft/client/gui/screens/inventory/EffectsInInventory;extractEffects(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Ljava/util/Collection;IIIII)V"))
-    public void render(EffectsInInventory effectsInInventory, GuiGraphicsExtractor graphics, Collection<MobEffectInstance> activeEffects, int posX, int posY, int mouseX, int mouseY, int maxWidth, Operation<Void> operation) {
-        int availableWidth = this.screen.width - posX;
+    public void render(EffectsInInventory effectsInInventory, GuiGraphicsExtractor graphics, Collection<MobEffectInstance> activeEffects, int x0, int yStep, int mouseX, int mouseY, int maxWidth, Operation<Void> operation) {
+        int availableWidth = this.screen.width - x0;
         boolean smallWidgets = maxWidth == 32;
         MutableBoolean smallWidgetsValue = MutableBoolean.fromValue(smallWidgets);
-        MutableInt horizontalPositionValue = MutableInt.fromValue(posX);
+        MutableInt horizontalPositionValue = MutableInt.fromValue(x0);
         EventResult eventResult = FabricGuiEvents.INVENTORY_MOB_EFFECTS.invoker()
                 .onPrepareInventoryMobEffects(this.screen, availableWidth, smallWidgetsValue, horizontalPositionValue);
         if (smallWidgetsValue.getAsBoolean() != smallWidgets) {
@@ -58,8 +58,7 @@ abstract class EffectsInInventoryFabricMixin {
             operation.call(effectsInInventory,
                     graphics,
                     activeEffects,
-                    horizontalPositionValue.getAsInt(),
-                    posY,
+                    horizontalPositionValue.getAsInt(), yStep,
                     mouseX,
                     mouseY,
                     maxWidth);

@@ -39,11 +39,6 @@ public class AbstractMenuSelectionList<E extends AbstractMenuSelectionList.Entry
     }
 
     @Override
-    public void clearEntries() {
-        super.clearEntries();
-    }
-
-    @Override
     public int getRowWidth() {
         return this.getWidth();
     }

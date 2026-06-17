@@ -21,8 +21,8 @@ abstract class AbstractContainerScreenFabricMixin extends Screen {
             at = @At(value = "INVOKE",
                      target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;extractLabels(Lnet/minecraft/client/gui/GuiGraphicsExtractor;II)V",
                      shift = At.Shift.AFTER))
-    public void renderContents(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks, CallbackInfo callback) {
+    public void renderContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a, CallbackInfo callback) {
         FabricGuiEvents.EXTRACT_CONTAINER_SCREEN_CONTENTS.invoker()
-                .onExtractContainerScreenContents(AbstractContainerScreen.class.cast(this), guiGraphics, mouseX, mouseY);
+                .onExtractContainerScreenContents(AbstractContainerScreen.class.cast(this), graphics, mouseX, mouseY);
     }
 }

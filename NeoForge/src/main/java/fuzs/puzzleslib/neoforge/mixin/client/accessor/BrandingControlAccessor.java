@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.List;
 
+@SuppressWarnings("UnstableApiUsage")
 @Mixin(BrandingControl.class)
 public interface BrandingControlAccessor {
     @Accessor("brandings")

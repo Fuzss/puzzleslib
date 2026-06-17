@@ -18,10 +18,10 @@ abstract class GameRendererFabricMixin {
     private Identifier postEffectId;
 
     @Inject(method = "checkEntityPostEffect", at = @At("TAIL"))
-    public void checkEntityPostEffect(@Nullable Entity entity, CallbackInfo callback) {
+    public void checkEntityPostEffect(@Nullable Entity cameraEntity, CallbackInfo callback) {
         // Vanilla has set no effect, so we look for one. This mirrors the implementation on NeoForge.
         if (this.postEffectId == null) {
-            EntitySpectatorShadersContextFabricImpl.getEntityShader(entity).ifPresent(this::setPostEffect);
+            EntitySpectatorShadersContextFabricImpl.getEntityShader(cameraEntity).ifPresent(this::setPostEffect);
         }
     }
 

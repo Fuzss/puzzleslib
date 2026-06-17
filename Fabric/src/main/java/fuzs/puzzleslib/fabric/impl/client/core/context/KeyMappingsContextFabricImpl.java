@@ -57,7 +57,7 @@ public final class KeyMappingsContextFabricImpl implements KeyMappingsContext {
             ScreenEvents.BEFORE_INIT.register((Minecraft minecraft, Screen screen, int scaledWidth, int scaledHeight) -> {
                 if (activationHandler.screenType().isInstance(screen)) {
                     ScreenKeyboardEvents.allowKeyPress(screen).register((Screen currentScreen, KeyEvent keyEvent) -> {
-                        if (!(minecraft.screen instanceof KeyBindsScreen) && keyMapping.matches(keyEvent)) {
+                        if (!(minecraft.gui.screen() instanceof KeyBindsScreen) && keyMapping.matches(keyEvent)) {
                             screenConsumer.accept(currentScreen);
                             return false;
                         } else {

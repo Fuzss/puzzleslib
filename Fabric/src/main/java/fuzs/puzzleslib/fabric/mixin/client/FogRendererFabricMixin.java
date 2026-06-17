@@ -48,13 +48,12 @@ abstract class FogRendererFabricMixin {
                      target = "Lnet/minecraft/client/renderer/fog/FogData;renderDistanceEnd:F",
                      opcode = Opcodes.PUTFIELD,
                      shift = At.Shift.AFTER))
-    public void setupFog(Camera camera, int renderDistance, DeltaTracker deltaTracker, float darkenWorldAmount, ClientLevel clientLevel, CallbackInfoReturnable<Vector4f> callback, @Local FogType fogType, @Local FogData fogData, @Share(
+    public void setupFog(Camera camera, int renderDistanceInChunks, DeltaTracker deltaTracker, float darkenWorldAmount, ClientLevel level, CallbackInfoReturnable<Vector4f> callback, @Local FogType fogType, @Local FogData fog, @Share(
             "fogEnvironment") LocalRef<@Nullable FogEnvironment> fogEnvironmentRef) {
         FabricRendererEvents.SETUP_FOG.invoker()
                 .onSetupFog(camera,
                         deltaTracker.getGameTimeDeltaPartialTick(false),
                         fogEnvironmentRef.get(),
-                        fogType,
-                        fogData);
+                        fogType, fog);
     }
 }

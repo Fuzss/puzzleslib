@@ -28,7 +28,7 @@ abstract class ScreenEffectRendererFabricMixin {
     @WrapWithCondition(method = "submit",
                        at = @At(value = "INVOKE",
                                 target = "Lnet/minecraft/client/renderer/ScreenEffectRenderer;submitBlockSprite(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V"))
-    public boolean submit(TextureAtlasSprite textureAtlasSprite, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int color, @Local BlockState blockState) {
+    public boolean submit(TextureAtlasSprite sprite, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int color, @Local BlockState blockState) {
         return FabricRendererEvents.RENDER_BLOCK_OVERLAY.invoker()
                 .onRenderBlockOverlay(this.minecraft.player, poseStack, submitNodeCollector, blockState, this.sprites)
                 .isPass();
@@ -50,7 +50,7 @@ abstract class ScreenEffectRendererFabricMixin {
     @WrapWithCondition(method = "submit",
                        at = @At(value = "INVOKE",
                                 target = "Lnet/minecraft/client/renderer/ScreenEffectRenderer;submitFire(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V"))
-    public boolean submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, TextureAtlasSprite textureAtlasSprite) {
+    public boolean submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, TextureAtlasSprite sprite) {
         return FabricRendererEvents.RENDER_BLOCK_OVERLAY.invoker()
                 .onRenderBlockOverlay(this.minecraft.player,
                         poseStack,

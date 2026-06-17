@@ -18,9 +18,9 @@ abstract class DedicatedServerSettingsMixin {
     private DedicatedServerProperties properties;
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    public void init(Path path, CallbackInfo callback) {
+    public void init(Path source, CallbackInfo callback) {
         if (!this.properties.serverIp.isEmpty()) return;
         // will print the FileNotFoundException twice, but ¯\_(ツ)_/¯
-        this.properties = ServerPropertiesHelper.createDedicatedServerProperties(path, LogUtils.getLogger());
+        this.properties = ServerPropertiesHelper.createDedicatedServerProperties(source, LogUtils.getLogger());
     }
 }

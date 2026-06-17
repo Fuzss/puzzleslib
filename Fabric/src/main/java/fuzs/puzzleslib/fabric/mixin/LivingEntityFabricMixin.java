@@ -12,15 +12,15 @@ import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import fuzs.puzzleslib.common.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.common.api.event.v1.data.MutableDouble;
 import fuzs.puzzleslib.common.api.event.v1.data.MutableFloat;
-import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
-import fuzs.puzzleslib.fabric.impl.event.CapturedDropsEntity;
-import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
 import fuzs.puzzleslib.common.impl.PuzzlesLib;
 import fuzs.puzzleslib.common.impl.event.EventImplHelper;
 import fuzs.puzzleslib.common.impl.event.data.DefaultedDouble;
 import fuzs.puzzleslib.common.impl.event.data.DefaultedFloat;
 import fuzs.puzzleslib.common.impl.event.data.DefaultedInt;
 import fuzs.puzzleslib.common.impl.event.data.DefaultedValue;
+import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
+import fuzs.puzzleslib.fabric.impl.event.CapturedDropsEntity;
+import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -67,9 +67,9 @@ abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEn
     }
 
     @Inject(method = "die", at = @At("HEAD"), cancellable = true)
-    public void die(DamageSource damageSource, CallbackInfo callback) {
+    public void die(DamageSource source, CallbackInfo callback) {
         EventResult eventResult = FabricLivingEvents.LIVING_DEATH.invoker()
-                .onLivingDeath(LivingEntity.class.cast(this), damageSource);
+                .onLivingDeath(LivingEntity.class.cast(this), source);
         if (eventResult.isInterrupt()) {
             callback.cancel();
         }
@@ -81,11 +81,11 @@ abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEn
                      shift = At.Shift.AFTER,
                      opcode = Opcodes.PUTFIELD),
             cancellable = true)
-    public void startUsingItem(InteractionHand interactionHand, CallbackInfo callback) {
+    public void startUsingItem(InteractionHand hand, CallbackInfo callback) {
         // this injects after the field is already updated, so it is fine to use instead of ItemStack::getUseDuration
         DefaultedInt useItemRemaining = DefaultedInt.fromValue(this.useItemRemaining);
         EventResult eventResult = FabricLivingEvents.USE_ITEM_START.invoker()
-                .onUseItemStart(LivingEntity.class.cast(this), this.useItem, interactionHand, useItemRemaining);
+                .onUseItemStart(LivingEntity.class.cast(this), this.useItem, hand, useItemRemaining);
         if (eventResult.isInterrupt()) {
             this.useItem = ItemStack.EMPTY;
             this.useItemRemaining = 0;
@@ -96,12 +96,12 @@ abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEn
     }
 
     @Inject(method = "updateUsingItem", at = @At("HEAD"), cancellable = true)
-    protected void updateUsingItem(ItemStack usingItem, CallbackInfo callback) {
-        if (!usingItem.isEmpty()) {
+    protected void updateUsingItem(ItemStack useItem, CallbackInfo callback) {
+        if (!useItem.isEmpty()) {
             DefaultedInt remainingUseDuration = DefaultedInt.fromValue(this.getUseItemRemainingTicks());
             EventResult eventResult = FabricLivingEvents.USE_ITEM_TICK.invoker()
                     .onUseItemTick(LivingEntity.class.cast(this),
-                            usingItem,
+                            useItem,
                             this.getUsedItemHand(),
                             remainingUseDuration);
             // --this.useItemRemaining == 0 runs at the end of this method, when 0 is set increase by one again,
@@ -111,7 +111,7 @@ abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEn
                             useItemRemaining == 0 ? 1 : useItemRemaining);
             if (eventResult.isInterrupt()) {
                 // this copies LivingEntity::updateUsingItem without calling ItemStack::onUseTick
-                if (--this.useItemRemaining == 0 && !this.level().isClientSide() && !usingItem.useOnRelease()) {
+                if (--this.useItemRemaining == 0 && !this.level().isClientSide() && !useItem.useOnRelease()) {
                     this.completeUsingItem();
                 }
 
@@ -139,15 +139,15 @@ abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEn
     }
 
     @ModifyVariable(method = "completeUsingItem", at = @At("STORE"), ordinal = 0)
-    protected ItemStack completeUsingItem(ItemStack useItem, @Share("originalUseItem") LocalRef<ItemStack> originalUseItem) {
+    protected ItemStack completeUsingItem(ItemStack result, @Share("originalUseItem") LocalRef<ItemStack> originalUseItem) {
         Objects.requireNonNull(originalUseItem.get(), "original use item is null");
-        DefaultedValue<ItemStack> itemStack = DefaultedValue.fromValue(useItem);
+        DefaultedValue<ItemStack> itemStack = DefaultedValue.fromValue(result);
         FabricLivingEvents.USE_ITEM_FINISH.invoker()
                 .onUseItemFinish(LivingEntity.class.cast(this),
                         itemStack,
                         originalUseItem.get(),
                         this.getUsedItemHand());
-        return itemStack.getAsOptional().orElse(useItem);
+        return itemStack.getAsOptional().orElse(result);
     }
 
     @Shadow
@@ -174,14 +174,14 @@ abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEn
     }
 
     @Inject(method = "dropAllDeathLoot", at = @At("HEAD"))
-    protected void dropAllDeathLoot$1(ServerLevel level, DamageSource damageSource, CallbackInfo callback) {
+    protected void dropAllDeathLoot$1(ServerLevel level, DamageSource source, CallbackInfo callback) {
         this.puzzleslib$acceptCapturedDrops(new ArrayList<>());
     }
 
     @Inject(method = "dropAllDeathLoot", at = @At("TAIL"))
-    protected void dropAllDeathLoot$2(ServerLevel level, DamageSource damageSource, CallbackInfo callback) {
+    protected void dropAllDeathLoot$2(ServerLevel level, DamageSource source, CallbackInfo callback) {
         if (!FabricEventImplHelper.tryOnLivingDrops(LivingEntity.class.cast(this),
-                damageSource,
+                source,
                 this.lastHurtByPlayerMemoryTime)) {
             PuzzlesLib.LOGGER.warn("Unable to invoke LivingDropsCallback for entity {}: Drops is null",
                     this.getName().getString());
@@ -189,24 +189,22 @@ abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEn
     }
 
     @Inject(method = "die", at = @At("TAIL"))
-    public void die$1(DamageSource damageSource, CallbackInfo callback) {
+    public void die$1(DamageSource source, CallbackInfo callback) {
         // this is a safety precaution, in case LivingEntity::dropAllDeathLoot does not reach TAIL and therefore doesn't spawn the captured drops (another mixin might cancel the method mid-way)
         // this should work rather fine, as LivingEntity::dropAllDeathLoot is basically exclusively called from LivingEntity::die,
         // and spawning captured drops in LivingEntity::dropAllDeathLoot only rarely has a conflict if any at all
-        FabricEventImplHelper.tryOnLivingDrops(LivingEntity.class.cast(this),
-                damageSource,
-                this.lastHurtByPlayerMemoryTime);
+        FabricEventImplHelper.tryOnLivingDrops(LivingEntity.class.cast(this), source, this.lastHurtByPlayerMemoryTime);
     }
 
     @Inject(method = "drop",
             at = @At(value = "INVOKE",
                      target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"),
             cancellable = true)
-    public void drop(CallbackInfoReturnable<ItemEntity> callback, @Local ItemEntity itemEntity) {
+    public void drop(CallbackInfoReturnable<ItemEntity> callback, @Local ItemEntity entity) {
         Collection<ItemEntity> capturedDrops = this.puzzleslib$getCapturedDrops();
         if (capturedDrops != null) {
-            capturedDrops.add(itemEntity);
-            callback.setReturnValue(itemEntity);
+            capturedDrops.add(entity);
+            callback.setReturnValue(entity);
         }
     }
 
@@ -214,8 +212,8 @@ abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEn
             at = @At(value = "INVOKE",
                      target = "Lnet/minecraft/world/entity/ExperienceOrb;award(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;I)V"),
             cancellable = true)
-    protected void dropExperience(ServerLevel serverLevel, @Nullable Entity killer, CallbackInfo callback) {
-        DefaultedInt experienceReward = DefaultedInt.fromValue(this.getBaseExperienceReward(serverLevel));
+    protected void dropExperience(ServerLevel level, @Nullable Entity killer, CallbackInfo callback) {
+        DefaultedInt experienceReward = DefaultedInt.fromValue(this.getBaseExperienceReward(level));
         EventResult eventResult = FabricLivingEvents.EXPERIENCE_DROP.invoker()
                 .onLivingExperienceDrop(LivingEntity.class.cast(this), this.getLastHurtByPlayer(), experienceReward);
         if (eventResult.isInterrupt()) {
@@ -229,38 +227,34 @@ abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEn
     }
 
     @Shadow
-    protected abstract int getBaseExperienceReward(ServerLevel serverLevel);
+    protected abstract int getBaseExperienceReward(ServerLevel level);
 
     @Shadow
     public abstract @Nullable Player getLastHurtByPlayer();
 
     @ModifyVariable(method = "actuallyHurt", at = @At("HEAD"), ordinal = 0, argsOnly = true)
-    protected float actuallyHurt(float damageAmount, ServerLevel serverLevel, DamageSource damageSource, @Cancellable CallbackInfo callback) {
-        if (!this.isInvulnerableTo(serverLevel, damageSource)) {
+    protected float actuallyHurt(float dmg, ServerLevel level, DamageSource source, @Cancellable CallbackInfo callback) {
+        if (!this.isInvulnerableTo(level, source)) {
             MutableBoolean preventHurting = new MutableBoolean();
-            damageAmount = FabricEventImplHelper.onLivingHurt(LivingEntity.class.cast(this),
-                    serverLevel,
-                    damageSource,
-                    damageAmount,
-                    preventHurting);
+            dmg = FabricEventImplHelper.onLivingHurt(LivingEntity.class.cast(this), level, source, dmg, preventHurting);
             if (preventHurting.booleanValue()) {
                 callback.cancel();
             }
         }
 
-        return damageAmount;
+        return dmg;
     }
 
     @Shadow
-    public abstract boolean isInvulnerableTo(ServerLevel serverLevel, DamageSource damageSource);
+    public abstract boolean isInvulnerableTo(ServerLevel level, DamageSource source);
 
     @ModifyExpressionValue(method = "applyItemBlocking",
                            at = @At(value = "INVOKE",
                                     target = "Lnet/minecraft/world/item/component/BlocksAttacks;resolveBlockedDamage(Lnet/minecraft/world/damagesource/DamageSource;FD)F"))
-    public float applyItemBlocking(float blockedDamage, ServerLevel serverLevel, DamageSource damageSource, float damageAmount, @Cancellable CallbackInfoReturnable<Float> callback) {
+    public float applyItemBlocking(float blockedDamage, ServerLevel level, DamageSource source, float damage, @Cancellable CallbackInfoReturnable<Float> callback) {
         DefaultedFloat blockedDamageValue = DefaultedFloat.fromValue(blockedDamage);
         EventResult eventResult = FabricLivingEvents.SHIELD_BLOCK.invoker()
-                .onShieldBlock(LivingEntity.class.cast(this), damageSource, blockedDamageValue);
+                .onShieldBlock(LivingEntity.class.cast(this), source, blockedDamageValue);
         if (eventResult.isInterrupt()) {
             callback.setReturnValue(0.0F);
             return 0.0F;
@@ -283,7 +277,9 @@ abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEn
         }
     }
 
-    @Inject(method = "knockback", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "knockback(DDDLnet/minecraft/world/damagesource/DamageSource;FZ)V",
+            at = @At("HEAD"),
+            cancellable = true)
     public void knockback(CallbackInfo callback, @Local(ordinal = 0,
                                                         argsOnly = true) LocalDoubleRef strengthRef, @Local(ordinal = 1,
                                                                                                             argsOnly = true) LocalDoubleRef ratioXRef, @Local(
@@ -302,18 +298,18 @@ abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEn
     @ModifyVariable(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z",
                     at = @At("STORE"),
                     ordinal = 1)
-    public MobEffectInstance addEffect(@Nullable MobEffectInstance oldEffectInstance, MobEffectInstance mobEffect, @Nullable Entity entity) {
+    public MobEffectInstance addEffect(@Nullable MobEffectInstance effect, MobEffectInstance newEffect, @Nullable Entity source) {
         FabricLivingEvents.MOB_EFFECT_APPLY.invoker()
-                .onMobEffectApply(LivingEntity.class.cast(this), mobEffect, oldEffectInstance, entity);
-        return oldEffectInstance;
+                .onMobEffectApply(LivingEntity.class.cast(this), newEffect, effect, source);
+        return effect;
     }
 
     @Inject(method = "canBeAffected", at = @At("HEAD"), cancellable = true)
-    public void canBeAffected(MobEffectInstance mobEffect, CallbackInfoReturnable<Boolean> callback) {
+    public void canBeAffected(MobEffectInstance newEffect, CallbackInfoReturnable<Boolean> callback) {
         // Forge also adds this patch to spiders, but let's just say no one wants to remove poison immunity from them
         // Forge is incomplete anyway, with mobs are not affected by this event when checking for the wither effect
         EventResult eventResult = FabricLivingEvents.MOB_EFFECT_AFFECTS.invoker()
-                .onMobEffectAffects(LivingEntity.class.cast(this), mobEffect);
+                .onMobEffectAffects(LivingEntity.class.cast(this), newEffect);
         if (eventResult.isInterrupt()) {
             callback.setReturnValue(eventResult.getAsBoolean());
         }
@@ -357,7 +353,7 @@ abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEn
     }
 
     @Shadow
-    protected abstract void onEffectsRemoved(Collection<MobEffectInstance> mobEffects);
+    protected abstract void onEffectsRemoved(Collection<MobEffectInstance> effects);
 
     @Shadow
     public abstract InteractionHand getUsedItemHand();
@@ -365,12 +361,12 @@ abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEn
     @ModifyExpressionValue(method = "tickEffects",
                            at = @At(value = "INVOKE",
                                     target = "Lnet/minecraft/world/effect/MobEffectInstance;tickServer(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;Ljava/lang/Runnable;)Z"))
-    protected boolean tickEffects(boolean tickServer, @Local MobEffectInstance mobEffect, @Share("isExpired") LocalBooleanRef isExpired) {
+    protected boolean tickEffects(boolean tickServer, @Local MobEffectInstance effect, @Share("isExpired") LocalBooleanRef isExpired) {
         isExpired.set(false);
         if (tickServer) {
             return true;
         } else if (FabricLivingEvents.MOB_EFFECT_EXPIRE.invoker()
-                .onMobEffectExpire(LivingEntity.class.cast(this), mobEffect)
+                .onMobEffectExpire(LivingEntity.class.cast(this), effect)
                 .isInterrupt()) {
             // There are multiple things that happen when an effect expires.
             // To bypass all of them, we prevent it from expiring and then cancel everything that would follow normally.
@@ -394,23 +390,23 @@ abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEn
     }
 
     @ModifyVariable(method = "getVisibilityPercent", at = @At("TAIL"), ordinal = 0)
-    public double getVisibilityPercent(double value, @Nullable Entity lookingEntity) {
-        DefaultedDouble visibilityPercentage = DefaultedDouble.fromValue(value);
+    public double getVisibilityPercent(double visibilityPercent, @Nullable Entity targetingEntity) {
+        DefaultedDouble visibilityPercentage = DefaultedDouble.fromValue(visibilityPercent);
         FabricLivingEvents.CALCULATE_LIVING_VISIBILITY.invoker()
-                .onCalculateLivingVisibility(LivingEntity.class.cast(this), lookingEntity, visibilityPercentage);
+                .onCalculateLivingVisibility(LivingEntity.class.cast(this), targetingEntity, visibilityPercentage);
         return visibilityPercentage.getAsOptionalDouble()
                 .stream()
                 .map((double visibilityPercentageValue) -> Math.max(visibilityPercentageValue, 0.0))
                 .findAny()
-                .orElse(value);
+                .orElse(visibilityPercent);
     }
 
     @ModifyReturnValue(method = "getProjectile", at = @At("RETURN"))
-    public ItemStack getProjectile(ItemStack projectileItemStack, ItemStack weaponItemStack) {
-        if (weaponItemStack.getItem() instanceof ProjectileWeaponItem) {
+    public ItemStack getProjectile(ItemStack projectileItemStack, ItemStack heldWeapon) {
+        if (heldWeapon.getItem() instanceof ProjectileWeaponItem) {
             DefaultedValue<ItemStack> projectileItemStackValue = DefaultedValue.fromValue(projectileItemStack);
             FabricLivingEvents.PICK_PROJECTILE.invoker()
-                    .onPickProjectile(LivingEntity.class.cast(this), weaponItemStack, projectileItemStackValue);
+                    .onPickProjectile(LivingEntity.class.cast(this), heldWeapon, projectileItemStackValue);
             return projectileItemStackValue.getAsOptional().orElse(projectileItemStack);
         } else {
             return projectileItemStack;

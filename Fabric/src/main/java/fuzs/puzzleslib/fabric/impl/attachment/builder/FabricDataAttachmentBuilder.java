@@ -13,6 +13,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
+@SuppressWarnings("NonExtendableApiUsage")
 public abstract class FabricDataAttachmentBuilder<T extends AttachmentTarget, V, B extends DataAttachmentRegistry.Builder<T, V, B>> extends DataAttachmentBuilder<T, V, B> {
 
     @Override

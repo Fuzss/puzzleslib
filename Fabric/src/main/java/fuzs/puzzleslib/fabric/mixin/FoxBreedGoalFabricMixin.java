@@ -18,8 +18,8 @@ abstract class FoxBreedGoalFabricMixin extends BreedGoal {
     }
 
     @ModifyVariable(method = "breed", at = @At("STORE"))
-    protected Fox breed(Fox fox) {
-        MutableValue<AgeableMob> child = MutableValue.fromValue(fox);
+    protected Fox breed(Fox offspring) {
+        MutableValue<AgeableMob> child = MutableValue.fromValue(offspring);
         if (FabricLivingEvents.BABY_ENTITY_SPAWN.invoker()
                 .onBabyEntitySpawn(this.animal, this.partner, child)
                 .isInterrupt()) {

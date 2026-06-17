@@ -231,7 +231,7 @@ public final class FabricClientEventInvokers {
             net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft minecraft) -> {
                 HudElementRegistry.addFirst(PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())),
                         (GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker) -> {
-                            if (!minecraft.options.hideGui) {
+                            if (!minecraft.gui.hud.isHidden()) {
                                 callback.onBeforeRenderGui(guiGraphics, deltaTracker);
                             }
                         });
@@ -239,7 +239,7 @@ public final class FabricClientEventInvokers {
                 HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP,
                         PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())),
                         (GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker) -> {
-                            if (minecraft.options.hideGui) {
+                            if (minecraft.gui.hud.isHidden()) {
                                 callback.onBeforeRenderGui(guiGraphics, deltaTracker);
                             }
                         });
@@ -250,7 +250,7 @@ public final class FabricClientEventInvokers {
             net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft minecraft) -> {
                 HudElementRegistry.addLast(PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())),
                         (GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker) -> {
-                            if (!minecraft.options.hideGui) {
+                            if (!minecraft.gui.hud.isHidden()) {
                                 callback.onAfterRenderGui(guiGraphics, deltaTracker);
                             }
                         });
@@ -258,7 +258,7 @@ public final class FabricClientEventInvokers {
                 HudElementRegistry.attachElementAfter(VanillaHudElements.SLEEP,
                         PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())),
                         (GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker) -> {
-                            if (minecraft.options.hideGui) {
+                            if (minecraft.gui.hud.isHidden()) {
                                 callback.onAfterRenderGui(guiGraphics, deltaTracker);
                             }
                         });
@@ -664,7 +664,7 @@ public final class FabricClientEventInvokers {
                 LevelRenderEvents.END_EXTRACTION,
                 (ExtractLevelRenderStateCallback callback) -> {
                     return (LevelExtractionContext context) -> {
-                        callback.onExtractLevelRenderState(context.levelRenderer(),
+                        callback.onExtractLevelRenderState(Minecraft.getInstance().levelExtractor,
                                 context.levelState(),
                                 context.level(),
                                 context.camera(),

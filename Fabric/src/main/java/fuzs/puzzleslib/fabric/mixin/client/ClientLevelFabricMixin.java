@@ -16,7 +16,7 @@ import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.extract.LevelExtractor;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -43,7 +43,7 @@ abstract class ClientLevelFabricMixin extends Level {
     }
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    public void init(ClientPacketListener clientPacketListener, ClientLevel.ClientLevelData clientLevelData, ResourceKey<Level> resourceKey, Holder<DimensionType> holder, int i, int j, LevelRenderer levelRenderer, boolean bl, long l, int k, CallbackInfo callback) {
+    public void init(ClientPacketListener connection, ClientLevel.ClientLevelData levelData, ResourceKey<Level> dimension, Holder<DimensionType> dimensionType, int serverChunkRadius, int serverSimulationDistance, LevelExtractor levelExtractor, boolean isDebug, long biomeZoomSeed, int seaLevel, CallbackInfo callback) {
         FabricClientLevelEvents.LOAD_LEVEL.invoker().onLevelLoad(Minecraft.getInstance(), ClientLevel.class.cast(this));
     }
 
@@ -65,9 +65,9 @@ abstract class ClientLevelFabricMixin extends Level {
     }
 
     @Inject(method = "addEntity", at = @At("HEAD"), cancellable = true)
-    private void addEntity(Entity entityToSpawn, CallbackInfo callback) {
+    private void addEntity(Entity entity, CallbackInfo callback) {
         EventResult eventResult = FabricClientEntityEvents.ENTITY_LOAD.invoker()
-                .onEntityLoad(entityToSpawn, ClientLevel.class.cast(this));
+                .onEntityLoad(entity, ClientLevel.class.cast(this));
         if (eventResult.isInterrupt()) {
             callback.cancel();
         }

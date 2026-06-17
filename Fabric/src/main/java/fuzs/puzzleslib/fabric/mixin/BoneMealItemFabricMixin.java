@@ -20,9 +20,9 @@ abstract class BoneMealItemFabricMixin extends Item {
     }
 
     @Inject(method = "growCrop", at = @At("HEAD"), cancellable = true)
-    private static void growCrop(ItemStack itemStack, Level level, BlockPos blockPos, CallbackInfoReturnable<Boolean> callbackInfo) {
+    private static void growCrop(ItemStack itemStack, Level level, BlockPos pos, CallbackInfoReturnable<Boolean> callbackInfo) {
         EventResult result = FabricLevelEvents.USE_BONE_MEAL.invoker()
-                .onUseBoneMeal(level, blockPos, level.getBlockState(blockPos), itemStack);
+                .onUseBoneMeal(level, pos, level.getBlockState(pos), itemStack);
         if (result.isInterrupt()) {
             callbackInfo.setReturnValue(result.getAsBoolean());
         }

@@ -55,11 +55,13 @@ public class PuzzlesLibNeoForgeClient {
         });
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private static String getBrandingMessage() {
         return "Minecraft " + SharedConstants.getCurrentVersion().name() + "/" + BrandingControl.BRANDING_NAME
                 + getModListMessage();
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private static String getModListMessage() {
         return FMLTranslations.parseMessageWithFallback("fml.menu.branding", () -> {
             return " (" + FMLTranslations.parseMessageWithFallback("fml.menu.loadingmods",
