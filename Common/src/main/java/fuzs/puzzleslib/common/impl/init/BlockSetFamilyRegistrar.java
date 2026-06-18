@@ -10,7 +10,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -139,8 +139,8 @@ public final class BlockSetFamilyRegistrar implements BlockSetFamily, BlockSetFa
     }
 
     @Override
-    public Writable generateFor(BlockSetVariant variant) {
-        variant.generateFor(this);
+    public Writable generateFor(BlockSetVariant variant, @Nullable String baseNameOverride) {
+        variant.generateFor(this, baseNameOverride);
         return this;
     }
 

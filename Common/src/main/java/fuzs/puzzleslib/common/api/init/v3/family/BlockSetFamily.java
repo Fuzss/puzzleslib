@@ -18,9 +18,9 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -191,7 +191,11 @@ public interface BlockSetFamily {
 
         Writable registerEntityType(BlockSetVariant variant, Holder.Reference<EntityType<?>> holder);
 
-        Writable generateFor(BlockSetVariant variant);
+        default Writable generateFor(BlockSetVariant variant) {
+            return this.generateFor(variant, null);
+        }
+
+        Writable generateFor(BlockSetVariant variant, @Nullable String baseNameOverride);
 
         Writable configureBlockFamily(Consumer<BlockFamily.Builder> blockFamilyConsumer);
     }

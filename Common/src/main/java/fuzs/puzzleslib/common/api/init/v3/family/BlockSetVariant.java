@@ -388,10 +388,6 @@ public interface BlockSetVariant extends StringRepresentable {
         }
     };
 
-    default void generateFor(BlockSetFamily.Context context) {
-        this.generateFor(context, null);
-    }
-
     void generateFor(BlockSetFamily.Context context, @Nullable String baseNameOverride);
 
     BlockFamily.@Nullable Variant toVanilla();
