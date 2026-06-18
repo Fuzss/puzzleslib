@@ -190,6 +190,7 @@ transitive-accessible	method	net/minecraft/data/worldgen/biome/OverworldBiomes	b
 transitive-accessible	method	net/minecraft/data/worldgen/biome/OverworldBiomes	globalOverworldGeneration	(Lnet/minecraft/world/level/biome/BiomeGenerationSettings$Builder;)V
 transitive-accessible	field	net/minecraft/server/MinecraftServer	resources	Lnet/minecraft/server/MinecraftServer$ReloadableResources;
 transitive-accessible	class	net/minecraft/server/MinecraftServer$ReloadableResources
+transitive-accessible   method  net/minecraft/server/MinecraftServer$ReloadableResources    <init>  (Lnet/minecraft/server/packs/resources/CloseableResourceManager;Lnet/minecraft/server/ReloadableServerResources;)V
 transitive-accessible	method	net/minecraft/server/commands/GiveCommand	giveItem	(Lnet/minecraft/commands/CommandSourceStack;Lnet/minecraft/commands/arguments/item/ItemInput;Ljava/util/Collection;I)I
 transitive-accessible	field	net/minecraft/server/network/ServerCommonPacketListenerImpl	connection	Lnet/minecraft/network/Connection;
 transitive-accessible	method	net/minecraft/util/ARGB	from8BitChannel	(I)F
@@ -286,6 +287,7 @@ accessible	field	net/minecraft/client/Minecraft	running	Z
 accessible	field	net/minecraft/client/MouseHandler	lastClick	Lnet/minecraft/client/MouseHandler$LastClick;
 accessible	field	net/minecraft/client/MouseHandler	lastClickButton	I
 accessible	class	net/minecraft/client/MouseHandler$LastClick
+accessible  method  net/minecraft/client/MouseHandler$LastClick <init>  (JLnet/minecraft/client/gui/screens/Screen;)V
 mutable	field	net/minecraft/client/data/models/BlockModelGenerators	FULL_BLOCK_MODEL_CUSTOM_GENERATORS	Ljava/util/Map;
 mutable	field	net/minecraft/client/data/models/BlockModelGenerators	NON_ORIENTABLE_TRAPDOOR	Ljava/util/List;
 mutable	field	net/minecraft/client/data/models/BlockModelGenerators	TEXTURED_MODELS	Ljava/util/Map;
