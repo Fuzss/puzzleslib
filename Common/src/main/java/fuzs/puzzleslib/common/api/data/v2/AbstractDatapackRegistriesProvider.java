@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+@Deprecated
 public abstract class AbstractDatapackRegistriesProvider extends RegistriesDatapackGenerator implements RegistriesDataProvider {
     private final CompletableFuture<HolderLookup.Provider> fullRegistries;
 

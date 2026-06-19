@@ -9,8 +9,7 @@ import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(MenuProviderWithData.class)
 public interface MenuProviderWithDataFabricMixin<T> extends ExtendedMenuProvider<T> {
-
-    @Shadow(remap = false)
+    @Shadow
     T getMenuData(@Nullable ServerPlayer serverPlayer);
 
     @Override

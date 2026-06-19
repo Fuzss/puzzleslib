@@ -9,8 +9,8 @@ import java.util.concurrent.CompletableFuture;
  * An extension for {@link net.minecraft.data.registries.RegistriesDatapackGenerator} for obtaining the updated
  * {@link HolderLookup.Provider} future.
  */
+@Deprecated
 public interface RegistriesDataProvider {
-
     /**
      * @return the updated {@link HolderLookup.Provider} future obtained from
      *         {@link RegistrySetBuilder.PatchedRegistries#full()}
