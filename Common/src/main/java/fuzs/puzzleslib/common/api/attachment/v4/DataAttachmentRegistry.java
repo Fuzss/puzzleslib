@@ -8,6 +8,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -185,8 +186,20 @@ public final class DataAttachmentRegistry {
          * @param defaultValue the default value
          * @return the builder instance
          */
+        @Deprecated
         default EntityBuilder<V> defaultValue(EntityType<?> entityType, V defaultValue) {
-            return this.defaultValue((Entity entity) -> entity.getType() == entityType, defaultValue);
+            return this.defaultValue(entityType.builtInRegistryHolder().key(), defaultValue);
+        }
+
+        /**
+         * Set a default value for the provided entity type.
+         *
+         * @param entityType   the entity type key
+         * @param defaultValue the default value
+         * @return the builder instance
+         */
+        default EntityBuilder<V> defaultValue(ResourceKey<EntityType<?>> entityType, V defaultValue) {
+            return this.defaultValue((Entity entity) -> entity.is(entityType), defaultValue);
         }
 
         /**
@@ -213,10 +226,20 @@ public final class DataAttachmentRegistry {
          * @param defaultValue    the default value
          * @return the builder instance
          */
+        @Deprecated
         default BlockEntityBuilder<V> defaultValue(BlockEntityType<?> blockEntityType, V defaultValue) {
-            return this.defaultValue((BlockEntity blockEntity) -> {
-                return blockEntity.getType() == blockEntityType;
-            }, defaultValue);
+            return this.defaultValue(blockEntityType.builtInRegistryHolder().key(), defaultValue);
+        }
+
+        /**
+         * Set a default value for the provided block entity type.
+         *
+         * @param blockEntityType the block entity type
+         * @param defaultValue    the default value
+         * @return the builder instance
+         */
+        default BlockEntityBuilder<V> defaultValue(ResourceKey<BlockEntityType<?>> blockEntityType, V defaultValue) {
+            return this.defaultValue((BlockEntity blockEntity) -> blockEntity.is(blockEntityType), defaultValue);
         }
     }
 
