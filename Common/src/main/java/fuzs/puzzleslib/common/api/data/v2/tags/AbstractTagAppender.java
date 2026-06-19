@@ -9,8 +9,14 @@ import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ExtraCodecs;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
+/**
+ * TODO replace Holder.Reference with plain Holder, also maybe this could be an interface
+ * TODO maybe also remove ids
+ */
 public abstract class AbstractTagAppender<T> implements TagAppender<T> {
     protected final TagBuilder tagBuilder;
 
@@ -43,6 +49,18 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T> {
             this.add(key);
         }
 
+        return this;
+    }
+
+    @Override
+    public AbstractTagAppender<T> addAll(Collection<ResourceKey<T>> keys) {
+        keys.forEach(this::add);
+        return this;
+    }
+
+    @Override
+    public AbstractTagAppender<T> addAll(Stream<ResourceKey<T>> keys) {
+        keys.forEach(this::add);
         return this;
     }
 
@@ -98,6 +116,16 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T> {
         return this;
     }
 
+    public AbstractTagAppender<T> addAllOptional(Collection<ResourceKey<T>> keys) {
+        keys.forEach(this::addOptional);
+        return this;
+    }
+
+    public AbstractTagAppender<T> addAllOptional(Stream<ResourceKey<T>> keys) {
+        keys.forEach(this::addOptional);
+        return this;
+    }
+
     public AbstractTagAppender<T> addOptional(Holder.Reference<? extends T> holder) {
         return this.addOptional((ResourceKey<T>) holder.key());
     }
@@ -135,6 +163,16 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T> {
             this.addTag(tag);
         }
 
+        return this;
+    }
+
+    public AbstractTagAppender<T> addAllTags(Collection<TagKey<T>> keys) {
+        keys.forEach(this::addTag);
+        return this;
+    }
+
+    public AbstractTagAppender<T> addAllTags(Stream<TagKey<T>> keys) {
+        keys.forEach(this::addTag);
         return this;
     }
 
@@ -177,6 +215,16 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T> {
         return this;
     }
 
+    public AbstractTagAppender<T> addAllOptionalTags(Collection<TagKey<T>> keys) {
+        keys.forEach(this::addOptionalTag);
+        return this;
+    }
+
+    public AbstractTagAppender<T> addAllOptionalTags(Stream<TagKey<T>> keys) {
+        keys.forEach(this::addOptionalTag);
+        return this;
+    }
+
     public abstract AbstractTagAppender<T> remove(Identifier id);
 
     public AbstractTagAppender<T> remove(Identifier... ids) {
@@ -197,6 +245,16 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T> {
             this.remove(key);
         }
 
+        return this;
+    }
+
+    public AbstractTagAppender<T> removeAll(Collection<ResourceKey<T>> keys) {
+        keys.forEach(this::remove);
+        return this;
+    }
+
+    public AbstractTagAppender<T> removeAll(Stream<ResourceKey<T>> keys) {
+        keys.forEach(this::remove);
         return this;
     }
 
@@ -248,6 +306,16 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T> {
         return this;
     }
 
+    public AbstractTagAppender<T> removeAllOptional(Collection<ResourceKey<T>> keys) {
+        keys.forEach(this::removeOptional);
+        return this;
+    }
+
+    public AbstractTagAppender<T> removeAllOptional(Stream<ResourceKey<T>> keys) {
+        keys.forEach(this::removeOptional);
+        return this;
+    }
+
     public AbstractTagAppender<T> removeOptional(Holder.Reference<? extends T> holder) {
         return this.removeOptional((ResourceKey<T>) holder.key());
     }
@@ -284,6 +352,16 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T> {
         return this;
     }
 
+    public AbstractTagAppender<T> removeAllTags(Collection<TagKey<T>> keys) {
+        keys.forEach(this::removeTag);
+        return this;
+    }
+
+    public AbstractTagAppender<T> removeAllTags(Stream<TagKey<T>> keys) {
+        keys.forEach(this::removeTag);
+        return this;
+    }
+
     public AbstractTagAppender<T> removeOptionalTag(String id) {
         return this.removeOptionalTag(Identifier.parse(id));
     }
@@ -316,6 +394,16 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T> {
             this.removeOptionalTag(tag);
         }
 
+        return this;
+    }
+
+    public AbstractTagAppender<T> removeAllOptionalTags(Collection<TagKey<T>> keys) {
+        keys.forEach(this::removeOptionalTag);
+        return this;
+    }
+
+    public AbstractTagAppender<T> removeAllOptionalTags(Stream<TagKey<T>> keys) {
+        keys.forEach(this::removeOptionalTag);
         return this;
     }
 
