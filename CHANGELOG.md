@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Add missing `BlockSetFamily::generateFor` method allowing for a custom name override
+- `AbstractModelProvider::createVariantWoodBlockProviders` now includes log and wood blocks
 
 ### Fixed
 
