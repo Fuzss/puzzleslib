@@ -101,11 +101,28 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
     /**
      * @see #generateFor(BlockSetFamily, Map, Map)
      */
+    @Deprecated(forRemoval = true)
     public static Map<BlockSetVariant, FamilyRecipeProvider> createVariantWoodProviders(BlockSetFamily blockSetFamily, Block strippedBlock) {
+        return createVariantWoodProviders(blockSetFamily);
+    }
+
+    /**
+     * @see #generateFor(BlockSetFamily, Map, Map)
+     */
+    public static Map<BlockSetVariant, FamilyRecipeProvider> createVariantWoodProviders(BlockSetFamily blockSetFamily) {
         return ImmutableMap.<BlockSetVariant, FamilyRecipeProvider>builder()
+                .put(BlockSetVariant.WOOD,
+                        (RecipeProvider recipeProvider, ItemLike result, ItemLike input, Optional<String> recipeGroupPrefix, Optional<String> recipeUnlockedBy) -> {
+                            recipeProvider.woodFromLogs(result, blockSetFamily.getItem(BlockSetVariant.LOG).value());
+                        })
+                .put(BlockSetVariant.STRIPPED_WOOD,
+                        (RecipeProvider recipeProvider, ItemLike result, ItemLike input, Optional<String> recipeGroupPrefix, Optional<String> recipeUnlockedBy) -> {
+                            recipeProvider.woodFromLogs(result,
+                                    blockSetFamily.getItem(BlockSetVariant.STRIPPED_LOG).value());
+                        })
                 .put(BlockSetVariant.SHELF,
                         (RecipeProvider recipeProvider, ItemLike result, ItemLike input, Optional<String> recipeGroupPrefix, Optional<String> recipeUnlockedBy) -> {
-                            recipeProvider.shelf(result, strippedBlock);
+                            recipeProvider.shelf(result, blockSetFamily.getItem(BlockSetVariant.STRIPPED_LOG).value());
                         })
                 .put(BlockSetVariant.BOAT,
                         (RecipeProvider recipeProvider, ItemLike result, ItemLike input, Optional<String> recipeGroupPrefix, Optional<String> recipeUnlockedBy) -> {
@@ -113,9 +130,7 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
                         })
                 .put(BlockSetVariant.CHEST_BOAT,
                         (RecipeProvider recipeProvider, ItemLike result, ItemLike input, Optional<String> recipeGroupPrefix, Optional<String> recipeUnlockedBy) -> {
-                            Holder.Reference<Item> boatItem = blockSetFamily.getItem(BlockSetVariant.BOAT);
-                            Objects.requireNonNull(boatItem, "boat item is null");
-                            recipeProvider.chestBoat(result, boatItem.value());
+                            recipeProvider.chestBoat(result, blockSetFamily.getItem(BlockSetVariant.BOAT).value());
                         })
                 .build();
     }
