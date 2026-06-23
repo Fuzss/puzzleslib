@@ -18,6 +18,7 @@ import java.util.List;
  * simpler as it does not need to handle additions and removals (Forge has dedicated methods in the init events for
  * that).
  */
+@Deprecated
 public final class ScreenButtonList extends TransformingForwardingList<AbstractWidget, Renderable> {
 
     public ScreenButtonList(List<Renderable> delegate) {

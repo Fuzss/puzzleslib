@@ -5,6 +5,7 @@ import fuzs.puzzleslib.common.api.event.v1.data.MutableInt;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
+@Deprecated(forRemoval = true)
 @FunctionalInterface
 public interface CustomizeChatPanelCallback {
     EventInvoker<CustomizeChatPanelCallback> EVENT = EventInvoker.lookup(CustomizeChatPanelCallback.class);

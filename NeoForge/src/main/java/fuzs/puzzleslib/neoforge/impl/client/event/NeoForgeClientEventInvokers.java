@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.client.event;
 
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fuzs.puzzleslib.common.api.client.event.v1.*;
 import fuzs.puzzleslib.common.api.client.event.v1.entity.ClientEntityEvents;
@@ -242,15 +243,17 @@ public final class NeoForgeClientEventInvokers {
                             DefaultedFloat.fromEvent(consumer, supplier, event::getFovModifier));
                 });
         registerScreenEvent(ScreenEvents.BeforeInit.class, ScreenEvent.Init.Pre.class, (callback, event) -> {
+            Window window = event.getScreen().getMinecraft().getWindow();
             callback.onBeforeInit(event.getScreen(),
-                    event.getScreen().width,
-                    event.getScreen().height,
+                    window.getGuiScaledWidth(),
+                    window.getGuiScaledHeight(),
                     new ScreenButtonList(event.getScreen().renderables));
         });
         registerScreenEvent(ScreenEvents.AfterInit.class, ScreenEvent.Init.Post.class, (callback, event) -> {
+            Window window = event.getScreen().getMinecraft().getWindow();
             callback.onAfterInit(event.getScreen(),
-                    event.getScreen().width,
-                    event.getScreen().height,
+                    window.getGuiScaledWidth(),
+                    window.getGuiScaledHeight(),
                     new ScreenButtonList(event.getScreen().renderables),
                     (UnaryOperator<AbstractWidget>) (AbstractWidget abstractWidget) -> {
                         event.addListener(abstractWidget);
