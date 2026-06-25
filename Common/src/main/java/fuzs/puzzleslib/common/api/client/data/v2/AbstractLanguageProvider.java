@@ -33,6 +33,7 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ColorCollection;
 import net.minecraft.world.level.gamerules.GameRule;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -89,6 +90,25 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             .put(BlockSetVariant.BOAT, (String baseName) -> baseName + " Boat")
             .put(BlockSetVariant.CHEST_BOAT, (String baseName) -> baseName + " Chest Boat")
             .build();
+    /**
+     * @see ColorCollection#NAMES
+     */
+    public static final ColorCollection<String> COLOR_NAMES = new ColorCollection<>("White",
+            "Orange",
+            "Magenta",
+            "Light Blue",
+            "Yellow",
+            "Lime",
+            "Pink",
+            "Gray",
+            "Light Gray",
+            "Cyan",
+            "Purple",
+            "Blue",
+            "Brown",
+            "Green",
+            "Red",
+            "Black");
 
     private final Identifier filePath;
     private final PackOutput.PathProvider pathProvider;
