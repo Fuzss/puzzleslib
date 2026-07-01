@@ -18,8 +18,15 @@ transitive-accessible	field	net/minecraft/client/gui/screens/inventory/AbstractC
 transitive-accessible	field	net/minecraft/client/gui/screens/inventory/AbstractContainerScreen	topPos	I
 transitive-accessible	method	net/minecraft/client/gui/screens/inventory/AbstractContainerScreen	findSlot	(DD)Lnet/minecraft/world/inventory/Slot;
 transitive-accessible	method	net/minecraft/client/gui/screens/inventory/AbstractContainerScreen	isHovering	(IIIIDD)Z
+transitive-accessible	method	net/minecraft/client/gui/screens/inventory/InventoryScreen	isHovering	(IIIIDD)Z
+transitive-accessible	method	net/minecraft/client/gui/screens/inventory/CraftingScreen	isHovering	(IIIIDD)Z
 transitive-accessible	method	net/minecraft/client/gui/screens/inventory/AbstractContainerScreen	isHovering	(Lnet/minecraft/world/inventory/Slot;DD)Z
 transitive-accessible	method	net/minecraft/client/gui/screens/inventory/AbstractContainerScreen	slotClicked	(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V
+transitive-accessible	method	net/minecraft/client/gui/screens/inventory/AbstractFurnaceScreen	slotClicked	(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V
+transitive-accessible	method	net/minecraft/client/gui/screens/inventory/InventoryScreen	slotClicked	(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V
+transitive-accessible	method	net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen	slotClicked	(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V
+transitive-accessible	method	net/minecraft/client/gui/screens/inventory/CraftingScreen	slotClicked	(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V
+transitive-accessible	method	net/minecraft/client/gui/screens/inventory/CrafterScreen	slotClicked	(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V
 transitive-accessible	class	net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen$SlotWrapper
 transitive-accessible	field	net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen$SlotWrapper	target	Lnet/minecraft/world/inventory/Slot;
 transitive-accessible	field	net/minecraft/client/model/PlayerModel	slim	Z
@@ -90,11 +97,13 @@ transitive-accessible	method	net/minecraft/world/effect/MobEffect	<init>	(Lnet/m
 transitive-accessible	method	net/minecraft/world/entity/Entity	getEncodeId	()Ljava/lang/String;
 transitive-accessible	field	net/minecraft/world/entity/LivingEntity	jumping	Z
 transitive-accessible	method	net/minecraft/world/entity/LivingEntity	shouldDropLoot	()Z
+transitive-accessible	method	net/minecraft/world/entity/monster/Monster	shouldDropLoot	()Z
 transitive-accessible	field	net/minecraft/world/entity/Mob	goalSelector	Lnet/minecraft/world/entity/ai/goal/GoalSelector;
 transitive-accessible	field	net/minecraft/world/entity/Mob	lootTable	Lnet/minecraft/resources/ResourceKey;
 transitive-accessible	field	net/minecraft/world/entity/Mob	targetSelector	Lnet/minecraft/world/entity/ai/goal/GoalSelector;
 transitive-accessible	method	net/minecraft/world/entity/decoration/PaintingVariants	register	(Lnet/minecraft/data/worldgen/BootstrapContext;Lnet/minecraft/resources/ResourceKey;II)V
 transitive-extendable	method	net/minecraft/world/entity/monster/AbstractSkeleton	getStepSound	()Lnet/minecraft/sounds/SoundEvent;
+transitive-accessible	method	net/minecraft/world/entity/monster/Bogged   getStepSound	()Lnet/minecraft/sounds/SoundEvent;
 transitive-extendable	method	net/minecraft/world/entity/monster/Skeleton	getStepSound	()Lnet/minecraft/sounds/SoundEvent;
 transitive-extendable	method	net/minecraft/world/entity/monster/Stray	getStepSound	()Lnet/minecraft/sounds/SoundEvent;
 transitive-extendable	method	net/minecraft/world/entity/monster/WitherSkeleton	getStepSound	()Lnet/minecraft/sounds/SoundEvent;
@@ -219,6 +228,7 @@ accessible	class	net/minecraft/client/resources/model/ModelBakery$BakedCacheKey
 accessible	method	net/minecraft/client/resources/model/ModelBakery$BakedCacheKey	<init>	(Lnet/minecraft/resources/ResourceLocation;Lcom/mojang/math/Transformation;Z)V
 accessible	method	net/minecraft/core/Holder$Reference	bindTags	(Ljava/util/Collection;)V
 accessible	method	net/minecraft/core/Holder$Reference	bindValue	(Ljava/lang/Object;)V
+accessible	method	net/minecraft/core/RegistrySetBuilder$LazyHolder	bindValue	(Ljava/lang/Object;)V
 accessible	method	net/minecraft/data/DataGenerator$PackGenerator	<init>	(Lnet/minecraft/data/DataGenerator;ZLjava/lang/String;Lnet/minecraft/data/PackOutput;)V
 mutable	field	net/minecraft/data/loot/BlockLootSubProvider	registries	Lnet/minecraft/core/HolderLookup$Provider;
 mutable	field	net/minecraft/data/loot/EntityLootSubProvider	registries	Lnet/minecraft/core/HolderLookup$Provider;
@@ -247,7 +257,16 @@ mutable	field	net/minecraft/world/SimpleContainer	items	Lnet/minecraft/core/NonN
 accessible	field	net/minecraft/world/SimpleContainer	size	I
 mutable	field	net/minecraft/world/SimpleContainer	size	I
 accessible	method	net/minecraft/world/entity/Entity	canAddPassenger	(Lnet/minecraft/world/entity/Entity;)Z
+accessible	method	net/minecraft/world/entity/vehicle/Boat	canAddPassenger	(Lnet/minecraft/world/entity/Entity;)Z
+accessible	method	net/minecraft/world/entity/animal/camel/Camel   canAddPassenger	(Lnet/minecraft/world/entity/Entity;)Z
+accessible	method	net/minecraft/world/entity/OminousItemSpawner	canAddPassenger	(Lnet/minecraft/world/entity/Entity;)Z
+accessible	method	net/minecraft/world/entity/Marker	canAddPassenger	(Lnet/minecraft/world/entity/Entity;)Z
+accessible	method	net/minecraft/world/entity/monster/Strider	canAddPassenger	(Lnet/minecraft/world/entity/Entity;)Z
 accessible	method	net/minecraft/world/entity/Entity	canRide	(Lnet/minecraft/world/entity/Entity;)Z
+accessible	method	net/minecraft/world/entity/animal/Dolphin	canRide	(Lnet/minecraft/world/entity/Entity;)Z
+accessible  method	net/minecraft/world/entity/boss/enderdragon/EnderDragon	canRide	(Lnet/minecraft/world/entity/Entity;)Z
+accessible	method	net/minecraft/world/entity/monster/warden/Warden	canRide	(Lnet/minecraft/world/entity/Entity;)Z
+accessible	method	net/minecraft/world/entity/boss/wither/WitherBoss	canRide	(Lnet/minecraft/world/entity/Entity;)Z
 accessible	field	net/minecraft/world/entity/vehicle/Boat	lastYd	D
 accessible	method	net/minecraft/world/inventory/AbstractContainerMenu	addSlot	(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;
 accessible	method	net/minecraft/world/inventory/GrindstoneMenu	computeResult	(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/ItemStack;
@@ -323,7 +342,7 @@ transitive-accessible	field	net/minecraft/data/models/BlockModelGenerators	model
 transitive-accessible	field	net/minecraft/data/models/ItemModelGenerators	output	Ljava/util/function/BiConsumer;
 transitive-accessible	method	net/minecraft/data/models/model/TextureSlot	create	(Ljava/lang/String;)Lnet/minecraft/data/models/model/TextureSlot;
 transitive-accessible	method	net/minecraft/data/models/model/TextureSlot	create	(Ljava/lang/String;Lnet/minecraft/data/models/model/TextureSlot;)Lnet/minecraft/data/models/model/TextureSlot;
-transitive-extendable	method	net/minecraft/data/tags/TagsProvider$TagAppender	add	([Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/data/tags/TagsProvider$TagAppender;
+#transitive-extendable	method	net/minecraft/data/tags/TagsProvider$TagAppender	add	([Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/data/tags/TagsProvider$TagAppender;
 transitive-accessible	method	net/minecraft/data/models/model/TexturedModel	createDefault	(Ljava/util/function/Function;Lnet/minecraft/data/models/model/ModelTemplate;)Lnet/minecraft/data/models/model/TexturedModel$Provider;
 transitive-accessible	class	net/minecraft/data/models/BlockModelGenerators$TintState
 transitive-accessible	class	net/minecraft/data/models/BlockModelGenerators$BlockFamilyProvider
@@ -333,6 +352,8 @@ transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	HAS_SHE
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	run	(Lnet/minecraft/data/CachedOutput;Lnet/minecraft/core/HolderLookup$Provider;)Ljava/util/concurrent/CompletableFuture;
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	buildAdvancement	(Lnet/minecraft/data/CachedOutput;Lnet/minecraft/core/HolderLookup$Provider;Lnet/minecraft/advancements/AdvancementHolder;)Ljava/util/concurrent/CompletableFuture;
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	buildRecipes	(Lnet/minecraft/data/recipes/RecipeOutput;)V
+transitive-accessible	method	net/minecraft/data/recipes/packs/VanillaRecipeProvider  buildRecipes	(Lnet/minecraft/data/recipes/RecipeOutput;)V
+transitive-accessible	method	net/minecraft/data/recipes/packs/BundleRecipeProvider   buildRecipes	(Lnet/minecraft/data/recipes/RecipeOutput;)V
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	generateForEnabledBlockFamilies	(Lnet/minecraft/data/recipes/RecipeOutput;Lnet/minecraft/world/flag/FeatureFlagSet;)V
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	oneToOneConversionRecipe	(Lnet/minecraft/data/recipes/RecipeOutput;Lnet/minecraft/world/level/ItemLike;Lnet/minecraft/world/level/ItemLike;Ljava/lang/String;)V
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	oneToOneConversionRecipe	(Lnet/minecraft/data/recipes/RecipeOutput;Lnet/minecraft/world/level/ItemLike;Lnet/minecraft/world/level/ItemLike;Ljava/lang/String;I)V
@@ -567,6 +588,7 @@ transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	create
 transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	createPetalsDrops	(Lnet/minecraft/world/level/block/Block;)Lnet/minecraft/world/level/storage/loot/LootTable$Builder;
 transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	createCandleCakeDrops	(Lnet/minecraft/world/level/block/Block;)Lnet/minecraft/world/level/storage/loot/LootTable$Builder;
 transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	generate	()V
+transitive-accessible	method	net/minecraft/data/loot/packs/VanillaBlockLoot  generate	()V
 transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	addNetherVinesDropTable	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/block/Block;)V
 transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	createDoorTable	(Lnet/minecraft/world/level/block/Block;)Lnet/minecraft/world/level/storage/loot/LootTable$Builder;
 transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	dropPottedContents	(Lnet/minecraft/world/level/block/Block;)V
