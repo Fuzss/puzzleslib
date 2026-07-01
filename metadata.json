@@ -4,7 +4,7 @@
         "id": "puzzleslib",
         "group": "fuzs.puzzleslib",
         "name": "Puzzles Lib",
-        "version": "21.1.52",
+        "version": "21.1.53",
         "authors": [
             "Fuzs"
         ],
@@ -35,7 +35,7 @@
         },
         {
             "name": "github",
-            "slug": "puzzleslib"
+            "slug": "puzzles-lib"
         },
         {
             "name": "modrinth",
