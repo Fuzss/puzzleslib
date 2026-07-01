@@ -83,17 +83,9 @@ def format_repo_title(repo_name: str) -> str:
     """
     Convert kebab case repository names to a human readable title.
 
-    New format
+    Format:
     forge-config-api-port -> Forge Config Api Port
-
-    Old format
-    forgeconfigapiport -> unchanged
-
-    Only transform when hyphens are present to avoid modifying legacy names.
     """
-    if "-" not in repo_name:
-        return repo_name
-
     parts = repo_name.split("-")
     return " ".join(part.capitalize() for part in parts)
 
@@ -198,7 +190,7 @@ def collect_table_loaders(branch_list):
 
 
 def build_table_header(metadata, published):
-    header_columns = ["Branch", "Status", "Changelog"]
+    header_columns = ["Branch", "History", "Status", "Changelog"]
 
     if metadata:
         if has_download_links(metadata.get("links", [])):
@@ -282,6 +274,13 @@ def generate_table_row(
     """
     Generate a single markdown table row.
     """
+    row = [
+        f"[{branch}]({repo_url}/tree/{branch})",
+        f"[Commits]({repo_url}/commits/{branch})",
+        display_status,
+        f"[CHANGELOG.md]({changelog_url})"
+    ]
+
     if metadata:
         minecraft = metadata.get("minecraft") or get_mc_version(branch)
         links = metadata.get("links", [])
@@ -289,12 +288,6 @@ def generate_table_row(
         id = metadata["mod"]["id"]
         version = metadata["mod"]["version"]
         group = metadata["mod"]["group"]
-
-        row = [
-            f"[{branch}]({repo_url}/tree/{branch})",
-            display_status,
-            f"[CHANGELOG.md]({changelog_url})"
-        ]
 
         if has_download_links(links):
             row += [
@@ -312,20 +305,9 @@ def generate_table_row(
             row.append("<br />".join(maven_entries))
 
     else:
-        row = [
-            f"[{branch}]({repo_url}/tree/{branch})",
-            display_status,
-            f"[CHANGELOG.md]({changelog_url})",
-            DEFAULT_DOWNLOADS
-        ]
+        row .append(DEFAULT_DOWNLOADS)
 
     return "| " + " | ".join(row) + " |"
-
-
-def write_readme(readme_lines):
-    """Write README.md file."""
-    with open(README_FILE, "w") as f:
-        f.write("\n".join(readme_lines))
 
 
 def main():
@@ -380,7 +362,8 @@ def main():
         for name, description in SUPPORT_TYPES.values()
     )
 
-    write_readme(readme_lines)
+    with open(README_FILE, "w") as f:
+        f.write("\n".join(readme_lines))
 
 
 if __name__ == "__main__":
