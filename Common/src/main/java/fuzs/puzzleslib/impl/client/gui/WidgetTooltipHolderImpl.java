@@ -104,7 +104,7 @@ public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
     }
 
     @Override
-    protected ClientTooltipPositioner createTooltipPositioner(ScreenRectangle screenRectangle, boolean hovering, boolean focused) {
+    public ClientTooltipPositioner createTooltipPositioner(ScreenRectangle screenRectangle, boolean hovering, boolean focused) {
         ClientTooltipPositioner tooltipPositioner = super.createTooltipPositioner(screenRectangle, hovering, focused);
         if (this.tooltipPositionerFactory != null) {
             return this.tooltipPositionerFactory.apply(tooltipPositioner, this.abstractWidget);

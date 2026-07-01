@@ -238,7 +238,7 @@ public final class ArmorMaterialBuilder {
                 this.assetId.map((ResourceLocation resourceLocation) -> Collections.singletonList(new ArmorMaterial.Layer(
                         resourceLocation) {
                     @Override
-                    protected ResourceLocation resolveTexture(boolean innerTexture) {
+                    public ResourceLocation resolveTexture(boolean innerTexture) {
                         return this.assetName.withPath((String string) -> "textures/entity/equipment/" + (innerTexture ?
                                 "humanoid_leggings" : "humanoid") + "/" + this.assetName.getPath() + ".png");
                     }

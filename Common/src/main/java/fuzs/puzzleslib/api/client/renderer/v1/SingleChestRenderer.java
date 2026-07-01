@@ -54,7 +54,7 @@ public abstract class SingleChestRenderer<T extends BlockEntity & LidBlockEntity
 
     @ApiStatus.Internal
     @Override
-    protected final void render(PoseStack poseStack, VertexConsumer consumer, ModelPart lidPart, ModelPart lockPart, ModelPart bottomPart, float openness, int packedLight, int packedOverlay) {
+    public final void render(PoseStack poseStack, VertexConsumer consumer, ModelPart lidPart, ModelPart lockPart, ModelPart bottomPart, float openness, int packedLight, int packedOverlay) {
         Objects.requireNonNull(this.blockEntity, "block entity is null");
         Objects.requireNonNull(this.partialTick, "partial tick is null");
         Objects.requireNonNull(this.bufferSource, "buffer source is null");

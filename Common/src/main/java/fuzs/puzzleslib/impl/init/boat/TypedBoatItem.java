@@ -22,7 +22,7 @@ public class TypedBoatItem extends BoatItem {
     }
 
     @Override
-    protected Boat getBoat(Level level, HitResult hitResult, ItemStack itemStack, Player player) {
+    public Boat getBoat(Level level, HitResult hitResult, ItemStack itemStack, Player player) {
         Vec3 vec3 = hitResult.getLocation();
         Boat boat = this.entityType.create(level);
         if (boat != null) {
