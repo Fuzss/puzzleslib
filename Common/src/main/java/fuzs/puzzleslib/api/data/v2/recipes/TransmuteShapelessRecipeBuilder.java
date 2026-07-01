@@ -98,7 +98,7 @@ public class TransmuteShapelessRecipeBuilder extends ShapelessRecipeBuilder {
     @Override
     public void save(RecipeOutput recipeOutput, ResourceLocation resourceLocation) {
         Objects.requireNonNull(this.input, "input is null");
-        super.save(new TransformingRecipeOutput(recipeOutput, (Recipe<?> recipe) -> {
+        super.save(TransformingRecipeOutput.transformed(recipeOutput, (Recipe<?> recipe) -> {
             return new TransmuteShapelessRecipe(TransmuteShapelessRecipeBuilder.this.recipeSerializer,
                     (ShapelessRecipe) recipe,
                     TransmuteShapelessRecipeBuilder.this.input);

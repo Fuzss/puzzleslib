@@ -3,8 +3,6 @@ package fuzs.puzzleslib.api.data.v2.recipes;
 import fuzs.puzzleslib.api.data.v2.AbstractRecipeProvider;
 import fuzs.puzzleslib.impl.item.CopyComponentsRecipe;
 import fuzs.puzzleslib.impl.item.CopyComponentsShapedRecipe;
-import net.minecraft.advancements.Advancement;
-import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
@@ -87,27 +85,16 @@ public class CopyComponentsShapedRecipeBuilder extends ShapedRecipeBuilder {
 
     @Override
     public void save(RecipeOutput recipeOutput, ResourceLocation id) {
-        super.save(new RecipeOutput() {
-
-            @Override
-            public Advancement.Builder advancement() {
-                return recipeOutput.advancement();
-            }
-
-            @Override
-            public void accept(ResourceLocation location, Recipe<?> recipe, @Nullable AdvancementHolder advancement) {
-                // some weird hack to get the proper mod id for the serializer
-                String modId =
-                        recipeOutput instanceof AbstractRecipeProvider.IdentifiableRecipeOutput identifiableRecipeOutput ?
-                                identifiableRecipeOutput.getModId() : id.getNamespace();
-                RecipeSerializer<?> recipeSerializer = CopyComponentsRecipe.getModSerializer(modId,
-                        CopyComponentsRecipe.SHAPED_RECIPE_SERIALIZER_ID
-                );
-                recipe = new CopyComponentsShapedRecipe(recipeSerializer, (ShapedRecipe) recipe,
-                        CopyComponentsShapedRecipeBuilder.this.copyFrom
-                );
-                recipeOutput.accept(location, recipe, advancement);
-            }
-        }, id);
+        super.save(TransformingRecipeOutput.transformed(recipeOutput, (Recipe<?> recipe) -> {
+            // some weird hack to get the proper mod id for the serializer
+            String modId =
+                    recipeOutput instanceof AbstractRecipeProvider.IdentifiableRecipeOutput identifiableRecipeOutput ?
+                            identifiableRecipeOutput.getModId() : id.getNamespace();
+            RecipeSerializer<?> recipeSerializer = CopyComponentsRecipe.getModSerializer(modId,
+                    CopyComponentsRecipe.SHAPED_RECIPE_SERIALIZER_ID);
+            return new CopyComponentsShapedRecipe(recipeSerializer,
+                    (ShapedRecipe) recipe,
+                    CopyComponentsShapedRecipeBuilder.this.copyFrom);
+        }), id);
     }
 }

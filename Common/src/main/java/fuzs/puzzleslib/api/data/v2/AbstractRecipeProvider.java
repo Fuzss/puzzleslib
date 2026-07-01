@@ -11,6 +11,7 @@ import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.api.init.v3.family.BlockSetFamily;
 import fuzs.puzzleslib.api.init.v3.family.BlockSetVariant;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.Criterion;
@@ -316,7 +317,7 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
     @Override
     public CompletableFuture<?> run(CachedOutput output, HolderLookup.Provider registries) {
         List<CompletableFuture<?>> completableFutures = new ArrayList<>();
-        this.buildRecipes(new IdentifiableRecipeOutput(output, registries, completableFutures));
+        this.buildRecipes(ProxyImpl.get().getIdentifiableRecipeOutput(this, output, registries, completableFutures));
         return CompletableFuture.allOf(completableFutures.toArray(CompletableFuture[]::new));
     }
 
@@ -347,7 +348,7 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
         }
     }
 
-    public class IdentifiableRecipeOutput implements RecipeOutput {
+    public abstract class IdentifiableRecipeOutput implements RecipeOutput {
         private final CachedOutput output;
         private final HolderLookup.Provider registries;
         private final List<CompletableFuture<?>> completableFutures;

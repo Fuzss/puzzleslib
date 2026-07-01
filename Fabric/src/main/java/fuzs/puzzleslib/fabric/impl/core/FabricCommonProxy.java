@@ -2,6 +2,8 @@ package fuzs.puzzleslib.fabric.impl.core;
 
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
+import fuzs.puzzleslib.api.data.v2.AbstractRecipeProvider;
+import fuzs.puzzleslib.api.data.v2.recipes.TransformingRecipeOutput;
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents;
@@ -37,6 +39,9 @@ import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.impl.datagen.FabricTagBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.CachedOutput;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -72,6 +77,7 @@ import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.GameRules;
@@ -84,10 +90,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 public class FabricCommonProxy implements FabricProxy {
     private final Set<String> hiddenPacks = new HashSet<>();
@@ -324,6 +333,28 @@ public class FabricCommonProxy implements FabricProxy {
     @Override
     public DataAttachmentRegistryImpl getDataAttachmentRegistry() {
         return new FabricDataAttachmentRegistryImpl();
+    }
+
+    @Override
+    public RecipeOutput getTransformingRecipeOutput(RecipeOutput recipeOutput, UnaryOperator<Recipe<?>> operator) {
+        return new TransformingRecipeOutput() {
+            @Override
+            public RecipeOutput recipeOutput() {
+                return recipeOutput;
+            }
+
+            @Override
+            public UnaryOperator<Recipe<?>> operator() {
+                return operator;
+            }
+        };
+    }
+
+    @Override
+    public RecipeOutput getIdentifiableRecipeOutput(AbstractRecipeProvider provider, CachedOutput output, HolderLookup.Provider registries, List<CompletableFuture<?>> completableFutures) {
+        return provider.new IdentifiableRecipeOutput(output, registries, completableFutures) {
+            // NO-OP
+        };
     }
 
     @Override

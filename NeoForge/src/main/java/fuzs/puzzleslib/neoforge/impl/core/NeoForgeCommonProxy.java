@@ -2,6 +2,8 @@ package fuzs.puzzleslib.neoforge.impl.core;
 
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
+import fuzs.puzzleslib.api.data.v2.AbstractRecipeProvider;
+import fuzs.puzzleslib.api.data.v2.recipes.TransformingRecipeOutput;
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
 import fuzs.puzzleslib.api.init.v3.GameRulesFactory;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryFactory;
@@ -26,8 +28,12 @@ import fuzs.puzzleslib.neoforge.impl.init.NeoForgeRegistryFactoryV3;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgeRegistryFactoryV4;
 import fuzs.puzzleslib.neoforge.impl.item.NeoForgeToolTypeHelper;
 import fuzs.puzzleslib.neoforge.impl.item.crafting.NeoForgeCombinedIngredients;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.CachedOutput;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -56,12 +62,14 @@ import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.neoforged.neoforge.common.conditions.ICondition;
 import net.neoforged.neoforge.common.extensions.ICommonPacketListener;
 import net.neoforged.neoforge.entity.PartEntity;
 import net.neoforged.neoforge.event.EventHooks;
@@ -72,10 +80,12 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 public class NeoForgeCommonProxy implements NeoForgeProxy {
 
@@ -269,6 +279,36 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     @Override
     public DataAttachmentRegistryImpl getDataAttachmentRegistry() {
         return new NeoForgeDataAttachmentRegistryImpl();
+    }
+
+    @Override
+    public RecipeOutput getTransformingRecipeOutput(RecipeOutput recipeOutput, UnaryOperator<Recipe<?>> operator) {
+        return new TransformingRecipeOutput() {
+            @Override
+            public RecipeOutput recipeOutput() {
+                return recipeOutput;
+            }
+
+            @Override
+            public UnaryOperator<Recipe<?>> operator() {
+                return operator;
+            }
+
+            @Override
+            public void accept(ResourceLocation id, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions) {
+                this.accept(id, recipe, advancement);
+            }
+        };
+    }
+
+    @Override
+    public RecipeOutput getIdentifiableRecipeOutput(AbstractRecipeProvider provider, CachedOutput output, HolderLookup.Provider registries, List<CompletableFuture<?>> completableFutures) {
+        return provider.new IdentifiableRecipeOutput(output, registries, completableFutures) {
+            @Override
+            public void accept(ResourceLocation id, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions) {
+                this.accept(id, recipe, advancement);
+            }
+        };
     }
 
     @Override

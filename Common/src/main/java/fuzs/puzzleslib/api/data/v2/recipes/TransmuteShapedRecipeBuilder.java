@@ -33,7 +33,8 @@ public class TransmuteShapedRecipeBuilder extends ShapedRecipeBuilder {
     }
 
     public static TransmuteShapedRecipeBuilder shaped(RecipeSerializer<?> recipeSerializer, RecipeCategory category, ItemLike result, int count) {
-        return new TransmuteShapedRecipeBuilder(recipeSerializer, category,
+        return new TransmuteShapedRecipeBuilder(recipeSerializer,
+                category,
                 result.asItem().getDefaultInstance().copyWithCount(count));
     }
 
@@ -97,7 +98,7 @@ public class TransmuteShapedRecipeBuilder extends ShapedRecipeBuilder {
     @Override
     public void save(RecipeOutput recipeOutput, ResourceLocation resourceLocation) {
         Objects.requireNonNull(this.input, "input is null");
-        super.save(new TransformingRecipeOutput(recipeOutput, (Recipe<?> recipe) -> {
+        super.save(TransformingRecipeOutput.transformed(recipeOutput, (Recipe<?> recipe) -> {
             return new TransmuteShapedRecipe(TransmuteShapedRecipeBuilder.this.recipeSerializer,
                     (ShapedRecipe) recipe,
                     TransmuteShapedRecipeBuilder.this.input);
