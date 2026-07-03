@@ -67,12 +67,11 @@ public class StyleCombiningCharSink implements FormattedCharSink {
     }
 
     public Component getAsComponent() {
-        MutableComponent mutableComponent = Component.empty().withStyle(this.defaultStyle);
+        MutableComponent baseComponent = Component.empty().withStyle(this.defaultStyle);
         this.iterateForwards((String string, Style style) -> {
-            Component component = ComponentHelper.getAsComponent(string, style);
-            mutableComponent.append(component);
+            baseComponent.append(ComponentHelper.getAsComponent(string, style));
         });
-        return mutableComponent;
+        return baseComponent;
     }
 
     public String getAsString() {
@@ -125,12 +124,13 @@ public class StyleCombiningCharSink implements FormattedCharSink {
 
     private void iterate(List<Map.Entry<StringBuilder, Style>> strings, BiPredicate<String, Style> componentConsumer) {
         for (Map.Entry<StringBuilder, Style> entry : strings) {
-            // The default style is "wrapped" around the whole component / string, so we can safely remove it from individual parts.
-            if (!entry.getKey().isEmpty() || !entry.getValue().isEmpty() && !Objects.equals(entry.getValue(),
-                    this.defaultStyle)) {
-                Style style = this.defaultStyle.isEmpty() ? ComponentHelper.sanitizeLegacyFormat(entry.getValue()) :
-                        entry.getValue();
-                if (!componentConsumer.test(entry.getKey().toString(), style)) {
+            StringBuilder text = entry.getKey();
+            // The default style is set for the whole component / string, so we can safely skip it for individual parts.
+            Style style = Objects.equals(entry.getValue(), this.defaultStyle) ? Style.EMPTY : entry.getValue();
+            if (!text.isEmpty() || !style.isEmpty()) {
+                Style sanitizedStyle =
+                        this.defaultStyle.isEmpty() ? ComponentHelper.sanitizeLegacyFormat(style) : style;
+                if (!componentConsumer.test(text.toString(), sanitizedStyle)) {
                     break;
                 }
             }
