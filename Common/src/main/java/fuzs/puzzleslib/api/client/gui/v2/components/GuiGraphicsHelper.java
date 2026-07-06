@@ -14,6 +14,7 @@ import org.joml.Matrix4f;
  * {@link TextureAtlasSprite TextureAtlasSprites} with a different {@link GuiSpriteScaling} than is defined by the
  * resource pack.
  */
+@Deprecated
 public final class GuiGraphicsHelper {
 
     private GuiGraphicsHelper() {
