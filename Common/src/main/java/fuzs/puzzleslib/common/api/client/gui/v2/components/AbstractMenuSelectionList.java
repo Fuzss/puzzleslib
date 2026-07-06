@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.common.api.client.gui.v2.components;
 
+import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import fuzs.puzzleslib.common.api.client.gui.v2.ScreenHelper;
 import net.minecraft.client.Minecraft;
@@ -23,10 +24,13 @@ import java.util.List;
  * Also, the scroll bar is mostly handled separately and is placed outside the bounds of the actual list.
  */
 public class AbstractMenuSelectionList<E extends AbstractMenuSelectionList.Entry<E>> extends ContainerObjectSelectionList<E> {
-    public static final Identifier DISABLED_SCROLLER_SPRITE = Identifier.withDefaultNamespace(
-            "container/creative_inventory/scroller_disabled");
     public static final Identifier SCROLLER_SPRITE = Identifier.withDefaultNamespace(
             "container/creative_inventory/scroller");
+    /**
+     * TODO should be called SCROLLER_DISABLED_SPRITE
+     */
+    public static final Identifier DISABLED_SCROLLER_SPRITE = Identifier.withDefaultNamespace(
+            "container/creative_inventory/scroller_disabled");
 
     public AbstractMenuSelectionList(Minecraft minecraft, int x, int y, int width, int height, int itemHeight) {
         super(minecraft, width, height, y, itemHeight);
@@ -45,31 +49,23 @@ public class AbstractMenuSelectionList<E extends AbstractMenuSelectionList.Entry
 
     @Override
     protected void extractScrollbar(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
-        int scrollbarX = this.scrollBarX();
-        int scrollerHeight = this.scrollerHeight();
-        int scrollerY = this.scrollBarY();
-        if (!this.scrollable()) {
-            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED,
-                    DISABLED_SCROLLER_SPRITE,
-                    scrollbarX,
-                    this.getY(),
-                    this.scrollbarWidth(),
-                    scrollerHeight);
-            if (this.isOverScrollbar(mouseX, mouseY)) {
-                guiGraphics.requestCursor(CursorTypes.NOT_ALLOWED);
-            }
+        Identifier sprite = this.scrollable() ? SCROLLER_SPRITE : DISABLED_SCROLLER_SPRITE;
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED,
+                sprite,
+                this.scrollBarX(),
+                this.scrollBarY(),
+                this.scrollerWidth(),
+                this.scrollerHeight());
+        if (this.isOverScrollbar(mouseX, mouseY)) {
+            guiGraphics.requestCursor(this.pickCursorType());
         }
+    }
 
+    protected CursorType pickCursorType() {
         if (this.scrollable()) {
-            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED,
-                    SCROLLER_SPRITE,
-                    scrollbarX,
-                    scrollerY,
-                    this.scrollbarWidth(),
-                    scrollerHeight);
-            if (this.isOverScrollbar(mouseX, mouseY)) {
-                guiGraphics.requestCursor(this.scrolling ? CursorTypes.RESIZE_NS : CursorTypes.POINTING_HAND);
-            }
+            return this.scrolling ? CursorTypes.RESIZE_NS : CursorTypes.POINTING_HAND;
+        } else {
+            return CursorTypes.NOT_ALLOWED;
         }
     }
 
@@ -95,6 +91,14 @@ public class AbstractMenuSelectionList<E extends AbstractMenuSelectionList.Entry
 
     @Override
     public int scrollbarWidth() {
+        return this.scrollerWidth();
+    }
+
+    public int scrollbarHeight() {
+        return this.getHeight();
+    }
+
+    protected int scrollerWidth() {
         return 12;
     }
 
@@ -109,7 +113,7 @@ public class AbstractMenuSelectionList<E extends AbstractMenuSelectionList.Entry
             return this.getY();
         } else {
             double scrollScale = this.scrollAmount() / this.maxScrollAmount();
-            return this.getY() + Math.max(0, (int) (scrollScale * (this.getHeight() - this.scrollerHeight())));
+            return this.getY() + Math.max(0, (int) (scrollScale * (this.scrollbarHeight() - this.scrollerHeight())));
         }
     }
 
@@ -134,8 +138,9 @@ public class AbstractMenuSelectionList<E extends AbstractMenuSelectionList.Entry
     }
 
     protected void setMouseButtonScrollAmount(MouseButtonEvent mouseButtonEvent) {
-        double scrollOffset = (mouseButtonEvent.y() - this.getY() - this.scrollerHeight() / 2.0) / (this.getHeight()
-                - this.scrollerHeight());
+        double scrollOffset =
+                (mouseButtonEvent.y() - this.getY() - this.scrollerHeight() / 2.0) / (this.scrollbarHeight()
+                        - this.scrollerHeight());
         this.setScrollAmount(Mth.clamp(scrollOffset, 0.0, 1.0) * this.maxScrollAmount());
     }
 
@@ -149,7 +154,7 @@ public class AbstractMenuSelectionList<E extends AbstractMenuSelectionList.Entry
         return ScreenHelper.isHovering(this.scrollBarX(),
                 this.getY(),
                 this.scrollbarWidth(),
-                this.getHeight(),
+                this.scrollbarHeight(),
                 mouseX,
                 mouseY);
     }

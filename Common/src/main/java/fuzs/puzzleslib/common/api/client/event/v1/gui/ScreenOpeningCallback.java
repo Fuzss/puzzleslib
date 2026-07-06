@@ -15,14 +15,15 @@ public interface ScreenOpeningCallback {
      * exchanging the new screen with a different one, or can prevent a new screen from opening, by returning the
      * original screen (which will be initialized once again).
      *
-     * @param oldScreen the screen that is being removed, which may be {@code null} when opening the screen from
-     *                  {@link net.minecraft.client.gui.Gui}, like {@link net.minecraft.client.gui.screens.PauseScreen}
-     * @param newScreen the new screen that is being set, which may be {@code null} when closing a screen and returning
-     *                  to the in-game hud
+     * @param previousScreen the screen that is being removed, which may be {@code null} when opening the screen from
+     *                       {@link net.minecraft.client.gui.Gui}, like
+     *                       {@link net.minecraft.client.gui.screens.PauseScreen}
+     * @param updatedScreen  the new screen that is being set, which may be {@code null} when closing a screen and
+     *                       returning to the in-game hud
      * @return <ul>
      *         <li>{@link EventResultHolder#interrupt(Object)} to set a different new screen, potentially the original screen for no change (except the original screen being initialised again), or {@code null} when closing a screen and returning to the in-game gui</li>
      *         <li>{@link EventResultHolder#pass()} to allow the vanilla screen to be set</li>
      *         </ul>
      */
-    EventResultHolder<@Nullable Screen> onScreenOpening(@Nullable Screen oldScreen, @Nullable Screen newScreen);
+    EventResultHolder<@Nullable Screen> onScreenOpening(@Nullable Screen previousScreen, @Nullable Screen updatedScreen);
 }
