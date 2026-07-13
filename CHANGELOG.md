@@ -5,12 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v26.2.1-mc26.2.x] - 2026-06-19
+## [v26.2.1-mc26.2.x] - 2026-07-13
 
 ### Changed
 
 - Add missing `BlockSetFamily::generateFor` method allowing for a custom name override
 - `AbstractModelProvider::createVariantWoodBlockProviders` now includes log and wood blocks
+- Recipe serializers registered via `ContentRegistrationHelper::registerTransmuteRecipeSerializers` are now
+  automatically synced to clients on Fabric to allow for recipe viewer mods to pick them up properly
 
 ### Fixed
 
