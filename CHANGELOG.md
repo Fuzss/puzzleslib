@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v26.1.12-mc26.1.x] - 2026-07-13
+
+### Changed
+
+- Recipe serializers registered via `ContentRegistrationHelper::registerTransmuteRecipeSerializers` are now automatically synced to clients on Fabric to allow for recipe viewer mods to pick them up properly
+
 ## [v26.1.11-mc26.1.x] - 2026-06-15
 
 ### Fixed
