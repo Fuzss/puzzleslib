@@ -27,6 +27,7 @@ import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.fabricmc.fabric.api.menu.v1.ExtendedMenuProvider;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.api.recipe.v1.sync.RecipeSynchronization;
 import net.fabricmc.fabric.impl.resource.pack.FabricPack;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
@@ -75,6 +76,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -318,6 +320,11 @@ public class FabricCommonProxy implements FabricProxy {
                 throw new UnsupportedOperationException();
             }
         };
+    }
+
+    @Override
+    public void synchronizeRecipeSerializer(Holder<? extends RecipeSerializer<?>> serializer) {
+        RecipeSynchronization.synchronizeRecipeSerializer(serializer.value());
     }
 
     @Override

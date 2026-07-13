@@ -8,12 +8,14 @@ import fuzs.puzzleslib.common.api.item.v2.crafting.CombinedIngredients;
 import fuzs.puzzleslib.common.impl.attachment.DataAttachmentRegistryImpl;
 import fuzs.puzzleslib.common.impl.core.ModContext;
 import fuzs.puzzleslib.common.impl.core.context.ModConstructorImpl;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.tags.TagBuilder;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -40,4 +42,6 @@ public interface FactoriesProxy {
     RecipeOutput getRecipeProviderOutput(CachedOutput output, String modId, PackOutput packOutput, HolderLookup.Provider registries, Consumer<CompletableFuture<?>> consumer);
 
     RecipeOutput getThrowingRecipeOutput();
+
+    void synchronizeRecipeSerializer(Holder<? extends RecipeSerializer<?>> serializer);
 }
