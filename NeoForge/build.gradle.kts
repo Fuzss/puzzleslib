@@ -20,7 +20,6 @@ multiloader {
             "GatherDataEventNeoForgeAccessor",
             "PackNeoForgeAccessor"
         )
-        clientMixin("MouseHandlerNeoForgeMixin")
         clientAccessor("BrandingControlAccessor", "RegisterKeyMappingsEventNeoForgeAccessor")
     }
 }

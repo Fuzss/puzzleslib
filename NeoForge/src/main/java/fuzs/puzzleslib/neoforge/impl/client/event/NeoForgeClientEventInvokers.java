@@ -61,7 +61,6 @@ import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.joml.Matrix3x2fStack;
-import org.joml.Vector2i;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
@@ -75,7 +74,6 @@ import static fuzs.puzzleslib.neoforge.api.event.v1.core.NeoForgeEventInvokerReg
 
 @SuppressWarnings("unchecked")
 public final class NeoForgeClientEventInvokers {
-    public static Vector2i wheelXY = new Vector2i();
 
     private NeoForgeClientEventInvokers() {
         // NO-OP
@@ -449,7 +447,8 @@ public final class NeoForgeClientEventInvokers {
                     }
 
                     Inventory inventory = player.getInventory();
-                    int wheel = wheelXY.y == 0 ? -wheelXY.x : wheelXY.y;
+                    int wheel = event.getAccumulatedScrollY() == 0 ? -event.getAccumulatedScrollX() :
+                            event.getAccumulatedScrollY();
                     int newSlot = ScrollWheelHandler.getNextScrollWheelSelection(wheel,
                             inventory.getSelectedSlot(),
                             Inventory.getSelectionSize());
