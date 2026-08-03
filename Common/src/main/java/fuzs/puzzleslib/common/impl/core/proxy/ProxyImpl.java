@@ -23,6 +23,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -66,6 +67,8 @@ public interface ProxyImpl extends SidedProxy, FactoriesProxy, NetworkingProxy, 
     void setPackHidden(Pack pack, boolean isHidden);
 
     Style getRarityStyle(Rarity rarity);
+
+    boolean shouldDisplayAllTooltipInformation(TooltipFlag flag);
 
     void onPlayerDestroyItem(Player player, ItemStack originalItemStack, @Nullable InteractionHand interactionHand);
 

@@ -64,6 +64,7 @@ import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -137,6 +138,11 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     @Override
     public Style getRarityStyle(Rarity rarity) {
         return rarity.getStyleModifier().apply(Style.EMPTY);
+    }
+
+    @Override
+    public boolean shouldDisplayAllTooltipInformation(TooltipFlag flag) {
+        return flag.shouldDisplayAllInformation();
     }
 
     @Override

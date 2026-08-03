@@ -12,6 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
@@ -109,5 +110,17 @@ public final class ItemHelper {
     public static Style getRarityStyle(Rarity rarity) {
         Objects.requireNonNull(rarity, "rarity is null");
         return ProxyImpl.get().getRarityStyle(rarity);
+    }
+
+    /**
+     * Should the tooltip include all information including contents restricted to e.g., certain keys such as shift
+     * being held.
+     *
+     * @param flag the tooltip flag
+     * @return show all information that may be included under varying circumstances
+     */
+    public static boolean shouldDisplayAllTooltipInformation(TooltipFlag flag) {
+        Objects.requireNonNull(flag, "flag is null");
+        return ProxyImpl.get().shouldDisplayAllTooltipInformation(flag);
     }
 }
