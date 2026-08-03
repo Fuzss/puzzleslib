@@ -40,6 +40,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -440,14 +441,20 @@ public final class FabricClientEventInvokers {
                     return callback::onAfterKeyRelease;
                 },
                 net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::afterKeyRelease);
-        INSTANCE.register((Class<ScreenKeyboardEvents.BeforeCharacterType<?>>) (Class<?>) ScreenKeyboardEvents.BeforeCharacterType.class,
-                (ScreenKeyboardEvents.BeforeCharacterType<?> callback, @Nullable Object context) -> {
-                    // TODO invoke proper Fabric event when added
-                });
-        INSTANCE.register((Class<ScreenKeyboardEvents.AfterCharacterType<?>>) (Class<?>) ScreenKeyboardEvents.AfterCharacterType.class,
-                (ScreenKeyboardEvents.AfterCharacterType<?> callback, @Nullable Object context) -> {
-                    // TODO invoke proper Fabric event when added
-                });
+        registerScreenEvent(ScreenKeyboardEvents.BeforeCharacterType.class,
+                net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents.AllowCharType.class,
+                callback -> {
+                    return (Screen screen, CharacterEvent event) -> {
+                        return callback.onBeforeCharacterType(screen, event).isPass();
+                    };
+                },
+                net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::allowCharType);
+        registerScreenEvent(ScreenKeyboardEvents.AfterCharacterType.class,
+                net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents.AfterCharType.class,
+                callback -> {
+                    return callback::onAfterCharacterType;
+                },
+                net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::afterCharType);
         INSTANCE.register(CustomizeChatPanelCallback.class,
                 (CustomizeChatPanelCallback callback, @Nullable Object context) -> {
                     HudElementRegistry.replaceElement(VanillaHudElements.CHAT, (HudElement hudElement) -> {
