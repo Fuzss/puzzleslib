@@ -24,6 +24,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
@@ -59,6 +60,7 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import org.joml.Matrix3x2fStack;
 import org.joml.Vector2i;
 import org.jspecify.annotations.Nullable;
 
@@ -396,12 +398,18 @@ public final class NeoForgeClientEventInvokers {
                     callback.onAfterCharacterType(event.getScreen(), event.getCharacterEvent());
                 });
         INSTANCE.register(ExtractContainerScreenContentsCallback.class,
-                ContainerScreenEvent.Render.Foreground.class,
-                (ExtractContainerScreenContentsCallback callback, ContainerScreenEvent.Render.Foreground event) -> {
-                    callback.onExtractContainerScreenContents(event.getContainerScreen(),
-                            event.getGuiGraphics(),
-                            event.getMouseX(),
-                            event.getMouseY());
+                ScreenEvent.Render.Foreground.class,
+                (ExtractContainerScreenContentsCallback callback, ScreenEvent.Render.Foreground event) -> {
+                    if (event.getScreen() instanceof AbstractContainerScreen<?> screen) {
+                        Matrix3x2fStack pose = event.getGuiGraphics().pose();
+                        pose.pushMatrix();
+                        pose.translate(screen.getLeftPos(), screen.getTopPos());
+                        callback.onExtractContainerScreenContents(screen,
+                                event.getGuiGraphics(),
+                                event.getMouseX(),
+                                event.getMouseY());
+                        pose.popMatrix();
+                    }
                 });
         INSTANCE.register(CustomizeChatPanelCallback.class,
                 CustomizeGuiOverlayEvent.Chat.class,

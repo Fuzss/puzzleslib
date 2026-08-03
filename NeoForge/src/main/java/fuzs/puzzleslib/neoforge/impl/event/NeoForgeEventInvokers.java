@@ -213,13 +213,13 @@ public final class NeoForgeEventInvokers {
                             });
                 });
         INSTANCE.register(PlayerInteractEvents.UseEntity.class,
-                PlayerInteractEvent.EntityInteractSpecific.class,
-                (PlayerInteractEvents.UseEntity callback, PlayerInteractEvent.EntityInteractSpecific event) -> {
+                PlayerInteractEvent.EntityInteract.class,
+                (PlayerInteractEvents.UseEntity callback, PlayerInteractEvent.EntityInteract event) -> {
                     callback.onUseEntity(event.getEntity(),
                             event.getLevel(),
                             event.getHand(),
                             event.getTarget(),
-                            event.getLocalPos()).ifInterrupt((InteractionResult interactionResult) -> {
+                            event.getLocation()).ifInterrupt((InteractionResult interactionResult) -> {
                         event.setCancellationResult(interactionResult);
                         event.setCanceled(true);
                     });
