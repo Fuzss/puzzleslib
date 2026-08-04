@@ -344,6 +344,8 @@ accessible	field	net/minecraft/client/resources/model/ModelBakery	missingModel	L
 accessible	field	net/minecraft/client/resources/model/ModelBakery	playerSkinRenderCache	Lnet/minecraft/client/renderer/PlayerSkinRenderCache;
 accessible	field	net/minecraft/client/resources/model/ModelBakery	resolvedModels	Ljava/util/Map;
 accessible	field	net/minecraft/client/resources/model/ModelBakery	sprites	Lnet/minecraft/client/resources/model/sprite/SpriteGetter;
+accessible  class   net/minecraft/client/resources/model/ModelBakery$InternerImpl
+accessible  method  net/minecraft/client/resources/model/ModelBakery$InternerImpl   <init>  ()V
 accessible	field	net/minecraft/client/resources/model/ModelDiscovery	uncachedResolver	Lit/unimi/dsi/fastutil/objects/Object2ObjectFunction;
 mutable	field	net/minecraft/client/resources/model/ModelDiscovery	uncachedResolver	Lit/unimi/dsi/fastutil/objects/Object2ObjectFunction;
 accessible	method	net/minecraft/client/resources/model/ModelDiscovery	createAndQueueWrapper	(Lnet/minecraft/resources/Identifier;Lnet/minecraft/client/resources/model/UnbakedModel;)Lnet/minecraft/client/resources/model/ModelDiscovery$ModelWrapper;
