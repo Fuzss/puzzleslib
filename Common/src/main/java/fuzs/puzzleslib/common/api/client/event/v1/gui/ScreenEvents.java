@@ -42,6 +42,11 @@ public final class ScreenEvents {
         return EventInvoker.lookup((Class<AfterBackground<T>>) (Class<?>) AfterBackground.class, screen);
     }
 
+    public static <T extends Screen> EventInvoker<AfterForeground<T>> afterForeground(Class<T> screen) {
+        Objects.requireNonNull(screen, "screen type is null");
+        return EventInvoker.lookup((Class<AfterForeground<T>>) (Class<?>) AfterForeground.class, screen);
+    }
+
     public static <T extends Screen> EventInvoker<AfterExtract<T>> afterExtract(Class<T> screen) {
         Objects.requireNonNull(screen, "screen type is null");
         return EventInvoker.lookup((Class<AfterExtract<T>>) (Class<?>) AfterExtract.class, screen);
@@ -120,7 +125,7 @@ public final class ScreenEvents {
     public interface AfterBackground<T extends Screen> {
 
         /**
-         * Runs after a screen background is extracted in
+         * Runs after a screen's background is extracted in
          * {@link Screen#extractBackground(GuiGraphicsExtractor, int, int, float)}.
          *
          * @param screen      the currently displayed screen
@@ -130,6 +135,25 @@ public final class ScreenEvents {
          * @param partialTick the partial tick time
          */
         void onAfterBackground(T screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick);
+    }
+
+    @FunctionalInterface
+    public interface AfterForeground<T extends Screen> {
+
+        /**
+         * Runs after a screen's foreground is extracted in
+         * {@link
+         * net.minecraft.client.gui.screens.inventory.AbstractContainerScreen#extractContents(GuiGraphicsExtractor, int,
+         * int, float)} or via {@link GuiGraphicsExtractor#extractDeferredElements(int, int, float)} for generic
+         * screens.
+         *
+         * @param screen      the currently displayed screen
+         * @param guiGraphics the gui graphics component
+         * @param mouseX      the x-position of the mouse
+         * @param mouseY      the y-position of the mouse
+         * @param partialTick the partial tick time
+         */
+        void onAfterForeground(T screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick);
     }
 
     @FunctionalInterface

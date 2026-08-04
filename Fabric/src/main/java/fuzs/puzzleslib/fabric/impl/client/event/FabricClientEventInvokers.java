@@ -331,18 +331,25 @@ public final class FabricClientEventInvokers {
                     return callback::onBeforeExtract;
                 },
                 net.fabricmc.fabric.api.client.screen.v1.ScreenEvents::beforeExtract);
-        registerScreenEvent(ScreenEvents.AfterExtract.class,
-                net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AfterExtract.class,
-                callback -> {
-                    return callback::onAfterExtract;
-                },
-                net.fabricmc.fabric.api.client.screen.v1.ScreenEvents::afterExtract);
         registerScreenEvent(ScreenEvents.AfterBackground.class,
                 net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AfterBackground.class,
                 callback -> {
                     return callback::onAfterBackground;
                 },
                 net.fabricmc.fabric.api.client.screen.v1.ScreenEvents::afterBackground);
+        // TODO invoke proper Fabric event when added
+        registerScreenEvent(ScreenEvents.AfterForeground.class,
+                net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AfterBackground.class,
+                callback -> {
+                    return callback::onAfterForeground;
+                },
+                net.fabricmc.fabric.api.client.screen.v1.ScreenEvents::afterBackground);
+        registerScreenEvent(ScreenEvents.AfterExtract.class,
+                net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AfterExtract.class,
+                callback -> {
+                    return callback::onAfterExtract;
+                },
+                net.fabricmc.fabric.api.client.screen.v1.ScreenEvents::afterExtract);
         registerScreenEvent(ScreenMouseEvents.BeforeMouseClick.class,
                 net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents.AllowMouseClick.class,
                 callback -> {

@@ -280,6 +280,15 @@ public final class NeoForgeClientEventInvokers {
                             event.getMouseY(),
                             event.getPartialTick());
                 });
+        registerScreenEvent(ScreenEvents.AfterForeground.class,
+                ScreenEvent.Render.Foreground.class,
+                (callback, event) -> {
+                    callback.onAfterForeground(event.getScreen(),
+                            event.getGuiGraphics(),
+                            event.getMouseX(),
+                            event.getMouseY(),
+                            event.getPartialTick());
+                });
         registerScreenEvent(ScreenEvents.AfterExtract.class, ScreenEvent.Render.Post.class, (callback, event) -> {
             callback.onAfterExtract(event.getScreen(),
                     event.getGuiGraphics(),
