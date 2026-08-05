@@ -38,22 +38,29 @@ import java.util.function.*;
 
 public final class BlockStateResolverContextNeoForgeImpl implements BlockStateResolverContext {
     private final ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
-    private final Function<Identifier, TextureAtlasSprite> textureGetter;
+    private final Function<Identifier, TextureAtlasSprite> textureResolver;
     private final ResolvedModel missingModel;
     private final Supplier<TextureAtlasSprite> missingSprite;
-    private final Map<Identifier, ResolvedModel> resolvedModels;
+    private final Function<Identifier, @Nullable ResolvedModel> modelResolver;
+    private final BiConsumer<Identifier, ResolvedModel> modelCache;
     private final BiConsumer<BlockState, BlockStateModel> blockStateModelOutput;
     private final Function<MaterialBaker, ModelBaker> modelBakerFactory = this::createModelBaker;
 
     public BlockStateResolverContextNeoForgeImpl(ModelEvent.ModifyBakingResult event) {
-        this.textureGetter = event.getTextureGetter();
-        this.missingModel = event.getModelBakery().missingModel;
+        this.textureResolver = event.getTextureGetter();
+        ModelBakery bakery = event.getModelBakery();
+        this.missingModel = bakery.missingModel;
         this.missingSprite = Suppliers.memoize(() -> {
             TextureAtlasSprite missingSprite = event.getTextureGetter().apply(MissingTextureAtlasSprite.getLocation());
             Objects.requireNonNull(missingSprite, "missing sprite is null");
             return missingSprite;
         });
-        this.resolvedModels = new HashMap<>(event.getModelBakery().resolvedModels);
+        Map<Identifier, ResolvedModel> resolvedModels = new HashMap<>();
+        this.modelResolver = (Identifier id) -> {
+            // The resolved models map from the bakery is unmodifiable when the ModernFix mod is installed.
+            return bakery.resolvedModels.containsKey(id) ? bakery.resolvedModels.get(id) : resolvedModels.get(id);
+        };
+        this.modelCache = resolvedModels::putIfAbsent;
         this.blockStateModelOutput = event.getBakingResult().blockStateModels()::put;
     }
 
@@ -72,33 +79,33 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
      */
     @Override
     public void registerBlockStateResolver(Block block, Consumer<BiConsumer<BlockState, BlockStateModel.UnbakedRoot>> blockStateConsumer) {
-        ModelDiscovery modelDiscovery = new ModelDiscovery(new HashMap<>(), this.missingModel.wrapped());
-        modelDiscovery.uncachedResolver = (Object object) -> {
+        ModelDiscovery discovery = new ModelDiscovery(new HashMap<>(), this.missingModel.wrapped());
+        discovery.uncachedResolver = (Object object) -> {
             Identifier id = (Identifier) object;
-            ResolvedModel resolvedModel = this.resolvedModels.get(id);
-            if (resolvedModel instanceof ModelDiscovery.ModelWrapper modelWrapper) {
-                return modelWrapper;
+            ResolvedModel model = this.modelResolver.apply(id);
+            if (model instanceof ModelDiscovery.ModelWrapper wrapper) {
+                return wrapper;
             } else {
-                UnbakedModel unbakedmodel = ModelLoadingHelper.loadBlockModel(this.resourceManager, id);
-                if (unbakedmodel == null) {
+                UnbakedModel blockModel = ModelLoadingHelper.loadBlockModel(this.resourceManager, id);
+                if (blockModel == null) {
                     PuzzlesLib.LOGGER.warn("Missing block model: {}", id);
                     return (ModelDiscovery.ModelWrapper) this.missingModel;
                 } else {
-                    return modelDiscovery.createAndQueueWrapper(id, unbakedmodel);
+                    return discovery.createAndQueueWrapper(id, blockModel);
                 }
             }
         };
         Map<BlockState, BlockStateModel.UnbakedRoot> models = new HashMap<>();
         blockStateConsumer.accept((BlockState blockState, BlockStateModel.UnbakedRoot unbakedBlockStateModel) -> {
-            modelDiscovery.addRoot(unbakedBlockStateModel);
+            discovery.addRoot(unbakedBlockStateModel);
             models.put(blockState, unbakedBlockStateModel);
         });
-        modelDiscovery.resolve().forEach(this.resolvedModels::putIfAbsent);
+        discovery.resolve().forEach(this.modelCache);
         this.loadModels(models).forEach(this.blockStateModelOutput);
     }
 
     private Map<BlockState, BlockStateModel> loadModels(Map<BlockState, BlockStateModel.UnbakedRoot> models) {
-        return loadModels(models, this.textureGetter, this.modelBakerFactory, this.missingSprite);
+        return loadModels(models, this.textureResolver, this.modelBakerFactory, this.missingSprite);
     }
 
     @Override
@@ -179,13 +186,13 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
         }
 
         @Override
-        public ResolvedModel getModel(Identifier location) {
-            ResolvedModel result = BlockStateResolverContextNeoForgeImpl.this.resolvedModels.get(location);
-            if (result == null) {
-                PuzzlesLib.LOGGER.warn("Requested a model that was not discovered previously: {}", location);
+        public ResolvedModel getModel(Identifier id) {
+            ResolvedModel model = BlockStateResolverContextNeoForgeImpl.this.modelResolver.apply(id);
+            if (model == null) {
+                PuzzlesLib.LOGGER.warn("Requested a model that was not discovered previously: {}", id);
                 return BlockStateResolverContextNeoForgeImpl.this.missingModel;
             } else {
-                return result;
+                return model;
             }
         }
 
