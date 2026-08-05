@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v26.1.14-mc26.1.x] - 2026-08-05
+
+### Changed
+
+- Allow `BlockStateResolverContext` to fully support the dynamic resources option from
+  the [ModernFix](https://modrinth.com/mod/modernfix) mod on NeoForge
+
 ## [v26.1.13-mc26.1.x] - 2026-08-04
 
 ### Changed
