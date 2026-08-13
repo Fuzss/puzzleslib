@@ -10,6 +10,7 @@ import fuzs.puzzleslib.api.client.event.v1.level.ClientChunkEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.renderer.*;
+import fuzs.puzzleslib.api.client.event.v2.gui.ScreenOpeningCallback;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
@@ -76,9 +77,9 @@ public final class NeoForgeClientEventInvokers {
                                 reloadListener));
                     });
                 });
-        INSTANCE.register(ScreenOpeningCallback.class,
+        INSTANCE.register(fuzs.puzzleslib.api.client.event.v1.gui.ScreenOpeningCallback.class,
                 ScreenEvent.Opening.class,
-                (ScreenOpeningCallback callback, ScreenEvent.Opening evt) -> {
+                (fuzs.puzzleslib.api.client.event.v1.gui.ScreenOpeningCallback callback, ScreenEvent.Opening evt) -> {
                     DefaultedValue<Screen> newScreen = DefaultedValue.fromEvent(evt::setNewScreen,
                             evt::getNewScreen,
                             evt::getScreen);
@@ -90,6 +91,22 @@ public final class NeoForgeClientEventInvokers {
                             .isPresent()) {
                         evt.setCanceled(true);
                     }
+                });
+        INSTANCE.register(ScreenOpeningCallback.class,
+                ScreenEvent.Opening.class,
+                (ScreenOpeningCallback callback, ScreenEvent.Opening event) -> {
+                    EventResultHolder<@Nullable Screen> eventResult = callback.onScreenOpening(event.getCurrentScreen(),
+                            event.getNewScreen());
+                    // returning the current screen should ideally cause no change at all,
+                    // which is implemented fine on NeoForge via cancelling the event,
+                    // on Fabric though the screen will be initialized again, after Screen::remove having been called
+                    eventResult.ifInterrupt((@Nullable Screen screen) -> {
+                        if (screen == event.getCurrentScreen()) {
+                            event.setCanceled(true);
+                        } else {
+                            event.setNewScreen(screen);
+                        }
+                    });
                 });
         INSTANCE.register(ModelEvents.ModifyUnbakedModel.class,
                 ModelEvent.ModifyBakingResult.class,

@@ -9,9 +9,11 @@ import fuzs.puzzleslib.api.client.event.v1.level.ClientChunkEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.renderer.*;
+import fuzs.puzzleslib.api.client.event.v2.gui.ScreenOpeningCallback;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
+import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.fabric.api.client.event.v1.*;
 import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLifecycleEvents;
@@ -98,6 +100,20 @@ public final class FabricClientEventInvokers {
                     };
                 });
         INSTANCE.register(ScreenOpeningCallback.class, FabricGuiEvents.SCREEN_OPENING);
+        INSTANCE.register(fuzs.puzzleslib.api.client.event.v1.gui.ScreenOpeningCallback.class,
+                FabricGuiEvents.SCREEN_OPENING,
+                callback -> {
+                    return (@Nullable Screen previousScreen, @Nullable Screen updatedScreen) -> {
+                        DefaultedValue<Screen> newScreen = DefaultedValue.fromValue(updatedScreen);
+                        if (callback.onScreenOpening(previousScreen, newScreen).isInterrupt()) {
+                            newScreen.accept(previousScreen);
+                        }
+
+                        return newScreen.getAsOptional()
+                                .map(EventResultHolder::interrupt)
+                                .orElseGet(EventResultHolder::pass);
+                    };
+                });
         INSTANCE.register(ModelEvents.ModifyUnbakedModel.class,
                 (ModelEvents.ModifyUnbakedModel callback, @Nullable Object o) -> {
                     ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {

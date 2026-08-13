@@ -1,11 +1,14 @@
 package fuzs.puzzleslib.fabric.api.client.event.v1;
 
 import fuzs.puzzleslib.api.client.event.v1.gui.*;
+import fuzs.puzzleslib.api.client.event.v2.gui.ScreenOpeningCallback;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.IdentityHashMap;
@@ -34,9 +37,9 @@ public final class FabricGuiEvents {
     public static final Event<InventoryMobEffectsCallback> INVENTORY_MOB_EFFECTS = FabricEventFactory.createResult(
             InventoryMobEffectsCallback.class);
     /**
-     * Called just before a new screen is set to {@link net.minecraft.client.Minecraft#screen} in
-     * {@link net.minecraft.client.Minecraft#setScreen}, allows for exchanging the new screen with a different one, or
-     * can prevent a new screen from opening, effectively forcing the old screen to remain.
+     * Called just before a new screen is set to {@link Gui#screen()} in {@link Gui#setScreen(Screen)}, allows for
+     * exchanging the new screen with a different one, or can prevent a new screen from opening, by returning the
+     * original screen (which will be initialized once again).
      */
     public static final Event<ScreenOpeningCallback> SCREEN_OPENING = FabricEventFactory.createResult(
             ScreenOpeningCallback.class);
@@ -77,8 +80,7 @@ public final class FabricGuiEvents {
      * Called at the beginning of {@link net.minecraft.client.gui.Gui#render(GuiGraphics, DeltaTracker)}, before vanilla
      * has drawn any gui elements.
      */
-    public static final Event<RenderGuiEvents.Before> BEFORE_RENDER_GUI = FabricEventFactory.create(
-            RenderGuiEvents.Before.class);
+    public static final Event<RenderGuiEvents.Before> BEFORE_RENDER_GUI = FabricEventFactory.create(RenderGuiEvents.Before.class);
 
     private FabricGuiEvents() {
         // NO-OP
