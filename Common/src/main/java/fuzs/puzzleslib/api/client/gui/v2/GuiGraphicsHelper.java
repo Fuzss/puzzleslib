@@ -1,16 +1,17 @@
 package fuzs.puzzleslib.api.client.gui.v2;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import fuzs.puzzleslib.impl.client.gui.SingleTextureAtlasSprite;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.GuiSpriteManager;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.metadata.gui.GuiSpriteScaling;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import org.joml.Matrix4f;
 
 /**
  * A helper class for extending the functionality of {@link GuiGraphics}. Especially useful for drawing
@@ -33,8 +34,9 @@ public final class GuiGraphicsHelper {
      * @param posY            the y-position
      * @param color           the text color
      * @param backgroundColor the background text color
-     * @see GuiGraphics#text(Font, Component, int, int, int)
-     * @see Font#prepare8xTextOutline(FormattedCharSequence, float, float, int)
+     * @see GuiGraphics#drawString(Font, Component, int, int, int)
+     * @see Font#drawInBatch8xOutline(FormattedCharSequence, float, float, int, int, Matrix4f, MultiBufferSource,
+     *         int)
      */
     public static void prepare8xTextOutline(GuiGraphics guiGraphics, Font font, Component component, int posX, int posY, int color, int backgroundColor) {
         for (int i = -1; i <= 1; i++) {
@@ -91,23 +93,20 @@ public final class GuiGraphicsHelper {
      * <p>
      * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
      *
-     * @param guiGraphics    the gui graphics instance
-     * @param renderPipeline the render pipeline, usually
-     *                       {@link net.minecraft.client.renderer.RenderPipelines#GUI_TEXTURED}
-     * @param identifier     the texture sheet identifier
-     * @param x              the x-position on the screen
-     * @param y              the y-position on the screen
-     * @param width          the width to draw
-     * @param height         the height to draw
-     * @param borderSize     the border width &amp; height on the sides of the sprite, for drawing the frame
-     * @param spriteWidth    the sprite texture width
-     * @param spriteHeight   the sprite texture height
-     * @param uOffset        the sprite u-offset on the texture sheet
-     * @param vOffset        the sprite v-offset on the texture sheet
+     * @param guiGraphics  the gui graphics instance
+     * @param identifier   the texture sheet identifier
+     * @param x            the x-position on the screen
+     * @param y            the y-position on the screen
+     * @param width        the width to draw
+     * @param height       the height to draw
+     * @param borderSize   the border width &amp; height on the sides of the sprite, for drawing the frame
+     * @param spriteWidth  the sprite texture width
+     * @param spriteHeight the sprite texture height
+     * @param uOffset      the sprite u-offset on the texture sheet
+     * @param vOffset      the sprite v-offset on the texture sheet
      */
-    public static void blitNineSliced(GuiGraphics guiGraphics, RenderPipeline renderPipeline, ResourceLocation identifier, int x, int y, int width, int height, int borderSize, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
+    public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation identifier, int x, int y, int width, int height, int borderSize, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
         blitNineSliced(guiGraphics,
-                renderPipeline,
                 identifier,
                 x,
                 y,
@@ -127,24 +126,21 @@ public final class GuiGraphicsHelper {
      * <p>
      * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
      *
-     * @param guiGraphics    the gui graphics instance
-     * @param renderPipeline the render pipeline, usually
-     *                       {@link net.minecraft.client.renderer.RenderPipelines#GUI_TEXTURED}
-     * @param identifier     the texture sheet identifier
-     * @param x              the x-position on the screen
-     * @param y              the y-position on the screen
-     * @param width          the width to draw
-     * @param height         the height to draw
-     * @param borderWidth    the border width on the sides of the sprite, for drawing the frame
-     * @param borderHeight   the border height on the sides of the sprite, for drawing the frame
-     * @param spriteWidth    the sprite texture width
-     * @param spriteHeight   the sprite texture height
-     * @param uOffset        the sprite u-offset on the texture sheet
-     * @param vOffset        the sprite v-offset on the texture sheet
+     * @param guiGraphics  the gui graphics instance
+     * @param identifier   the texture sheet identifier
+     * @param x            the x-position on the screen
+     * @param y            the y-position on the screen
+     * @param width        the width to draw
+     * @param height       the height to draw
+     * @param borderWidth  the border width on the sides of the sprite, for drawing the frame
+     * @param borderHeight the border height on the sides of the sprite, for drawing the frame
+     * @param spriteWidth  the sprite texture width
+     * @param spriteHeight the sprite texture height
+     * @param uOffset      the sprite u-offset on the texture sheet
+     * @param vOffset      the sprite v-offset on the texture sheet
      */
-    public static void blitNineSliced(GuiGraphics guiGraphics, RenderPipeline renderPipeline, ResourceLocation identifier, int x, int y, int width, int height, int borderWidth, int borderHeight, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
+    public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation identifier, int x, int y, int width, int height, int borderWidth, int borderHeight, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
         blitNineSliced(guiGraphics,
-                renderPipeline,
                 identifier,
                 x,
                 y,
@@ -166,26 +162,23 @@ public final class GuiGraphicsHelper {
      * <p>
      * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
      *
-     * @param guiGraphics    the gui graphics instance
-     * @param renderPipeline the render pipeline, usually
-     *                       {@link net.minecraft.client.renderer.RenderPipelines#GUI_TEXTURED}
-     * @param identifier     the texture sheet identifier
-     * @param x              the x-position on the screen
-     * @param y              the y-position on the screen
-     * @param width          the width to draw
-     * @param height         the height to draw
-     * @param borderLeft     the border width on the left side of the sprite, for drawing the frame
-     * @param borderTop      the border height on the top side of the sprite, for drawing the frame
-     * @param borderRight    the border width on the right side of the sprite, for drawing the frame
-     * @param borderBottom   the border height on the bottom side of the sprite, for drawing the frame
-     * @param spriteWidth    the sprite texture width
-     * @param spriteHeight   the sprite texture height
-     * @param uOffset        the sprite u-offset on the texture sheet
-     * @param vOffset        the sprite v-offset on the texture sheet
+     * @param guiGraphics  the gui graphics instance
+     * @param identifier   the texture sheet identifier
+     * @param x            the x-position on the screen
+     * @param y            the y-position on the screen
+     * @param width        the width to draw
+     * @param height       the height to draw
+     * @param borderLeft   the border width on the left side of the sprite, for drawing the frame
+     * @param borderTop    the border height on the top side of the sprite, for drawing the frame
+     * @param borderRight  the border width on the right side of the sprite, for drawing the frame
+     * @param borderBottom the border height on the bottom side of the sprite, for drawing the frame
+     * @param spriteWidth  the sprite texture width
+     * @param spriteHeight the sprite texture height
+     * @param uOffset      the sprite u-offset on the texture sheet
+     * @param vOffset      the sprite v-offset on the texture sheet
      */
-    public static void blitNineSliced(GuiGraphics guiGraphics, RenderPipeline renderPipeline, ResourceLocation identifier, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
+    public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation identifier, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
         blitNineSliced(guiGraphics,
-                renderPipeline,
                 identifier,
                 x,
                 y,
@@ -208,27 +201,24 @@ public final class GuiGraphicsHelper {
      * <p>
      * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
      *
-     * @param guiGraphics    the gui graphics instance
-     * @param renderPipeline the render pipeline, usually
-     *                       {@link net.minecraft.client.renderer.RenderPipelines#GUI_TEXTURED}
-     * @param identifier     the texture sheet identifier
-     * @param x              the x-position on the screen
-     * @param y              the y-position on the screen
-     * @param width          the width to draw
-     * @param height         the height to draw
-     * @param borderLeft     the border width on the left side of the sprite, for drawing the frame
-     * @param borderTop      the border height on the top side of the sprite, for drawing the frame
-     * @param borderRight    the border width on the right side of the sprite, for drawing the frame
-     * @param borderBottom   the border height on the bottom side of the sprite, for drawing the frame
-     * @param spriteWidth    the sprite texture width
-     * @param spriteHeight   the sprite texture height
-     * @param uOffset        the sprite u-offset on the texture sheet
-     * @param vOffset        the sprite v-offset on the texture sheet
-     * @param color          the vertex color, usually {@code -1}
+     * @param guiGraphics  the gui graphics instance
+     * @param identifier   the texture sheet identifier
+     * @param x            the x-position on the screen
+     * @param y            the y-position on the screen
+     * @param width        the width to draw
+     * @param height       the height to draw
+     * @param borderLeft   the border width on the left side of the sprite, for drawing the frame
+     * @param borderTop    the border height on the top side of the sprite, for drawing the frame
+     * @param borderRight  the border width on the right side of the sprite, for drawing the frame
+     * @param borderBottom the border height on the bottom side of the sprite, for drawing the frame
+     * @param spriteWidth  the sprite texture width
+     * @param spriteHeight the sprite texture height
+     * @param uOffset      the sprite u-offset on the texture sheet
+     * @param vOffset      the sprite v-offset on the texture sheet
+     * @param color        the vertex color, usually {@code -1}
      */
-    public static void blitNineSliced(GuiGraphics guiGraphics, RenderPipeline renderPipeline, ResourceLocation identifier, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int color) {
+    public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation identifier, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int color) {
         blitNineSliced(guiGraphics,
-                renderPipeline,
                 identifier,
                 x,
                 y,
@@ -253,28 +243,25 @@ public final class GuiGraphicsHelper {
      * <p>
      * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
      *
-     * @param guiGraphics    the gui graphics instance
-     * @param renderPipeline the render pipeline, usually
-     *                       {@link net.minecraft.client.renderer.RenderPipelines#GUI_TEXTURED}
-     * @param identifier     the texture sheet identifier
-     * @param x              the x-position on the screen
-     * @param y              the y-position on the screen
-     * @param width          the width to draw
-     * @param height         the height to draw
-     * @param borderLeft     the border width on the left side of the sprite, for drawing the frame
-     * @param borderTop      the border height on the top side of the sprite, for drawing the frame
-     * @param borderRight    the border width on the right side of the sprite, for drawing the frame
-     * @param borderBottom   the border height on the bottom side of the sprite, for drawing the frame
-     * @param spriteWidth    the sprite texture width
-     * @param spriteHeight   the sprite texture height
-     * @param uOffset        the sprite u-offset on the texture sheet
-     * @param vOffset        the sprite v-offset on the texture sheet
-     * @param textureWidth   the texture sheet width
-     * @param textureHeight  the texture sheet height
+     * @param guiGraphics   the gui graphics instance
+     * @param identifier    the texture sheet identifier
+     * @param x             the x-position on the screen
+     * @param y             the y-position on the screen
+     * @param width         the width to draw
+     * @param height        the height to draw
+     * @param borderLeft    the border width on the left side of the sprite, for drawing the frame
+     * @param borderTop     the border height on the top side of the sprite, for drawing the frame
+     * @param borderRight   the border width on the right side of the sprite, for drawing the frame
+     * @param borderBottom  the border height on the bottom side of the sprite, for drawing the frame
+     * @param spriteWidth   the sprite texture width
+     * @param spriteHeight  the sprite texture height
+     * @param uOffset       the sprite u-offset on the texture sheet
+     * @param vOffset       the sprite v-offset on the texture sheet
+     * @param textureWidth  the texture sheet width
+     * @param textureHeight the texture sheet height
      */
-    public static void blitNineSliced(GuiGraphics guiGraphics, RenderPipeline renderPipeline, ResourceLocation identifier, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int textureWidth, int textureHeight) {
+    public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation identifier, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int textureWidth, int textureHeight) {
         blitNineSliced(guiGraphics,
-                renderPipeline,
                 identifier,
                 x,
                 y,
@@ -299,27 +286,25 @@ public final class GuiGraphicsHelper {
      * <p>
      * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
      *
-     * @param guiGraphics    the gui graphics instance
-     * @param renderPipeline the render pipeline, usually
-     *                       {@link net.minecraft.client.renderer.RenderPipelines#GUI_TEXTURED}
-     * @param identifier     the texture sheet identifier
-     * @param x              the x-position on the screen
-     * @param y              the y-position on the screen
-     * @param width          the width to draw
-     * @param height         the height to draw
-     * @param borderLeft     the border width on the left side of the sprite, for drawing the frame
-     * @param borderTop      the border height on the top side of the sprite, for drawing the frame
-     * @param borderRight    the border width on the right side of the sprite, for drawing the frame
-     * @param borderBottom   the border height on the bottom side of the sprite, for drawing the frame
-     * @param spriteWidth    the sprite texture width
-     * @param spriteHeight   the sprite texture height
-     * @param uOffset        the sprite u-offset on the texture sheet
-     * @param vOffset        the sprite v-offset on the texture sheet
-     * @param textureWidth   the texture sheet width
-     * @param textureHeight  the texture sheet height
-     * @param color          the vertex color, usually {@code -1}
+     * @param guiGraphics   the gui graphics instance
+     * @param identifier    the texture sheet identifier
+     * @param x             the x-position on the screen
+     * @param y             the y-position on the screen
+     * @param width         the width to draw
+     * @param height        the height to draw
+     * @param borderLeft    the border width on the left side of the sprite, for drawing the frame
+     * @param borderTop     the border height on the top side of the sprite, for drawing the frame
+     * @param borderRight   the border width on the right side of the sprite, for drawing the frame
+     * @param borderBottom  the border height on the bottom side of the sprite, for drawing the frame
+     * @param spriteWidth   the sprite texture width
+     * @param spriteHeight  the sprite texture height
+     * @param uOffset       the sprite u-offset on the texture sheet
+     * @param vOffset       the sprite v-offset on the texture sheet
+     * @param textureWidth  the texture sheet width
+     * @param textureHeight the texture sheet height
+     * @param color         the vertex color, usually {@code -1}
      */
-    public static void blitNineSliced(GuiGraphics guiGraphics, RenderPipeline renderPipeline, ResourceLocation identifier, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int textureWidth, int textureHeight, int color) {
+    public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation identifier, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int textureWidth, int textureHeight, int color) {
         SingleTextureAtlasSprite textureAtlasSprite = new SingleTextureAtlasSprite(identifier,
                 spriteWidth,
                 spriteHeight,
@@ -338,19 +323,16 @@ public final class GuiGraphicsHelper {
      * <p>
      * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
      *
-     * @param guiGraphics    the gui graphics instance
-     * @param renderPipeline the render pipeline, usually
-     *                       {@link net.minecraft.client.renderer.RenderPipelines#GUI_TEXTURED}
-     * @param sprite         the sprite identifier
-     * @param x              the x-position on the screen
-     * @param y              the y-position on the screen
-     * @param width          the width to draw
-     * @param height         the height to draw
-     * @param borderSize     the border width &amp; height on the sides of the sprite, for drawing the frame
+     * @param guiGraphics the gui graphics instance
+     * @param sprite      the sprite identifier
+     * @param x           the x-position on the screen
+     * @param y           the y-position on the screen
+     * @param width       the width to draw
+     * @param height      the height to draw
+     * @param borderSize  the border width &amp; height on the sides of the sprite, for drawing the frame
      */
-    public static void blitNineSlicedSprite(GuiGraphics guiGraphics, RenderPipeline renderPipeline, ResourceLocation sprite, int x, int y, int width, int height, int borderSize) {
+    public static void blitNineSlicedSprite(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, int width, int height, int borderSize) {
         blitNineSlicedSprite(guiGraphics,
-                renderPipeline,
                 sprite,
                 x,
                 y,
@@ -368,22 +350,19 @@ public final class GuiGraphicsHelper {
      * <p>
      * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
      *
-     * @param guiGraphics    the gui graphics instance
-     * @param renderPipeline the render pipeline, usually
-     *                       {@link net.minecraft.client.renderer.RenderPipelines#GUI_TEXTURED}
-     * @param sprite         the sprite identifier
-     * @param x              the x-position on the screen
-     * @param y              the y-position on the screen
-     * @param width          the width to draw
-     * @param height         the height to draw
-     * @param borderLeft     the border width on the left side of the sprite, for drawing the frame
-     * @param borderTop      the border height on the top side of the sprite, for drawing the frame
-     * @param borderRight    the border width on the right side of the sprite, for drawing the frame
-     * @param borderBottom   the border height on the bottom side of the sprite, for drawing the frame
+     * @param guiGraphics  the gui graphics instance
+     * @param sprite       the sprite identifier
+     * @param x            the x-position on the screen
+     * @param y            the y-position on the screen
+     * @param width        the width to draw
+     * @param height       the height to draw
+     * @param borderLeft   the border width on the left side of the sprite, for drawing the frame
+     * @param borderTop    the border height on the top side of the sprite, for drawing the frame
+     * @param borderRight  the border width on the right side of the sprite, for drawing the frame
+     * @param borderBottom the border height on the bottom side of the sprite, for drawing the frame
      */
-    public static void blitNineSlicedSprite(GuiGraphics guiGraphics, RenderPipeline renderPipeline, ResourceLocation sprite, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom) {
+    public static void blitNineSlicedSprite(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom) {
         blitNineSlicedSprite(guiGraphics,
-                renderPipeline,
                 sprite,
                 x,
                 y,
@@ -401,21 +380,19 @@ public final class GuiGraphicsHelper {
      * <p>
      * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
      *
-     * @param guiGraphics    the gui graphics instance
-     * @param renderPipeline the render pipeline, usually
-     *                       {@link net.minecraft.client.renderer.RenderPipelines#GUI_TEXTURED}
-     * @param sprite         the sprite identifier
-     * @param x              the x-position on the screen
-     * @param y              the y-position on the screen
-     * @param width          the width to draw
-     * @param height         the height to draw
-     * @param borderLeft     the border width on the left side of the sprite, for drawing the frame
-     * @param borderTop      the border height on the top side of the sprite, for drawing the frame
-     * @param borderRight    the border width on the right side of the sprite, for drawing the frame
-     * @param borderBottom   the border height on the bottom side of the sprite, for drawing the frame
-     * @param color          the vertex color, usually {@code -1}
+     * @param guiGraphics  the gui graphics instance
+     * @param sprite       the sprite identifier
+     * @param x            the x-position on the screen
+     * @param y            the y-position on the screen
+     * @param width        the width to draw
+     * @param height       the height to draw
+     * @param borderLeft   the border width on the left side of the sprite, for drawing the frame
+     * @param borderTop    the border height on the top side of the sprite, for drawing the frame
+     * @param borderRight  the border width on the right side of the sprite, for drawing the frame
+     * @param borderBottom the border height on the bottom side of the sprite, for drawing the frame
+     * @param color        the vertex color, usually {@code -1}
      */
-    public static void blitNineSlicedSprite(GuiGraphics guiGraphics, RenderPipeline renderPipeline, ResourceLocation sprite, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int color) {
+    public static void blitNineSlicedSprite(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int color) {
         GuiSpriteManager guiSprites = Minecraft.getInstance().getGuiSprites();
         TextureAtlasSprite textureAtlasSprite = guiSprites.getSprite(sprite);
         GuiSpriteScaling.NineSlice nineSlice = new GuiSpriteScaling.NineSlice(textureAtlasSprite.contents().width(),
@@ -430,19 +407,17 @@ public final class GuiGraphicsHelper {
      * <p>
      * Most sprites by default use the stretch mode, which squeezes them into the provided width &amp; height.
      *
-     * @param guiGraphics    the gui graphics instance
-     * @param renderPipeline the render pipeline, usually
-     *                       {@link net.minecraft.client.renderer.RenderPipelines#GUI_TEXTURED}
-     * @param sprite         the sprite identifier
-     * @param x              the x-position on the screen
-     * @param y              the y-position on the screen
-     * @param width          the width to draw
-     * @param height         the height to draw
-     * @param spriteWidth    the sprite texture file width
-     * @param spriteHeight   the sprite texture file height
+     * @param guiGraphics  the gui graphics instance
+     * @param sprite       the sprite identifier
+     * @param x            the x-position on the screen
+     * @param y            the y-position on the screen
+     * @param width        the width to draw
+     * @param height       the height to draw
+     * @param spriteWidth  the sprite texture file width
+     * @param spriteHeight the sprite texture file height
      */
-    public static void blitTiledSprite(GuiGraphics guiGraphics, RenderPipeline renderPipeline, ResourceLocation sprite, int x, int y, int width, int height, int spriteWidth, int spriteHeight) {
-        blitTiledSprite(guiGraphics, renderPipeline, sprite, x, y, width, height, spriteWidth, spriteHeight, -1);
+    public static void blitTiledSprite(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, int width, int height, int spriteWidth, int spriteHeight) {
+        blitTiledSprite(guiGraphics, sprite, x, y, width, height, spriteWidth, spriteHeight, -1);
     }
 
     /**
@@ -451,31 +426,18 @@ public final class GuiGraphicsHelper {
      * <p>
      * Most sprites by default use the stretch mode, which squeezes them into the provided width &amp; height.
      *
-     * @param guiGraphics    the gui graphics instance
-     * @param renderPipeline the render pipeline, usually
-     *                       {@link net.minecraft.client.renderer.RenderPipelines#GUI_TEXTURED}
-     * @param sprite         the sprite identifier
-     * @param x              the x-position on the screen
-     * @param y              the y-position on the screen
-     * @param width          the width to draw
-     * @param height         the height to draw
-     * @param spriteWidth    the sprite texture file width
-     * @param spriteHeight   the sprite texture file height
-     * @param color          the vertex color, usually {@code -1}
+     * @param guiGraphics  the gui graphics instance
+     * @param sprite       the sprite identifier
+     * @param x            the x-position on the screen
+     * @param y            the y-position on the screen
+     * @param width        the width to draw
+     * @param height       the height to draw
+     * @param spriteWidth  the sprite texture file width
+     * @param spriteHeight the sprite texture file height
+     * @param color        the vertex color, usually {@code -1}
      */
-    public static void blitTiledSprite(GuiGraphics guiGraphics, RenderPipeline renderPipeline, ResourceLocation sprite, int x, int y, int width, int height, int spriteWidth, int spriteHeight, int color) {
-        blitTiledSprite(guiGraphics,
-                renderPipeline,
-                sprite,
-                x,
-                y,
-                width,
-                height,
-                spriteWidth,
-                spriteHeight,
-                0,
-                0,
-                color);
+    public static void blitTiledSprite(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, int width, int height, int spriteWidth, int spriteHeight, int color) {
+        blitTiledSprite(guiGraphics, sprite, x, y, width, height, spriteWidth, spriteHeight, 0, 0, color);
     }
 
     /**
@@ -484,21 +446,19 @@ public final class GuiGraphicsHelper {
      * <p>
      * Most sprites by default use the stretch mode, which squeezes them into the provided width &amp; height.
      *
-     * @param guiGraphics    the gui graphics instance
-     * @param renderPipeline the render pipeline, usually
-     *                       {@link net.minecraft.client.renderer.RenderPipelines#GUI_TEXTURED}
-     * @param sprite         the sprite identifier
-     * @param x              the x-position on the screen
-     * @param y              the y-position on the screen
-     * @param width          the width to draw
-     * @param height         the height to draw
-     * @param spriteWidth    the sprite texture file width
-     * @param spriteHeight   the sprite texture file height
-     * @param uOffset        the sprite u-offset on the texture sheet
-     * @param vOffset        the sprite v-offset on the texture sheet
-     * @param color          the vertex color, usually {@code -1}
+     * @param guiGraphics  the gui graphics instance
+     * @param sprite       the sprite identifier
+     * @param x            the x-position on the screen
+     * @param y            the y-position on the screen
+     * @param width        the width to draw
+     * @param height       the height to draw
+     * @param spriteWidth  the sprite texture file width
+     * @param spriteHeight the sprite texture file height
+     * @param uOffset      the sprite u-offset on the texture sheet
+     * @param vOffset      the sprite v-offset on the texture sheet
+     * @param color        the vertex color, usually {@code -1}
      */
-    public static void blitTiledSprite(GuiGraphics guiGraphics, RenderPipeline renderPipeline, ResourceLocation sprite, int x, int y, int width, int height, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int color) {
+    public static void blitTiledSprite(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, int width, int height, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int color) {
         GuiSpriteManager guiSprites = Minecraft.getInstance().getGuiSprites();
         TextureAtlasSprite textureAtlasSprite = guiSprites.getSprite(sprite);
         guiGraphics.blitTiledSprite(textureAtlasSprite,

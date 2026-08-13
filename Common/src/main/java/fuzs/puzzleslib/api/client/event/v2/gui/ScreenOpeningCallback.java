@@ -11,9 +11,10 @@ public interface ScreenOpeningCallback {
     EventInvoker<ScreenOpeningCallback> EVENT = EventInvoker.lookup(ScreenOpeningCallback.class);
 
     /**
-     * Called just before a new screen is set to {@link Gui#screen()} in {@link Gui#setScreen(Screen)}, allows for
-     * exchanging the new screen with a different one, or can prevent a new screen from opening, by returning the
-     * original screen (which will be initialized once again).
+     * Called just before a new screen is set to {@link net.minecraft.client.Minecraft#screen} in
+     * {@link net.minecraft.client.Minecraft#setScreen(Screen)}, allows for exchanging the new screen with a different
+     * one, or can prevent a new screen from opening by returning the original screen (which will be initialized once
+     * again).
      *
      * @param previousScreen the screen that is being removed, which may be {@code null} when opening the screen from
      *                       {@link Gui}, like {@link net.minecraft.client.gui.screens.PauseScreen}
