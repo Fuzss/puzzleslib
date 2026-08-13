@@ -13,7 +13,6 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Backport modern `SimpleJsonResourceReloadListener`
 - Backport modern `DataProvider` methods
 - Backport `AbstractWidgetsContainerScreen`
-- Backport `AbstractMenuSelectionList`
 - Backport updated `ScreenOpeningCallback`
 - Backport updated `GuiGraphicsHelper`
 
