@@ -31,7 +31,7 @@ public final class SpawnerDataBuilder {
     /**
      * Creates a new spawner data builder.
      *
-     * @param context context for mob spawn settings
+     * @param context    context for mob spawn settings
      * @param entityType the entity type to configure spawning for
      * @return the builder
      */
@@ -132,24 +132,29 @@ public final class SpawnerDataBuilder {
      * @param entityType the entity type to apply spawner data to
      */
     public void apply(EntityType<?> entityType) {
-        for (MobCategory mobCategory : this.context.getMobCategoriesWithSpawns()) {
-            this.getSpawnerDataForType(this.context, mobCategory, this.entityType)
-                    .ifPresent((Weighted<MobSpawnSettings.SpawnerData> spawnerData) -> {
-                        int weight = this.weightMapper.applyAsInt(spawnerData.weight());
-                        int minCount = this.minCountMapper.applyAsInt(spawnerData.value());
-                        int maxCount = this.maxCountMapper.applyAsInt(spawnerData.value());
-                        this.context.addSpawn(mobCategory,
+        for (MobCategory category : this.context.getMobCategoriesWithSpawns()) {
+            this.getSpawnerDataForType(this.context, category, this.entityType)
+                    .ifPresent((Weighted<MobSpawnSettings.SpawnerData> data) -> {
+                        int weight = this.weightMapper.applyAsInt(data.weight());
+                        int minCount = this.minCountMapper.applyAsInt(data.value());
+                        int maxCount = this.maxCountMapper.applyAsInt(data.value());
+                        this.context.addSpawn(category,
                                 weight,
                                 new MobSpawnSettings.SpawnerData(entityType, Math.min(minCount, maxCount), maxCount));
                     });
+            MobSpawnSettings.MobSpawnCost cost = this.context.getSpawnCost(entityType);
+            if (cost != null) {
+                // Just add this with the same values as the vanilla mob.
+                // The spawn data weight is what matters most.
+                this.context.setSpawnCost(entityType, cost.energyBudget(), cost.charge());
+            }
         }
     }
 
     private Optional<Weighted<MobSpawnSettings.SpawnerData>> getSpawnerDataForType(MobSpawnSettingsContext context, MobCategory mobCategory, EntityType<?> entityType) {
         return context.getSpawnerData(mobCategory)
                 .stream()
-                .filter((Weighted<MobSpawnSettings.SpawnerData> spawnerData) -> spawnerData.value().type() ==
-                        entityType)
+                .filter((Weighted<MobSpawnSettings.SpawnerData> data) -> data.value().type() == entityType)
                 .findAny();
     }
 }
