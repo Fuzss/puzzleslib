@@ -27,9 +27,19 @@ public final class ParticleProvidersContextFabricImpl implements ParticleProvide
         Objects.requireNonNull(particleProvider, "particle provider is null");
         this.registerParticleProvider(particleType, (SpriteSet spriteSet) -> {
             return (T particleOptions, ClientLevel clientLevel, double x, double y, double z, double xd, double yd, double zd) -> {
-                TextureSheetParticle textureSheetParticle = particleProvider.createParticle(particleOptions, clientLevel, x, y, z, xd, yd, zd);
-                if (textureSheetParticle != null) textureSheetParticle.pickSprite(spriteSet);
-                return textureSheetParticle;
+                TextureSheetParticle particle = particleProvider.createParticle(particleOptions,
+                        clientLevel,
+                        x,
+                        y,
+                        z,
+                        xd,
+                        yd,
+                        zd);
+                if (particle != null) {
+                    particle.pickSprite(spriteSet);
+                }
+
+                return particle;
             };
         });
     }
