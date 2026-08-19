@@ -1,4 +1,5 @@
 classTweaker    v2  official
+transitive-accessible   field   net/minecraft/advancements/Advancement$Builder  parent  Ljava/util/Optional;
 transitive-accessible	field	net/minecraft/client/KeyMapping	key	Lcom/mojang/blaze3d/platform/InputConstants$Key;
 transitive-accessible   field   net/minecraft/client/renderer/entity/EntityRenderDispatcher blockModelResolver  Lnet/minecraft/client/renderer/block/BlockModelResolver;
 transitive-accessible	field	net/minecraft/client/Minecraft	missTime	I

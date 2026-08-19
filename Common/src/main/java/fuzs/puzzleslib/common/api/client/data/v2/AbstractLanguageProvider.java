@@ -13,6 +13,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.Identifier;
@@ -175,6 +176,9 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         return DataProvider.saveStable(cachedOutput, jsonObject, this.pathProvider.json(this.filePath));
     }
 
+    /**
+     * @see net.minecraft.server.Bootstrap#getMissingTranslations(Language)
+     */
     private <T> void verifyRequiredTranslationKeys(Predicate<String> predicate, Registry<T> registry, HolderTranslationCollector<T> holderTranslationCollector) {
         registry.listElements()
                 .filter((Holder.Reference<T> holder) -> holder.key()
