@@ -5,6 +5,10 @@ transitive-accessible	field	net/minecraft/client/Minecraft	missTime	I
 transitive-accessible	method	net/minecraft/client/Minecraft	pick	(F)V
 transitive-accessible	field	net/minecraft/client/color/block/BlockColors	BLANK_LAYER	Lnet/minecraft/client/color/block/BlockTintSource;
 transitive-accessible	field	net/minecraft/client/color/block/BlockColors	sources	Ljava/util/Map;
+transitive-accessible   field   net/minecraft/client/data/AtlasProvider TRIM_PALETTE_KEY    Lnet/minecraft/resources/Identifier;
+transitive-accessible   field   net/minecraft/client/data/AtlasProvider TRIM_PALETTE_VALUES Ljava/util/Map;
+transitive-accessible   field   net/minecraft/client/data/AtlasProvider VANILLA_PATTERNS    Ljava/util/List;
+transitive-accessible   field   net/minecraft/client/data/AtlasProvider HUMANOID_LAYERS Ljava/util/List;
 transitive-accessible	method	net/minecraft/client/data/AtlasProvider	forMapper	(Lnet/minecraft/client/renderer/SpriteMapper;)Lnet/minecraft/client/renderer/texture/atlas/SpriteSource;
 transitive-accessible	method	net/minecraft/client/data/AtlasProvider	forMaterial	(Lnet/minecraft/client/resources/model/sprite/SpriteId;)Lnet/minecraft/client/renderer/texture/atlas/SpriteSource;
 transitive-accessible	method	net/minecraft/client/data/AtlasProvider	noPrefixMapper	(Ljava/lang/String;)Ljava/util/List;
