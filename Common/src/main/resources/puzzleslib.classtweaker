@@ -174,6 +174,10 @@ transitive-accessible	field	net/minecraft/world/level/storage/loot/parameters/Lo
 transitive-accessible   method  net/minecraft/world/level/block/state/properties/BlockSetType   register    (Lnet/minecraft/world/level/block/state/properties/BlockSetType;)Lnet/minecraft/world/level/block/state/properties/BlockSetType;
 transitive-accessible   method  net/minecraft/world/level/block/state/properties/WoodType   register    (Lnet/minecraft/world/level/block/state/properties/WoodType;)Lnet/minecraft/world/level/block/state/properties/WoodType;
 transitive-accessible   class   net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
+transitive-accessible   class   net/minecraft/data/models/ItemModelGenerators$TrimModelData
+transitive-accessible   method  net/minecraft/data/models/ItemModelGenerators$TrimModelData <init>  (Ljava/lang/String;FLjava/util/Map;)V
+transitive-accessible   method  net/minecraft/client/renderer/texture/atlas/sources/PalettedPermutations    <init>  (Ljava/util/List;Lnet/minecraft/resources/ResourceLocation;Ljava/util/Map;)V
+transitive-accessible   field   net/minecraft/data/models/ItemModelGenerators   GENERATED_TRIM_MODELS   Ljava/util/List;
 
 accessible	field	net/minecraft/client/KeyMapping	defaultKey	Lcom/mojang/blaze3d/platform/InputConstants$Key;
 mutable	field	net/minecraft/client/KeyMapping	defaultKey	Lcom/mojang/blaze3d/platform/InputConstants$Key;
