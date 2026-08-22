@@ -83,8 +83,8 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
     }
 
     @Override
-    protected CreativeModeTab.Builder getCreativeModeTabBuilder(boolean withSearchBar) {
-        return withSearchBar ? CreativeModeTab.builder().withSearchBar() : CreativeModeTab.builder();
+    protected CreativeModeTab.Builder getCreativeModeTabBuilder(boolean hasSearchBar) {
+        return hasSearchBar ? CreativeModeTab.builder().withSearchBar() : CreativeModeTab.builder();
     }
 
     @Override
