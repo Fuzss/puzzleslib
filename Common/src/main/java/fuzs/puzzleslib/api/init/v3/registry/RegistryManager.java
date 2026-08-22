@@ -373,7 +373,21 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param displayItems the display items generator
      * @return the holder reference
      */
+    @Deprecated
     default Holder.Reference<CreativeModeTab> registerCreativeModeTab(Supplier<ItemStack> iconSupplier, CreativeModeTab.DisplayItemsGenerator displayItems) {
+        return this.registerCreativeModeTab(iconSupplier,
+                (CreativeModeTab.DisplayItemsGenerator generator) -> displayItems);
+    }
+
+    /**
+     * Register a creative mode tab.
+     *
+     * @param iconSupplier the tab icon item stack
+     * @param displayItems the display items generating all registered items; allows for overriding item order by
+     *                     passing individual items beforehand
+     * @return the holder reference
+     */
+    default Holder.Reference<CreativeModeTab> registerCreativeModeTab(Supplier<ItemStack> iconSupplier, UnaryOperator<CreativeModeTab.DisplayItemsGenerator> displayItems) {
         return this.registerCreativeModeTab("main", iconSupplier, displayItems, false);
     }
 
@@ -383,10 +397,28 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param path          path for new entry
      * @param iconSupplier  the tab icon item stack
      * @param displayItems  the display items generator
-     * @param withSearchBar should the tab include a search bar (only supported for NeoForge)
+     * @param hasSearchBar should the tab include a search bar (only supported for NeoForge)
      * @return the holder reference
      */
-    Holder.Reference<CreativeModeTab> registerCreativeModeTab(String path, Supplier<ItemStack> iconSupplier, CreativeModeTab.DisplayItemsGenerator displayItems, boolean withSearchBar);
+    @Deprecated
+    default Holder.Reference<CreativeModeTab> registerCreativeModeTab(String path, Supplier<ItemStack> iconSupplier, CreativeModeTab.DisplayItemsGenerator displayItems, boolean hasSearchBar) {
+        return this.registerCreativeModeTab(path,
+                iconSupplier,
+                (CreativeModeTab.DisplayItemsGenerator generator) -> displayItems,
+                hasSearchBar);
+    }
+
+    /**
+     * Register a creative mode tab.
+     *
+     * @param path         the registered name
+     * @param iconSupplier the tab icon item stack
+     * @param displayItems the display items generating all registered items; allows for overriding item order by
+     *                     passing individual items beforehand
+     * @param hasSearchBar should the tab include a search bar (only supported for NeoForge)
+     * @return the holder reference
+     */
+    Holder.Reference<CreativeModeTab> registerCreativeModeTab(String path, Supplier<ItemStack> iconSupplier, UnaryOperator<CreativeModeTab.DisplayItemsGenerator> displayItems, boolean hasSearchBar);
 
     /**
      * Register a data component type.
