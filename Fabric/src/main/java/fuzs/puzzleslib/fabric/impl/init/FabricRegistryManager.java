@@ -84,7 +84,7 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
     }
 
     @Override
-    protected CreativeModeTab.Builder getCreativeModeTabBuilder(boolean withSearchBar) {
+    protected CreativeModeTab.Builder getCreativeModeTabBuilder(boolean hasSearchBar) {
         return FabricItemGroup.builder();
     }
 

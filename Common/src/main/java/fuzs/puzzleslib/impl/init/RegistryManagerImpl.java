@@ -19,13 +19,12 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackLinkedSet;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 public abstract class RegistryManagerImpl implements RegistryManager, Freezable {
     protected final String modId;
@@ -94,17 +93,30 @@ public abstract class RegistryManagerImpl implements RegistryManager, Freezable 
         return Mth.hsvToRgb(HSV.hueFloat(hsv), saturation, value);
     }
 
+    /**
+     * @see net.minecraft.world.item.CreativeModeTab.ItemDisplayBuilder#accept(ItemStack,
+     *         CreativeModeTab.TabVisibility)
+     */
     @Override
-    public Holder.Reference<CreativeModeTab> registerCreativeModeTab(String path, Supplier<ItemStack> iconSupplier, CreativeModeTab.DisplayItemsGenerator displayItems, boolean withSearchBar) {
+    public Holder.Reference<CreativeModeTab> registerCreativeModeTab(String path, Supplier<ItemStack> iconSupplier, UnaryOperator<CreativeModeTab.DisplayItemsGenerator> displayItems, boolean hasSearchBar) {
         return this.register(Registries.CREATIVE_MODE_TAB, path, () -> {
-            CreativeModeTab.Builder builder = this.getCreativeModeTabBuilder(withSearchBar);
-            ResourceLocation resourceLocation = this.makeKey(path);
-            builder.title(CreativeModeTabHelper.getTitle(resourceLocation));
+            CreativeModeTab.Builder builder = this.getCreativeModeTabBuilder(hasSearchBar);
+            builder.title(CreativeModeTabHelper.getTitle(this.makeKey(path)));
             builder.icon(iconSupplier);
-            builder.displayItems(displayItems);
+            builder.displayItems((CreativeModeTab.ItemDisplayParameters parameters, CreativeModeTab.Output output) -> {
+                Collection<ItemStack> tabContents = ItemStackLinkedSet.createTypeAndComponentsSet();
+                displayItems.apply(CreativeModeTabHelper.getDisplayItems(this.modId))
+                        .accept(parameters, (ItemStack itemStack, CreativeModeTab.TabVisibility tabVisibility) -> {
+                            if (!tabContents.contains(itemStack)
+                                    || tabVisibility == CreativeModeTab.TabVisibility.SEARCH_TAB_ONLY) {
+                                tabContents.add(itemStack);
+                                output.accept(itemStack, tabVisibility);
+                            }
+                        });
+            });
             return builder.build();
         });
     }
 
-    protected abstract CreativeModeTab.Builder getCreativeModeTabBuilder(boolean withSearchBar);
+    protected abstract CreativeModeTab.Builder getCreativeModeTabBuilder(boolean hasSearchBar);
 }
