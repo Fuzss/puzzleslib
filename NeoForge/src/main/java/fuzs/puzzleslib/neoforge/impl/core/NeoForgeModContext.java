@@ -8,7 +8,6 @@ import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
 import fuzs.puzzleslib.impl.network.NetworkHandlerRegistryImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.api.data.v2.core.DataProviderHelper;
-import fuzs.puzzleslib.neoforge.api.data.v2.core.NeoForgeDataProviderContext;
 import fuzs.puzzleslib.neoforge.impl.capability.NeoForgeCapabilityController;
 import fuzs.puzzleslib.neoforge.impl.config.NeoForgeConfigHolderImpl;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgeRegistryManager;
@@ -16,6 +15,7 @@ import fuzs.puzzleslib.neoforge.impl.network.NeoForgeNetworkHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.protocol.common.custom.BrandPayload;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -27,13 +27,16 @@ public final class NeoForgeModContext extends ModContext {
 
     public NeoForgeModContext(String modId) {
         super(modId);
-        DataProviderHelper.registerDataProviders(modId,
-                (NeoForgeDataProviderContext.Factory) ModPackMetadataProvider::new);
+        DataProviderHelper.registerDataProviders(modId, ModPackMetadataProvider::new);
+    }
+
+    @Override
+    protected void setupHandshakePayload(String modId, CustomPacketPayload.Type<BrandPayload> payloadType) {
         NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent((IEventBus eventBus) -> {
             eventBus.addListener((final RegisterPayloadHandlersEvent event) -> {
-                event.registrar(this.payloadType.id().toString())
+                event.registrar(payloadType.id().toString())
                         .optional()
-                        .playBidirectional(this.payloadType,
+                        .playBidirectional(payloadType,
                                 BrandPayload.STREAM_CODEC,
                                 (BrandPayload payload, IPayloadContext context) -> {
                                     // NO-OP
@@ -43,15 +46,15 @@ public final class NeoForgeModContext extends ModContext {
     }
 
     @Override
-    public boolean isPresentServerside() {
+    protected boolean isPresentServerside(CustomPacketPayload.Type<BrandPayload> payloadType) {
         ClientPacketListener clientPacketListener = Minecraft.getInstance().getConnection();
-        return clientPacketListener != null && clientPacketListener.hasChannel(this.payloadType);
+        return clientPacketListener != null && clientPacketListener.hasChannel(payloadType);
     }
 
     @Override
-    public boolean isPresentClientside(ServerPlayer serverPlayer) {
+    protected boolean isPresentClientside(CustomPacketPayload.Type<BrandPayload> payloadType, ServerPlayer serverPlayer) {
         Objects.requireNonNull(serverPlayer, "server player is null");
-        return serverPlayer.connection.hasChannel(this.payloadType);
+        return serverPlayer.connection.hasChannel(payloadType);
     }
 
     @Override

@@ -23,7 +23,7 @@ public abstract class ModContext {
     private static final Map<String, ModContext> MOD_CONTEXTS = Maps.newConcurrentMap();
 
     private final String modId;
-    protected final CustomPacketPayload.Type<BrandPayload> payloadType;
+    private final CustomPacketPayload.Type<BrandPayload> payloadType;
     @Nullable
     private NetworkHandlerRegistryImpl networkHandler;
     @Nullable
@@ -50,9 +50,19 @@ public abstract class ModContext {
         return MOD_CONTEXTS.computeIfAbsent(modId, ProxyImpl.get()::getModContext);
     }
 
-    public abstract boolean isPresentServerside();
+    protected abstract void setupHandshakePayload(String modId, CustomPacketPayload.Type<BrandPayload> payloadType);
 
-    public abstract boolean isPresentClientside(ServerPlayer serverPlayer);
+    public final boolean isPresentServerside() {
+        return this.isPresentServerside(this.payloadType);
+    }
+
+    protected abstract boolean isPresentServerside(CustomPacketPayload.Type<BrandPayload> payloadType);
+
+    public final boolean isPresentClientside(ServerPlayer serverPlayer) {
+        return this.isPresentClientside(this.payloadType, serverPlayer);
+    }
+
+    protected abstract boolean isPresentClientside(CustomPacketPayload.Type<BrandPayload> payloadType, ServerPlayer serverPlayer);
 
     public final NetworkHandler.Builder getNetworkHandler() {
         if (this.networkHandler == null) {
@@ -102,6 +112,8 @@ public abstract class ModContext {
         if (this.configHolder != null) {
             this.configHolder.freeze();
         }
+
+        this.setupHandshakePayload(this.modId, this.payloadType);
     }
 
     public final void runAfterConstruction() {

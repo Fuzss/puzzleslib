@@ -15,6 +15,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.protocol.common.custom.BrandPayload;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Objects;
@@ -23,21 +24,25 @@ public final class FabricModContext extends ModContext {
 
     public FabricModContext(String modId) {
         super(modId);
-        PayloadTypeRegistry.playC2S().register(this.payloadType, BrandPayload.STREAM_CODEC);
-        PayloadTypeRegistry.playS2C().register(this.payloadType, BrandPayload.STREAM_CODEC);
-        FabricProxy.get().setupHandshakePayload(this.payloadType);
     }
 
     @Override
-    public boolean isPresentServerside() {
+    protected void setupHandshakePayload(String modId, CustomPacketPayload.Type<BrandPayload> payloadType) {
+        PayloadTypeRegistry.playC2S().register(payloadType, BrandPayload.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(payloadType, BrandPayload.STREAM_CODEC);
+        FabricProxy.get().setupHandshakePayload(payloadType);
+    }
+
+    @Override
+    protected boolean isPresentServerside(CustomPacketPayload.Type<BrandPayload> payloadType) {
         ClientPacketListener clientPacketListener = Minecraft.getInstance().getConnection();
-        return clientPacketListener != null && ClientPlayNetworking.canSend(this.payloadType);
+        return clientPacketListener != null && ClientPlayNetworking.canSend(payloadType);
     }
 
     @Override
-    public boolean isPresentClientside(ServerPlayer serverPlayer) {
+    protected boolean isPresentClientside(CustomPacketPayload.Type<BrandPayload> payloadType, ServerPlayer serverPlayer) {
         Objects.requireNonNull(serverPlayer, "server player is null");
-        return ServerPlayNetworking.canSend(serverPlayer.connection, this.payloadType);
+        return ServerPlayNetworking.canSend(serverPlayer.connection, payloadType);
     }
 
     @Override
