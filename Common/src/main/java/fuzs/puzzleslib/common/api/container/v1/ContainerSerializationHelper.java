@@ -3,6 +3,7 @@ package fuzs.puzzleslib.common.api.container.v1;
 import fuzs.puzzleslib.common.impl.container.SlotsProvider;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.ItemStackWithSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.ValueInput;
@@ -26,7 +27,7 @@ public final class ContainerSerializationHelper {
      * @see net.minecraft.world.ContainerHelper#saveAllItems(ValueOutput, NonNullList)
      */
     public static void saveAllItems(ValueOutput valueOutput, NonNullList<ItemStack> itemStacks) {
-        storeAsSlots(itemStacks, valueOutput.list("Items", ItemStackWithSlot.CODEC));
+        storeAsSlots(itemStacks, valueOutput.list(ContainerHelper.TAG_ITEMS, ItemStackWithSlot.CODEC));
     }
 
     /**
@@ -37,7 +38,7 @@ public final class ContainerSerializationHelper {
      * @see net.minecraft.world.ContainerHelper#saveAllItems(ValueOutput, NonNullList)
      */
     public static void saveAllItems(ValueOutput valueOutput, Container container) {
-        storeAsSlots(container, valueOutput.list("Items", ItemStackWithSlot.CODEC));
+        storeAsSlots(container, valueOutput.list(ContainerHelper.TAG_ITEMS, ItemStackWithSlot.CODEC));
     }
 
     /**
@@ -79,7 +80,7 @@ public final class ContainerSerializationHelper {
      * @see net.minecraft.world.ContainerHelper#loadAllItems(ValueInput, NonNullList)
      */
     public static void loadAllItems(ValueInput valueInput, NonNullList<ItemStack> itemStacks) {
-        fromSlots(itemStacks, valueInput.listOrEmpty("Items", ItemStackWithSlot.CODEC));
+        fromSlots(itemStacks, valueInput.listOrEmpty(ContainerHelper.TAG_ITEMS, ItemStackWithSlot.CODEC));
     }
 
     /**
@@ -90,7 +91,7 @@ public final class ContainerSerializationHelper {
      * @see net.minecraft.world.ContainerHelper#loadAllItems(ValueInput, NonNullList)
      */
     public static void loadAllItems(ValueInput valueInput, Container container) {
-        fromSlots(container, valueInput.listOrEmpty("Items", ItemStackWithSlot.CODEC));
+        fromSlots(container, valueInput.listOrEmpty(ContainerHelper.TAG_ITEMS, ItemStackWithSlot.CODEC));
     }
 
     /**
