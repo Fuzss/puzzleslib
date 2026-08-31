@@ -5,7 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v21.1.55-1.21.1] - 2025-08-13
+## [v21.1.56-1.21.1] - 2026-08-31
+
+### Added
+
+- Backport `TrimPatternBuilder`
+- Backport `RegistryManager::registerCreativeModeTab`
+
+### Changed
+
+- Delay setting up handshake payloads to avoid registering `IModBusEvents` too early on NeoForge
+- Set spawn cost in `SpawnerDataBuilder`
+
+## [v21.1.55-1.21.1] - 2026-08-13
 
 ### Added
 
@@ -18,31 +30,27 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- Ship an access transformer instead of a class tweaker file for backwards compatibility on Fabric
+- Update `EventResult#value` type
 
-### Fixed
-
-- Fix `EventResult#value` type
-
-## [v21.1.54-1.21.1] - 2025-07-02
+## [v21.1.54-1.21.1] - 2026-07-02
 
 ### Changed
 
 - Ship an access transformer instead of a class tweaker file for backwards compatibility on Fabric
 
-## [v21.1.53-1.21.1] - 2025-07-01
+## [v21.1.53-1.21.1] - 2026-07-01
 
 ### Changed
 
 - Use Multiloader Convention Plugins v1.1
 
-## [v21.1.52-1.21.1] - 2025-06-15
+## [v21.1.52-1.21.1] - 2026-06-15
 
 ### Fixed
 
 - Fix `NetworkingHelper::hasChannel` not checking `Connection::isConnected` on NeoForge
 
-## [v21.1.51-1.21.1] - 2025-05-30
+## [v21.1.51-1.21.1] - 2026-05-30
 
 ### Changed
 
@@ -52,26 +60,26 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Fix crash when trying to open a config screen for a config which is not loaded
 
-## [v21.1.50-1.21.1] - 2025-05-28
+## [v21.1.50-1.21.1] - 2026-05-28
 
 ### Changed
 
 - Support registering stripple blocks without an `axis` property on Fabric
 
-## [v21.1.49-1.21.1] - 2025-05-27
+## [v21.1.49-1.21.1] - 2026-05-27
 
 ### Fixed
 
 - Fix wrong sign type being passed to the `BlockSetVariant#HANGING_SIGN` item
 
-## [v21.1.48-1.21.1] - 2025-05-27
+## [v21.1.48-1.21.1] - 2026-05-27
 
 ### Added
 
 - Backport `ChunkSectionLayer` from Minecraft 1.21.11
 - Backport missing `BlockSetFamily` related methods in `AbstractRecipeProvider` & `AbstractTagProvider`
 
-## [v21.1.47-1.21.1] - 2025-05-26
+## [v21.1.47-1.21.1] - 2026-05-26
 
 ### Added
 
@@ -83,13 +91,13 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Fix `RenderTypeHelper::getRenderType` not calling the proper method on NeoForge
 
-## [v21.1.46-1.21.1] - 2025-05-23
+## [v21.1.46-1.21.1] - 2026-05-23
 
 ### Fixed
 
 - Fix wrong `MeshDefinition` parameter in `LayerDefinition::create`
 
-## [v21.1.45-1.21.1] - 2025-05-23
+## [v21.1.45-1.21.1] - 2026-05-23
 
 ### Added
 
@@ -103,7 +111,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Make sure our custom `LayerDefinition` stores a custom `MeshDefinition`, not the vanilla variant
 
-## [v21.1.44-1.21.1] - 2025-05-21
+## [v21.1.44-1.21.1] - 2026-05-21
 
 ### Added
 
@@ -113,7 +121,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Fix tag generation failing when including tags from other namespaces
 
-## [v21.1.43-1.21.1] - 2025-05-21
+## [v21.1.43-1.21.1] - 2026-05-21
 
 ### Added
 
@@ -121,7 +129,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Add some helper methods to `ShapesHelper`
 - Add some helper methods to `AbstractRecipeProvider`
 
-## [v21.1.42-1.21.1] - 2025-05-20
+## [v21.1.42-1.21.1] - 2026-05-20
 
 ### Added
 
@@ -135,7 +143,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Fix custom `PartDefinition` `ClassCastException`
 
-## [v21.1.41-1.21.1] - 2025-05-19
+## [v21.1.41-1.21.1] - 2026-05-19
 
 ### Added
 
