@@ -9,6 +9,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Backport modern `ParticleProvider`
 - Backport `TrimPatternBuilder`
 - Backport `RegistryManager::registerCreativeModeTab`
 
