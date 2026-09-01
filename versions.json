@@ -5,12 +5,18 @@
     "26.1.x": "maintained",
     "26.2.x": "primary"
   },
-  "properties": {
-    "distributions.curseforge.id": "495476",
-    "distributions.curseforge.slug": "puzzles-lib",
-    "distributions.github.slug": "puzzles-lib",
-    "distributions.modrinth.id": "QAGBst4M",
-    "distributions.modrinth.slug": "puzzles-lib"
+  "distributions": {
+    "curseforge": {
+      "id": "495476",
+      "slug": "puzzles-lib"
+    },
+    "github": {
+      "slug": "puzzles-lib"
+    },
+    "modrinth": {
+      "id": "QAGBst4M",
+      "slug": "puzzles-lib"
+    }
   },
   "published": true
 }
