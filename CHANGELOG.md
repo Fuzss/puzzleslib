@@ -11,6 +11,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Backport updated `RangedSliderButton`
 
+### Changed
+
+- Manually include `architectury.common.marker` in published artifacts for backwards compatibility
+
 ## [v21.1.56-mc1.21.1] - 2026-08-31
 
 ### Added
