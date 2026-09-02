@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.client.gui.v2.components;
+package fuzs.puzzleslib.api.client.gui.v3.components;
 
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.network.chat.CommonComponents;
@@ -8,11 +8,7 @@ import net.minecraft.util.Mth;
 /**
  * An extension to {@link AbstractSliderButton} that supports values within any range, therefore requiring minimum and
  * maximum bounds to be specified.
- *
- * @deprecated the implementation is partially broken without the required AWs, use
- *         {@link fuzs.puzzleslib.api.client.gui.v3.components.RangedSliderButton} instead
  */
-@Deprecated(forRemoval = true)
 public abstract class RangedSliderButton extends AbstractSliderButton {
     /**
      * Lower value bound.
@@ -36,7 +32,7 @@ public abstract class RangedSliderButton extends AbstractSliderButton {
         super(x, y, width, height, CommonComponents.EMPTY, 0.0);
         this.minValue = minValue;
         this.maxValue = maxValue;
-        this.setScaledValue(value);
+        this.setAbsoluteValue(value);
     }
 
     /**
@@ -44,8 +40,8 @@ public abstract class RangedSliderButton extends AbstractSliderButton {
      *
      * @return current value
      */
-    public double getScaledValue() {
-        return this.getValue() * (this.maxValue - this.minValue) + this.minValue;
+    public double getAbsoluteValue() {
+        return this.getRelativeValue() * (this.maxValue - this.minValue) + this.minValue;
     }
 
     /**
@@ -53,8 +49,8 @@ public abstract class RangedSliderButton extends AbstractSliderButton {
      *
      * @param value new value to set
      */
-    public void setScaledValue(double value) {
-        this.setValue((value - this.minValue) / (this.maxValue - this.minValue));
+    public void setAbsoluteValue(double value) {
+        this.setRelativeValue((value - this.minValue) / (this.maxValue - this.minValue));
     }
 
     /**
@@ -62,7 +58,7 @@ public abstract class RangedSliderButton extends AbstractSliderButton {
      *
      * @return current value
      */
-    public double getValue() {
+    public double getRelativeValue() {
         return this.value;
     }
 
@@ -73,7 +69,7 @@ public abstract class RangedSliderButton extends AbstractSliderButton {
      *
      * @param value new value to set
      */
-    private void setValue(double value) {
+    public void setRelativeValue(double value) {
         double oldValue = this.value;
         this.value = Mth.clamp(value, 0.0F, 1.0F);
         if (oldValue != this.value) {
@@ -85,12 +81,12 @@ public abstract class RangedSliderButton extends AbstractSliderButton {
 
     @Override
     protected void updateMessage() {
-        this.setMessage(this.getMessageFromValue(this.getScaledValue()));
+        this.setMessage(this.getMessageFromValue(this.getAbsoluteValue()));
     }
 
     @Override
     protected void applyValue() {
-        this.applyValue(this.getScaledValue());
+        this.applyValue(this.getAbsoluteValue());
     }
 
     /**
@@ -98,17 +94,17 @@ public abstract class RangedSliderButton extends AbstractSliderButton {
      * <p>
      * Like {@link #updateMessage()}, but directly sets the new message.
      *
-     * @param value new value after it has changed, obtained from {@link #getValue()}
+     * @param absoluteValue new value after it has changed, obtained from {@link #getAbsoluteValue()}
      * @return the new component to set to {@link #setMessage(Component)}
      */
-    protected abstract Component getMessageFromValue(double value);
+    protected abstract Component getMessageFromValue(double absoluteValue);
 
     /**
      * Apply the value after it has changed to wherever it is being tracked.
      * <p>
      * Like {@link #applyValue()}, but with additional parameter.
      *
-     * @param value new value after it has changed, obtained from {@link #getValue()}
+     * @param absoluteValue new value after it has changed, obtained from {@link #getAbsoluteValue()}
      */
-    protected abstract void applyValue(double value);
+    protected abstract void applyValue(double absoluteValue);
 }
