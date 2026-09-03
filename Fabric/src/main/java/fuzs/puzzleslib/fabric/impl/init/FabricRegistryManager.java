@@ -3,9 +3,9 @@ package fuzs.puzzleslib.fabric.impl.init;
 import com.mojang.brigadier.arguments.ArgumentType;
 import fuzs.puzzleslib.common.api.init.v3.registry.LookupHelper;
 import fuzs.puzzleslib.common.api.init.v3.registry.MenuSupplierWithData;
-import fuzs.puzzleslib.common.impl.init.StandAloneHolder;
 import fuzs.puzzleslib.common.impl.init.LazyHolder;
 import fuzs.puzzleslib.common.impl.init.RegistryManagerImpl;
+import fuzs.puzzleslib.common.impl.init.StandAloneHolder;
 import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.fabricmc.fabric.api.menu.v1.ExtendedMenuType;
@@ -135,12 +135,13 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
     }
 
     @Override
-    public <T> void prepareTag(ResourceKey<? extends Registry<? super T>> registryKey, TagKey<T> tagKey) {
+    public <T> void bootstrapTag(TagKey<T> key) {
         this.isWritableOrThrow();
-        Objects.requireNonNull(registryKey, "registry key is null");
-        Objects.requireNonNull(tagKey, "tag key is null");
-        Registry<T> registry = LookupHelper.getRegistry(registryKey).orElseThrow();
-        BuiltInRegistries.acquireBootstrapRegistrationLookup(registry).getOrThrow(tagKey);
+        Objects.requireNonNull(key, "key is null");
+        Registry<T> registry = LookupHelper.getRegistry(key.registry()).orElse(null);
+        if (registry != null) {
+            BuiltInRegistries.acquireBootstrapRegistrationLookup(registry).getOrThrow(key);
+        }
     }
 
     @Override
