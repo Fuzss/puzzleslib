@@ -786,5 +786,18 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param tagKey      the tag key
      * @param <T>         the registry type
      */
-    <T> void prepareTag(ResourceKey<? extends Registry<? super T>> registryKey, TagKey<T> tagKey);
+    @Deprecated(forRemoval = true)
+    default <T> void prepareTag(ResourceKey<? extends Registry<? super T>> registryKey, TagKey<T> tagKey) {
+        this.bootstrapTag(tagKey);
+    }
+
+    /**
+     * Creates an empty tag in the corresponding registry, so that the tag can be used during data generation via
+     * {@link net.minecraft.core.HolderGetter#get(TagKey)} and
+     * {@link net.minecraft.core.HolderGetter#getOrThrow(TagKey)}.
+     *
+     * @param <T> the registry type
+     * @param key the tag key
+     */
+    <T> void bootstrapTag(TagKey<T> key);
 }

@@ -122,14 +122,13 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
     }
 
     @Override
-    public <T> void prepareTag(ResourceKey<? extends Registry<? super T>> registryKey, TagKey<T> tagKey) {
+    public <T> void bootstrapTag(TagKey<T> key) {
         this.isWritableOrThrow();
-        Objects.requireNonNull(registryKey, "registry key is null");
-        Objects.requireNonNull(tagKey, "tag key is null");
+        Objects.requireNonNull(key, "key is null");
         this.submitRegistrar((RegisterEvent event) -> {
-            Registry<T> registry = event.getRegistry((ResourceKey<? extends Registry<T>>) registryKey);
+            Registry<T> registry = event.getRegistry(key.registry());
             if (registry != null) {
-                BuiltInRegistries.acquireBootstrapRegistrationLookup(registry).getOrThrow(tagKey);
+                BuiltInRegistries.acquireBootstrapRegistrationLookup(registry).getOrThrow(key);
             }
         });
     }
