@@ -61,19 +61,19 @@ public abstract class AbstractRegistriesDatapackGenerator<T> extends RegistriesD
         return this.fullRegistries;
     }
 
-    protected static void registerEnchantment(BootstrapContext<Enchantment> context, ResourceKey<Enchantment> resourceKey, Enchantment.Builder builder) {
+    public static void registerEnchantment(BootstrapContext<Enchantment> context, ResourceKey<Enchantment> resourceKey, Enchantment.Builder builder) {
         context.register(resourceKey, builder.build(resourceKey.location()));
     }
 
-    protected static void registerDamageType(BootstrapContext<DamageType> context, ResourceKey<DamageType> resourceKey) {
+    public static void registerDamageType(BootstrapContext<DamageType> context, ResourceKey<DamageType> resourceKey) {
         context.register(resourceKey, new DamageType(resourceKey.location().getPath(), 0.1F));
     }
 
-    protected static void registerDamageType(BootstrapContext<DamageType> context, ResourceKey<DamageType> resourceKey, DamageEffects damageEffects) {
+    public static void registerDamageType(BootstrapContext<DamageType> context, ResourceKey<DamageType> resourceKey, DamageEffects damageEffects) {
         context.register(resourceKey, new DamageType(resourceKey.location().getPath(), 0.1F, damageEffects));
     }
 
-    protected static void registerTrimMaterial(BootstrapContext<TrimMaterial> context, ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor, float itemModelIndex) {
+    public static void registerTrimMaterial(BootstrapContext<TrimMaterial> context, ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor, float itemModelIndex) {
         registerTrimMaterial(context,
                 resourceKey,
                 ingredient,
@@ -83,7 +83,7 @@ public abstract class AbstractRegistriesDatapackGenerator<T> extends RegistriesD
         );
     }
 
-    protected static void registerTrimMaterial(BootstrapContext<TrimMaterial> context, ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor, float itemModelIndex, Map<Holder<ArmorMaterial>, String> overrideArmorMaterials) {
+    public static void registerTrimMaterial(BootstrapContext<TrimMaterial> context, ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor, float itemModelIndex, Map<Holder<ArmorMaterial>, String> overrideArmorMaterials) {
         Component component = Component.translatable(Util.makeDescriptionId("trim_material", resourceKey.location()))
                 .withStyle(Style.EMPTY.withColor(descriptionColor));
         TrimMaterial trimMaterial = TrimMaterial.create(resourceKey.location().getPath(),
