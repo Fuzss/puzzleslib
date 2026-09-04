@@ -7,6 +7,7 @@ import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
+@Deprecated
 public final class ModelLoadingEvents {
     public static final EventInvoker<LoadModel> LOAD_MODEL = EventInvoker.lookup(LoadModel.class);
     public static final EventInvoker<LoadBlockModel> LOAD_BLOCK_MODEL = EventInvoker.lookup(LoadBlockModel.class);
