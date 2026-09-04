@@ -8,6 +8,7 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
+@Deprecated
 public final class ModelBakingEvents {
     public static final EventInvoker<BeforeBlock> BEFORE_BLOCK = EventInvoker.lookup(BeforeBlock.class);
     public static final EventInvoker<AfterBlock> AFTER_BLOCK = EventInvoker.lookup(AfterBlock.class);
