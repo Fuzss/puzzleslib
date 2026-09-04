@@ -5,6 +5,7 @@ import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import fuzs.puzzleslib.common.api.client.gui.v2.ScreenHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -22,6 +23,11 @@ import java.util.List;
  * screen width.
  * <p>
  * Also, the scroll bar is mostly handled separately and is placed outside the bounds of the actual list.
+ * <p>
+ * There is no need to handle
+ * {@link net.minecraft.client.gui.components.AbstractSelectionList#extractSelection(GuiGraphicsExtractor,
+ * AbstractSelectionList.Entry, int)} as that is already bypassed in
+ * {@link ContainerObjectSelectionList#entriesCanBeSelected()}.
  */
 public class AbstractMenuSelectionList<E extends AbstractMenuSelectionList.Entry<E>> extends ContainerObjectSelectionList<E> {
     public static final Identifier SCROLLER_SPRITE = Identifier.withDefaultNamespace(
@@ -160,18 +166,8 @@ public class AbstractMenuSelectionList<E extends AbstractMenuSelectionList.Entry
     }
 
     @Override
-    protected void extractSelection(GuiGraphicsExtractor guiGraphics, E entry, int innerColor) {
-        // NO-OP
-    }
-
-    @Override
     public int getRowLeft() {
         return this.getX();
-    }
-
-    @Override
-    public int getRowTop(int index) {
-        return super.getRowTop(index) - 4;
     }
 
     public static class Entry<E extends Entry<E>> extends ContainerObjectSelectionList.Entry<E> {
