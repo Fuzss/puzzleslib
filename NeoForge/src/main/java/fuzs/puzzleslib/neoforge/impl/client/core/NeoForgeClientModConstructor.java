@@ -59,6 +59,9 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
             eventBus.addListener((final RegisterItemDecorationsEvent event) -> {
                 modConstructor.onRegisterItemDecorations(new ItemDecorationContextNeoForgeImpl(event::register));
             });
+            eventBus.addListener((final ModelEvent.ModifyBakingResult event) -> {
+                modConstructor.onRegisterBlockStateResolver(new BlockStateResolverContextNeoForgeImpl(event));
+            });
             eventBus.addListener((final RegisterEntitySpectatorShadersEvent event) -> {
                 modConstructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShaderContextNeoForgeImpl(event::register));
             });

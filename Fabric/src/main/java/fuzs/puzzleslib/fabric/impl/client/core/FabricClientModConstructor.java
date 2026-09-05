@@ -1,11 +1,10 @@
 package fuzs.puzzleslib.fabric.impl.client.core;
 
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContext;
-import fuzs.puzzleslib.api.client.core.v1.context.CoreShadersContext;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
+import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.fabric.impl.client.core.context.*;
 import fuzs.puzzleslib.impl.client.core.context.BlockRenderTypesContextImpl;
@@ -23,7 +22,6 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 public final class FabricClientModConstructor implements ModConstructorImpl<ClientModConstructor> {
 
@@ -39,11 +37,13 @@ public final class FabricClientModConstructor implements ModConstructorImpl<Clie
         modConstructor.onRegisterLayerDefinitions(new LayerDefinitionsContextFabricImpl());
         modConstructor.onRegisterAdditionalModels(new AdditionalModelsContextFabricImpl());
         modConstructor.onRegisterItemModelProperties(new ItemModelPropertiesContextFabricImpl());
+        LoadCompleteCallback.EVENT.register(() -> {
+            modConstructor.onRegisterBlockStateResolver(new BlockStateResolverContextFabricImpl());
+        });
         modConstructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShaderContextFabricImpl());
         modConstructor.onRegisterRenderBuffers(new RenderBuffersContextFabricImpl());
         List<ResourceManagerReloadListener> dynamicRenderers = new ArrayList<>();
-        ((Consumer<BuiltinModelItemRendererContext>) modConstructor::onRegisterBuiltinModelItemRenderers).accept(new BuiltinModelItemRendererContextFabricImpl(
-                modId,
+        modConstructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextFabricImpl(modId,
                 dynamicRenderers));
         // do not punish ContentRegistrationFlags#DYNAMIC_RENDERERS being absent as not every built-in item renderer needs to reload
         if (contentRegistrationFlags.contains(ContentRegistrationFlags.DYNAMIC_RENDERERS)) {
@@ -54,6 +54,7 @@ public final class FabricClientModConstructor implements ModConstructorImpl<Clie
                     dynamicRenderers));
             ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(reloadListener);
         }
+
         modConstructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContextFabricImpl());
         modConstructor.onRegisterItemDecorations(new ItemDecorationContextFabricImpl());
         modConstructor.onRegisterSkullRenderers(new SkullRenderersContextFabricImpl());
@@ -67,8 +68,7 @@ public final class FabricClientModConstructor implements ModConstructorImpl<Clie
             modConstructor.onRegisterItemColorProviders(new ItemColorProvidersContextFabricImpl());
         });
         CoreShaderRegistrationCallback.EVENT.register((CoreShaderRegistrationCallback.RegistrationContext context) -> {
-            ((Consumer<CoreShadersContext>) modConstructor::onRegisterCoreShaders).accept(new CoreShadersContextFabricImpl(
-                    context));
+            modConstructor.onRegisterCoreShaders(new CoreShadersContextFabricImpl(context));
         });
     }
 }

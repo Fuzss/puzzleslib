@@ -73,7 +73,7 @@ public interface ModConstructor extends BaseModConstructor {
     /**
      * @param context add to entity spawn placement register
      */
-    default void onRegisterSpawnPlacements(final SpawnPlacementsContext context) {
+    default void onRegisterSpawnPlacements(SpawnPlacementsContext context) {
         // NO-OP
     }
 
@@ -81,7 +81,7 @@ public interface ModConstructor extends BaseModConstructor {
      * @param context add default attributes for our own entities to entity attribute map
      */
     @Deprecated
-    default void onEntityAttributeCreation(final EntityAttributesCreateContext context) {
+    default void onEntityAttributeCreation(EntityAttributesCreateContext context) {
         // NO-OP
     }
 
@@ -89,7 +89,7 @@ public interface ModConstructor extends BaseModConstructor {
      * @param context replace or add attribute in entity attribute map
      */
     @Deprecated
-    default void onEntityAttributeModification(final EntityAttributesModifyContext context) {
+    default void onEntityAttributeModification(EntityAttributesModifyContext context) {
         // NO-OP
     }
 
@@ -97,7 +97,7 @@ public interface ModConstructor extends BaseModConstructor {
      * @param context allows for registering modifications (including additions and removals) to biomes loaded from the
      *                current data pack
      */
-    default void onRegisterBiomeModifications(final fuzs.puzzleslib.api.core.v2.context.BiomeModificationsContext context) {
+    default void onRegisterBiomeModifications(fuzs.puzzleslib.api.core.v2.context.BiomeModificationsContext context) {
         // NO-OP
     }
 
@@ -106,7 +106,7 @@ public interface ModConstructor extends BaseModConstructor {
      *                current data pack
      */
     @Deprecated
-    default void onRegisterBiomeModifications(final BiomeModificationsContext context) {
+    default void onRegisterBiomeModifications(BiomeModificationsContext context) {
         // NO-OP
     }
 
@@ -121,7 +121,7 @@ public interface ModConstructor extends BaseModConstructor {
      * @param context add fuel burn time for blocks and items, e.g. in a furnace
      */
     @Deprecated
-    default void onRegisterFuelBurnTimes(final FuelBurnTimesContext context) {
+    default void onRegisterFuelBurnTimes(FuelBurnTimesContext context) {
         // NO-OP
     }
 
@@ -129,7 +129,7 @@ public interface ModConstructor extends BaseModConstructor {
      * @param context register blocks that {@link net.minecraft.world.level.block.FireBlock} can spread to
      */
     @Deprecated
-    default void onRegisterFlammableBlocks(final FlammableBlocksContext context) {
+    default void onRegisterFlammableBlocks(FlammableBlocksContext context) {
         // NO-OP
     }
 
@@ -153,7 +153,7 @@ public interface ModConstructor extends BaseModConstructor {
      * @param context register new creative mode tabs via the respective builder
      */
     @Deprecated
-    default void onRegisterCreativeModeTabs(final CreativeModeTabContext context) {
+    default void onRegisterCreativeModeTabs(CreativeModeTabContext context) {
         // NO-OP
     }
 
@@ -161,14 +161,14 @@ public interface ModConstructor extends BaseModConstructor {
      * @param context add items to a creative tab
      */
     @Deprecated
-    default void onBuildCreativeModeTabContents(final BuildCreativeModeTabContentsContext context) {
+    default void onBuildCreativeModeTabContents(BuildCreativeModeTabContentsContext context) {
         // NO-OP
     }
 
     /**
      * @param context register additional data pack sources
      */
-    default void onAddDataPackFinders(final PackRepositorySourcesContext context) {
+    default void onAddDataPackFinders(PackRepositorySourcesContext context) {
         // NO-OP
     }
 
