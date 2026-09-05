@@ -90,8 +90,6 @@ public final class ModelLoadingHelper {
     public static CompletableFuture<Map<BlockState, UnbakedModel>> loadBlockState(List<BlockStateModelLoader.LoadedJson> loadedBlockModelDefinitions, ResourceLocation blockId, StateDefinition<Block, BlockState> stateDefinition, Executor executor) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                // TODO check the ids here, which ones is actually needed to be in the map?
-                // TODO this is most likely wrong, as the loaded block can be different from the one we want to use the model for
                 Map<ResourceLocation, List<BlockStateModelLoader.LoadedJson>> blockStateResources = Collections.singletonMap(
                         BlockStateModelLoader.BLOCKSTATE_LISTER.idToFile(blockId),
                         loadedBlockModelDefinitions);
@@ -119,25 +117,26 @@ public final class ModelLoadingHelper {
     }
 
     @ApiStatus.Experimental
-    public static @Nullable BlockModel loadBlockModel(ResourceManager resourceManager, ResourceLocation blockId) {
-        return loadBlockModel(resourceManager, blockId, Util.backgroundExecutor()).join();
+    public static @Nullable BlockModel loadBlockModel(ResourceManager resourceManager, ResourceLocation modelId) {
+        return loadBlockModel(resourceManager, modelId, Util.backgroundExecutor()).join();
     }
 
     /**
      * @see ModelManager#loadBlockModels(ResourceManager, Executor)
      */
-    public static CompletableFuture<@Nullable BlockModel> loadBlockModel(ResourceManager resourceManager, ResourceLocation blockId, Executor executor) {
-        return CompletableFuture.supplyAsync(() -> resourceManager.getResource(ModelBakery.MODEL_LISTER.idToFile(blockId)),
-                executor).thenApply((Optional<Resource> optional) -> {
-            return optional.<BlockModel>map((Resource resource) -> {
-                try (Reader reader = resource.openAsReader()) {
-                    return BlockModel.fromStream(reader);
-                } catch (Exception exception) {
-                    PuzzlesLib.LOGGER.error("Failed to load model {}", blockId, exception);
-                    return null;
-                }
-            }).orElse(null);
-        });
+    public static CompletableFuture<@Nullable BlockModel> loadBlockModel(ResourceManager resourceManager, ResourceLocation modelId, Executor executor) {
+        // The model id is already processed by the call site, so it must not be passed through ModelBakery.MODEL_LISTER#idToFile again.
+        return CompletableFuture.supplyAsync(() -> resourceManager.getResource(modelId), executor)
+                .thenApply((Optional<Resource> optional) -> {
+                    return optional.<BlockModel>map((Resource resource) -> {
+                        try (Reader reader = resource.openAsReader()) {
+                            return BlockModel.fromStream(reader);
+                        } catch (Exception exception) {
+                            PuzzlesLib.LOGGER.error("Failed to load model {}", modelId, exception);
+                            return null;
+                        }
+                    }).orElse(null);
+                });
     }
 
     /**

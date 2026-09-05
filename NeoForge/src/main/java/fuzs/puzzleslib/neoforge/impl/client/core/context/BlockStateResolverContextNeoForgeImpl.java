@@ -45,7 +45,8 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
 
     public BlockStateResolverContextNeoForgeImpl(ModelEvent.ModifyBakingResult event) {
         this.textureResolver = event.getTextureGetter();
-        this.missingModel = event.getModelBakery().missingModel;
+        ModelBakery bakery = event.getModelBakery();
+        this.missingModel = bakery.missingModel;
         this.missingSprite = Suppliers.memoize(() -> {
             Material material = new Material(TextureAtlas.LOCATION_BLOCKS, MissingTextureAtlasSprite.getLocation());
             TextureAtlasSprite textureAtlasSprite = event.getTextureGetter().apply(material);
@@ -54,16 +55,17 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
         });
         Map<ResourceLocation, BlockModel> modelResources = new HashMap<>();
         Function<ResourceLocation, BlockModel> modelResolver = this::getBlockModel;
-        this.modelResolver = (ResourceLocation blockId) -> {
-            return modelResources.computeIfAbsent(blockId, modelResolver);
+        this.modelResolver = (ResourceLocation modelId) -> {
+            return bakery.modelResources.containsKey(modelId) ? bakery.modelResources.get(modelId) :
+                    modelResources.computeIfAbsent(modelId, modelResolver);
         };
         this.blockStateModelOutput = event.getModels()::put;
     }
 
-    private BlockModel getBlockModel(ResourceLocation blockId) {
-        BlockModel blockModel = ModelLoadingHelper.loadBlockModel(this.resourceManager, blockId);
+    private BlockModel getBlockModel(ResourceLocation modelId) {
+        BlockModel blockModel = ModelLoadingHelper.loadBlockModel(this.resourceManager, modelId);
         if (blockModel == null) {
-            PuzzlesLib.LOGGER.warn("Missing block model: {}", blockId);
+            PuzzlesLib.LOGGER.warn("Missing block model: {}", modelId);
             return (BlockModel) this.missingModel;
         } else {
             return blockModel;
@@ -75,6 +77,9 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
         ModelDiscovery discovery = new ModelDiscovery(this.modelResolver, this.modelCache, this.missingModel);
         blockStateConsumer.accept((BlockState state, UnbakedModel model) -> {
             discovery.registerModelAndLoadDependencies(BlockModelShaper.stateToModelLocation(state), model);
+        });
+        discovery.getTopLevelModels().values().forEach((UnbakedModel model) -> {
+            model.resolveParents(discovery::getModel);
         });
         this.loadModels(discovery).forEach(this.blockStateModelOutput);
     }

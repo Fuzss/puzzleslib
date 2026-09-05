@@ -16,6 +16,9 @@ import java.util.Set;
 import java.util.function.Function;
 
 /**
+ * This is basically a plain copy of the vanilla ModelBakery without all the setup stuff in the constructor and without
+ * giving other mods an opportunity to interfere via events or Mixins.
+ *
  * @see ModelBakery
  */
 public class ModelDiscovery {
@@ -31,6 +34,10 @@ public class ModelDiscovery {
         this.modelResolver = modelResolver;
         this.unbakedCache = unbakedCache;
         this.missingModel = missingModel;
+    }
+
+    public Map<ModelResourceLocation, UnbakedModel> getTopLevelModels() {
+        return this.topLevelModels;
     }
 
     public Map<ModelResourceLocation, BakedModel> getBakedTopLevelModels() {
@@ -99,6 +106,7 @@ public class ModelDiscovery {
     }
 
     private BlockModel loadBlockModel(ResourceLocation modelId) throws IOException {
+        // We do not need to handle the missing model here as we inherit that directly from the vanilla ModelBakery.
         String path = modelId.getPath();
         if ("builtin/generated".equals(path)) {
             return ModelBakery.GENERATION_MARKER;
