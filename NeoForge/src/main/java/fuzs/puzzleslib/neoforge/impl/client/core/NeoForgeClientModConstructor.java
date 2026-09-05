@@ -11,6 +11,7 @@ import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.impl.client.core.context.*;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
@@ -29,9 +30,12 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
             modConstructor.onConstructMod();
             List<ResourceManagerReloadListener> dynamicRenderers = new ArrayList<>();
             eventBus.addListener((final FMLClientSetupEvent event) -> {
-                // need to run this deferred as most registries here do not use concurrent maps
+                event.enqueueWork(modConstructor::onClientSetup);
+            });
+            // Let this run after other mods, some of our mods are likely going to reference what other mods have registered.
+            eventBus.addListener(EventPriority.LOW, (final FMLClientSetupEvent event) -> {
+                // Need to run this deferred as most registries here do not use concurrent maps.
                 event.enqueueWork(() -> {
-                    modConstructor.onClientSetup();
                     modConstructor.onRegisterItemModelProperties(new ItemModelPropertiesContextNeoForgeImpl());
                     modConstructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextImpl());
                     modConstructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextImpl());
