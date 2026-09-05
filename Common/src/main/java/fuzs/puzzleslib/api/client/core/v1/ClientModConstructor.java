@@ -11,6 +11,7 @@ import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -107,7 +108,7 @@ public interface ClientModConstructor extends BaseModConstructor {
 
     /**
      * @param context register a resolver responsible for mapping each {@link BlockState} of a block to an
-     *                {@link net.minecraft.client.renderer.block.dispatch.BlockStateModel.UnbakedRoot}
+     *                {@link UnbakedModel}
      */
     default void onRegisterBlockStateResolver(BlockStateResolverContext context) {
         // NO-OP
