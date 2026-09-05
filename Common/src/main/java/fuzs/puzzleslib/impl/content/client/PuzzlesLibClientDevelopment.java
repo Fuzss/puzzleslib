@@ -2,13 +2,11 @@ package fuzs.puzzleslib.impl.content.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.core.v1.context.BlockStateResolverContext;
 import fuzs.puzzleslib.api.client.event.v1.gui.AddToastCallback;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenMouseEvents;
 import fuzs.puzzleslib.api.client.event.v2.gui.ScreenOpeningCallback;
 import fuzs.puzzleslib.api.client.gui.v2.screen.ScreenSkipper;
-import fuzs.puzzleslib.api.client.renderer.v1.model.ModelLoadingHelper;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
@@ -28,13 +26,10 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
-import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -180,17 +175,5 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
         if (optionsStillMissing) {
             keyMapping.setKey(InputConstants.UNKNOWN);
         }
-    }
-
-    @Override
-    public void onRegisterBlockStateResolver(BlockStateResolverContext context) {
-        context.registerBlockStateResolver(Blocks.NETHER_BRICK_FENCE, (resourceManager, executor) -> {
-            return ModelLoadingHelper.loadBlockState(resourceManager, Blocks.OAK_FENCE, executor);
-        }, (loadedModels, blockStateUnbakedRootBiConsumer) -> {
-            for (BlockState state : Blocks.NETHER_BRICK_FENCE.getStateDefinition().getPossibleStates()) {
-                UnbakedModel model = loadedModels.get(Blocks.OAK_FENCE.withPropertiesOf(state));
-                blockStateUnbakedRootBiConsumer.accept(state, model);
-            }
-        });
     }
 }
