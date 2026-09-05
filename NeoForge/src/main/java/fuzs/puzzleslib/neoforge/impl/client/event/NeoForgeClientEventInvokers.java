@@ -18,6 +18,7 @@ import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.event.ModelLoadingHelper;
 import fuzs.puzzleslib.impl.client.event.ScreenButtonList;
+import fuzs.puzzleslib.neoforge.impl.client.renderer.NeoForgeModelBakerImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;

@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.neoforge.impl.client.event;
+package fuzs.puzzleslib.neoforge.impl.client.renderer;
 
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.event.ModelLoadingHelper;

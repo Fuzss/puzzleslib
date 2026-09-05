@@ -231,6 +231,7 @@ accessible	field	net/minecraft/client/resources/language/ClientLanguage	storage	
 mutable	field	net/minecraft/client/resources/language/ClientLanguage	storage	Ljava/util/Map;
 accessible	method	net/minecraft/client/resources/model/BlockStateModelLoader	loadBlockStateDefinitions	(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/world/level/block/state/StateDefinition;)V
 accessible	field	net/minecraft/client/resources/model/ModelBakery	ITEM_MODEL_GENERATOR	Lnet/minecraft/client/renderer/block/model/ItemModelGenerator;
+accessible  field   net/minecraft/client/resources/model/ModelBakery    missingModel    Lnet/minecraft/client/resources/model/UnbakedModel;
 accessible	field	net/minecraft/client/resources/model/ModelBakery	topLevelModels	Ljava/util/Map;
 accessible	method	net/minecraft/client/resources/model/ModelBakery	getModel	(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/resources/model/UnbakedModel;
 accessible	class	net/minecraft/client/resources/model/ModelBakery$BakedCacheKey

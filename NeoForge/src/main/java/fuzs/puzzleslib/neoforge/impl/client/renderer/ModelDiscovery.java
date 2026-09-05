@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.neoforge.impl.client.core.context;
+package fuzs.puzzleslib.neoforge.impl.client.renderer;
 
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.client.renderer.block.model.BlockModel;
@@ -15,17 +15,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+/**
+ * @see ModelBakery
+ */
 public class ModelDiscovery {
     private final Function<ResourceLocation, BlockModel> modelResolver;
     private final Set<ResourceLocation> loadingStack = new HashSet<>();
-    private final Map<ResourceLocation, UnbakedModel> unbakedCache = new HashMap<>();
+    private final Map<ResourceLocation, UnbakedModel> unbakedCache;
     final Map<ModelBakery.BakedCacheKey, BakedModel> bakedCache = new HashMap<>();
     private final Map<ModelResourceLocation, UnbakedModel> topLevelModels = new HashMap<>();
     private final Map<ModelResourceLocation, BakedModel> bakedTopLevelModels = new HashMap<>();
     private final UnbakedModel missingModel;
 
-    public ModelDiscovery(Function<ResourceLocation, BlockModel> modelResolver, UnbakedModel missingModel) {
+    public ModelDiscovery(Function<ResourceLocation, BlockModel> modelResolver, Map<ResourceLocation, UnbakedModel> unbakedCache, UnbakedModel missingModel) {
         this.modelResolver = modelResolver;
+        this.unbakedCache = unbakedCache;
         this.missingModel = missingModel;
     }
 
@@ -34,17 +38,18 @@ public class ModelDiscovery {
     }
 
     public void bakeModels(ModelBakery.TextureGetter textureGetter) {
-        this.topLevelModels.forEach((ModelResourceLocation modelId, UnbakedModel model) -> {
-            BakedModel bakedmodel = null;
+        this.topLevelModels.forEach((ModelResourceLocation modelId, UnbakedModel unbakedModel) -> {
+            BakedModel bakedModel = null;
 
             try {
-                bakedmodel = new ModelBakerImpl(textureGetter, modelId).bakeUncached(model, BlockModelRotation.X0_Y0);
+                bakedModel = new ModelBakerImpl(textureGetter, modelId).bakeUncached(unbakedModel,
+                        BlockModelRotation.X0_Y0);
             } catch (Exception exception) {
                 PuzzlesLib.LOGGER.warn("Unable to bake model: '{}': {}", modelId, exception);
             }
 
-            if (bakedmodel != null) {
-                this.bakedTopLevelModels.put(modelId, bakedmodel);
+            if (bakedModel != null) {
+                this.bakedTopLevelModels.put(modelId, bakedModel);
             }
         });
     }
@@ -111,6 +116,9 @@ public class ModelDiscovery {
         }
     }
 
+    /**
+     * @see ModelBakery.ModelBakerImpl
+     */
     private class ModelBakerImpl implements ModelBaker {
         private final Function<Material, TextureAtlasSprite> modelTextureGetter;
 
