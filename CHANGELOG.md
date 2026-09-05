@@ -9,6 +9,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Backport `BlockStateResolverContext`
 - Backport `AbstractMenuSelectionList`
 
 ## [v21.1.57-mc1.21.1] - 2026-09-02
