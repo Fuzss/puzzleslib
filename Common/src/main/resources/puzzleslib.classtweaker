@@ -8,6 +8,9 @@ transitive-accessible	method	net/minecraft/client/gui/Gui	getVehicleMaxHearts	(L
 transitive-accessible	method	net/minecraft/client/gui/Gui	getVisibleVehicleHeartRows	(I)I
 transitive-accessible	class	net/minecraft/client/gui/Gui$HeartType
 transitive-accessible	method	net/minecraft/client/gui/GuiGraphics	blitNineSlicedSprite	(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lnet/minecraft/client/resources/metadata/gui/GuiSpriteScaling$NineSlice;IIIII)V
+transitive-accessible	method	net/minecraft/client/gui/components/AbstractSelectionList	clearEntries	()V
+transitive-extendable   method  net/minecraft/client/gui/components/AbstractSelectionList   getEntryAtPosition  (DD)Lnet/minecraft/client/gui/components/AbstractSelectionList$Entry;
+transitive-accessible   field   net/minecraft/client/gui/components/AbstractSelectionList   scrolling   Z
 transitive-accessible	field	net/minecraft/client/gui/screens/Screen	font	Lnet/minecraft/client/gui/Font;
 transitive-accessible	field	net/minecraft/client/gui/screens/Screen	minecraft	Lnet/minecraft/client/Minecraft;
 transitive-accessible	field	net/minecraft/client/gui/screens/Screen	renderables	Ljava/util/List;
@@ -29,6 +32,7 @@ transitive-accessible	method	net/minecraft/client/gui/screens/inventory/Crafting
 transitive-accessible	method	net/minecraft/client/gui/screens/inventory/CrafterScreen	slotClicked	(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V
 transitive-accessible	class	net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen$SlotWrapper
 transitive-accessible	field	net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen$SlotWrapper	target	Lnet/minecraft/world/inventory/Slot;
+transitive-accessible	method	net/minecraft/client/gui/screens/worldselection/WorldSelectionList	clearEntries	()V
 transitive-accessible	field	net/minecraft/client/model/PlayerModel	slim	Z
 transitive-accessible	field	net/minecraft/client/model/geom/LayerDefinitions	INNER_ARMOR_DEFORMATION	Lnet/minecraft/client/model/geom/builders/CubeDeformation;
 transitive-accessible	field	net/minecraft/client/model/geom/LayerDefinitions	OUTER_ARMOR_DEFORMATION	Lnet/minecraft/client/model/geom/builders/CubeDeformation;
