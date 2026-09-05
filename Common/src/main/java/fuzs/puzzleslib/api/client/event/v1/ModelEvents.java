@@ -9,6 +9,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Deprecated
 public final class ModelEvents {
     public static final EventInvoker<ModifyUnbakedModel> MODIFY_UNBAKED_MODEL = EventInvoker.lookup(
             ModifyUnbakedModel.class);
