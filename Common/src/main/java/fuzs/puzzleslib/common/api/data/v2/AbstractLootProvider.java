@@ -196,6 +196,10 @@ public final class AbstractLootProvider {
                             .unwrap());
         }
 
+        public final void generateFor(BlockSetFamily blockSetFamily) {
+            this.generateFor(blockSetFamily, VARIANT_PROVIDERS);
+        }
+
         public final void generateFor(BlockSetFamily blockSetFamily, Map<BlockSetVariant, BiConsumer<AbstractLootProvider.Blocks, Block>> variants) {
             blockSetFamily.getBlockVariants().forEach((BlockSetVariant variant, Holder.Reference<Block> block) -> {
                 BiConsumer<AbstractLootProvider.Blocks, Block> provider = variants.get(variant);
