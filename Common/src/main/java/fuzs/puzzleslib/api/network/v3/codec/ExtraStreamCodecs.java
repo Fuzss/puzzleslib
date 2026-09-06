@@ -37,51 +37,58 @@ public final class ExtraStreamCodecs {
      * {@link Date} stream codec
      */
     public static final StreamCodec<FriendlyByteBuf, Date> DATE = StreamCodec.of(FriendlyByteBuf::writeDate,
-            FriendlyByteBuf::readDate
-    );
+            FriendlyByteBuf::readDate);
     /**
      * {@link Instant} stream codec
      */
     public static final StreamCodec<FriendlyByteBuf, Instant> INSTANT = StreamCodec.of(FriendlyByteBuf::writeInstant,
-            FriendlyByteBuf::readInstant
-    );
+            FriendlyByteBuf::readInstant);
     /**
      * {@link ChunkPos} stream codec
      */
-    public static final StreamCodec<FriendlyByteBuf, ChunkPos> CHUNK_POS = StreamCodec.of(
-            FriendlyByteBuf::writeChunkPos, FriendlyByteBuf::readChunkPos);
+    public static final StreamCodec<FriendlyByteBuf, ChunkPos> CHUNK_POS = StreamCodec.of(FriendlyByteBuf::writeChunkPos,
+            FriendlyByteBuf::readChunkPos);
     /**
      * {@link BlockHitResult} stream codec
      */
-    public static final StreamCodec<FriendlyByteBuf, BlockHitResult> BLOCK_HIT_RESULT = StreamCodec.of(
-            FriendlyByteBuf::writeBlockHitResult, FriendlyByteBuf::readBlockHitResult);
+    public static final StreamCodec<FriendlyByteBuf, BlockHitResult> BLOCK_HIT_RESULT = StreamCodec.of(FriendlyByteBuf::writeBlockHitResult,
+            FriendlyByteBuf::readBlockHitResult);
     /**
      * {@link BitSet} stream codec
      */
     public static final StreamCodec<FriendlyByteBuf, BitSet> BIT_SET = StreamCodec.of(FriendlyByteBuf::writeBitSet,
-            FriendlyByteBuf::readBitSet
-    );
+            FriendlyByteBuf::readBitSet);
     /**
      * {@link ResourceKey} stream codec
      */
     public static final StreamCodec<ByteBuf, ResourceKey<?>> DIRECT_RESOURCE_KEY = StreamCodec.composite(
-            ResourceLocation.STREAM_CODEC, ResourceKey::registry, ResourceLocation.STREAM_CODEC, ResourceKey::location,
+            ResourceLocation.STREAM_CODEC,
+            ResourceKey::registry,
+            ResourceLocation.STREAM_CODEC,
+            ResourceKey::location,
             (ResourceLocation registry, ResourceLocation location) -> {
                 return ResourceKey.create(ResourceKey.createRegistryKey(registry), location);
-            }
-    );
+            });
     /**
      * {@link Vec3} stream codec
      */
-    public static final StreamCodec<ByteBuf, Vec3> VEC3 = StreamCodec.composite(ByteBufCodecs.DOUBLE, Vec3::x,
-            ByteBufCodecs.DOUBLE, Vec3::y, ByteBufCodecs.DOUBLE, Vec3::z, Vec3::new
-    );
+    public static final StreamCodec<ByteBuf, Vec3> VEC3 = StreamCodec.composite(ByteBufCodecs.DOUBLE,
+            Vec3::x,
+            ByteBufCodecs.DOUBLE,
+            Vec3::y,
+            ByteBufCodecs.DOUBLE,
+            Vec3::z,
+            Vec3::new);
     /**
      * {@link Vector3f} stream codec
      */
     public static final StreamCodec<ByteBuf, Vector3f> VECTOR3F = StreamCodec.composite(ByteBufCodecs.FLOAT,
-            Vector3f::x, ByteBufCodecs.FLOAT, Vector3f::y, ByteBufCodecs.FLOAT, Vector3f::z, Vector3f::new
-    );
+            Vector3f::x,
+            ByteBufCodecs.FLOAT,
+            Vector3f::y,
+            ByteBufCodecs.FLOAT,
+            Vector3f::z,
+            Vector3f::new);
     /**
      * {@link FriendlyByteBuf} stream codec
      */
@@ -145,9 +152,9 @@ public final class ExtraStreamCodecs {
      * @return the stream codec
      */
     public static <E extends Enum<E>> StreamCodec<ByteBuf, E> fromEnum(Class<E> clazz, ToIntFunction<E> keyExtractor) {
-        IntFunction<E> idMapper = ByIdMap.continuous(keyExtractor, clazz.getEnumConstants(),
-                ByIdMap.OutOfBoundsStrategy.ZERO
-        );
+        IntFunction<E> idMapper = ByIdMap.continuous(keyExtractor,
+                clazz.getEnumConstants(),
+                ByIdMap.OutOfBoundsStrategy.ZERO);
         return ByteBufCodecs.idMapper(idMapper, keyExtractor);
     }
 

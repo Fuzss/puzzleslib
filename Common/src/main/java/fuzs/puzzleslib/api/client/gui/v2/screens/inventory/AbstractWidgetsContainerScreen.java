@@ -17,6 +17,12 @@ public abstract class AbstractWidgetsContainerScreen<T extends AbstractContainer
         super(menu, inventory, title);
     }
 
+    public AbstractWidgetsContainerScreen(T menu, Inventory inventory, Component title, int imageWidth, int imageHeight) {
+        super(menu, inventory, title);
+        this.imageWidth = imageWidth;
+        this.imageHeight = imageHeight;
+    }
+
     /**
      * @see net.minecraft.client.gui.components.events.ContainerEventHandler#mouseScrolled(double, double, double,
      *         double)

@@ -123,7 +123,7 @@ public final class ItemHelper {
      * @param itemStack the item
      * @return the hover name component
      */
-    public Component getStyledHoverName(ItemStack itemStack) {
+    public static Component getStyledHoverName(ItemStack itemStack) {
         MutableComponent hoverName = Component.empty()
                 .append(itemStack.getHoverName())
                 .withStyle(getRarityStyle(itemStack.getRarity()));
