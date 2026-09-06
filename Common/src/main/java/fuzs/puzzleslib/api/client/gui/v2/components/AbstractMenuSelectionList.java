@@ -155,6 +155,12 @@ public abstract class AbstractMenuSelectionList<E extends ContainerObjectSelecti
     }
 
     @Override
+    protected void renderItem(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, int index, int left, int top, int width, int height) {
+        // Add back height subtracted by vanilla for the item outline, which we have removed.
+        super.renderItem(guiGraphics, mouseX, mouseY, partialTick, index, left, top, width, height + 4);
+    }
+
+    @Override
     protected int getRowTop(int index) {
         return super.getRowTop(index) - 4;
     }

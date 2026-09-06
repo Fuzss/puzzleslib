@@ -104,7 +104,7 @@ public final class ItemHelper {
     /**
      * Creates a style for item names for a rarity.
      * <p>
-     * Alternatively use {@link #getStyledHoverName(ItemStack)} where possible.
+     * Alternatively, use {@link #getStyledHoverName(ItemStack)} where possible.
      *
      * @param rarity the rarity
      * @return the style for this rarity, apply via {@link net.minecraft.network.chat.MutableComponent#withStyle(Style)}

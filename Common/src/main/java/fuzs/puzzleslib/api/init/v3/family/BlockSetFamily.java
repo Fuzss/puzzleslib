@@ -75,6 +75,7 @@ public interface BlockSetFamily {
                 .generateFor(BlockSetVariant.WALL);
     }
 
+    @Deprecated(forRemoval = true)
     static Writable metal(RegistryManager registries, Holder.Reference<Block> baseBlock, String basePath) {
         return base(registries, baseBlock, basePath).generateFor(BlockSetVariant.STAIRS)
                 .generateFor(BlockSetVariant.SLAB)
