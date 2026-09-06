@@ -200,6 +200,15 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 (TagsUpdatedCallback callback) -> {
                     return callback::onTagsUpdated;
                 });
+        INSTANCE.register(ServerResourcesLoadCallback.class,
+                CommonLifecycleEvents.TAGS_LOADED,
+                (ServerResourcesLoadCallback callback) -> {
+                    return (RegistryAccess registries, boolean client) -> {
+                        if (!client) {
+                            callback.onServerResourcesLoad(registries);
+                        }
+                    };
+                });
         INSTANCE.register(RegisterCommandsCallback.class,
                 CommandRegistrationCallback.EVENT,
                 (RegisterCommandsCallback callback) -> {

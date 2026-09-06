@@ -48,6 +48,7 @@ import net.minecraft.world.phys.HitResult;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.common.util.TriState;
+import net.neoforged.neoforge.event.TagsUpdatedEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
@@ -248,6 +249,11 @@ public final class NeoForgeClientEventInvokers {
     }
 
     public static void registerEventHandlers() {
+        INSTANCE.register(ClientTagsUpdatedCallback.class,
+                TagsUpdatedEvent.class,
+                (ClientTagsUpdatedCallback callback, TagsUpdatedEvent event) -> {
+                    callback.onClientTagsUpdated(event.getRegistryAccess());
+                });
         INSTANCE.register(ClientTickEvents.Start.class,
                 ClientTickEvent.Pre.class,
                 (ClientTickEvents.Start callback, ClientTickEvent.Pre evt) -> {

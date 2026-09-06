@@ -3,13 +3,16 @@ package fuzs.puzzleslib.impl.config.serialization;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import fuzs.puzzleslib.api.client.event.v1.ClientTagsUpdatedCallback;
 import fuzs.puzzleslib.api.config.v3.serialization.ConfigDataSet;
 import fuzs.puzzleslib.api.config.v3.serialization.KeyedValueProvider;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
-import fuzs.puzzleslib.api.event.v1.server.TagsUpdatedCallback;
+import fuzs.puzzleslib.api.event.v1.server.ServerResourcesLoadCallback;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +35,13 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
     /**
      * the data types we currently are able to handle
      */
-    private static final Set<Class<?>> SUPPORTED_DATA_TYPES = ImmutableSet.of(boolean.class, Boolean.class, int.class, Integer.class, double.class, Double.class, String.class);
+    private static final Set<Class<?>> SUPPORTED_DATA_TYPES = ImmutableSet.of(boolean.class,
+            Boolean.class,
+            int.class,
+            Integer.class,
+            double.class,
+            Double.class,
+            String.class);
 
     /**
      * registry to work with
@@ -43,7 +52,8 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
      */
     private final List<EntryHolder<?, T>> values = new ArrayList<>();
     /**
-     * filter for when {@link EntryHolder}s are constructed, first argument is index (only index 0 when no data is specified), second is entry/data value
+     * filter for when {@link EntryHolder}s are constructed, first argument is index (only index 0 when no data is
+     * specified), second is entry/data value
      */
     private final BiPredicate<Integer, Object> filter;
     private final int dataSize;
@@ -70,9 +80,15 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         for (String value : values) {
             this.deserialize(value, types).ifPresent(this.values::add);
         }
-        TagsUpdatedCallback.EVENT.register((registryAccess, client) -> {
+
+        ServerResourcesLoadCallback.EVENT.register((RegistryAccess registryAccess) -> {
             this.dissolved = null;
         });
+        if (ModLoaderEnvironment.INSTANCE.isClient()) {
+            ClientTagsUpdatedCallback.EVENT.register((RegistryAccess registryAccess) -> {
+                this.dissolved = null;
+            });
+        }
     }
 
     /**
@@ -223,7 +239,11 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
                 }
             }
             if (entries.isEmpty() && !toRemove.isEmpty()) {
-                entries = this.valueProvider.streamValues().collect(Collectors.toMap(Function.identity(), t -> EntryHolder.EMPTY_DATA, (o1, o2) -> o1, Maps::newIdentityHashMap));
+                entries = this.valueProvider.streamValues()
+                        .collect(Collectors.toMap(Function.identity(),
+                                t -> EntryHolder.EMPTY_DATA,
+                                (o1, o2) -> o1,
+                                Maps::newIdentityHashMap));
             }
             entries.keySet().removeIf(t -> !this.filter.test(0, t) || toRemove.contains(t));
             this.dissolved = dissolved = Collections.unmodifiableMap(entries);
@@ -245,11 +265,16 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
                 Object[] data = new Object[types.length];
                 for (int i = 0; i < types.length; i++) {
                     if (sources.length - 1 <= i) {
-                        throw new IllegalArgumentException("Data index out of bounds, index was %s, but length is %s".formatted(i + 1, sources.length));
+                        throw new IllegalArgumentException("Data index out of bounds, index was %s, but length is %s".formatted(
+                                i + 1,
+                                sources.length));
                     }
                     data[i] = deserializeData(types[i], sources[i + 1].trim());
                     if (!this.filter.test(i + 1, data[i])) {
-                        throw new IllegalStateException("Data %s at index %s from source entry %s does not conform to filter".formatted(data[i], i, source));
+                        throw new IllegalStateException(
+                                "Data %s at index %s from source entry %s does not conform to filter".formatted(data[i],
+                                        i,
+                                        source));
                     }
                 }
                 return Optional.of(this.deserialize(newSource).withData(data));
@@ -288,7 +313,8 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
 
     /**
      * holds a single entry from a string list, ready to be dissolved into registry entries when required
-     * <p>supports pattern matching for {@link ResourceLocation} path, therefore input and path are stored separately instead of as {@link ResourceLocation}
+     * <p>supports pattern matching for {@link ResourceLocation} path, therefore input and path are stored separately
+     * instead of as {@link ResourceLocation}
      *
      * @param <D> raw value type, single registry entry or tag
      * @param <E> value type for set, result from dissolving
@@ -338,7 +364,10 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
          * @param entries provided entries to add to
          */
         public final void dissolve(BiConsumer<E, Object[]> builder) {
-            this.findRegistryMatches(this.input).stream().flatMap(this::dissolveValue).forEach(value -> builder.accept(value, this.data));
+            this.findRegistryMatches(this.input)
+                    .stream()
+                    .flatMap(this::dissolveValue)
+                    .forEach(value -> builder.accept(value, this.data));
         }
 
         private Collection<D> findRegistryMatches(String s) {
@@ -347,7 +376,10 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
                 Optional.ofNullable(ResourceLocationHelper.tryParse(s)).flatMap(this::toValue).ifPresent(matches::add);
             } else {
                 String regexSource = s.replace("*", "[a-z0-9/._-]*");
-                this.allValues().filter(entry -> entry.getKey().toString().matches(regexSource)).map(Map.Entry::getValue).forEach(matches::add);
+                this.allValues()
+                        .filter(entry -> entry.getKey().toString().matches(regexSource))
+                        .map(Map.Entry::getValue)
+                        .forEach(matches::add);
             }
             // test if this is a valid entry first
             if (matches.isEmpty()) {

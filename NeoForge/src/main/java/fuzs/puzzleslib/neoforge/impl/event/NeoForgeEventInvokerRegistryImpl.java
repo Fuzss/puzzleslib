@@ -561,6 +561,11 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                     callback.onTagsUpdated(evt.getRegistryAccess(),
                             evt.getUpdateCause() == TagsUpdatedEvent.UpdateCause.CLIENT_PACKET_RECEIVED);
                 });
+        INSTANCE.register(ServerResourcesLoadCallback.class,
+                TagsUpdatedEvent.class,
+                (ServerResourcesLoadCallback callback, TagsUpdatedEvent event) -> {
+                    callback.onServerResourcesLoad(event.getRegistryAccess());
+                });
         INSTANCE.register(ExplosionEvents.Start.class,
                 ExplosionEvent.Start.class,
                 (ExplosionEvents.Start callback, ExplosionEvent.Start evt) -> {

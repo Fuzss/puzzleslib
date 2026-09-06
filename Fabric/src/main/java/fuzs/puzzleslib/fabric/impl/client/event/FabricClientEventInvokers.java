@@ -31,6 +31,7 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.client.player.ClientPickBlockApplyCallback;
 import net.fabricmc.fabric.api.event.client.player.ClientPickBlockGatherCallback;
 import net.fabricmc.fabric.api.event.client.player.ClientPreAttackCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
@@ -45,6 +46,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.resources.model.*;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -213,6 +215,15 @@ public final class FabricClientEventInvokers {
     }
 
     public static void registerEventHandlers() {
+        INSTANCE.register(ClientTagsUpdatedCallback.class,
+                CommonLifecycleEvents.TAGS_LOADED,
+                (ClientTagsUpdatedCallback callback) -> {
+                    return (RegistryAccess registries, boolean client) -> {
+                        if (client) {
+                            callback.onClientTagsUpdated(registries);
+                        }
+                    };
+                });
         INSTANCE.register(ClientTickEvents.Start.class,
                 net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.START_CLIENT_TICK,
                 callback -> {
