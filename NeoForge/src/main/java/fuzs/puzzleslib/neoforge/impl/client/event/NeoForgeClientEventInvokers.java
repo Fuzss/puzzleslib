@@ -80,11 +80,6 @@ public final class NeoForgeClientEventInvokers {
     }
 
     public static void registerLoadingHandlers() {
-        INSTANCE.register(ClientTagsUpdatedCallback.class,
-                TagsUpdatedEvent.ClientPacketReceived.class,
-                (ClientTagsUpdatedCallback callback, TagsUpdatedEvent.ClientPacketReceived event) -> {
-                    callback.onClientTagsUpdated(event.getRegistries());
-                });
         INSTANCE.register(ClientSetupCallback.class,
                 FMLClientSetupEvent.class,
                 (ClientSetupCallback callback, FMLClientSetupEvent event) -> {
@@ -165,6 +160,11 @@ public final class NeoForgeClientEventInvokers {
     }
 
     public static void registerEventHandlers() {
+        INSTANCE.register(ClientTagsUpdatedCallback.class,
+                TagsUpdatedEvent.ClientPacketReceived.class,
+                (ClientTagsUpdatedCallback callback, TagsUpdatedEvent.ClientPacketReceived event) -> {
+                    callback.onClientTagsUpdated(event.getRegistries());
+                });
         INSTANCE.register(ClientTickEvents.Start.class,
                 ClientTickEvent.Pre.class,
                 (ClientTickEvents.Start callback, ClientTickEvent.Pre event) -> {

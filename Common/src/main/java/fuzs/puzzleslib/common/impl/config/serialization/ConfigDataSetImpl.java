@@ -80,11 +80,11 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
             this.deserialize(value, types).ifPresent(this.values::add);
         }
 
-        ServerResourcesLoadCallback.EVENT.register((ReloadableServerResources _, RegistryAccess _) -> {
+        ServerResourcesLoadCallback.EVENT.register((ReloadableServerResources serverResources, RegistryAccess registries) -> {
             this.dissolved = null;
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
-            ClientTagsUpdatedCallback.EVENT.register((RegistryAccess _) -> {
+            ClientTagsUpdatedCallback.EVENT.register((RegistryAccess registries) -> {
                 this.dissolved = null;
             });
         }
