@@ -92,6 +92,7 @@ public interface BlockSetFamily {
                 .generateFor(BlockSetVariant.WALL);
     }
 
+    @Deprecated(forRemoval = true)
     static Writable metal(RegistryManager registries, Holder.Reference<Block> baseBlock, String baseName) {
         return base(registries,
                 baseBlock,
