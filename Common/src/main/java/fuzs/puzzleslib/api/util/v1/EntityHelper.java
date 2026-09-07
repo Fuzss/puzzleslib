@@ -20,7 +20,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
- * A helper class containing entity related methods.
+ * A helper class containing entity-related methods.
  */
 public final class EntityHelper {
 
@@ -118,7 +118,7 @@ public final class EntityHelper {
      * @param dropConsumer the consumer for handling generated item stacks
      * @return whether any items were generated
      */
-    public static boolean dropFromGiftLootTable(Entity entity, ServerLevel level, ResourceKey<LootTable> key, BiConsumer<ServerLevel, ItemStack> dropConsumer) {
+    public static boolean dropFromGiftLootTable(LivingEntity entity, ServerLevel level, ResourceKey<LootTable> key, BiConsumer<ServerLevel, ItemStack> dropConsumer) {
         return dropFromLootTable(level,
                 key,
                 (LootParams.Builder params) -> params.withParameter(LootContextParams.ORIGIN, entity.position())
@@ -138,7 +138,7 @@ public final class EntityHelper {
      * @param dropConsumer the consumer for handling generated item stacks
      * @return whether any items were generated
      */
-    public static boolean dropFromShearingLootTable(Entity entity, ServerLevel level, ResourceKey<LootTable> key, BiConsumer<ServerLevel, ItemStack> dropConsumer) {
+    public static boolean dropFromShearingLootTable(LivingEntity entity, ServerLevel level, ResourceKey<LootTable> key, BiConsumer<ServerLevel, ItemStack> dropConsumer) {
         return dropFromLootTable(level,
                 key,
                 (LootParams.Builder params) -> params.withParameter(LootContextParams.ORIGIN, entity.position())

@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.client.data.v2;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
+import fuzs.puzzleslib.api.block.v1.ColorCollection;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.api.init.v3.family.BlockSetFamily;
@@ -81,6 +82,25 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             .put(BlockSetVariant.BOAT, (String baseName) -> baseName + " Boat")
             .put(BlockSetVariant.CHEST_BOAT, (String baseName) -> baseName + " Chest Boat")
             .build();
+    /**
+     * @see ColorCollection#NAMES
+     */
+    public static final ColorCollection<String> COLOR_NAMES = new ColorCollection<>("White",
+            "Orange",
+            "Magenta",
+            "Light Blue",
+            "Yellow",
+            "Lime",
+            "Pink",
+            "Gray",
+            "Light Gray",
+            "Cyan",
+            "Purple",
+            "Blue",
+            "Brown",
+            "Green",
+            "Red",
+            "Black");
 
     protected final String languageCode;
     protected final String modId;

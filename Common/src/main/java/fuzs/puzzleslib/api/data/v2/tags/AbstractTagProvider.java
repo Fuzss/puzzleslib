@@ -32,7 +32,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
-    private static final TagBuilder STATIC_TAG_BUILDER = TagBuilder.create();
     /**
      * @see #generateFor(Map, Map)
      */
@@ -130,7 +129,7 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     public AbstractTagProvider(ResourceKey<? extends Registry<T>> registryKey, String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
         super(packOutput, registryKey, registries, CompletableFuture.completedFuture((TagKey<T> tagKey) -> {
             return Objects.equals(tagKey.location().getNamespace(), modId) ? Optional.empty() :
-                    Optional.of(STATIC_TAG_BUILDER);
+                    Optional.of(TagBuilder.create());
         }));
         this.modId = modId;
         this.registry = LookupHelper.getRegistry(registryKey).orElse(null);
@@ -139,7 +138,7 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     }
 
     @Override
-    public abstract void addTags(HolderLookup.Provider registries);
+    public abstract void addTags(HolderLookup.Provider context);
 
     @Override
     protected TagBuilder getOrCreateRawBuilder(TagKey<T> tag) {
