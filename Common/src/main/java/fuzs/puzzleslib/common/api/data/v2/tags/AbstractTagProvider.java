@@ -27,7 +27,6 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
-    private static final TagBuilder STATIC_TAG_BUILDER = TagBuilder.create();
     /**
      * A custom {@link Codec} for {@link TagFile} which adds both NeoForge and Fabric remove fields.
      * <p>
@@ -145,12 +144,12 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     public AbstractTagProvider(ResourceKey<? extends Registry<T>> registryKey, String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
         super(packOutput, registryKey, registries, CompletableFuture.completedFuture((TagKey<T> tagKey) -> {
             return Objects.equals(tagKey.location().getNamespace(), modId) ? Optional.empty() :
-                    Optional.of(STATIC_TAG_BUILDER);
+                    Optional.of(TagBuilder.create());
         }));
     }
 
     @Override
-    public abstract void addTags(HolderLookup.Provider registries);
+    public abstract void addTags(HolderLookup.Provider context);
 
     @Override
     protected TagBuilder getOrCreateRawBuilder(TagKey<T> tag) {
