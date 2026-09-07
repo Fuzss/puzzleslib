@@ -1,15 +1,23 @@
 package fuzs.puzzleslib.api.util.v1;
 
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 /**
  * A helper class containing entity related methods.
@@ -97,5 +105,68 @@ public final class EntityHelper {
      */
     public static boolean isPiglinCurrency(ItemStack itemStack) {
         return ProxyImpl.get().isPiglinCurrency(itemStack);
+    }
+
+    /**
+     * Drops items generated from a gift loot table for an entity.
+     * <p>
+     * Copied from {@code LivingEntity::dropFromGiftLootTable} in Minecraft 26.1.
+     *
+     * @param entity       the entity providing the loot
+     * @param level        the level
+     * @param key          the loot table
+     * @param dropConsumer the consumer for handling generated item stacks
+     * @return whether any items were generated
+     */
+    public static boolean dropFromGiftLootTable(Entity entity, ServerLevel level, ResourceKey<LootTable> key, BiConsumer<ServerLevel, ItemStack> dropConsumer) {
+        return dropFromLootTable(level,
+                key,
+                (LootParams.Builder params) -> params.withParameter(LootContextParams.ORIGIN, entity.position())
+                        .withParameter(LootContextParams.THIS_ENTITY, entity)
+                        .create(LootContextParamSets.GIFT),
+                dropConsumer);
+    }
+
+    /**
+     * Drops items generated from a shearing loot table for an entity.
+     * <p>
+     * Copied from {@code LivingEntity::dropFromShearingLootTable} in Minecraft 26.1.
+     *
+     * @param entity       the entity providing the loot
+     * @param level        the level
+     * @param key          the loot table
+     * @param dropConsumer the consumer for handling generated item stacks
+     * @return whether any items were generated
+     */
+    public static boolean dropFromShearingLootTable(Entity entity, ServerLevel level, ResourceKey<LootTable> key, BiConsumer<ServerLevel, ItemStack> dropConsumer) {
+        return dropFromLootTable(level,
+                key,
+                (LootParams.Builder params) -> params.withParameter(LootContextParams.ORIGIN, entity.position())
+                        .withParameter(LootContextParams.THIS_ENTITY, entity)
+                        .create(LootContextParamSets.SHEARING),
+                dropConsumer);
+    }
+
+    /**
+     * Drops items generated from a loot table for an entity.
+     * <p>
+     * Copied from {@code LivingEntity::dropFromLootTable} in Minecraft 26.1.
+     *
+     * @param level         the level
+     * @param key           the loot table
+     * @param paramsBuilder the function for building the loot parameters
+     * @param dropConsumer  the consumer for handling generated item stacks
+     * @return whether any items were generated
+     */
+    public static boolean dropFromLootTable(ServerLevel level, ResourceKey<LootTable> key, Function<LootParams.Builder, LootParams> paramsBuilder, BiConsumer<ServerLevel, ItemStack> dropConsumer) {
+        LootTable lootTable = level.getServer().reloadableRegistries().getLootTable(key);
+        LootParams params = paramsBuilder.apply(new LootParams.Builder(level));
+        List<ItemStack> drops = lootTable.getRandomItems(params);
+        if (!drops.isEmpty()) {
+            drops.forEach((ItemStack stack) -> dropConsumer.accept(level, stack));
+            return true;
+        } else {
+            return false;
+        }
     }
 }
