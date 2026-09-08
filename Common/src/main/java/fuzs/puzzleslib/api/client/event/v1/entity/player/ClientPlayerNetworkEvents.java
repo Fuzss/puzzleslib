@@ -6,11 +6,15 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.Connection;
 
 public final class ClientPlayerNetworkEvents {
-    public static final EventInvoker<LoggedIn> LOGGED_IN = EventInvoker.lookup(LoggedIn.class);
-    public static final EventInvoker<LoggedOut> LOGGED_OUT = EventInvoker.lookup(LoggedOut.class);
+    public static final EventInvoker<LoggedIn> JOIN = EventInvoker.lookup(LoggedIn.class);
+    public static final EventInvoker<LoggedOut> LEAVE = EventInvoker.lookup(LoggedOut.class);
+    @Deprecated
+    public static final EventInvoker<LoggedIn> LOGGED_IN = JOIN;
+    @Deprecated
+    public static final EventInvoker<LoggedOut> LOGGED_OUT = LEAVE;
 
     private ClientPlayerNetworkEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface
@@ -30,7 +34,8 @@ public final class ClientPlayerNetworkEvents {
     public interface LoggedOut {
 
         /**
-         * Called when a player disconnects from the server, but also occurs before joining a new single player level or server.
+         * Called when a player disconnects from the server, but also occurs before joining a new single player level or
+         * server.
          *
          * @param player              the player logging out
          * @param multiPlayerGameMode the multiplayer game mode controller for the player

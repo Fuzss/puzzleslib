@@ -25,7 +25,7 @@ public interface EntityCapabilityKeyImpl<T extends Entity, C extends CapabilityC
             throw new IllegalStateException("Sync strategy has already been set!");
         } else {
             if (syncStrategy != SyncStrategy.MANUAL) {
-                PlayerNetworkEvents.LOGGED_IN.register((ServerPlayer serverPlayer) -> {
+                PlayerNetworkEvents.JOIN.register((ServerPlayer serverPlayer) -> {
                     this.getIfProvided(serverPlayer).ifPresent(capabilityComponent -> {
                         capabilityComponent.setChanged(PlayerSet.ofPlayer(serverPlayer));
                     });
@@ -79,8 +79,7 @@ public interface EntityCapabilityKeyImpl<T extends Entity, C extends CapabilityC
                                 originalCapability.get(),
                                 newPlayer,
                                 newCapability.get(),
-                                originalStillAlive
-                        );
+                                originalStillAlive);
             }
         });
     }
